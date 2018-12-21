@@ -3,18 +3,8 @@ This is a research project on beliefs regarding climate change and climate polic
 
 
 # To do:
-    # Do the matching with ENTD to correct heterogeneity in transport fuel consumption
-    # Create the scripts to run the simulations
-    # Create a set of elasticities to apply
-    # Update inflators
-
-
-# What we want
-    # Estimate average gains/losses from carbon tax reforms by :
-        i) income group
-        ii) residential area
-        iii) heating mode
-        iv) age
-        v) ?
-    # Estimate the share of winners/losers within these groups
-    # Estimate the full distribution of gains ans losses within these groups
+    # Update inflators (expenditures and quantities) : current values are arbitrary / imprecise
+    # Update prices : current values are arbitrary / imprecise
+    # Create a set of heteroregenous elasticities to apply
+    # Compute reform cost (in expenditures) for all households
+    # Test alternative revenue-recycling scenarios (the one proposed in the questionnaire)

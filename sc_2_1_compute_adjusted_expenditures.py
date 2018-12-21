@@ -52,7 +52,7 @@ def adjusted_expenditures():
     df_hh['housing_energy_expenditures_increase'] = (
         df_hh['domestic_fuel_expenditures_increase']
         )
-    df_hh['energy_expenditures_increase'] = (
+    df_hh['total_energy_expenditures_increase'] = (
         df_hh['transport_energy_expenditures_increase'] + df_hh['housing_energy_expenditures_increase']
         )
 
