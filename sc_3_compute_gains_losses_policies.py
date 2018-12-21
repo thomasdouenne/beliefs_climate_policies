@@ -7,8 +7,6 @@ from __future__ import division
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from matplotlib.ticker import FuncFormatter
 from sc_2_2_compute_adjusted_taxes import adjusted_taxes
 
 
@@ -29,18 +27,31 @@ df_hh = adjusted_taxes()
 # Compute total revenue from policy
 tax_revenue_total = (df_hh['total_taxes_adjusted'] * df_hh['hh_weight']).sum() / 1000000
 tax_revenue_per_uc = (df_hh['total_taxes_adjusted'] * df_hh['hh_weight']).sum() / (df_hh['consumption_units'] * df_hh['hh_weight']).sum()
+avg_loss_per_uc = (df_hh['total_energy_expenditures_increase'] * df_hh['hh_weight']).sum() / (df_hh['consumption_units'] * df_hh['hh_weight']).sum()
 
 # Households losses in purchasing power (increase in expenditures) prior revenue-recycling:
 df_deciles = pd.DataFrame(index = range(1, 11),
-        columns = ['income_decile', 'total_energy_expenditures_increase',
-                   'transport_energy_expenditures_increase', 'housing_energy_expenditures_increase']
+        columns = ['income_decile', 'total_energy_expenditures_increase_cu',
+                   'transport_energy_expenditures_increase_cu', 'housing_energy_expenditures_increase_cu']
         )
 for i in range(1,11):
     df_deciles['income_decile'][i] = i
-    df_deciles['total_energy_expenditures_increase'][i] = df_hh.query('income_decile == {}'.format(i))['total_energy_expenditures_increase'].mean()
-    df_deciles['transport_energy_expenditures_increase'][i] = df_hh.query('income_decile == {}'.format(i))['transport_energy_expenditures_increase'].mean()
-    df_deciles['housing_energy_expenditures_increase'][i] = df_hh.query('income_decile == {}'.format(i))['housing_energy_expenditures_increase'].mean()
+    df_deciles['total_energy_expenditures_increase_cu'][i] = (
+        df_hh.query('income_decile == {}'.format(i))['total_energy_expenditures_increase'].mean() / df_hh.query('income_decile == {}'.format(i))['consumption_units'].mean()
+        )
+    df_deciles['transport_energy_expenditures_increase_cu'][i] = (
+        df_hh.query('income_decile == {}'.format(i))['transport_energy_expenditures_increase'].mean() / df_hh.query('income_decile == {}'.format(i))['consumption_units'].mean()
+        )
+    df_deciles['housing_energy_expenditures_increase_cu'][i] = (
+        df_hh.query('income_decile == {}'.format(i))['housing_energy_expenditures_increase'].mean() / df_hh.query('income_decile == {}'.format(i))['consumption_units'].mean()
+        )
 
-graph_builder_bar(df_deciles['transport_energy_expenditures_increase'])
-graph_builder_bar(df_deciles['housing_energy_expenditures_increase'])
-graph_builder_bar(df_deciles['total_energy_expenditures_increase'])
+graph_builder_bar(df_deciles['transport_energy_expenditures_increase_cu'])
+graph_builder_bar(df_deciles['housing_energy_expenditures_increase_cu'])
+graph_builder_bar(df_deciles['total_energy_expenditures_increase_cu'])
+
+
+# Households losses in purchasing power after flat-transfer:
+df_deciles['total_energy_expenditures_flat_transfer_cu'] = df_deciles['total_energy_expenditures_increase_cu'] - tax_revenue_per_uc
+graph_builder_bar(df_deciles['total_energy_expenditures_flat_transfer_cu'])
+
