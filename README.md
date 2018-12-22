@@ -3,9 +3,8 @@ This is a research project on beliefs regarding climate change and climate polic
 
 
 # To do:
-    # Add gas to calculations
+    # Include gas in the policy
+    # Update parameters for natural gas
     # Update inflators (expenditures and quantities) : current values are arbitrary / imprecise
-    # Update prices : current values are arbitrary / imprecise
-    # Create a set of heteroregenous elasticities to apply
-    # Compute reform cost (in expenditures) for all households
-    # Test alternative revenue-recycling scenarios (the one proposed in the questionnaire)
+    # Update prices and taxes : current values are arbitrary / imprecise
+    # Test alternative revenue-recycling scenarios : implement the ones proposed in the questionnaire

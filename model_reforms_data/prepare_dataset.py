@@ -72,4 +72,8 @@ def prepare_dataset():
     df_hh['domestic_fuel_quantity'] = 1 * df_hh['domestic_fuel_quantity']
     df_hh['gas_quantity'] = 1 * df_hh['gas_quantity']
 
+    # Keep only some variables :
+    df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] +
+                  ['consumption_units'] + ['hh_weight'] + ['income_decile']]
+
     return df_hh
