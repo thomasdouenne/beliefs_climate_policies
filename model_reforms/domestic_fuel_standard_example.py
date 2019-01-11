@@ -19,13 +19,13 @@ def domestic_fuel_example(expenditures):
     e_housing = -0.15
     i = 0.9
     
-    current_price = 0.9 # This is roughly the value of gasoline prices
+    current_price = 0.859 # This is roughly the value of gasoline prices
         
     old_carbon_tax = 44.6 # Carbon tax in 2018
     new_carbon_tax = 44.6 + 50 # Carbon tax that we simulate
     carbon_intensity = 0.002651 # Carbon content of gasoline (deduced from art 265 code des douanes)
     
-    initial_excise_tax = 0.4284 + 2*0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
+    initial_excise_tax = 0.038
     
     # Compute tax rates :
     new_carbon_tax = carbon_tax(new_carbon_tax, carbon_intensity)
@@ -40,7 +40,7 @@ def domestic_fuel_example(expenditures):
     # Compute prices :
     new_final_price = final_price_adjusted(current_price, i, new_excise_tax, old_excise_tax)
     final_price_variation = variation_final_price(i, current_price, new_excise_tax, old_excise_tax)
-    print "Final price (before/after)", current_price, "/", new_final_price
+    #print "Final price (before/after)", current_price, "/", new_final_price
     
     current_price_without_tax = price_without_tax(current_price, old_excise_tax)
     new_price_without_tax = price_without_tax(new_final_price, new_excise_tax)

@@ -17,7 +17,7 @@ def diesel_example(expenditures):
     e_transports = -0.3
     i = 0.9
     
-    current_price = 1.45 # This is roughly the value of gasoline prices
+    current_price = 1.399 # This is roughly the value of gasoline prices
         
     old_carbon_tax = 44.6 # Carbon tax in 2018
     new_carbon_tax = 44.6 + 50 # Carbon tax that we simulate

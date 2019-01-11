@@ -22,25 +22,25 @@ def compute_gains_losses(df_hh):
         adjusted_carbon_price = 44.6 + 50 # Carbon tax that we simulate
             
         if element == 'gasoline':
-            current_price = 1.5 # This is roughly the value of gasoline prices
+            current_price = 1.441 # This is roughly the value of gasoline prices
             e = -0.3
             carbon_intensity = 0.002286
             initial_excise_tax = 0.6069 - 0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'diesel':
-            current_price = 1.45 # This is roughly the value of diesel prices
+            current_price = 1.399 # This is roughly the value of diesel prices
             e = -0.3
             carbon_intensity = 0.002651
             initial_excise_tax = 0.4284 + 2*0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'domestic_fuel':
-            current_price = 0.9 # This is roughly the value of domestic fuel prices
+            current_price = 0.859 # This is roughly the value of domestic fuel prices
             e = -0.15
             carbon_intensity = 0.00265
-            initial_excise_tax = 0.1 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
+            initial_excise_tax = 0.038 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         else:
-            current_price = 0.07 # to change
+            current_price = 0.0651 # For someone in zone 3 that use gas for heating
             e = -0.15
-            carbon_intensity = 0.000205
-            initial_excise_tax = 0 # to chance
+            carbon_intensity = 0.000182
+            initial_excise_tax = 0.0003 # Cf. excel, level of the TICGN if carbon price was null
         
         """ Compute remaining parameters : """
         adjusted_carbon_tax = carbon_tax(adjusted_carbon_price, carbon_intensity)
@@ -87,4 +87,8 @@ def compute_gains_losses(df_hh):
 if __name__ == "__main__":
     df_hh = prepare_dataset()
     df_hh = compute_gains_losses(df_hh)
-    print df_hh['total_expenditures_increase'].mean(), df_hh['total_tax_increase'].mean()
+    revenue_from_tax = (df_hh['hh_weight'] * df_hh['total_tax_increase']).sum()
+
+    print "Average loss in purchasing power :", df_hh['total_expenditures_increase'].mean()
+    print "Average additional taxes paid :", df_hh['total_tax_increase'].mean()
+    print "Revenue from the policy in billions euros :", revenue_from_tax / 1e09

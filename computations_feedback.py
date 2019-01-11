@@ -46,7 +46,6 @@ def loss_purchasing_power(df_hh, consumption_units, heating, accommodation_size,
     """ Match households to guess housing energy expenditures """
     df_hh = match_households_per_categ(df_hh, consumption_units, heating, accommodation_size, hh_income)
     housing_mean_expenditures = df_hh['{}_expenditures'.format(heating)].mean()
-    print housing_mean_expenditures
     
     """ Compute households transport expenditures from information """
         
