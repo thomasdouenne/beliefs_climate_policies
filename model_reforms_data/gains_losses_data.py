@@ -13,7 +13,7 @@ def compute_gains_losses(df_hh):
     """ load dataset """
     #df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] + ['natural_gas_expenditures']]
     
-    for element in ['gasoline', 'diesel', 'domestic_fuel']:
+    for element in ['gasoline', 'diesel', 'domestic_fuel', 'natural_gas']:
     
         """ Fix parameters : """
         
@@ -23,20 +23,24 @@ def compute_gains_losses(df_hh):
             
         if element == 'gasoline':
             current_price = 1.5 # This is roughly the value of gasoline prices
-            e = -0.2
+            e = -0.3
             carbon_intensity = 0.002286
             initial_excise_tax = 0.6069 - 0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'diesel':
-            current_price = 1.45 # This is roughly the value of gasoline prices
-            e = -0.2
+            current_price = 1.45 # This is roughly the value of diesel prices
+            e = -0.3
             carbon_intensity = 0.002651
             initial_excise_tax = 0.4284 + 2*0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
-        else:
-            current_price = 0.9 # This is roughly the value of gasoline prices
-            e = -0.1
+        elif element == 'domestic_fuel':
+            current_price = 0.9 # This is roughly the value of domestic fuel prices
+            e = -0.15
             carbon_intensity = 0.00265
             initial_excise_tax = 0.1 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
-        
+        else:
+            current_price = 0.07 # to change
+            e = -0.15
+            carbon_intensity = 0.000205
+            initial_excise_tax = 0 # to chance
         
         """ Compute remaining parameters : """
         adjusted_carbon_tax = carbon_tax(adjusted_carbon_price, carbon_intensity)
@@ -68,14 +72,14 @@ def compute_gains_losses(df_hh):
         df_hh['gasoline_expenditures_increase'] + df_hh['diesel_expenditures_increase']
         )
     df_hh['housing_expenditures_increase'] = (
-        df_hh['domestic_fuel_expenditures_increase']
+        df_hh['domestic_fuel_expenditures_increase'] + df_hh['natural_gas_expenditures_increase']
         )
     df_hh['total_expenditures_increase'] = (
         df_hh['transport_expenditures_increase'] + df_hh['housing_expenditures_increase']
         )
     df_hh['total_tax_increase'] = (
         df_hh['gasoline_tax_increase'] + df_hh['diesel_tax_increase']
-        + df_hh['domestic_fuel_tax_increase']
+        + df_hh['domestic_fuel_tax_increase'] + df_hh['natural_gas_tax_increase']
         )
     
     return df_hh

@@ -22,6 +22,7 @@ def prepare_dataset():
                     'age_vehicule' : 'age_vehicle',
                     'agepr' : 'age_hh_representative',
                     'aides_logement' : 'housing benefits',
+                    'combustibles_liquides' : 'domestic_fuel',
                     'depenses_carburants_corrigees': 'transport_energy_expenditures',
                     'depenses_combustibles_liquides': 'domestic_fuel_expenditures',
                     'depenses_diesel_corrigees' : 'diesel_expenditures',
@@ -34,6 +35,7 @@ def prepare_dataset():
                     'depenses_gaz_ville' : 'natural_gas_expenditures',
                     'distance_routiere_hebdomadaire_teg' : 'weekly_road_distance_home_to_work',
                     'duree_moyenne_trajet_aller_retour_teg' : 'avg_duration_home_to_work',
+                    'gaz_ville' : 'natural_gas',
                     'isolation_fenetres' : 'windows_isolation',
                     'isolation_murs' : 'walls_isolation',
                     'log_indiv': 'individual_housing',
@@ -78,6 +80,8 @@ def prepare_dataset():
     
     # Keep only some variables :
     df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] +
-        ['consumption_units'] + ['hh_weight'] + ['income_decile'] + ['disposable_income_imputed_rent']]
+        ['natural_gas_expenditures'] + ['consumption_units'] + ['hh_weight'] + ['income_decile'] +
+        ['disposable_income_imputed_rent'] + ['domestic_fuel'] + ['natural_gas'] + ['age_hh_representative'] +
+        ['accommodation_size']]
 
     return df_hh

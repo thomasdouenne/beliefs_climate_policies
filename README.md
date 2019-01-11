@@ -8,3 +8,6 @@ This is a research project on beliefs regarding climate change and climate polic
     # Update parameters for natural gas
     # Update inflators (expenditures and quantities) : current values are arbitrary / imprecise
     # Update prices and taxes : current values are arbitrary / imprecise
+    # Add VAT reform
+    # For different vehicle types, split between diesel and gasoline to compute tax incidence
+    # Create a script to go directly from hh information to expect loss from matching
