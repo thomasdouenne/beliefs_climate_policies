@@ -4,16 +4,17 @@
 
 from __future__ import division
 
+import statsmodels.formula.api as smf
 
-from prepare_dataset import prepare_dataset
+
+from prepare_dataset_enl import prepare_dataset_enl
 from define_tax_incidence_data import *
 
 
-def compute_gains_losses(df_hh):
-    """ load dataset """
-    #df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] + ['natural_gas_expenditures']]
-    
-    for element in ['gasoline', 'diesel', 'domestic_fuel', 'natural_gas_variable']:
+def compute_gains_losses_housing(df_hh):
+
+    initial_variables = df_hh.columns.tolist()    
+    for element in ['domestic_fuel', 'natural_gas_variable']:
     
         """ Fix parameters : """
         
@@ -21,17 +22,7 @@ def compute_gains_losses(df_hh):
         current_carbon_price = 44.6 # Carbon tax in 2018
         adjusted_carbon_price = 44.6 + 50 # Carbon tax that we simulate
             
-        if element == 'gasoline':
-            current_price = 1.441 # This is roughly the value of gasoline prices
-            e = -0.3
-            carbon_intensity = 0.002286
-            initial_excise_tax = 0.6069 - 0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
-        elif element == 'diesel':
-            current_price = 1.399 # This is roughly the value of diesel prices
-            e = -0.3
-            carbon_intensity = 0.002651
-            initial_excise_tax = 0.4284 + 2*0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
-        elif element == 'domestic_fuel':
+        if element == 'domestic_fuel':
             current_price = 0.859 # This is roughly the value of domestic fuel prices
             e = -0.15
             carbon_intensity = 0.00265
@@ -68,37 +59,36 @@ def compute_gains_losses(df_hh):
         df_hh['{}_tax_increase'.format(element)] = df_hh['{}_adjusted_taxes'.format(element)] - df_hh['{}_taxes'.format(element)]
     
     
-    df_hh['transport_expenditures_increase'] = (
-        df_hh['gasoline_expenditures_increase'] + df_hh['diesel_expenditures_increase']
-        )
     df_hh['housing_expenditures_increase'] = (
         df_hh['domestic_fuel_expenditures_increase'] + df_hh['natural_gas_variable_expenditures_increase']
-        )
-    df_hh['total_expenditures_increase'] = (
-        df_hh['transport_expenditures_increase'] + df_hh['housing_expenditures_increase']
-        )
-    df_hh['transport_tax_increase'] = (
-        df_hh['gasoline_tax_increase'] + df_hh['diesel_tax_increase']
         )
     df_hh['housing_tax_increase'] = (
         df_hh['domestic_fuel_tax_increase'] + df_hh['natural_gas_variable_tax_increase']
         )
-    df_hh['total_tax_increase'] = (
-        df_hh['transport_tax_increase'] + df_hh['housing_tax_increase']
-        )
     
-    return df_hh
+    return df_hh[initial_variables + ['housing_expenditures_increase'] + ['housing_tax_increase']]
+
+
+def regress_housing_expenditures_increase(df_hh):
+
+    df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
+
+    df_hh['age_18_24'] = 0 + 1 * (df_hh['age_hh_representative'] > 17) * (df_hh['age_hh_representative'] < 25)
+    df_hh['age_25_34'] = 0 + 1 * (df_hh['age_hh_representative'] > 24) * (df_hh['age_hh_representative'] < 35)
+    df_hh['age_35_49'] = 0 + 1 * (df_hh['age_hh_representative'] > 34) * (df_hh['age_hh_representative'] < 50)
+    df_hh['age_50_64'] = 0 + 1 * (df_hh['age_hh_representative'] > 49) * (df_hh['age_hh_representative'] < 65)
+
+    regression_ols = smf.ols(formula = 'housing_expenditures_increase ~ \
+        hh_income + hh_income_2 + + consumption_units + natural_gas + domestic_fuel + \
+        accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
+        data = df_hh).fit()
+
+    return regression_ols
 
 
 if __name__ == "__main__":
-    df_hh = prepare_dataset()
-    df_hh = compute_gains_losses(df_hh)
-    revenue_from_tax_transports = (df_hh['hh_weight'] * df_hh['transport_tax_increase']).sum()
-    revenue_from_tax_housing = (df_hh['hh_weight'] * df_hh['housing_tax_increase']).sum()
-    revenue_from_tax_total = (df_hh['hh_weight'] * df_hh['total_tax_increase']).sum()
+    df_hh = prepare_dataset_enl()
+    df_hh = compute_gains_losses_housing(df_hh)
+    regression_ols = regress_housing_expenditures_increase(df_hh)
 
-    print "Average loss in purchasing power :", df_hh['total_expenditures_increase'].mean()
-    print "Average additional taxes paid :", df_hh['total_tax_increase'].mean()
-    print "Revenue from trannsport fuels tax policy in billions euros :", revenue_from_tax_transports / 1e09
-    print "Revenue from housing energies tax policy in billions euros :", revenue_from_tax_housing / 1e09
-    print "Revenue from the total policy in billions euros :", revenue_from_tax_total / 1e09
+    print regression_ols.summary()
