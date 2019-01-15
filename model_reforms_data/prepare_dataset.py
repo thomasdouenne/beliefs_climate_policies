@@ -8,6 +8,31 @@
 import pandas as pd
 
 
+def gas_expenditure_without_fixed_price(df_hh): # We impute the contract that gives highest consumption
+    df_hh['natural_gas_variable_expenditures_base'] = df_hh['natural_gas_expenditures'] - 97.80
+    df_hh['natural_gas_variable_expenditures_b0'] = df_hh['natural_gas_expenditures'] - 110.04
+    df_hh['natural_gas_variable_expenditures_b1_b2i'] = df_hh['natural_gas_expenditures'] - 250.44
+
+    df_hh['natural_gas_quantity_base'] = df_hh['natural_gas_variable_expenditures_base'] / 0.0999
+    df_hh['natural_gas_quantity_b0'] = df_hh['natural_gas_variable_expenditures_b0'] / 0.0859
+    df_hh['natural_gas_quantity_b1_b2i'] = df_hh['natural_gas_variable_expenditures_b1_b2i'] / 0.0651
+    
+    df_hh['natural_gas_variable_expenditures'] = (
+            df_hh['natural_gas_variable_expenditures_base']
+            * (df_hh['natural_gas_quantity_base'] + 1e-06 > df_hh['natural_gas_quantity_b0'])
+            * (df_hh['natural_gas_quantity_base'] + 1e-06 > df_hh['natural_gas_quantity_b0'])
+            + df_hh['natural_gas_variable_expenditures_b0']
+            * (df_hh['natural_gas_quantity_b0'] + 1e-06 > df_hh['natural_gas_quantity_base'])
+            * (df_hh['natural_gas_quantity_b0'] + 1e-06 > df_hh['natural_gas_quantity_b1_b2i'])
+            + df_hh['natural_gas_variable_expenditures_b1_b2i']
+            * (df_hh['natural_gas_quantity_b1_b2i'] + 1e-06 > df_hh['natural_gas_quantity_base'])
+            * (df_hh['natural_gas_quantity_b1_b2i'] + 1e-06 > df_hh['natural_gas_quantity_b0'])
+            )
+    df_hh['natural_gas_variable_expenditures'] = 0 + df_hh['natural_gas_variable_expenditures'] * (df_hh['natural_gas_variable_expenditures'] > 0)
+        
+    return df_hh
+
+
 def prepare_dataset():
     # Load data with all households and relevant characteristics
     try:
@@ -52,7 +77,7 @@ def prepare_dataset():
                     'quantites_essence' : 'gasoline_quantity',
                     'quantites_gaz_final' : 'gas_quantity',
                     'quantites_gaz_liquefie' : 'liquefied_gas_quantity',
-                    'rev_disp_loyerimput' : 'disposable_income_imputed_rent',
+                    'rev_disp_loyerimput' : 'hh_income',
                     'situacj' : 'situation_hh_second',
                     'situapr' : 'situation_hh_representative',
                     'strate' : 'urbanisation',
@@ -63,10 +88,10 @@ def prepare_dataset():
     
     
     # Inflate expenditures data to represent 2018 as closely as possible
-    df_hh['diesel_expenditures'] = 1 * df_hh['diesel_expenditures']
-    df_hh['gasoline_expenditures'] = 1 * df_hh['gasoline_expenditures']
-    df_hh['domestic_fuel_expenditures'] = 1 * df_hh['domestic_fuel_expenditures']
-    df_hh['natural_gas_expenditures'] = 1 * df_hh['natural_gas_expenditures']
+    df_hh['diesel_expenditures'] = (36916.0 / 33412) * df_hh['diesel_expenditures'] # Not specific to diesel
+    df_hh['gasoline_expenditures'] = (36916.0 / 33412) * df_hh['gasoline_expenditures'] # Not specific to diesel
+    df_hh['domestic_fuel_expenditures'] = (6040.0 / 4710) * df_hh['domestic_fuel_expenditures']
+    df_hh['natural_gas_expenditures'] = (12987.0 / 12560) * df_hh['natural_gas_expenditures']
     
     # Inflate quantity data to represent 2018 as closely as possible
     df_hh['diesel_quantity'] = 1 * df_hh['diesel_quantity']
@@ -76,12 +101,18 @@ def prepare_dataset():
 
     # Inflate households resources :
     #df_hh['total_expenditures'] = 1 * df_hh['total_expenditures']
-    df_hh['disposable_income_imputed_rent'] = 1 * df_hh['disposable_income_imputed_rent']
-    
+    df_hh['hh_income'] = 1 * df_hh['hh_income']
+
+    df_hh = gas_expenditure_without_fixed_price(df_hh)
+  
     # Keep only some variables :
     df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] +
-        ['natural_gas_expenditures'] + ['consumption_units'] + ['hh_weight'] + ['income_decile'] +
-        ['disposable_income_imputed_rent'] + ['domestic_fuel'] + ['natural_gas'] + ['age_hh_representative'] +
-        ['accommodation_size']]
+        ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] + ['income_decile'] +
+        ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] + ['age_hh_representative'] +
+        ['accommodation_size'] + ['consumption_units'] + ['hh_weight']]
 
     return df_hh
+
+
+if __name__ == "__main__":
+    df_hh = prepare_dataset()

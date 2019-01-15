@@ -33,13 +33,13 @@ avg_loss_per_uc = (df_hh['total_expenditures_increase'] * df_hh['hh_weight']).su
 
 def incidence_decile(data, targeted, amount): # tareted = number of deciles compensated / amount = size of compensation
     df_deciles = pd.DataFrame(index = range(1, 11),
-            columns = ['income_decile', 'disposable_income_imputed_rent_cu', 'total_expenditures_increase_cu',
+            columns = ['income_decile', 'hh_income_cu', 'total_expenditures_increase_cu',
                        'transport_expenditures_increase_cu', 'housing_expenditures_increase_cu']
             )
     for i in range(1,11):
         df_deciles['income_decile'][i] = i
-        df_deciles['disposable_income_imputed_rent_cu'][i] = (
-            df_hh.query('income_decile == {}'.format(i))['disposable_income_imputed_rent'].mean() / df_hh.query('income_decile == {}'.format(i))['consumption_units'].mean()
+        df_deciles['hh_income_cu'][i] = (
+            df_hh.query('income_decile == {}'.format(i))['hh_income'].mean() / df_hh.query('income_decile == {}'.format(i))['consumption_units'].mean()
             )
         df_deciles['total_expenditures_increase_cu'][i] = (
             df_hh.query('income_decile == {}'.format(i))['total_expenditures_increase'].mean() / df_hh.query('income_decile == {}'.format(i))['consumption_units'].mean()
@@ -57,8 +57,8 @@ def incidence_decile(data, targeted, amount): # tareted = number of deciles comp
     
     df_deciles['total_expenditures_flat_transfer_cu'] = df_deciles['total_expenditures_increase_cu'] - tax_revenue_per_uc
     
-    df_deciles['effort_rate_before_transfers'] = df_deciles['total_expenditures_increase_cu'] / df_deciles['disposable_income_imputed_rent_cu']
-    df_deciles['effort_rate_after_transfers'] = df_deciles['loss_purchasing_power_after_transfer_cu'] / df_deciles['disposable_income_imputed_rent_cu']
+    df_deciles['effort_rate_before_transfers'] = df_deciles['total_expenditures_increase_cu'] / df_deciles['hh_income_cu']
+    df_deciles['effort_rate_after_transfers'] = df_deciles['loss_purchasing_power_after_transfer_cu'] / df_deciles['hh_income_cu']
     
     return df_deciles
 

@@ -4,7 +4,13 @@ This is a research project on beliefs regarding climate change and climate polic
 
 # To do:
     # Change color graphs
-    # Update inflators (expenditures and quantities) : current values are arbitrary / imprecise
+    # Update inflators for BdF using 2017 values
+    # Change income variable to "revtot" for BdF
+    # Account for fixed-part of contracts for natural gas
+    # Improve matching quality for feedbacks
+    # Do simulations over regressivness of VAT
+    # Test other methods for feedback (probit, linear regression, distance matching, etc.)
+
 
 # How to use these files?
 - This repository is divided into two parts: one that requires data, one that does not.

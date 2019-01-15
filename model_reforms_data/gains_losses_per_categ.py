@@ -27,8 +27,8 @@ def match_households_per_categ(df_hh, cu, heating, size, hh_income):
     # Select age category
     
     # Select income
-    df_hh = df_hh.query('disposable_income_imputed_rent > 0.7 * {}'.format(hh_income * 12))
-    df_hh = df_hh.query('disposable_income_imputed_rent < 1.3 * {}'.format(hh_income * 12))
+    df_hh = df_hh.query('hh_income > 0.7 * {}'.format(hh_income * 12))
+    df_hh = df_hh.query('hh_income < 1.3 * {}'.format(hh_income * 12))
 
     return df_hh
 

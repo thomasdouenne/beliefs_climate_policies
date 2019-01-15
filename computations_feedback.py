@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # Careful : if the person does not match anyone, we get a Nan
-
+# Deal with people that consume both gas and domestic fuel
+# Update avg fuel consumption
 
 from __future__ import division
 
@@ -9,6 +10,7 @@ import pandas as pd
 
 from model_reforms_data.gains_losses_per_categ import match_households_per_categ
 from model_reforms_data.prepare_dataset import prepare_dataset
+from model_reforms_data.prepare_dataset_enl import prepare_dataset_enl
 from model_reforms.diesel_standard_example import diesel_example
 from model_reforms.domestic_fuel_standard_example import domestic_fuel_example
 from model_reforms.gas_standard_example import natural_gas_example
@@ -18,8 +20,8 @@ from model_reforms.gasoline_standard_example import gasoline_example
 def loss_purchasing_power(df_hh, consumption_units, heating, accommodation_size, hh_income, nb_vehicles,
                           energy_first_vehicle, energy_second_vehicle, avg_fuel_consumption, nb_kilometers):
     if nb_vehicles == 0: # If we don't know ther vehicle, we impute distance half and half for diesel and gasoline
-        diesel_expenditures = (nb_kilometers / 2) * (7 / 100) * diesel_price
-        gasoline_expenditures = (nb_kilometers / 2) * (8 / 100) * gasoline_price
+        diesel_expenditures = (nb_kilometers / 2) * (6.39 / 100) * diesel_price # avg fuel consumption from Statista
+        gasoline_expenditures = (nb_kilometers / 2) * (7.31 / 100) * gasoline_price # avg fuel consumption from Statista
     
     if nb_vehicles == 1:
         if energy_first_vehicle == 'diesel':
@@ -45,7 +47,10 @@ def loss_purchasing_power(df_hh, consumption_units, heating, accommodation_size,
     
     """ Match households to guess housing energy expenditures """
     df_hh = match_households_per_categ(df_hh, consumption_units, heating, accommodation_size, hh_income)
-    housing_mean_expenditures = df_hh['{}_expenditures'.format(heating)].mean()
+    if heating == 'natural_gas':
+        housing_mean_expenditures = df_hh['{}_variable_expenditures'.format(heating)].mean()
+    else:
+        housing_mean_expenditures = df_hh['{}_expenditures'.format(heating)].mean()
     
     """ Compute households transport expenditures from information """
         
@@ -67,12 +72,12 @@ def loss_purchasing_power(df_hh, consumption_units, heating, accommodation_size,
 
 if __name__ == "__main__":
     
-    df_hh = prepare_dataset()
+    df_hh = prepare_dataset_enl()
 
     consumption_units = 1.5
-    heating = 'domestic_fuel'
+    heating = 'natural_gas'
     accommodation_size = 80
-    hh_income = 4000
+    hh_income = 2500
     
     nb_vehicles = 2
     energy_first_vehicle = 'gasoline'

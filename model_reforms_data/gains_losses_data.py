@@ -13,7 +13,7 @@ def compute_gains_losses(df_hh):
     """ load dataset """
     #df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] + ['natural_gas_expenditures']]
     
-    for element in ['gasoline', 'diesel', 'domestic_fuel', 'natural_gas']:
+    for element in ['gasoline', 'diesel', 'domestic_fuel', 'natural_gas_variable']:
     
         """ Fix parameters : """
         
@@ -72,7 +72,7 @@ def compute_gains_losses(df_hh):
         df_hh['gasoline_expenditures_increase'] + df_hh['diesel_expenditures_increase']
         )
     df_hh['housing_expenditures_increase'] = (
-        df_hh['domestic_fuel_expenditures_increase'] + df_hh['natural_gas_expenditures_increase']
+        df_hh['domestic_fuel_expenditures_increase'] + df_hh['natural_gas_variable_expenditures_increase']
         )
     df_hh['total_expenditures_increase'] = (
         df_hh['transport_expenditures_increase'] + df_hh['housing_expenditures_increase']
@@ -81,13 +81,14 @@ def compute_gains_losses(df_hh):
         df_hh['gasoline_tax_increase'] + df_hh['diesel_tax_increase']
         )
     df_hh['housing_tax_increase'] = (
-        df_hh['domestic_fuel_tax_increase'] + df_hh['natural_gas_tax_increase']
+        df_hh['domestic_fuel_tax_increase'] + df_hh['natural_gas_variable_tax_increase']
         )
     df_hh['total_tax_increase'] = (
         df_hh['transport_tax_increase'] + df_hh['housing_tax_increase']
         )
     
     return df_hh
+
 
 if __name__ == "__main__":
     df_hh = prepare_dataset()
