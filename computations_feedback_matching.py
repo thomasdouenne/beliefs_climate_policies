@@ -10,7 +10,7 @@ import pandas as pd
 
 from model_reforms_data.gains_losses_per_categ import match_households_per_categ
 from model_reforms_data.prepare_dataset import prepare_dataset
-from model_reforms_data.prepare_dataset_enl import prepare_dataset_enl
+from model_reforms_data.prepare_dataset_housing import prepare_dataset_housing
 from model_reforms.diesel_standard_example import diesel_example
 from model_reforms.domestic_fuel_standard_example import domestic_fuel_example
 from model_reforms.gas_standard_example import natural_gas_example
@@ -72,7 +72,7 @@ def loss_purchasing_power(df_hh, consumption_units, heating, accommodation_size,
 
 if __name__ == "__main__":
     
-    df_hh = prepare_dataset_enl()
+    df_hh = prepare_dataset_housing('enl')
 
     consumption_units = 1.5
     heating = 'natural_gas'
@@ -85,8 +85,8 @@ if __name__ == "__main__":
     avg_fuel_consumption = 8 / 100
     nb_kilometers = 20000
     
-    diesel_price = 1.45
-    gasoline_price = 1.5
+    diesel_price = 1.4
+    gasoline_price = 1.45
     
     dict_loss = loss_purchasing_power(df_hh, consumption_units, heating, accommodation_size, hh_income, nb_vehicles,
                                       energy_first_vehicle, energy_second_vehicle, avg_fuel_consumption, nb_kilometers)

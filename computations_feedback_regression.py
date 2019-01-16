@@ -7,14 +7,18 @@
 from __future__ import division
 
 import pandas as pd
+import time
 
-from model_reforms_data.prepare_dataset_enl import prepare_dataset_enl
-from model_reforms_data.regression_feedback import compute_gains_losses_housing, regress_housing_expenditures_increase
+from model_reforms_data.prepare_dataset_housing import prepare_dataset_housing
+from model_reforms_data.regression_feedback import compute_gains_losses_housing, regress_ols_housing_expenditures_increase
 from model_reforms.diesel_standard_example import diesel_example
 from model_reforms.gasoline_standard_example import gasoline_example
 
 
-def loss_purchasing_power_from_regression(df_hh, hh_info):
+def loss_purchasing_power_from_regression(df_hh, hh_info, regression_ols):
+    diesel_price = 1.4
+    gasoline_price = 1.45    
+    
     if hh_info['nb_vehicles'] == 0: # If we don't know ther vehicle, we impute distance half and half for diesel and gasoline
         diesel_expenditures = (hh_info['nb_kilometers'] / 2) * (6.39 / 100) * diesel_price # avg fuel consumption from Statista
         gasoline_expenditures = (hh_info['nb_kilometers'] / 2) * (7.31 / 100) * gasoline_price # avg fuel consumption from Statista
@@ -52,7 +56,8 @@ def loss_purchasing_power_from_regression(df_hh, hh_info):
 
     hh_info['hh_income_2'] = hh_info['hh_income'] ** 2
 
-    regression_ols = regress_housing_expenditures_increase(df_hh)
+    if regression_ols == None:
+        regression_ols = regress_ols_housing_expenditures_increase(df_hh)
 
     params = regression_ols.params
     params = params.to_frame().T
@@ -79,8 +84,8 @@ def loss_purchasing_power_from_regression(df_hh, hh_info):
     return dict_loss
 
 if __name__ == "__main__":
-    
-    df_hh = prepare_dataset_enl()
+        
+    df_hh = prepare_dataset_housing('enl')
     df_hh = compute_gains_losses_housing(df_hh)
 
     hh_info = dict()
@@ -99,11 +104,8 @@ if __name__ == "__main__":
     hh_info['age_25_34'] = 0
     hh_info['age_35_49'] = 0
     hh_info['age_50_64'] = 1
-    
-    diesel_price = 1.45
-    gasoline_price = 1.5
-    
-    dict_loss = loss_purchasing_power_from_regression(df_hh, hh_info)
+        
+    dict_loss = loss_purchasing_power_from_regression(df_hh, hh_info, None)
 
     print "Loss purchasing power from housing : ", dict_loss['housing']
     print "Loss purchasing power from transports : ", dict_loss['transports']

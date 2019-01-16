@@ -5,8 +5,6 @@ Created on Tue Jan 15 09:58:11 2019
 @author: thoma
 """
 
-
-
 import pandas as pd
 
 
@@ -35,12 +33,12 @@ def gas_expenditure_without_fixed_price(df_hh): # We impute the contract that gi
     return df_hh
 
 
-def prepare_dataset_enl():
+def prepare_dataset_housing(survey):
     # Load data with all households and relevant characteristics
     try:
-        df_hh = pd.read_csv(r'C:\Users\t.douenne\Documents\Data\assets\matching\matching_enl\data_matching_enl.csv')
+        df_hh = pd.read_csv(r'C:\Users\t.douenne\Documents\Data\assets\matching\matching_enl\data_matching_{}.csv'.format(survey))
     except:
-        df_hh = pd.read_csv(r'C:\Users\thoma\Documents\Data\assets\matching\matching_enl\data_matching_enl.csv')
+        df_hh = pd.read_csv(r'C:\Users\thoma\Documents\Data\assets\matching\matching_enl\data_matching_{}.csv'.format(survey))
 
 
     # Change column names to english
@@ -67,13 +65,20 @@ def prepare_dataset_enl():
 
     df_hh = gas_expenditure_without_fixed_price(df_hh)
 
+    df_hh['age_18_24'] = 0 + 1 * (df_hh['age_hh_representative'] > 17) * (df_hh['age_hh_representative'] < 25)
+    df_hh['age_25_34'] = 0 + 1 * (df_hh['age_hh_representative'] > 24) * (df_hh['age_hh_representative'] < 35)
+    df_hh['age_35_49'] = 0 + 1 * (df_hh['age_hh_representative'] > 34) * (df_hh['age_hh_representative'] < 50)
+    df_hh['age_50_64'] = 0 + 1 * (df_hh['age_hh_representative'] > 49) * (df_hh['age_hh_representative'] < 65)
+
+
     # Keep only some variables :
     df_hh = df_hh[['domestic_fuel_expenditures'] + ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] +
         ['hh_weight'] + ['income_decile'] + ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] +
-        ['consumption_units'] + ['age_hh_representative'] + ['accommodation_size']]
+        ['consumption_units'] + ['age_hh_representative'] + ['accommodation_size'] + ['age_18_24'] +
+        ['age_25_34'] + ['age_35_49'] + ['age_50_64']]
 
     return df_hh
 
 
 if __name__ == "__main__":
-    df_hh = prepare_dataset_enl()
+    df_hh = prepare_dataset_housing('enl')

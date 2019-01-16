@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Compute tax incidence depending on parameters' values.
+# Careful : use nb of adults instead of cu.
 
 from __future__ import division
 
 import statsmodels.formula.api as smf
 
 
-from prepare_dataset_enl import prepare_dataset_enl
+from prepare_dataset_housing import prepare_dataset_housing
 from define_tax_incidence_data import *
 
 
@@ -69,26 +69,50 @@ def compute_gains_losses_housing(df_hh):
     return df_hh[initial_variables + ['housing_expenditures_increase'] + ['housing_tax_increase']]
 
 
-def regress_housing_expenditures_increase(df_hh):
+def regress_ols_housing_expenditures_increase(df_hh):
 
     df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
 
-    df_hh['age_18_24'] = 0 + 1 * (df_hh['age_hh_representative'] > 17) * (df_hh['age_hh_representative'] < 25)
-    df_hh['age_25_34'] = 0 + 1 * (df_hh['age_hh_representative'] > 24) * (df_hh['age_hh_representative'] < 35)
-    df_hh['age_35_49'] = 0 + 1 * (df_hh['age_hh_representative'] > 34) * (df_hh['age_hh_representative'] < 50)
-    df_hh['age_50_64'] = 0 + 1 * (df_hh['age_hh_representative'] > 49) * (df_hh['age_hh_representative'] < 65)
-
     regression_ols = smf.ols(formula = 'housing_expenditures_increase ~ \
-        hh_income + hh_income_2 + + consumption_units + natural_gas + domestic_fuel + \
+        hh_income + hh_income_2 + consumption_units + natural_gas + domestic_fuel + \
         accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
         data = df_hh).fit()
 
     return regression_ols
 
 
-if __name__ == "__main__":
-    df_hh = prepare_dataset_enl()
-    df_hh = compute_gains_losses_housing(df_hh)
-    regression_ols = regress_housing_expenditures_increase(df_hh)
+def predict_winner_looser_housing(df_hh):
 
-    print regression_ols.summary()
+    df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
+
+    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['consumption_units'])
+
+    variables = ['hh_income', 'hh_income_2', 'consumption_units', 'natural_gas', 'domestic_fuel',
+        'accommodation_size', 'age_18_24', 'age_25_34', 'age_35_49', 'age_50_64']
+
+    logit = smf.Logit(df_hh['winner'], df_hh[variables]).fit()
+    
+    probit = smf.Probit(df_hh['winner'], df_hh[variables]).fit()
+
+    ols = smf.ols(formula = 'winner ~ \
+        hh_income + hh_income_2 + consumption_units + natural_gas + domestic_fuel + \
+        accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
+        data = df_hh).fit()
+
+    return logit, probit, ols
+
+
+if __name__ == "__main__":
+    df_hh = prepare_dataset_housing('enl')
+    df_hh = compute_gains_losses_housing(df_hh)
+    regression_ols = regress_ols_housing_expenditures_increase(df_hh)
+
+    #print regression_ols.summary()
+    
+    logit_winner = predict_winner_looser_housing(df_hh)[0]
+    probit_winner = predict_winner_looser_housing(df_hh)[1]
+    ols_winner = predict_winner_looser_housing(df_hh)[2]
+    
+    print logit_winner.summary()
+    print probit_winner.summary()
+    print ols_winner.summary()
