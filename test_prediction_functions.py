@@ -22,7 +22,7 @@ from model_reforms.gasoline_standard_example import gasoline_example
 from probability_to_win_housing import compute_probability_to_win
 
 
-df_bdf = prepare_dataset_housing('enl')
+df_bdf = prepare_dataset_housing('bdf')
 df_bdf = compute_gains_losses_housing(df_bdf)
 #df_bdf = df_bdf.sample(100) # Select a random sample
 
@@ -35,9 +35,9 @@ df_enl['winner_housing'] = 0 + 1 * (df_enl['housing_expenditures_increase'] < 55
 results_regressions = predict_winner_looser_housing(df_enl)
     
 hh_info = dict()
-df_bdf['winner_from_regression_logit'] = 0
-df_bdf['winner_from_regression_probit'] = 0
-df_bdf['winner_from_regression_ols'] = 0
+df_bdf['predict_proba_logit'] = 0.0
+df_bdf['predict_proba_probit'] = 0.0
+df_bdf['predict_proba_ols'] = 0.0
 
 for index in df_bdf.iterrows():
     i = index[0]
@@ -46,6 +46,8 @@ for index in df_bdf.iterrows():
     hh_info['natural_gas'] = df_bdf['natural_gas'][i]
     hh_info['accommodation_size'] = df_bdf['accommodation_size'][i]
     hh_info['hh_income'] = df_bdf['hh_income'][i]
+    hh_info['hh_income_2'] = hh_info['hh_income'] ** 2
+    hh_info['Intercept'] = 1
     
     hh_info['age_18_24'] = df_bdf['age_18_24'][i]
     hh_info['age_25_34'] = df_bdf['age_25_34'][i]
@@ -55,10 +57,12 @@ for index in df_bdf.iterrows():
     dict_loss = compute_probability_to_win(df_enl, hh_info, results_regressions)
     
     for method in ['logit', 'probit', 'ols']:
-        df_bdf['winner_from_regression_{}'.format(method)][i] = \
-            0 + 1 * (dict_loss['predict_proba_{}'.format(method)] > 0.5)
+        df_bdf['predict_proba_{}'.format(method)][i] = dict_loss['predict_proba_{}'.format(method)]
 
 for method in ['logit', 'probit', 'ols']:
+    df_bdf['winner_from_regression_{}'.format(method)] = \
+        0 + 1 * (df_bdf['predict_proba_{}'.format(method)] > 0.5)
+
     df_bdf['mistake_{}'.format(method)] = \
         1 * ((df_bdf['winner_housing'] - df_bdf['winner_from_regression_{}'.format(method)]) != 0)
 

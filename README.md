@@ -11,9 +11,8 @@ This is a research project on beliefs regarding climate change and climate polic
     # Improve matching quality for feedbacks
     # Do simulations over regressivness of VAT
     # Test other methods for feedback (probit, linear regression, distance matching, etc.)
-    # Improve efficiency of code for comparison between imputation methods
-    # Fix function "compute probability to win" that gives wrong outcome
     # Clean everything
+    # Fix issue probability probit model
 
 
 # How to use these files?
