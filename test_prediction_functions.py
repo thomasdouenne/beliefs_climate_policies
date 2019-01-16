@@ -24,7 +24,7 @@ from probability_to_win_housing import compute_probability_to_win
 
 df_bdf = prepare_dataset_housing('enl')
 df_bdf = compute_gains_losses_housing(df_bdf)
-df_bdf = df_bdf.sample(500) # Select a random sample
+#df_bdf = df_bdf.sample(100) # Select a random sample
 
 df_enl = prepare_dataset_housing('enl')
 df_enl = compute_gains_losses_housing(df_enl)
@@ -42,19 +42,18 @@ df_bdf['winner_from_regression_ols'] = 0
 for index in df_bdf.iterrows():
     i = index[0]
     hh_info['consumption_units'] = df_bdf['consumption_units'][i]
-    if df_bdf['domestic_fuel'][i] == 1:
-        hh_info['heating'] = 'domestic_fuel'
-    else:
-        hh_info['heating'] = 'natural_gas'
+    hh_info['domestic_fuel'] = df_bdf['domestic_fuel'][i]
+    hh_info['natural_gas'] = df_bdf['natural_gas'][i]
     hh_info['accommodation_size'] = df_bdf['accommodation_size'][i]
     hh_info['hh_income'] = df_bdf['hh_income'][i]
     
-    hh_info['age_18_24'] = 0 + 1 * (df_bdf['age_hh_representative'][i] > 17) * (df_bdf['age_hh_representative'][i] < 25)
-    hh_info['age_25_34'] = 0 + 1 * (df_bdf['age_hh_representative'][i] > 24) * (df_bdf['age_hh_representative'][i] < 35)
-    hh_info['age_35_49'] = 0 + 1 * (df_bdf['age_hh_representative'][i] > 34) * (df_bdf['age_hh_representative'][i] < 50)
-    hh_info['age_50_64'] = 0 + 1 * (df_bdf['age_hh_representative'][i] > 49) * (df_bdf['age_hh_representative'][i] < 65)
+    hh_info['age_18_24'] = df_bdf['age_18_24'][i]
+    hh_info['age_25_34'] = df_bdf['age_25_34'][i]
+    hh_info['age_35_49'] = df_bdf['age_35_49'][i]
+    hh_info['age_50_64'] = df_bdf['age_50_64'][i]
 
     dict_loss = compute_probability_to_win(df_enl, hh_info, results_regressions)
+    
     for method in ['logit', 'probit', 'ols']:
         df_bdf['winner_from_regression_{}'.format(method)][i] = \
             0 + 1 * (dict_loss['predict_proba_{}'.format(method)] > 0.5)

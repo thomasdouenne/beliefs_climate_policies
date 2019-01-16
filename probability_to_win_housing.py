@@ -16,16 +16,6 @@ from model_reforms_data.regression_feedback import compute_gains_losses_housing,
 def compute_probability_to_win(df_hh, hh_info, results_regressions):
     if results_regressions is None:
         results_regressions = predict_winner_looser_housing(df_hh)
-    
-    if hh_info['heating'] == 'natural_gas': # Think about the case where tehy consume both
-        hh_info['natural_gas'] = 1
-        hh_info['domestic_fuel'] = 0
-    elif hh_info['heating'] == 'domestic_fuel':
-        hh_info['natural_gas'] = 0
-        hh_info['domestic_fuel'] = 1
-    else:
-        hh_info['natural_gas'] = 0
-        hh_info['domestic_fuel'] = 0
 
     hh_info['hh_income_2'] = hh_info['hh_income'] ** 2
     hh_info['Intercept'] = 1
@@ -62,7 +52,8 @@ if __name__ == "__main__":
     
     hh_info = dict()
     hh_info['consumption_units'] = 1.8
-    hh_info['heating'] = 'natural_gas'
+    hh_info['natural_gas'] = 1
+    hh_info['domestic_fuel'] = 0
     hh_info['accommodation_size'] = 80
     hh_info['hh_income'] = 36000
     hh_info['age_18_24'] = 0
