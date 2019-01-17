@@ -7,6 +7,8 @@
 from __future__ import division
 
 import numpy as np
+from scipy.stats import norm
+
 
 from model_reforms_data.prepare_dataset_housing import prepare_dataset_housing
 from model_reforms_data.regression_feedback import compute_gains_losses_housing, \
@@ -41,6 +43,9 @@ def compute_probability_to_win(df_hh, hh_info, results_regressions):
         if method == 'logit':
             dict_winner['predict_proba_logit'] = np.exp(dict_winner['predict_proba_logit'])
             dict_winner['predict_proba_logit'] = dict_winner['predict_proba_logit'] / (1 + dict_winner['predict_proba_logit'])
+    
+        if method == 'probit':
+            dict_winner['predict_proba_probit'] = norm.cdf(dict_winner['predict_proba_probit'])
     
     return dict_winner
 

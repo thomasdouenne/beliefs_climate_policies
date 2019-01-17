@@ -24,7 +24,7 @@ from probability_to_win_housing import compute_probability_to_win
 
 df_bdf = prepare_dataset_housing('bdf')
 df_bdf = compute_gains_losses_housing(df_bdf)
-#df_bdf = df_bdf.sample(100) # Select a random sample
+df_bdf = df_bdf.sample(200) # Select a random sample
 
 df_enl = prepare_dataset_housing('enl')
 df_enl = compute_gains_losses_housing(df_enl)
