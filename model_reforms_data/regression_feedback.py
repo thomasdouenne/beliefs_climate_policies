@@ -65,8 +65,14 @@ def compute_gains_losses_housing(df_hh):
     df_hh['housing_tax_increase'] = (
         df_hh['domestic_fuel_tax_increase'] + df_hh['natural_gas_variable_tax_increase']
         )
+
+    try:
+        df_hh['nb_adults'] = df_hh['nb_persons'] - df_hh['nb_children']
+    except:
+        df_hh['nb_adults'] = df_hh['plus_18']
+    df_hh['nb_beneficiaries'] = 2 - 1 * (df_hh['nb_adults'] == 1)
     
-    return df_hh[initial_variables + ['housing_expenditures_increase'] + ['housing_tax_increase']]
+    return df_hh[initial_variables + ['housing_expenditures_increase'] + ['housing_tax_increase'] + ['nb_beneficiaries']]
 
 
 def regress_ols_housing_expenditures_increase(df_hh):
@@ -74,7 +80,7 @@ def regress_ols_housing_expenditures_increase(df_hh):
     df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
 
     regression_ols = smf.ols(formula = 'housing_expenditures_increase ~ \
-        hh_income + hh_income_2 + consumption_units + natural_gas + domestic_fuel + \
+        hh_income + hh_income_2 + consumption_units + nb_beneficiaries + natural_gas + domestic_fuel + \
         accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
         data = df_hh).fit()
 
@@ -85,17 +91,17 @@ def predict_winner_looser_housing(df_hh):
 
     df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
 
-    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['consumption_units'])
+    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['nb_beneficiaries'])
 
-    variables = ['hh_income', 'hh_income_2', 'consumption_units', 'natural_gas', 'domestic_fuel',
-        'accommodation_size', 'age_18_24', 'age_25_34', 'age_35_49', 'age_50_64']
+    variables = ['hh_income', 'hh_income_2', 'consumption_units', 'nb_beneficiaries', 'natural_gas',
+        'domestic_fuel', 'accommodation_size', 'age_18_24', 'age_25_34', 'age_35_49', 'age_50_64']
 
     logit = smf.Logit(df_hh['winner'], df_hh[variables]).fit()
     
     probit = smf.Probit(df_hh['winner'], df_hh[variables]).fit()
 
     ols = smf.ols(formula = 'winner ~ \
-        hh_income + hh_income_2 + consumption_units + natural_gas + domestic_fuel + \
+        hh_income + hh_income_2 + consumption_units + nb_beneficiaries + natural_gas + domestic_fuel + \
         accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
         data = df_hh).fit()
 

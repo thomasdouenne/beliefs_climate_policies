@@ -51,7 +51,7 @@ if __name__ == "__main__":
     df_hh = compute_gains_losses_housing(df_hh)
     df_estimation = compute_gains_losses_housing(df_estimation)
     
-    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['consumption_units'])
+    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['nb_beneficiaries'])
     
     df_hh = compute_probability_to_win_housing(df_hh, df_estimation)
 

@@ -48,8 +48,11 @@ def prepare_dataset_housing(survey):
                     'depenses_combustibles_liquides' : 'domestic_fuel_expenditures',
                     'depenses_gaz_ville' : 'natural_gas_expenditures',
                     'fioul' : 'domestic_fuel',
+                    'combustibles_liquides': 'domestic_fuel',
                     'gaz_ville' : 'natural_gas',
                     'niveau_vie_decile' : 'income_decile',
+                    'nenfants' : 'nb_children',
+                    'npers' : 'nb_persons',
                     'ocde10' : 'consumption_units',
                     'pondmen' : 'hh_weight',
                     'revtot' : 'hh_income',
@@ -72,10 +75,16 @@ def prepare_dataset_housing(survey):
 
 
     # Keep only some variables :
-    df_hh = df_hh[['domestic_fuel_expenditures'] + ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] +
-        ['hh_weight'] + ['income_decile'] + ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] +
-        ['consumption_units'] + ['age_hh_representative'] + ['accommodation_size'] + ['age_18_24'] +
-        ['age_25_34'] + ['age_35_49'] + ['age_50_64']]
+    if survey == 'enl':
+        df_hh = df_hh[['domestic_fuel_expenditures'] + ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] +
+            ['hh_weight'] + ['income_decile'] + ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] +
+            ['consumption_units'] + ['age_hh_representative'] + ['accommodation_size'] + ['age_18_24'] +
+            ['age_25_34'] + ['age_35_49'] + ['age_50_64'] + ['nb_persons'] + ['plus_14'] + ['plus_18']]
+    else:
+        df_hh = df_hh[['domestic_fuel_expenditures'] + ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] +
+            ['hh_weight'] + ['income_decile'] + ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] +
+            ['consumption_units'] + ['age_hh_representative'] + ['accommodation_size'] + ['age_18_24'] +
+            ['age_25_34'] + ['age_35_49'] + ['age_50_64'] + ['nb_persons'] + ['nb_children']]
 
     return df_hh
 

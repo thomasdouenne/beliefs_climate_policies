@@ -67,6 +67,7 @@ def prepare_dataset():
                     'majorite_double_vitrage' : 'majority_double_glazing',
                     'nactifs' : 'nb_active',
                     'nenfants' : 'nb_children',
+                    'npers' : 'nb_persons',
                     'niveau_vie_decile' : 'income_decile',
                     'ocde10' : 'consumption_units',
                     'ouest_sud' : 'west_sud',
@@ -77,7 +78,7 @@ def prepare_dataset():
                     'quantites_essence' : 'gasoline_quantity',
                     'quantites_gaz_final' : 'gas_quantity',
                     'quantites_gaz_liquefie' : 'liquefied_gas_quantity',
-                    'rev_disp_loyerimput' : 'hh_income',
+                    'revtot' : 'hh_income',
                     'situacj' : 'situation_hh_second',
                     'situapr' : 'situation_hh_representative',
                     'strate' : 'urbanisation',
@@ -109,7 +110,7 @@ def prepare_dataset():
     df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] +
         ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] + ['income_decile'] +
         ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] + ['age_hh_representative'] +
-        ['accommodation_size'] + ['consumption_units'] + ['hh_weight']]
+        ['accommodation_size'] + ['consumption_units'] + ['nb_children'] + ['nb_persons'] + ['hh_weight']]
 
     return df_hh
 

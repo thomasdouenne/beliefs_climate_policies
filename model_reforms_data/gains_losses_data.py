@@ -87,6 +87,12 @@ def compute_gains_losses(df_hh):
         df_hh['transport_tax_increase'] + df_hh['housing_tax_increase']
         )
     
+    try:
+        df_hh['nb_adults'] = df_hh['nb_persons'] - df_hh['nb_children']
+    except:
+        df_hh['nb_adults'] = df_hh['plus_18']
+    df_hh['nb_beneficiaries'] = 2 - 1 * (df_hh['nb_adults'] == 1)
+    
     return df_hh
 
 

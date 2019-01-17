@@ -29,8 +29,8 @@ df_bdf = compute_gains_losses_housing(df_bdf)
 df_enl = prepare_dataset_housing('enl')
 df_enl = compute_gains_losses_housing(df_enl)
 
-df_bdf['winner_housing'] = 0 + 1 * (df_bdf['housing_expenditures_increase'] < 55 * df_bdf['consumption_units'])
-df_enl['winner_housing'] = 0 + 1 * (df_enl['housing_expenditures_increase'] < 55 * df_enl['consumption_units'])
+df_bdf['winner_housing'] = 0 + 1 * (df_bdf['housing_expenditures_increase'] < 55 * df_bdf['nb_beneficiaries'])
+df_enl['winner_housing'] = 0 + 1 * (df_enl['housing_expenditures_increase'] < 55 * df_enl['nb_beneficiaries'])
 
 results_regressions = predict_winner_looser_housing(df_enl)
     
@@ -41,6 +41,7 @@ df_bdf['predict_proba_ols'] = 0.0
 
 for index in df_bdf.iterrows():
     i = index[0]
+    hh_info['nb_beneficiaries'] = df_bdf['nb_beneficiaries'][i]
     hh_info['consumption_units'] = df_bdf['consumption_units'][i]
     hh_info['domestic_fuel'] = df_bdf['domestic_fuel'][i]
     hh_info['natural_gas'] = df_bdf['natural_gas'][i]
@@ -95,19 +96,24 @@ print "Avg income from EL:", df_enl['hh_income'].mean() # Not the same at all (d
 print "###"
 
 print "Avg acc. size from BdF:", df_bdf['accommodation_size'].mean()
-print "Avg acc.size from EL:", df_enl['accommodation_size'].mean() # Not the same at all (different definitions)
+print "Avg acc.size from EL:", df_enl['accommodation_size'].mean()
 
 print "###"
 
 print "Avg c.u. from BdF:", df_bdf['consumption_units'].mean()
-print "Avg c.u. from EL:", df_enl['consumption_units'].mean() # Not the same at all (different definitions)
+print "Avg c.u. from EL:", df_enl['consumption_units'].mean()
 
 print "###"
 
 print "Avg natural gas from BdF:", df_bdf['natural_gas'].mean()
-print "Avg natural gas from EL:", df_enl['natural_gas'].mean() # Not the same at all (different definitions)
+print "Avg natural gas from EL:", df_enl['natural_gas'].mean()
 
 print "###"
 
 print "Avg domestic fuel from BdF:", df_bdf['domestic_fuel'].mean()
-print "Avg domestic fuel from EL:", df_enl['domestic_fuel'].mean() # Not the same at all (different definitions)
+print "Avg domestic fuel from EL:", df_enl['domestic_fuel'].mean()
+
+print "###"
+
+print "Avg domestic fuel from BdF:", df_bdf['nb_beneficiaries'].mean()
+print "Avg domestic fuel from EL:", df_enl['nb_beneficiaries'].mean()
