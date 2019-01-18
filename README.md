@@ -9,7 +9,6 @@ This is a research project on beliefs regarding climate change and climate polic
     # Do simulations over regressivness of VAT
     # Test feedbacks including transport energies
     # Clean everything
-    # Fix issue probability probit model
 
 
 # How to use these files?

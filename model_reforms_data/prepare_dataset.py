@@ -61,6 +61,7 @@ def prepare_dataset():
                     'distance_routiere_hebdomadaire_teg' : 'weekly_road_distance_home_to_work',
                     'duree_moyenne_trajet_aller_retour_teg' : 'avg_duration_home_to_work',
                     'gaz_ville' : 'natural_gas',
+                    'identifiant_menage' : 'hh_id',
                     'isolation_fenetres' : 'windows_isolation',
                     'isolation_murs' : 'walls_isolation',
                     'log_indiv': 'individual_housing',
@@ -110,7 +111,8 @@ def prepare_dataset():
     df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] +
         ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] + ['income_decile'] +
         ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] + ['age_hh_representative'] +
-        ['accommodation_size'] + ['consumption_units'] + ['nb_children'] + ['nb_persons'] + ['hh_weight']]
+        ['accommodation_size'] + ['consumption_units'] + ['nb_children'] + ['nb_persons'] + ['hh_weight'] +
+        ['hh_id']]
 
     return df_hh
 

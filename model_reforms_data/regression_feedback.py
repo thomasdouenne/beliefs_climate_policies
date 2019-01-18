@@ -113,7 +113,7 @@ if __name__ == "__main__":
     df_hh = compute_gains_losses_housing(df_hh)
     regression_ols = regress_ols_housing_expenditures_increase(df_hh)
 
-    #print regression_ols.summary()
+    print regression_ols.summary()
     
     logit_winner = predict_winner_looser_housing(df_hh)[0]
     probit_winner = predict_winner_looser_housing(df_hh)[1]

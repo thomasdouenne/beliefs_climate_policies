@@ -47,13 +47,6 @@ def loss_purchasing_power_from_regression(df_hh, hh_info, regression_ols):
     
     """ Estimation of increase in housing energy expenditures from regression """
 
-    if hh_info['heating'] == 'natural_gas': # Think about the case where tehy consume both
-        hh_info['natural_gas'] = 1
-        hh_info['domestic_fuel'] = 0
-    else:
-        hh_info['natural_gas'] = 0
-        hh_info['domestic_fuel'] = 1    
-
     hh_info['hh_income_2'] = hh_info['hh_income'] ** 2
 
     if regression_ols == None:
@@ -90,20 +83,22 @@ if __name__ == "__main__":
 
     hh_info = dict()
 
-    hh_info['consumption_units'] = 1.5
-    hh_info['heating'] = 'natural_gas'
-    hh_info['accommodation_size'] = 80
-    hh_info['hh_income'] = 2500
-    
+    hh_info['consumption_units'] = 1.8
+    hh_info['natural_gas'] = 0
+    hh_info['domestic_fuel'] = 1
+    hh_info['accommodation_size'] = 200
+    hh_info['hh_income'] = 104860
+
     hh_info['nb_vehicles'] = 2
     hh_info['energy_first_vehicle'] = 'gasoline'
     hh_info['energy_second_vehicle'] = 'diesel'
-    hh_info['avg_fuel_consumption'] = 8 / 100
-    hh_info['nb_kilometers'] = 20000
+    hh_info['avg_fuel_consumption'] = 10 / 100
+    hh_info['nb_kilometers'] = 40000
     hh_info['age_18_24'] = 0
     hh_info['age_25_34'] = 0
     hh_info['age_35_49'] = 0
     hh_info['age_50_64'] = 1
+    hh_info['nb_beneficiaries'] = 2
         
     dict_loss = loss_purchasing_power_from_regression(df_hh, hh_info, None)
 

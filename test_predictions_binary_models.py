@@ -60,7 +60,7 @@ if __name__ == "__main__":
     df_hh = compute_probability_to_win_housing(df_hh, df_estimation)
 
     for method in ['logit', 'probit', 'ols']:
-        df_hh['predicted_winner_{}'.format(method)] = 0 + 1 * (df_hh['predict_proba_{}'.format(method)] > 0.5)
+        df_hh['predicted_winner_{}'.format(method)] = 0 + 1 * (df_hh['predict_proba_{}'.format(method)] > 0.43)
         df_hh['mistake'] = \
             1 * ((df_hh['winner'] - df_hh['predicted_winner_{}'.format(method)]) != 0)
         

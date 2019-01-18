@@ -33,6 +33,13 @@ def gas_expenditure_without_fixed_price(df_hh): # We impute the contract that gi
     return df_hh
 
 
+def merge_transport_data(df_hh, df_transport):
+    df_transport = df_transport[['hh_id'] + ['diesel_expenditures'] + ['gasoline_expenditures']]
+    df_hh = df_hh.merge(df_transport, on = 'hh_id')
+
+    return df_hh
+
+
 def prepare_dataset_housing(survey):
     # Load data with all households and relevant characteristics
     try:
@@ -50,6 +57,7 @@ def prepare_dataset_housing(survey):
                     'fioul' : 'domestic_fuel',
                     'combustibles_liquides': 'domestic_fuel',
                     'gaz_ville' : 'natural_gas',
+                    'identifiant_menage' : 'hh_id',
                     'niveau_vie_decile' : 'income_decile',
                     'nenfants' : 'nb_children',
                     'npers' : 'nb_persons',
@@ -82,7 +90,7 @@ def prepare_dataset_housing(survey):
             ['age_25_34'] + ['age_35_49'] + ['age_50_64'] + ['nb_persons'] + ['plus_14'] + ['plus_18']]
     else:
         df_hh = df_hh[['domestic_fuel_expenditures'] + ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] +
-            ['hh_weight'] + ['income_decile'] + ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] +
+            ['hh_weight'] + ['income_decile'] + ['hh_income'] + ['hh_id'] + ['domestic_fuel'] + ['natural_gas'] +
             ['consumption_units'] + ['age_hh_representative'] + ['accommodation_size'] + ['age_18_24'] +
             ['age_25_34'] + ['age_35_49'] + ['age_50_64'] + ['nb_persons'] + ['nb_children']]
 
@@ -90,4 +98,4 @@ def prepare_dataset_housing(survey):
 
 
 if __name__ == "__main__":
-    df_hh = prepare_dataset_housing('enl')
+    df_hh = prepare_dataset_housing('bdf')

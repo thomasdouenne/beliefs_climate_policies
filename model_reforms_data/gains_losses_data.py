@@ -13,6 +13,7 @@ def compute_gains_losses(df_hh):
     """ load dataset """
     #df_hh = df_hh[['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] + ['natural_gas_expenditures']]
     
+    initial_variables = df_hh.columns.tolist()      
     for element in ['gasoline', 'diesel', 'domestic_fuel', 'natural_gas_variable']:
     
         """ Fix parameters : """
@@ -23,22 +24,22 @@ def compute_gains_losses(df_hh):
             
         if element == 'gasoline':
             current_price = 1.441 # This is roughly the value of gasoline prices
-            e = -0.3
+            e = -0.4
             carbon_intensity = 0.002286
             initial_excise_tax = 0.6069 - 0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'diesel':
             current_price = 1.399 # This is roughly the value of diesel prices
-            e = -0.3
+            e = -0.4
             carbon_intensity = 0.002651
             initial_excise_tax = 0.4284 + 2*0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'domestic_fuel':
             current_price = 0.859 # This is roughly the value of domestic fuel prices
-            e = -0.15
+            e = -0.2
             carbon_intensity = 0.00265
             initial_excise_tax = 0.038 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         else:
             current_price = 0.0651 # For someone in zone 3 that use gas for heating
-            e = -0.15
+            e = -0.2
             carbon_intensity = 0.000182
             initial_excise_tax = 0.0003 # Cf. excel, level of the TICGN if carbon price was null
         
@@ -93,7 +94,9 @@ def compute_gains_losses(df_hh):
         df_hh['nb_adults'] = df_hh['plus_18']
     df_hh['nb_beneficiaries'] = 2 - 1 * (df_hh['nb_adults'] == 1)
     
-    return df_hh
+    return df_hh[initial_variables + ['housing_expenditures_increase'] + ['housing_tax_increase'] +
+        ['transport_expenditures_increase'] + ['transport_tax_increase'] +
+        ['total_expenditures_increase'] + ['total_tax_increase'] + ['nb_beneficiaries']]
 
 
 if __name__ == "__main__":
