@@ -20,7 +20,7 @@ def gas_expenditure_without_fixed_price(df_hh): # We impute the contract that gi
     df_hh['natural_gas_variable_expenditures'] = (
             df_hh['natural_gas_variable_expenditures_base']
             * (df_hh['natural_gas_quantity_base'] + 1e-06 > df_hh['natural_gas_quantity_b0'])
-            * (df_hh['natural_gas_quantity_base'] + 1e-06 > df_hh['natural_gas_quantity_b0'])
+            * (df_hh['natural_gas_quantity_base'] + 1e-06 > df_hh['natural_gas_quantity_b1_b2i'])
             + df_hh['natural_gas_variable_expenditures_b0']
             * (df_hh['natural_gas_quantity_b0'] + 1e-06 > df_hh['natural_gas_quantity_base'])
             * (df_hh['natural_gas_quantity_b0'] + 1e-06 > df_hh['natural_gas_quantity_b1_b2i'])
