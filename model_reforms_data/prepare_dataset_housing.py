@@ -45,8 +45,13 @@ def prepare_dataset_housing(survey):
     try:
         df_hh = pd.read_csv(r'C:\Users\t.douenne\Documents\Data\assets\matching\matching_enl\data_matching_{}.csv'.format(survey))
     except:
-        df_hh = pd.read_csv(r'C:\Users\thoma\Documents\Data\assets\matching\matching_enl\data_matching_{}.csv'.format(survey))
-
+        try:
+            df_hh = pd.read_csv(r'../data_matching_{}.csv'.format(survey))
+        except:
+            try:
+                df_hh = pd.read_csv(r'data_matching_{}.csv'.format(survey))
+            except:
+                df_hh = pd.read_csv(r'C:\Users\thoma\Documents\Data\assets\matching\matching_enl\data_matching_{}.csv'.format(survey))
 
     # Change column names to english
     df_hh.rename(

@@ -8,6 +8,7 @@ from __future__ import division
 
 import numpy as np
 from scipy.stats import norm
+from sklearn import tree
 
 from model_reforms_data.prepare_dataset_housing import prepare_dataset_housing
 from model_reforms_data.regression_feedback import compute_gains_losses_housing, \
@@ -61,9 +62,18 @@ if __name__ == "__main__":
 
     for method in ['logit', 'probit', 'ols']:
         df_hh['predicted_winner_{}'.format(method)] = 0 + 1 * (df_hh['predict_proba_{}'.format(method)] > 0.43)
-        df_hh['mistake'] = \
+        df_hh['mistake_{}'.format(method)] = \
             1 * ((df_hh['winner'] - df_hh['predicted_winner_{}'.format(method)]) != 0)
         
-        print "Share of mistakes with {}:".format(method), (float(len(df_hh.query('mistake == 1'))) / len(df_hh))
-        print "Probability predict that a loser wins with {}:".format(method), float(len(df_hh.query('winner == 0').query('predicted_winner_{} == 1'.format(method)))) / len(df_hh.query('winner == 0'))
-        print "Probability predict that a winner loses with {}:".format(method), float(len(df_hh.query('winner == 1').query('predicted_winner_{} == 0'.format(method)))) / len(df_hh.query('winner == 1'))
+        print "Share of mistakes with {}:".format(method), (float(sum(df_hh['mistake_{}'.format(method)])) / len(df_hh))
+        print "Probability predict that a loser wins with {}:".format(method), float(len(np.where((df_hh['winner']==0) & (df_hh['predicted_winner_{}'.format(method)] == 1))[0])) / len(np.where(df_hh['winner']==0)[0])
+        print "Probability predict that a winner loses with {}:".format(method), float(len(np.where((df_hh['winner']==1) & (df_hh['predicted_winner_{}'.format(method)] == 0))[0])) / len(np.where(df_hh['winner']==1)[0])
+        
+    logit, probit, ols, clf = predict_winner_looser_housing(df_estimation)
+    params = logit.params.to_frame().T.columns.tolist()
+    df_hh['predicted_winner_tree'] = 0 + 1 * (clf.predict(df_hh[params]) > 0.5)
+    df_hh['mistake_tree'] = 1 * (df_hh['winner'] != df_hh['predicted_winner_tree'])
+    
+    print "Share of mistakes with tree", (float(sum(df_hh['mistake_tree'])) / len(df_hh))
+    print "Probability predict that a loser wins with tree", float(len(np.where((df_hh['winner']==0) & (df_hh['predicted_winner_tree'] == 1))[0])) / len(np.where(df_hh['winner']==0)[0])
+    print "Probability predict that a winner loses with tree", float(len(np.where((df_hh['winner']==1) & (df_hh['predicted_winner_tree'] == 0))[0])) / len(np.where(df_hh['winner']==1)[0])

@@ -5,6 +5,7 @@
 from __future__ import division
 
 import statsmodels.formula.api as smf
+from sklearn import tree
 
 
 from prepare_dataset_housing import prepare_dataset_housing
@@ -105,7 +106,12 @@ def predict_winner_looser_housing(df_hh):
         accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
         data = df_hh).fit()
 
-    return logit, probit, ols
+    clf = tree.DecisionTreeClassifier(max_depth=3)
+    clf = clf.fit(df_hh[variables], df_hh['winner'])
+#    regr = tree.DecisionTreeRegressor(max_depth=3)
+#    regr.fit(df_hh[variables], df_hh['winner'])
+    
+    return logit, probit, ols, clf
 
 
 if __name__ == "__main__":

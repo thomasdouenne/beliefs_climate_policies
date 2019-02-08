@@ -1,0 +1,28 @@
+digraph Tree {
+node [shape=box] ;
+0 [label="natural_gas <= 0.5\ngini = 0.439\nsamples = 26729\nvalue = [8699, 18030]"] ;
+1 [label="domestic_fuel <= 0.5\ngini = 0.251\nsamples = 16024\nvalue = [2357, 13667]"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="gini = 0.0\nsamples = 13431\nvalue = [0, 13431]"] ;
+1 -> 2 ;
+3 [label="accommodation_size <= 39.0\ngini = 0.165\nsamples = 2593\nvalue = [2357, 236]"] ;
+1 -> 3 ;
+4 [label="gini = 0.48\nsamples = 15\nvalue = [6, 9]"] ;
+3 -> 4 ;
+5 [label="gini = 0.161\nsamples = 2578\nvalue = [2351, 227]"] ;
+3 -> 5 ;
+6 [label="accommodation_size <= 89.5\ngini = 0.483\nsamples = 10705\nvalue = [6342, 4363]"] ;
+0 -> 6 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+7 [label="nb_beneficiaries <= 1.5\ngini = 0.496\nsamples = 6253\nvalue = [2843, 3410]"] ;
+6 -> 7 ;
+8 [label="gini = 0.498\nsamples = 2780\nvalue = [1483, 1297]"] ;
+7 -> 8 ;
+9 [label="gini = 0.476\nsamples = 3473\nvalue = [1360, 2113]"] ;
+7 -> 9 ;
+10 [label="accommodation_size <= 119.5\ngini = 0.336\nsamples = 4452\nvalue = [3499, 953]"] ;
+6 -> 10 ;
+11 [label="gini = 0.395\nsamples = 2576\nvalue = [1877, 699]"] ;
+10 -> 11 ;
+12 [label="gini = 0.234\nsamples = 1876\nvalue = [1622, 254]"] ;
+10 -> 12 ;
+}
