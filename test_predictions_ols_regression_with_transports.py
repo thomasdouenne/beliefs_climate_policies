@@ -49,10 +49,10 @@ if __name__ == "__main__":
     df_estimation = prepare_dataset_housing('enl')
     df_estimation = compute_gains_losses_housing(df_estimation)
     
-    df_hh['winner'] = 0 + 1 * (df_hh['total_expenditures_increase'] < 110 * df_hh['nb_beneficiaries'])
+    df_hh['winner'] = 0 + 1 * (df_hh['total_expenditures_increase'] < 132 * df_hh['nb_beneficiaries'])
     
     df_hh = compute_probability_to_win_from_ols_regression(df_hh, df_estimation)
-    df_hh['predicted_winner'] = 0 + 1 * (df_hh['predicted_total_expenditures_increase'] < 110 * df_hh['nb_beneficiaries'])
+    df_hh['predicted_winner'] = 0 + 1 * (df_hh['predicted_total_expenditures_increase'] < 132 * df_hh['nb_beneficiaries'])
     
     df_hh['mistake'] = \
         1 * ((df_hh['winner'] - df_hh['predicted_winner']) != 0)
@@ -60,3 +60,6 @@ if __name__ == "__main__":
     print "Share of mistakes:", (float(len(df_hh.query('mistake == 1'))) / len(df_hh))
     print "Probability predict that a loser wins:", float(len(df_hh.query('winner == 0').query('predicted_winner == 1'))) / len(df_hh.query('winner == 0'))
     print "Probability predict that a winner loses:", float(len(df_hh.query('winner == 1').query('predicted_winner == 0'))) / len(df_hh.query('winner == 1'))
+
+    print df_hh['predicted_winner'].mean() 
+    print df_hh['winner'].mean()
