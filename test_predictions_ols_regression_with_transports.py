@@ -49,10 +49,10 @@ if __name__ == "__main__":
     df_estimation = prepare_dataset_housing('enl')
     df_estimation = compute_gains_losses_housing(df_estimation)
     
-    df_hh['winner'] = 0 + 1 * (df_hh['total_expenditures_increase'] < 132 * df_hh['nb_beneficiaries'])
+    df_hh['winner'] = 0 + 1 * (df_hh['total_expenditures_increase'] < 110 * df_hh['nb_beneficiaries'])
     
     df_hh = compute_probability_to_win_from_ols_regression(df_hh, df_estimation)
-    df_hh['predicted_winner'] = 0 + 1 * (df_hh['predicted_total_expenditures_increase'] < 132 * df_hh['nb_beneficiaries'])
+    df_hh['predicted_winner'] = 0 + 1 * (df_hh['predicted_total_expenditures_increase'] < 16.1 + 110 * df_hh['nb_beneficiaries'])
     
     df_hh['mistake'] = \
         1 * ((df_hh['winner'] - df_hh['predicted_winner']) != 0)
