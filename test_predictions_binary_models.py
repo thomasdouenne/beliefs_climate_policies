@@ -56,12 +56,12 @@ if __name__ == "__main__":
     df_hh = compute_gains_losses_housing(df_hh)
     df_estimation = compute_gains_losses_housing(df_estimation)
     
-    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['nb_beneficiaries'])
+    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 50 * df_hh['nb_beneficiaries'])
     
     df_hh = compute_probability_to_win_housing(df_hh, df_estimation)
 
     for method in ['logit', 'probit', 'ols']:
-        df_hh['predicted_winner_{}'.format(method)] = 0 + 1 * (df_hh['predict_proba_{}'.format(method)] > 0.43)
+        df_hh['predicted_winner_{}'.format(method)] = 0 + 1 * (df_hh['predict_proba_{}'.format(method)] > 0.5)
         df_hh['mistake_{}'.format(method)] = \
             1 * ((df_hh['winner'] - df_hh['predicted_winner_{}'.format(method)]) != 0)
         
