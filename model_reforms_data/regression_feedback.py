@@ -79,10 +79,10 @@ def compute_gains_losses_housing(df_hh):
 def regress_ols_housing_expenditures_increase(df_hh):
 
     df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
+    df_hh['accommodation_size_2'] = df_hh['accommodation_size'] ** 2
 
     regression_ols = smf.ols(formula = 'housing_expenditures_increase ~ \
-        natural_gas + domestic_fuel + \
-        accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
+        natural_gas + domestic_fuel + accommodation_size',
         data = df_hh).fit()
 
     return regression_ols

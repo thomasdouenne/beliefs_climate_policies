@@ -38,7 +38,13 @@ def prepare_dataset():
     try:
         df_hh = pd.read_csv(r'C:\Users\t.douenne\Documents\Data\assets\data_menages.csv')
     except:
-        df_hh = pd.read_csv(r'C:\Users\thoma\Documents\Data\assets\data_menages.csv')
+        try:
+            df_hh = pd.read_csv(r'../data_menages.csv')
+        except:
+            try:
+                df_hh = pd.read_csv(r'data_menages.csv')
+            except:
+                df_hh = pd.read_csv(r'C:\Users\thoma\Documents\Data\assets\data_menages.csv')
     
     
     # Change column names to english
