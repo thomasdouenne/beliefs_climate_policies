@@ -24,22 +24,22 @@ def compute_gains_losses(df_hh):
             
         if element == 'gasoline':
             current_price = 1.441 # This is roughly the value of gasoline prices
-            e = -0.4
+            e = -0.0
             carbon_intensity = 0.002286
             initial_excise_tax = 0.6069 - 0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'diesel':
             current_price = 1.399 # This is roughly the value of diesel prices
-            e = -0.4
+            e = -0.0
             carbon_intensity = 0.002651
             initial_excise_tax = 0.4284 + 2*0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'domestic_fuel':
             current_price = 0.859 # This is roughly the value of domestic fuel prices
-            e = -0.2
+            e = -0.0
             carbon_intensity = 0.00265
             initial_excise_tax = 0.038 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         else:
             current_price = 0.0651 # For someone in zone 3 that use gas for heating
-            e = -0.2
+            e = -0.0
             carbon_intensity = 0.000182
             initial_excise_tax = 0.0003 # Cf. excel, level of the TICGN if carbon price was null
         
@@ -111,3 +111,17 @@ if __name__ == "__main__":
     print "Revenue from trannsport fuels tax policy in billions euros :", revenue_from_tax_transports / 1e09
     print "Revenue from housing energies tax policy in billions euros :", revenue_from_tax_housing / 1e09
     print "Revenue from the total policy in billions euros :", revenue_from_tax_total / 1e09
+
+    print ((df_hh['transport_expenditures_increase'] - 60 * df_hh['nb_beneficiaries']) / df_hh['consumption_units']).quantile(0.956)
+    print ((df_hh['housing_expenditures_increase'] - 50 *df_hh['nb_beneficiaries']) / df_hh['consumption_units']).quantile(0.934)
+    print ((df_hh['total_expenditures_increase'] - 110 *df_hh['nb_beneficiaries']) / df_hh['consumption_units']).quantile(0.953)
+    
+    df_s = df_hh.query('consumption_units < 1.5')
+    df_m = df_hh.query('consumption_units > 1.4').query('consumption_units < 2')
+    df_l = df_hh.query('consumption_units > 1.9').query('consumption_units < 2.4')
+    df_xl = df_hh.query('consumption_units > 2.3')
+    
+    print ((df_s['total_expenditures_increase'] - 110 *df_s['nb_beneficiaries']) / df_s['consumption_units']).quantile(0.9)
+    print ((df_m['total_expenditures_increase'] - 110 *df_m['nb_beneficiaries']) / df_m['consumption_units']).quantile(0.9)
+    print ((df_l['total_expenditures_increase'] - 110 *df_l['nb_beneficiaries']) / df_l['consumption_units']).quantile(0.9)
+    print ((df_xl['total_expenditures_increase']- 110 *df_xl['nb_beneficiaries']) / df_xl['consumption_units']).quantile(0.9)
