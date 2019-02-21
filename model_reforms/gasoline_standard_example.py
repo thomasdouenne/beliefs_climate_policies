@@ -14,10 +14,10 @@ def gasoline_example(expenditures):
     dict_gasoline = dict()
     # Set common parameters :
     vat = 0.2
-    e_transports = -0.3
-    i = 0.9
+    e_transports = -0.4 # -0.3
+    i = 0.8 # 0.9
     
-    current_price = 1.441 # This is roughly the value of gasoline prices
+    current_price = 1.45 # 1.441 # This is roughly the value of gasoline prices
         
     old_carbon_tax = 44.6 # Carbon tax in 2018
     new_carbon_tax = 44.6 + 50 # Carbon tax that we simulate
