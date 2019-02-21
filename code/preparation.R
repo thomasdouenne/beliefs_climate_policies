@@ -103,43 +103,6 @@ taille_agglo$share[taille_agglo$taille_agglo==8] # Paris
 
 ##### Preparation #####
 
-weighting_s <- function(d, printWeights = T) { # cf. google sheet
-  # d <- data
-  # d$csp <- factor(d$csp)
-  # d$region <- factor(d$region)
-  # levels(d$csp) <- c(levels(d$csp),"missing")
-  # levels(d$Region) <- c(levels(d$Region),"missing")
-  # levels(d$taille_agglo) <- c(levels(d$taille_agglo),"missing")
-  # levels(d$sexe) <- c(levels(d$sexe),"missing")
-  # d$csp[is.na(d$csp) | d$csp=="" | d$csp=="NSP"] <- "missing"
-  # d$taille_agglo[is.na(d$taille_agglo)] <- "missing"
-  # d$sexe[d$sexe=="" | d$sexe=="Autre"] <- "missing"
-
-  unweigthed <- svydesign(ids=~1, data=d)
-  sexe <- data.frame(sexe = c("Féminin", "Masculin"), Freq=nrow(d)*c(0.0001,0.516,0.484)) # http://www.insee.fr/fr/themes/detail.asp?ref_id=bilan-demo&reg_id=0&page=donnees-detaillees/bilan-demo/pop_age2.htm
-  csp <- data.frame(csp = c("Inactif", "Ouvrier", "Cadre", "Indépendant", "Intermédiaire", "Retraité", "Employé", "Agriculteur"),
-                    Freq=nrow(d)*c(0.1244,0.1214,0.0943,0.0341,0.1364,0.3279,0.1535,0.008))
-  region <- data.frame(region = c("autre","ARA", "Est", "Nord", "IDF", "Ouest", "SO", "Occ", "Centre", "PACA"), 
-                       Freq=nrow(d)*c(0.001,0.124,0.129,0.093,0.189,0.103,0.093,0.091,0.099,0.078))
-  age <- data.frame(age = c("18 à 24 ans", "25 à 34 ans", "35 à 49 ans", "50 à 64 ans", "65 ans ou plus"), 
-                    Freq=nrow(d)*c(0.117,0.147,0.242,0.242,0.252)) # Données/estim-pop-reg-sexe...
-  taille_agglo <- data.frame(taille_agglo = c(1:5), Freq=nrow(d)*c(0.2166,0.1710,0.1408,0.3083,0.1633))
-  # revenu <- data.frame(revenu = c(), Freq=nrow(d)*c())
-  diplome4 <- data.frame(diplome4 = c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur"),  # http://webcache.googleusercontent.com/search?q=cache:rUvf6u0uCnEJ:www.insee.fr/fr/themes/tableau.asp%3Freg_id%3D0%26ref_id%3Dnattef07232+&cd=1&hl=fr&ct=clnk&gl=fr&lr=lang_en%7Clang_es%7Clang_fr
-                        Freq=nrow(d)*c(0.301, 0.246, 0.168, 0.285))
-
-  if (length(which(d$taille_agglo==""))>0) raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~region,~csp,~age),
-                population.margins = list(sexe,diplome4,region,csp,age))    
-  else raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~taille_agglo,~region,~csp,~age),
-                population.margins = list(sexe,diplome4,taille_agglo,region,csp,age)) 
-
-  if (printWeights) {    print(summary(weights(raked))  )
-    print(sum( weights(raked) )^2/(length(weights(raked))*sum(weights(raked)^2)) ) # <0.5 : problématique   
-    print( length(which(weights(raked)<0.25 | weights(raked)>4))/ length(weights(raked)))
-  }
-  return(weights(trimWeights(raked, lower=0.25, upper=4, strict=TRUE)))
-}
-
 relabel_and_rename_s <- function() {
   # Notation: ~ means that it's a random variant; * means that another question is exactly the same (in another random branch)
   
@@ -482,12 +445,12 @@ relabel_and_rename_s <- function() {
   label(s[[166]]) <<- "parle_CC: ~ Fréquence à laquelle le répondant parle du changement climatique (...)"
   names(s)[167] <<- "cause_CC"
   label(s[[167]]) <<- "cause_CC: ~ Cause principale du changement climatique selon le répondant (...)"
-  names(s)[168] <<- "ges_CO2" # TODO: majuscules (tva aussi)
-  label(s[[168]]) <<- "ges_CO2: ~ Le répondant pense que le CO2 participe au réchauffement climatique"
-  names(s)[169] <<- "ges_CH4"
-  label(s[[169]]) <<- "ges_CH4: ~ Le répondant pense que le CH4 participe au réchauffement climatique"
-  names(s)[170] <<- "ges_O2"
-  label(s[[170]]) <<- "ges_O2: ~ Le répondant pense que l'oxygène participe au réchauffement climatique"
+  names(s)[168] <<- "ges_co2" # TODO: majuscules (tva aussi)
+  label(s[[168]]) <<- "ges_co2: ~ Le répondant pense que le CO2 participe au réchauffement climatique"
+  names(s)[169] <<- "ges_ch4"
+  label(s[[169]]) <<- "ges_ch4: ~ Le répondant pense que le CH4 participe au réchauffement climatique"
+  names(s)[170] <<- "ges_o2"
+  label(s[[170]]) <<- "ges_o2: ~ Le répondant pense que l'oxygène participe au réchauffement climatique"
   names(s)[171] <<- "ges_pm"
   label(s[[171]]) <<- "ges_pm: ~ Le répondant pense que les particules fines participent au réchauffement climatique"
   names(s)[172] <<- "ges_boeuf"
@@ -876,6 +839,43 @@ convert_s <- function() {
   # s$taille_agglo <<- as.factor(gsub("[[:alpha:] ]", "", s$taille_agglo))
   # s <<- s[s$taille_agglo!="%1%",] # TODO: taille_agglo as.item
   
+}
+
+weighting_s <- function(d, printWeights = T) { # cf. google sheet
+  # d <- data
+  # d$csp <- factor(d$csp)
+  # d$region <- factor(d$region)
+  # levels(d$csp) <- c(levels(d$csp),"missing")
+  # levels(d$Region) <- c(levels(d$Region),"missing")
+  # levels(d$taille_agglo) <- c(levels(d$taille_agglo),"missing")
+  # levels(d$sexe) <- c(levels(d$sexe),"missing")
+  # d$csp[is.na(d$csp) | d$csp=="" | d$csp=="NSP"] <- "missing"
+  # d$taille_agglo[is.na(d$taille_agglo)] <- "missing"
+  # d$sexe[d$sexe=="" | d$sexe=="Autre"] <- "missing"
+
+  unweigthed <- svydesign(ids=~1, data=d)
+  sexe <- data.frame(sexe = c("Féminin", "Masculin"), Freq=nrow(d)*c(0.0001,0.516,0.484)) # http://www.insee.fr/fr/themes/detail.asp?ref_id=bilan-demo&reg_id=0&page=donnees-detaillees/bilan-demo/pop_age2.htm
+  csp <- data.frame(csp = c("Inactif", "Ouvrier", "Cadre", "Indépendant", "Intermédiaire", "Retraité", "Employé", "Agriculteur"),
+                    Freq=nrow(d)*c(0.1244,0.1214,0.0943,0.0341,0.1364,0.3279,0.1535,0.008))
+  region <- data.frame(region = c("autre","ARA", "Est", "Nord", "IDF", "Ouest", "SO", "Occ", "Centre", "PACA"), 
+                       Freq=nrow(d)*c(0.001,0.124,0.129,0.093,0.189,0.103,0.093,0.091,0.099,0.078))
+  age <- data.frame(age = c("18 à 24 ans", "25 à 34 ans", "35 à 49 ans", "50 à 64 ans", "65 ans ou plus"), 
+                    Freq=nrow(d)*c(0.117,0.147,0.242,0.242,0.252)) # Données/estim-pop-reg-sexe...
+  taille_agglo <- data.frame(taille_agglo = c(1:5), Freq=nrow(d)*c(0.2166,0.1710,0.1408,0.3083,0.1633))
+  # revenu <- data.frame(revenu = c(), Freq=nrow(d)*c())
+  diplome4 <- data.frame(diplome4 = c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur"),  # http://webcache.googleusercontent.com/search?q=cache:rUvf6u0uCnEJ:www.insee.fr/fr/themes/tableau.asp%3Freg_id%3D0%26ref_id%3Dnattef07232+&cd=1&hl=fr&ct=clnk&gl=fr&lr=lang_en%7Clang_es%7Clang_fr
+                        Freq=nrow(d)*c(0.301, 0.246, 0.168, 0.285))
+
+  if (length(which(d$taille_agglo==""))>0) raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~region,~csp,~age),
+                population.margins = list(sexe,diplome4,region,csp,age))    
+  else raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~taille_agglo,~region,~csp,~age),
+                population.margins = list(sexe,diplome4,taille_agglo,region,csp,age)) 
+
+  if (printWeights) {    print(summary(weights(raked))  )
+    print(sum( weights(raked) )^2/(length(weights(raked))*sum(weights(raked)^2)) ) # <0.5 : problématique   
+    print( length(which(weights(raked)<0.25 | weights(raked)>4))/ length(weights(raked)))
+  }
+  return(weights(trimWeights(raked, lower=0.25, upper=4, strict=TRUE)))
 }
 
 prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, exclude_quotas_full=TRUE, only_finished=TRUE, clean=TRUE, clean_all=FALSE) {
