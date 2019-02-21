@@ -102,7 +102,7 @@ def predict_winner_looser_housing(df_hh):
     probit = smf.Probit(df_hh['winner'], df_hh[variables]).fit()
 
     ols = smf.ols(formula = 'winner ~ \
-        hh_income + hh_income_2 + consumption_units + nb_beneficiaries + natural_gas + domestic_fuel + \
+        natural_gas + domestic_fuel + \
         accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
         data = df_hh).fit()
 
