@@ -12,7 +12,6 @@ package <- function(p) {
 package('pwr')
 package("foreign")
 package("memisc")
-package("Hmisc")
 package("DT")
 package("pastecs")
 package("lsr")
@@ -22,6 +21,7 @@ package("survey")
 package("plotly")
 package('gdata')
 package('tidyverse')
+package("Hmisc")
 
 # Fs <- function(QID) { s[QID][[1]] }
 # Vs <- function(QID) { as.vector(Fs(QID))  } 
@@ -849,6 +849,8 @@ convert_s <- function() {
   # s <<- s[s$taille_agglo!="%1%",] # TODO: taille_agglo as.item
   
   s$nb_vehicules <<- (s$nb_vehicules_texte=='Un') + 2*(s$nb_vehicules_texte=='Deux ou plus')
+  s$diesel <<- (s$hausse_diesel > 0)
+  s$essence <<- (s$hausse_essence > 0)
   
   s$variante_partielle <<- 'NA'
   s$variante_partielle[!is.na(s$gain_taxe_chauffage)] <<- 'c'
@@ -956,7 +958,9 @@ convert_s <- function() {
   s$conso[!is.na(s$conso_2)] <<- s$conso_2[!is.na(s$conso_2)]
   label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
 
-  # TODO: remove useless colonnes, such as _f/_p
+  s$score_polluants <<- 1*(s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) - 1*(s$ges_O2 == TRUE) - 1*(s$ges_pm == TRUE)
+  s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) - 1*(s$ges_nucleaire == TRUE)
+  # TODO: remove useless colonnes, such as _f/_p, pb peages_urbains
   # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_tva/fuel, si_/non_, gaz-fioul -> T/F, nb_vehicules 0, transferts_inter/variante, enfant
 }
 # convert_s()
@@ -1029,17 +1033,19 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   s$weight <<- weighting_s(s)
 
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
-  if (exclude_speeder) { s <<- s[s$duree > 540,] } # remove speedest
+  if (exclude_speeder) { s <<- s[s$duree > 420,] } # remove speedest /!\ speeder was 540 before 22-02-11h00 (Est Coast)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
   # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
   if (only_finished) { s <<- s[s$finished=="True",] }
 }
 
-# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
-# sa <- s
+prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
+sa <- s
 # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
 # se <- s
 # prepare_s(exclude_screened=FALSE)
 # sp <- s
 
 prepare_s()
+
+write.csv(s, "survey_prepared.csv")
