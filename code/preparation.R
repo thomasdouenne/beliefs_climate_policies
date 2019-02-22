@@ -1,4 +1,4 @@
-setwd("/var/www/beliefs_climate_policies")
+setwd("/var/www/beliefs_climate_policies/code")
 
 # options(download.file.method = "wget"); # For Ubuntu 14.04
 package <- function(p) { 
@@ -22,11 +22,9 @@ package("plotly")
 package('gdata')
 package('tidyverse')
 
-Fs <- function(QID) { s[QID][[1]] }
-Vs <- function(QID) { as.vector(Ff(QID))  }
+# Fs <- function(QID) { s[QID][[1]] }
+# Vs <- function(QID) { as.vector(Fs(QID))  } 
 n <- function(var) { as.numeric(as.vector(var)) }
-fs <- function(id) { s[paste("QID", id, sep="")][[1]] }
-vs <- function(id) { as.vector(f(id)) }
 NSPs <- function(QID) { length(V(QID)[V(QID) == "NSP (Je ne veux pas répondre)"])/length(V(QID)) }
 nsps <- function(id) { length(v(id)[v(id) == "NSP (Je ne veux pas répondre)"])/length(v(id)) }
 Label <- function(var) {
@@ -36,7 +34,7 @@ Label <- function(var) {
 decrit <- function(variable, miss = FALSE, weights = NULL) { 
   if (length(annotation(variable))>0) {
     if (!miss) {
-      if (is.element("Oui", levels(as.factor(variable)))| is.element("quotient", levels(as.factor(variable)))  | is.element("Pour", levels(as.factor(variable)))) { describe(as.factor(variable[variable!="" & !is.na(variable)]), weights = weights[variable!="" & !is.na(variable)]) }
+      if (is.element("Oui", levels(as.factor(variable))) | grepl("(char)", annotation(variable)) | is.element("quotient", levels(as.factor(variable)))  | is.element("Pour", levels(as.factor(variable)))) { describe(as.factor(variable[variable!="" & !is.na(variable)]), weights = weights[variable!="" & !is.na(variable)]) }
       else { describe(as.numeric(as.vector(variable[variable!="" & !is.na(variable)])), weights = weights[variable!="" & !is.na(variable)]) }
     }
     else describe(as.factor(include.missings(variable[variable!="" & !is.na(variable)])), weights = weights[variable!="" & !is.na(variable)]) }
@@ -51,77 +49,66 @@ clean_number <- function(vec, high_numbers='') {
      is.na(numeric_vec) <- numeric_vec>6000 }
    return(numeric_vec)
 }
+uc <- function(nb_pers, nb_14_et_plus) {
+  # https://www.insee.fr/fr/metadonnees/definition/c1802
+  return(1 + 0.5 * pmax(0, nb_14_et_plus - 1) + 0.3 * pmax(0, nb_pers - nb_14_et_plus))
+}
+quotient <- function(nb_pers, nb_adultes) {
+	# https://droit-finances.commentcamarche.com/contents/907-quotient-familial-calcul-du-nombre-de-parts-fiscales
+	# nb de parts fiscales en fonction de la situation et de nb_pers = 1 / 2 / 3 / 4 / 5
+	# marie: x / 2 / 2.5 / 3 / 4 --- en concubinage: x / 1 / 1.5 /2 / 3 (= marie - 1) --- seul: 1 / 2 / 2.5 / 3.5 / 4.5
+	return((nb_pers == 1) + (nb_pers == 2)*2 + (nb_pers == 3)*2.5 + (nb_pers == 4)*3 + (nb_pers > 4)*pmin(6, nb_pers - 1) + (nb_adultes==1)*(nb_pers > 3)*0.5 )
+}
+irpp <- function(rev, nb_adultes, nb_pers) {
+	# quotient <- (nb_pers < 2) + (nb_pers == 2) * 2 + (nb_pers == 3) * 2.5 + (nb_pers == 4) * 3 + (nb_pers > 4) * pmin(6, nb_pers - 1)
+	income <- 0.9334 * rev / quotient(nb_pers, nb_adultes) # (1 + (0.029 * 1.28))*0.9 : passage au brut (+28% en moyenne), CSG+CRDS non déductibles (2,90%), puis abattement de 10%
+	ir <- 0
+	ir <- ir + (income - 12815.25*12) * 0.45 * (income > 12815.25*12)
+	ir <- ir + (pmin(income, 12676*12) - 6051.42*12) * 0.41  * (income > 6051.42*12)
+	ir <- ir + (pmin(income, 6051.42*12) - 2257.17*12) * 0.3  * (income > 2257.17*12)
+	ir <- ir + (pmin(income, 2257.17*12) - 817.25*12) * 0.14  * (income > 817.25*12)
+	
+	ir <- quotient(nb_pers, nb_adultes) * ir
+	seuil_decote <- (nb_adultes>1)*2585/12 + (nb_adultes<=1)*1569/12
+	# decote <- (1920 - 0.75 * ir) * (marie & ir<2560) + (1165 - 0.75 * ir) * (!(marie) & ir<1553)
+	decote <- (ir < seuil_decote) * 0.75 * (seuil_decote - ir)
+	return(pmax((ir-decote),0)) # vrai calcul
+}
 
 ##### Correspondance zipcode - region #####
-communes_agglo <- read.xls("table-appartenance-geo-communes-18_V2.xls", pattern="CODGEO") # 2018
-communes_PLM <- read.xls("table-appartenance-geo-communes-18_V2.xls", sheet=2, pattern="CODGEO") # Paris Lyon Marseille
-communes_data <- read.csv("correspondance-code-insee-code-postal.csv", sep=";") # 2013
-communes_agglo <- communes_agglo[,c('CODGEO', 'TUU2015')]
-communes_PLM <- communes_PLM[,c('CODGEO', 'TUU2015')]
-colnames(communes_agglo) <- c('Code.INSEE', 'taille_agglo')
-colnames(communes_PLM) <- c('Code.INSEE', 'taille_agglo')
-communes_agglo$Code.INSEE <- as.character(communes_agglo$Code.INSEE)
-communes_PLM$Code.INSEE <- as.character(communes_PLM$Code.INSEE)
-communes_data <- communes_data[,c('Code.INSEE', "Code.Postal", 'Population')]
-communes <- merge(merge(communes_agglo, communes_PLM, all=T), communes_data, all=T)
-sum(communes$Population[is.na(communes$taille_agglo)], na.rm=T) # 750k missing because of Code.INSEE renaming
-taille_agglo <- aggregate(1000*Population ~ taille_agglo, communes, sum)
-colnames(taille_agglo) <- c('taille_agglo', 'pop')
-taille_agglo$share <- taille_agglo$pop / sum(taille_agglo$pop)
-taille_agglo # total: 63.76 M
-taille_agglo$share[taille_agglo$taille_agglo==0] # rural
-sum(taille_agglo$share[taille_agglo$taille_agglo<=3 & taille_agglo$taille_agglo>0]) # <20k
-sum(taille_agglo$share[taille_agglo$taille_agglo<=5 & taille_agglo$taille_agglo>3]) # <100k
-sum(taille_agglo$share[taille_agglo$taille_agglo<8 & taille_agglo$taille_agglo>5]) # >100k
-taille_agglo$share[taille_agglo$taille_agglo==8] # Paris
+# communes_agglo <- read.xls("table-appartenance-geo-communes-18_V2.xls", pattern="CODGEO") # 2018
+# communes_PLM <- read.xls("table-appartenance-geo-communes-18_V2.xls", sheet=2, pattern="CODGEO") # Paris Lyon Marseille
+# communes_data <- read.csv("correspondance-code-insee-code-postal.csv", sep=";") # 2013
+# communes_agglo <- communes_agglo[,c('CODGEO', 'TUU2015')]
+# communes_PLM <- communes_PLM[,c('CODGEO', 'TUU2015')]
+# colnames(communes_agglo) <- c('Code.INSEE', 'taille_agglo')
+# colnames(communes_PLM) <- c('Code.INSEE', 'taille_agglo')
+# communes_agglo$Code.INSEE <- as.character(communes_agglo$Code.INSEE)
+# communes_PLM$Code.INSEE <- as.character(communes_PLM$Code.INSEE)
+# communes_data <- communes_data[,c('Code.INSEE', "Code.Postal", 'Population')]
+# communes <- merge(merge(communes_agglo, communes_PLM, all=T), communes_data, all=T)
+# sum(communes$Population[is.na(communes$taille_agglo)], na.rm=T) # 750k missing because of Code.INSEE renaming
+# taille_agglo <- aggregate(1000*Population ~ taille_agglo, communes, sum)
+# colnames(taille_agglo) <- c('taille_agglo', 'pop')
+# taille_agglo$share <- taille_agglo$pop / sum(taille_agglo$pop)
+# taille_agglo # total: 63.76 M
+# taille_agglo$share[taille_agglo$taille_agglo==0] # rural
+# sum(taille_agglo$share[taille_agglo$taille_agglo<=3 & taille_agglo$taille_agglo>0]) # <20k
+# sum(taille_agglo$share[taille_agglo$taille_agglo<=5 & taille_agglo$taille_agglo>3]) # <100k
+# sum(taille_agglo$share[taille_agglo$taille_agglo<8 & taille_agglo$taille_agglo>5]) # >100k
+# taille_agglo$share[taille_agglo$taille_agglo==8] # Paris
 
 
 ##### Preparation #####
 
-weighting_s <- function(data, taille_agglo='automatic', printWeights = T) { # cf. deprecated/Quotas 2018.xlsx
-  d <- data
-  d$csp <- factor(d$csp)
-  d$region <- factor(d$region)
-  levels(d$csp) <- c(levels(d$csp),"missing")
-  levels(d$Region) <- c(levels(d$Region),"missing")
-  levels(d$taille_agglo) <- c(levels(d$taille_agglo),"missing")
-  levels(d$sexe) <- c(levels(d$sexe),"missing")
-  d$csp[is.na(d$csp) | d$csp=="" | d$csp=="NSP"] <- "missing"
-  d$taille_agglo[is.na(d$taille_agglo)] <- "missing"
-  d$sexe[d$sexe=="" | d$sexe=="Autre"] <- "missing"
-
-  unweigthed <- svydesign(ids=~1, data=d)
-  sexe <- data.frame(sexe = c("missing","Femme", "Homme"), Freq=nrow(d)*c(0.0001,0.515,0.485)) # http://www.insee.fr/fr/themes/detail.asp?ref_id=bilan-demo&reg_id=0&page=donnees-detaillees/bilan-demo/pop_age2.htm
-  csp <- data.frame(csp = c("missing","Inactifs", "Ouvriers", "Cadres", "Indépendants", "Professions intermédiaires", "Retraités", "Employés", "Agriculteurs"),
-                    Freq=nrow(d)*c(0.0001,0.124,0.121,0.094,0.034,0.136,0.327,0.153,0.009))
-  Region <- data.frame(Region = c("Autre","Auvergne-Rhône-Alpes", "Grand Est et Bourgogne-Franche-Comté", "Hauts-de-France", "Île-de-France", "Bretagne et Normandie", "Nouvelle-Aquitaine", "Occitanie", "Centre-Val de Loire et Pays de la Loire", "Provence-Alpes-Côte d'Azur"), 
-                       Freq=nrow(d)*c(0.005,0.124,0.129,0.093,0.189,0.103,0.093,0.091,0.098,0.078))
-  age <- data.frame(age = c("","18 à 24 ans", "25 à 34 ans", "35 à 49 ans", "50 à 64 ans", "65 ans ou plus"), 
-                    Freq=nrow(d)*c(0.00001,0.104,0.152,0.248,0.246,0.251)) # Données/estim-pop-reg-sexe...
-  taille_agglo <- data.frame(taille_agglo = c(1:5), Freq=nrow(d)*c(0.225,0.171,0.136,0.299,0.167))
-  # revenu <- data.frame(revenu = c(), Freq=nrow(d)*c())
-  diplome4 <- data.frame(diplome4 = c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur"),  # http://webcache.googleusercontent.com/search?q=cache:rUvf6u0uCnEJ:www.insee.fr/fr/themes/tableau.asp%3Freg_id%3D0%26ref_id%3Dnattef07232+&cd=1&hl=fr&ct=clnk&gl=fr&lr=lang_en%7Clang_es%7Clang_fr
-                        Freq=nrow(d)*c(0.301, 0.246, 0.168, 0.285)) # TODO: raccourcir bac+5
-
-  if (length(which(d$taille_agglo==""))>0) raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~Region,~csp,~age),
-                population.margins = list(sexe,diplome4,Region,csp,age))    
-  else raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~taille_agglo,~Region,~csp,~age),
-                population.margins = list(sexe,diplome4,taille_agglo,Region,csp,age)) 
-
-  if (printWeights) {    print(summary(weights(raked))  )
-    print(sum( weights(raked) )^2/(length(weights(raked))*sum(weights(raked)^2)) ) # <0.5 : problématique   
-    print( length(which(weights(raked)<0.25 | weights(raked)>4))/ length(weights(raked)))
-    return(weights(trimWeights(raked, lower=0.25, upper=4, strict=TRUE)))
-  }
-  else { return(weights(trimWeights(raked, lower=0.25, upper=4, strict=TRUE))) }
-}
-
 relabel_and_rename_s <- function() {
   # Notation: ~ means that it's a random variant; * means that another question is exactly the same (in another random branch)
-  for (i in 1:length(s)) {
-    label(s[[i]]) <- paste(names(s)[i], ": ", label(s[[i]]), sep="");
-    print(paste(i, label(s[[i]])))
-  }
+  
+  # The commented lines below should be executed before creating relabel_and_rename, to ease the filling of each name and label
+  # for (i in 1:length(s)) {
+  #   label(s[[i]]) <- paste(names(s)[i], ": ", label(s[[i]]), sep="");
+  #   print(paste(i, label(s[[i]])))
+  # }
   names(s)[1] <<- "date"
   label(s[[1]]) <<- "date: Date de commencement du sondage"
   names(s)[2] <<- "endDate"
@@ -172,7 +159,7 @@ relabel_and_rename_s <- function() {
   label(s[[24]]) <<- "duree_info_PM: Temps de soumission - Ancrage: information sur les particules fines - Q144"
   names(s)[25] <<- "nombre_clics_info_PM"
   label(s[[25]]) <<- "nombre_clics_info_PM: Nombre de clics - Ancrage: information sur les particules fines - Q144"
-  names(s)[26] <<- "premier_clic_info_PM"
+  names(s)[26] <<- "premier_clic_info_CC"
   label(s[[26]]) <<- "premier_clic_info_CC: Premier clic - Ancrage: information sur le changement climatique - Q145"
   names(s)[27] <<- "dernier_clic_info_CC"
   label(s[[27]]) <<- "dernier_clic_info_CC: Dernier clic - Ancrage: information sur le changement climatique - Q145"
@@ -197,7 +184,7 @@ relabel_and_rename_s <- function() {
   names(s)[37] <<- "statut_emploi"
   label(s[[37]]) <<- "statut_emploi: Statut d'emploi (Chômage/CDD/CDI/fonctionnaire/étudiant-e/retraité-e/précaire/autre actif/autre inactif) - Q35"
   names(s)[38] <<- "csp"
-  label(s[[38]]) <<- "csp: Catégorie Socio-Professionnelle: Agriculteur/rice /Artisan, commerçant.e/Profession libérale, cadre/Professions intermédiaire/Employé.e/Ouvrier/ère/Retraité.e/Autres inactif/ve - Q98"
+  label(s[[38]]) <<- "csp: Catégorie Socio-Professionnelle: Agriculteur/Indépendant: Artisan, commerçant.e/Cadre: Profession libérale, cadre/Intermédiaire: Profession intermédiaire/Employé/Ouvrier/Retraité/Inactif: Autres inactif/ve - Q98"
   names(s)[39] <<- "diplome"
   label(s[[39]]) <<- "diplome: Diplôme le plus haut obtenu ou prévu: Aucun/Brevet/CAP/Bac/+2/+3/>+4) - Q102"
   names(s)[40] <<- "taille_menage"
@@ -264,7 +251,7 @@ relabel_and_rename_s <- function() {
   label(s[[70]]) <<- "gain_taxe: Ménage Gagnant/Non affecté/Perdant par hausse taxe carbone redistribuée à tous (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence) - Q164"
   names(s)[71] <<- "gain_taxe_hausse"
   label(s[[71]]) <<- "gain_taxe_hausse: ~ (gain_taxe=Gagnant) Hausse de pouvoir d'achat du ménage suite à hausse taxe carbone redistribuée à tous (seuils à 20/40/60/80 €/an /UC) - Q165"
-  names(s)[72] <<- "gain_taxe_chauffage_baisse"
+  names(s)[72] <<- "gain_taxe_baisse"
   label(s[[72]]) <<- "gain_taxe_baisse: ~ (gain_taxe=Perdant) Baisse de pouvoir d'achat du ménage suite à hausse taxe carbone redistribuée à tous (seuils à 30/70/120/190/280 €/an /UC) - Q166"
   names(s)[73] <<- "taxe_efficace"
   label(s[[73]]) <<- "taxe_efficace: Une hausse de taxe carbone compensée permettrait de réduire la pollution et de lutter contre le changement climatique (Oui/Non/NSP) - Q10"
@@ -324,8 +311,8 @@ relabel_and_rename_s <- function() {
   label(s[[100]]) <<- "taxe_benefices_aucun_f: * Pour aucune de ces raisons - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
   names(s)[101] <<- "taxe_benefices_autre_choix_f"
   label(s[[101]]) <<- "taxe_benefices_autre_choix_f: * Autre (préciser) - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[102] <<- "taxe_benefices_choix_f"
-  label(s[[102]]) <<- "taxe_benefices_choix_f: * Champ libre - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[102] <<- "taxe_benefices_autre_f"
+  label(s[[102]]) <<- "taxe_benefices_autre_f: * Champ libre - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
   names(s)[103] <<- "taxe_problemes_inefficace_f"
   label(s[[103]]) <<- "taxe_problemes_inefficace_f: * Est inefficace pour réduire la pollution - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
   names(s)[104] <<- "taxe_problemes_alternatives_f"
@@ -338,7 +325,7 @@ relabel_and_rename_s <- function() {
   label(s[[107]]) <<- "taxe_problemes_pauvres_f: * Diminue le pouvoir d'achat de certains ménages modestes - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
   names(s)[108] <<- "taxe_problemes_economie_f"
   label(s[[108]]) <<- "taxe_problemes_economie_f: * Nuit à l'économie et à l'emploi - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[109] <<- "taxe_problemes_pretexte_f"
+  names(s)[109] <<- "taxe_problemes_pretexte_f" # TODO: vérifier recodage marche bien, cf. survey_old
   label(s[[109]]) <<- "taxe_problemes_pretexte_f: * Est un prétexte pour augmenter les impôts - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
   names(s)[110] <<- "taxe_problemes_aucun_f"
   label(s[[110]]) <<- "taxe_problemes_aucun_f: * Pour aucune de ces raisons - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
@@ -585,9 +572,9 @@ relabel_and_rename_s <- function() {
   names(s)[231] <<- "gilets_jaunes_NSP"
   label(s[[231]]) <<- "gilets_jaunes_NSP: ~ Le répondant ne sait pas s'il fait partie / s'il soutient / s'il comprend / s'il s'oppose aux gilets jaunes - Q35"
   names(s)[232] <<- "transferts_inter_a"
-  label(s[[232]]) <<- ""
+  label(s[[232]]) <<- "transferts_inter_a: ~ Transferts internationaux - approbation (Approuveriez-vous le transfert de 5% des revenus des pays riches aux pays pauvres ?: Oui/Non/NSP) - Q47"
   names(s)[233] <<- "transferts_inter_a_info"
-  label(s[[233]]) <<- ""
+  label(s[[233]]) <<- "transferts_inter_a_info: ~ Transferts internationaux avec information sur Aide Publique au Développement (0.3% PIB) - approbation du transfert de 5% des revenus des pays riches aux pays pauvres ? - Q200"
   names(s)[234] <<- "premier_clic_depenses"
   label(s[[234]]) <<- ""
   names(s)[235] <<- "dernier_clic_depenses"
@@ -597,9 +584,9 @@ relabel_and_rename_s <- function() {
   names(s)[237] <<- "nombre_clics_depenses"
   label(s[[237]]) <<- ""
   names(s)[238] <<- "depenses_confiant"
-  label(s[[238]]) <<- ""
+  label(s[[238]]) <<- "depenses_confiant: À quel point êtes-vous confiant.e dans le fait que l'évolution des dépenses publiques que vous venez de proposer serait souhaitable ? Assez/Pas vraiment confiant.e/NSP - Q198"
   names(s)[239] <<- "compris_depenses"
-  label(s[[239]]) <<- ""
+  label(s[[239]]) <<- "compris_depenses: Avez-vous compris le graphique et les curseurs interactifs [concernant les dépenses publiques] ? Oui/Non/Bug - Q200"
   names(s)[240] <<- "premier_clic_champ_libre"
   label(s[[240]]) <<- ""
   names(s)[241] <<- "dernier_clic_champ_libre"
@@ -744,126 +731,92 @@ relabel_and_rename_s <- function() {
 }
 
 convert_s <- function() {
-  lab <- label(s$csp)
+  # lab <- label(s$csp)
   # s$csp <<- factor(s$csp, levels=c(levels(s$csp), "Cadres", "Indépendants", "Ouvriers", 'Inactifs', "Professions intermédiaires", "Retraités", "Employés", "Agriculteurs"))
-  s$csp <<-as.character(s$csp)
-  s$csp[grepl("cadre",s$csp)] <<- "Cadres"
-  s$csp[grepl("Artisan",s$csp)] <<- "Indépendants"
-  s$csp[grepl("iaire",s$csp)] <<- "Professions intermédiaires"
-  s$csp[grepl("etrait",s$csp)] <<- "Retraités"
-  s$csp[grepl("Employ",s$csp)] <<- "Employés"
-  s$csp[grepl("Agricul",s$csp)] <<- "Agriculteurs"
-  s$csp[grepl("Ouvrier",s$csp)] <<- "Ouvriers"
-  s$csp[grepl("Inactif",s$csp)] <<- "Inactifs"
+  # s$csp <<- as.character(s$csp)
+  s$csp[grepl("cadre",s$csp)] <<- "Cadre"
+  s$csp[grepl("Artisan",s$csp)] <<- "Indépendant"
+  s$csp[grepl("iaire",s$csp)] <<- "Intermédiaire"
+  s$csp[grepl("etrait",s$csp)] <<- "Retraité"
+  s$csp[grepl("Employ",s$csp)] <<- "Employé"
+  s$csp[grepl("Agricul",s$csp)] <<- "Agriculteur"
+  s$csp[grepl("Ouvrier",s$csp)] <<- "Ouvrier"
+  s$csp[grepl("Inactif",s$csp)] <<- "Inactif"
   # label(s$csp) <<- lab
-  s$csp <<- as.factor(s$csp)
+  # s$csp <<- as.factor(s$csp)
   
-  for (i in 1:length(f)) {
-    levels(s[[i]]) <<- c(levels(s[[i]]), "NSP")
+  for (i in 1:length(s)) {
+    # levels(s[[i]]) <<- c(levels(s[[i]]), "NSP")
+    s[[i]][s[[i]] == "NSP (Ne sais pas, ne se prononce pas)"] <<- "NSP"
     s[[i]][s[[i]] == "NSP (Ne sait pas, ne se prononce pas)"] <<- "NSP"
+    s[[i]][s[[i]] == "NSP (Ne sais pas, ne se prononce pas)."] <<- "NSP"
     s[[i]][s[[i]] == "NSP (Ne sait pas, ne se prononce pas)."] <<- "NSP"
+    s[[i]][s[[i]] == "NSP (Ne sais pas, ne souhaite pas répondre)"] <<- "NSP"
     s[[i]][s[[i]] == "NSP (Ne sait pas, ne veut pas répondre)"] <<- "NSP"
     s[[i]][s[[i]] == "NSP (Ne veut pas répondre)"] <<- "NSP"
   }
+  
+  s$variante_transferts_inter[!is.na(s$transferts_inter_a) | !is.na(s$transferts_inter_a_info)] <<- "a"
+  s$transferts_inter <<- NA
+  s$transferts_inter_info[!is.na(s$transferts_inter_a_info)] <<- TRUE
+  s$transferts_inter_info[!is.na(s$transferts_inter_a)] <<- FALSE
+  s$transferts_inter[!is.na(s$transferts_inter_a_info)] <<- s$transferts_inter_a_info[!is.na(s$transferts_inter_a_info)]
+  s$transferts_inter[!is.na(s$transferts_inter_a)] <<- s$transferts_inter_a[!is.na(s$transferts_inter_a)]
+  label(s$variante_transferts_inter) <<- "variante_transferts_inter: Variante dans la formulation de transferts_inter; s/i/c/a: simple/intermédiaire/complète/approbation: (argument pauvreté,esponsabilité climatique des pays riches)/complète (i+ argument colonisation, esclavage)/pour ou contre un transfert de 5% des revenus des pays riches vers les pays pauvres (seulement en vague 2); Vague 1: curseur/NSP, Vague 2: champ de saisie (quelques données manquantes) - Q5,Q6,Q78"
+  label(s$transferts_inter) <<- "transferts_inter: Approbation d'un transfert de 5% des revenus des pays riches vers les pays pauvres"
+  # s$transferts_inter <<- as.item(as.numeric(s$transferts_inter), missing.values=-1, annotation="transferts_inter: Transferts internationaux, variantes (simple) avec curseur 0-20% (s) ou champ (Quelle % des revenus des pays riches devrait être transférée aux pays pauvres ?) - Q73,91")
 
-  s$variante_transferts_inter <<- "s"
-  s$variante_transferts_inter[which(s$transferts_inter_l_choix!="")] <<- "l"
-  label(s$variante_transferts_inter) <<- "variante_transferts_inter: Variante dans la saisie de transferts_inter; s/l: simple/libre:  s: curseur 0-20%/NSP,  l: champ de saisie/NSP - Q73,91"
-  s$transferts_inter_info <<- n(s$transferts_inter_info)
-  s$transferts_inter_info[which(is.missing(s$transferts_inter_info))] <<- TRUE
-  s$transferts_inter_l <<- as.numeric(gsub(',', '.', as.vector(s$transferts_inter_l)))
-  s$transferts_inter <<- -1
-  s$transferts_inter[s$transferts_inter_s!=""] <<- n(s$transferts_inter_s[s$transferts_inter_s!=""])
-  s$transferts_inter[!is.na(s$transferts_inter_l)] <<- n(s$transferts_inter_l[!is.na(s$transferts_inter_l)])
-  s$transferts_inter <<- as.item(as.numeric(s$transferts_inter), missing.values=-1, annotation="transferts_inter: Transferts internationaux, variantes (simple) avec curseur 0-20% (s) ou champ (Quelle % des revenus des pays riches devrait être transférée aux pays pauvres ?) - Q73,91")
-  s$transferts_inter_l_cru <<- as.numeric(gsub(',', '.', as.vector(s$transferts_inter_l_cru)))
-  s$transferts_inter_cru <<- -1
-  s$transferts_inter_cru[s$transferts_inter_s_cru!=""] <<- n(s$transferts_inter_s_cru[s$transferts_inter_s_cru!=""])
-  s$transferts_inter_cru[!is.na(s$transferts_inter_l_cru)] <<- n(s$transferts_inter_l_cru[!is.na(s$transferts_inter_l_cru)])
-  s$transferts_inter_cru <<- as.item(as.numeric(s$transferts_inter_cru), missing.values=-1, annotation="transferts_inter_cru: Perception des transferts internationaux désirés, variantes (simple) avec curseur 0-20% (s) ou champ (Quelle est la réponse typique au % des revenus des pays riches devrait être transférée aux pays pauvres ?) - Q73,91")
-  s$transferts_inter_actuel <<- n(s$transferts_inter_actuel)
-  s$transferts_inter_actuel_vu <<- n(s$transferts_inter_actuel_vu)
-  s$transferts_inter_actuel_vu[is.na(s$transferts_inter_actuel_vu)] <<- 1
-
-  s$revenu2 <<- clean_number(s$revenu2, high_numbers='divide')
   s$revenu <<- clean_number(s$revenu, high_numbers='divide')
-  s$revenu[s$revenu2!="" & !is.na(s$revenu2)] <<- s$revenu2[s$revenu2!="" & !is.na(s$revenu2)]
-  s$revenu_conjoint <<- clean_number(s$revenu_conjoint, high_numbers='divide')
-  s$victoire_bu <<- clean_number(s$victoire_bu)
-  s$avantager <<- clean_number(s$avantager)
-  s$avantager <<- clean_number(s$avantager)
-  s$transferts_inter_l <<- clean_number(s$transferts_inter_l)
-  s$transferts_inter_l_cru <<- clean_number(s$transferts_inter_l_cru)
-  s$smic <<- clean_number(s$smic)
-  for (i in c(
-     "revenu", "revenu_conjoint","taille_foyer", "duree", "variation_aide", "depense_aide",
-      # "transferts_inter_s_cru", "transferts_inter_l_cru", "transferts_inter_actuel",  "transferts_inter_s", "transferts_inter_l", "transferts_inter_cru",
-              "avantager", "desavantager", "rdb_leg", "smic", "depense_totale", "depense_sante", "depense_retraites", "depense_protection",
-     "depense_education", "depense_recherche", "depense_loisirs", "depense_infrastructures", "depense_justice", "depense_armee", "depense_securite",
-     "variation_totale", "variation_sante", "variation_retraites", "variation_protection", "recette_totale", "variation_recette", "budget_equilibre", "regle_or",
-     "variation_education", "variation_recherche", "variation_loisirs", "variation_infrastructures", "variation_justice", "variation_armee", "variation_securite"
+  s$rev_tot <<- clean_number(s$rev_tot, high_numbers='divide')
+  for (i in c( # TODO: check number outliers 
+     "revenu", "rev_tot", "taille_menage", "nb_adultes", "nb_14_et_plus", "duree", "variation_aide", "depense_aide", "km_0", "km_1", "km_2", "conso_1", "conso_2", "surface", "emission_cible",
+      "depense_totale", "depense_sante", "depense_retraites", "depense_protection", "depense_education", "depense_recherche", "depense_loisirs", 
+     "depense_infrastructures", "depense_justice", "depense_armee", "depense_securite", "depense_aide", "variation_totale", "variation_aide",
+     "variation_sante", "variation_retraites", "variation_protection", "recette_totale", "variation_recette", "budget_equilibre", "regle_or",
+     "variation_education", "variation_recherche", "variation_loisirs", "variation_infrastructures", "variation_justice", "variation_armee", "variation_securite",
+     "transports_distance", "duree_info_CC", "duree_info_CC_PM", "duree_info_PM", "duree_no_info", "duree_depenses", "duree_champ_libre", 
+     "hausse_chauffage", "hausse_depenses", "hausse_diesel", "hausse_essence", "nb_vehicules", "en_position_0", "en_position_1", "en_position_2", "en_position_3", 
+     "en_position_4", "en_position_5", "en_position_6", "en_position_7", "en_position_8", "en_position_9", "en_position_10"
               )) {
     lab <- label(s[[i]])
     s[[i]] <<- as.numeric(as.vector(s[[i]]))
     label(s[[i]]) <<- lab
   }
 
-  s$choix_impot_tous <<- 'NSP'
-  s$choix_impot_tous[s$choix_impot_referendum=='Oui' & s$choix_impot_deliberation=='Oui' & s$choix_impot_sondage=='Oui' & s$choix_impot_repartition=='Oui' & s$choix_impot_satisfaisant=='Non'] <<- 'Oui' #  s$choix_impot_repartition=='Oui' -> 14% Oui  & s$choix_impot_satisfaisant=='Non' -> 28% Oui
-  s$choix_impot_tous[s$choix_impot_referendum=='Non' | s$choix_impot_deliberation=='Non' | s$choix_impot_sondage=='Non' | s$choix_impot_repartition=='Non' | s$choix_impot_satisfaisant=='Oui'] <<- 'Non'
-  s$choix_impot_tous[s$choix_impot_referendum=='Non' | s$choix_impot_deliberation=='Non' | s$choix_impot_sondage=='Non' | s$choix_impot_satisfaisant=='NSP' | s$choix_impot_repartition=='NSP'] <<- 'NSP'
-  label(s$choix_impot_tous) <<- "choix_impot_tous: Vaut Oui ssi le répondant a répondu 'Oui' aux 5 questions choix_impot_, 'NSP' s'iel a répondu 'NSP' à au moins l'une d'entre elles, 'Non' s'iel s'est exprimé sur les 5 questions sans répondre 'Oui' à chaque fois"
-  
-  for (j in c("vitesse_reduction", "vitesse_maintien", "fusion_irpp_cotsoc_contre", "approbation_seuls", "approbation_triple", "approbation_triple_info",
-              "choix_impot_repartition", "choix_impot_satisfaisant", "choix_impot_sondage", "choix_impot_deliberation",
-              "choix_impot_referendum", "democratie_delegative", "legislatives_vote", "legislatives_abstention", "choix_impot_tous"
+  for (j in c("taxe_efficace", "rattrapage_diesel", "enfant_CC", "mode_vie_ecolo", "schiste_approbation", 
+              "transferts_inter_a", "transferts_inter_a_info", "transferts_inter", "taxe_approbation",
+              "taxe_feedback_approbation", "taxe_progressif_approbation", "taxe__20_approbation", "taxe_20_30_approbation",
+              "taxe_30_40_approbation", "taxe_40_50_approbation", "taxe_50_70_approbation", "taxe_70__approbation"
               )) {
     s[j][[1]] <<- as.item(as.character(s[j][[1]]),
                 labels = structure(c("","Non","NSP","Oui"), names = c("NA","Non","NSP","Oui")), 
                 missing.values = c("","NSP"), annotation=attr(s[j][[1]], "label"))
   }
+  
+  for (j in c("mode_chauffage", "chauffage", "parle_CC", "cause_CC", "effets_CC", "transports_frequence", 
+              "schiste_CC", "transports_avis", "transports_travail_actif", "transports_travail_commun", "interet_politique",
+              "perte_tva", "perte_fuel", "perte_chauffage"
+              )) {
+    s[j][[1]] <<- as.item(as.character(s[j][[1]]),
+                labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))), 
+                missing.values = c("","NSP"), annotation=paste(attr(s[j][[1]], "label"), "(char)"))
+  }  
 
-  s$variante_vitesse <<- "pro_reduction"
-  s$variante_vitesse[s$vitesse_maintien!=""] <<- "pro_maintien"
-  label(s$variante_vitesse) <<- "variante_vitesse: Variante de la formulation de la question sur la position quant à la réduction de la vitesse maximale autorisée de 90 à 80km/h: 'pour le maintien' (pro_maintien) ou 'pour la réduction' (pro_reduction) '?' - Q99,100"
-  s$vitesse <<- -1
-  s$vitesse[s$vitesse_reduction=="Oui" | s$vitesse_maintien=="Non"] <<- 80  
-  s$vitesse[s$vitesse_reduction=="Non" | s$vitesse_maintien=="Oui"] <<- 90  
-  s$vitesse <<- as.item(s$vitesse, labels = structure(c(-1,80,90)), #names = c("Extrême gauche","Gauche","Centre","Droite","Extrême droite")),
-                                missing.values = -1, annotation="vitesse: Position quant à la réduction de la vitesse maximale autorisée de 90 à 80km/h (deux variantes dans la formulation) - Q99,100")
-
-  s$compris_approbation <<- as.item(as.character(s$compris_approbation),
-                labels = structure(c("","Oui","Non","Bug: Le graphique ne s'est pas affiché"), names = c("NA","Oui","Non","Bug")), annotation=attr(s$compris_approbation, "label"))
+  for (j in names(s)) {
+    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_', j)) {
+      s[[j]][s[[j]]!=""] <<- TRUE
+      s[[j]][is.na(s[[j]])] <<- FALSE
+    }
+  }
+  
+  # s$compris_depenses <<- as.item(as.character(s$compris_depenses),
   s$compris_depenses <<- as.item(as.character(s$compris_depenses),
                 labels = structure(c("","Oui","Non","Bug: le graphique ne s'est pas affiché correctement."), names = c("NA","Oui","Non","Bug")), annotation=attr(s$compris_depenses, "label"))
+  s$mode_chauffage <<- as.item(as.character(s$mode_chauffage),
+                labels = structure(c("","Chauffage individuel","Chauffage collectif", "NSP"), names = c("NA","individuel","collectif","NSP")), annotation=attr(s$mode_chauffage, "label"))
+  s$schiste_CC <<- as.item(as.character(s$schiste_CC),
+                labels = structure(c("","Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir","Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"), names = c("NA","malvenue","valable","NSP")), annotation=attr(s$mode_chauffage, "label"))
 
-  for (j in 1:length(f)) { if (grepl("delegation", names(f)[j]) & grepl("choix", names(f)[j])) {
-    s[j][[1]] <<- as.item(as.character(s[j][[1]]),
-                labels = structure(c("","votez directement","déléguez votre vote à","vous abstenez", "NSP"), names = c("NA","vote","délégation","abstention", "NSP")),
-                missing.values = c("","NSP"), annotation=attr(s[j][[1]], "label"))
-  }}
-
-  s$variante_vote <<- "pro_vote"
-  s$variante_vote[s$legislatives_abstention!=""] <<- "pro_abstention"
-  label(s$variante_vote) <<- "variante_vote: Variante de la formulation de la question sur les législatives 2017: 'Avez-vous été voter' (pro_vote) ou 'Vous-êtes vous abstenu' (pro_abstention) '?' - Q90,91"
-  s$vote <<- -1
-  s$vote[s$legislatives_abstention=="Oui" | s$legislatives_vote=="Non"] <<- FALSE
-  s$vote[s$legislatives_abstention=="Non" | s$legislatives_vote=="Oui"] <<- TRUE
-  s$vote <<- as.item(s$vote, labels = structure(c(-1,TRUE,FALSE)), #names = c("Extrême gauche","Gauche","Centre","Droite","Extrême droite")), 
-                                missing.values = -1, annotation="vote: A été voter au premier tour des élections législatives de 2017 ou s'est abstenu.e (deux variantes dans la formulation) - Q90,91")
-
-  s$variante_diner <<- "neutre"
-  s$variante_diner[s$diner_amis!=""] <<- "pro_amis"
-  s$variante_diner[s$diner_famille!=""] <<- "pro_famille"
-  label(s$variante_diner) <<- "variante_diner: Variante de la formulation de la question sur la préférence entre un dîner entre amis ou en famille: pas d'amorce (neutre) / 'La question a pour but de valider l'hyp que les Fr préfèrent dîner ...' en famille/entre amis - Q92,93,94"
-  s$diner <<- "NSP"
-  s$diner[s$diner_simple!=""] <<- as.character(s$diner_simple[s$diner_simple!=""])
-  s$diner[s$diner_famille!=""] <<- as.character(s$diner_famille[s$diner_famille!=""])
-  s$diner[s$diner_amis!=""] <<- as.character(s$diner_amis[s$diner_amis!=""])
-  s$diner <<- as.item(s$diner, labels = structure(c("NSP","Entre amis","En famille"), names = c("NSP","Entre amis","En famille")),
-                                missing.values = c("NSP"), annotation="diner: Préférence entre un dîner entre amis ou en famille (trois variantes dans la formulation: sans amorce et avec amorce dans un sens ou dans l'autre) - Q92,93,94")
-
-  # TODO: fusion_irpp merge
   s$gauche_droite <<- pmax(-2,pmin(2,-2 * grepl("extrême gauche", s$extr_gauche) - grepl("De gauche", s$gauche) + grepl("De droite", s$droite) + 2 * grepl("extrême droite", s$extr_droite)))
   is.na(s$gauche_droite) <<- (s$gauche_droite == 0) & !grepl("centre", s$centre)
   s$Gauche_droite <<- as.factor(s$gauche_droite)
@@ -872,141 +825,220 @@ convert_s <- function() {
   levels(s$Gauche_droite) <<- c("Extreme-left", "Left", "Center", "Right", "Extreme-right", "Indeterminate")
   s$Gauche_droite[is.na(s$Gauche_droite)] <<- "Indeterminate"
 
-  s$rdb_leg <<- as.item(as.numeric(s$rdb_leg),  missing.values = -1, annotation=attr(s$rdb_leg, "label"))
-  s$rdb_leg[s$rdb_leg_choix == "NSP"] <<- -1
-  s$rdb[!is.na(s$rdb_leg)] <<- s$rdb_leg[!is.na(s$rdb_leg)]
-  s$rdb <<- as.item(as.numeric(s$rdb),  missing.values = -1, annotation="rdb: Revenu de base désiré, variantes gar/ass/rdb/aid: montant minimal garanti tous français/minimal qu'État devrait assurer à chacun-e/du rdb + explication/aides de l'État pour sans revenus; Vague 1, 3: champ de saisie/NSP, Vague 2: champ de saisie/NSP/on devrait pas - Q122,Q23,Q24,Q25,22")
-  s$smic[s$smic_choix=='NSP'] <<- -1
-  s$smic <<- as.item(as.numeric(s$smic),  missing.values = -1, annotation=attr(s$smic, "label"))
-  s$variante_rdb[!is.na(s$rdb_leg)] <<- "leg"
-  s$variante_rdb <<- factor(s$variante_rdb, c("gar","ass","rdb", "leg","aid")) # Pour l'ordre d'affichage dans les graphiques # c("aid","rdb","ass","gar")
-  label(s$variante_rdb) <<- "variante_rdb: Variante dans la formulation de rdb (revenu de base); gar/ass/rdb/leg/aid: montant minimal garanti tous français/minimal qu'État devrait assurer à chacun-e/du rdb + explication/seul >25 ans touchant que les aides de l'État/aides de l'État pour sans revenus; Vague 1, 3: champ de saisie/NSP, Vague 2: champ de saisie/NSP/on devrait pas - Q122,Q23,Q24,Q25,22"
-  s$desavantager <<- as.item(as.numeric(s$desavantager),  missing.values = -1, annotation=attr(s$desavantager, "label"))
-  s$desavantager[s$desavantager_choix == "NSP"] <<- -1
-  s$avantager <<- as.item(as.numeric(s$avantager),  missing.values = -1, annotation=attr(s$avantager, "label"))
-  s$avantager[s$avantager_choix == "NSP"] <<- -1
+  # temp <- label(s$diplome)
+  # s$diplome <<- factor(s$diplome, c("","Aucun diplôme","Brevet des collèges","CAP ou BEP","Baccalauréat","Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)","Bac +3 (licence...)","Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)","NSP (Ne se prononce pas)") )
+  # label(s$diplome) <<- temp
+  # temp <- label(s$interet_politique)
+  # s$interet_politique <<- factor(s$interet_politique, c("","Beaucoup","Un peu","Presque pas (ou pas du tout)","NSP","NSP (Je ne veux pas répondre)","Q20 - À quel point êtes-vous intéressé·e par la politique ?"))
+  # label(s$interet_politique) <<- temp
 
-  s$approbation <<- s$approbation_seuls
-  s$approbation[s$approbation_triple != ""] <<- s$approbation_triple[s$approbation_triple != ""]
-  s$approbation[s$approbation_triple_info != ""] <<- s$approbation_triple_info[s$approbation_triple_info != ""]
-  # s$approbation <<- as.item(as.numeric(s$approbation),  missing.values = c(-1,-2))
-  # s$approbation[s$approbation_nivvie == "NSP" | s$approbation_seuls == "NSP" | s$approbation_triple == "NSP"] <<- -1
-  # s$Approbation_variante <<- "seuls"
-  # s$Approbation_variante[s$approbation_triple != ""] <<- "triple"
-  # s$Approbation_variante[s$approbation_triple_info != ""] <<- "triple_info"
-  s$Approbation_variante <<- "triple"
-  s$Approbation_variante[s$approbation_seuls!=""] <<- "seuls"
-  s$approbation_info <<- FALSE
-  s$approbation_info[s$approbation_triple_info != ""] <<- TRUE
-  label(s$Approbation_variante) <<- "Approbation_variante: Variante sur la réforme de redistribution des revenus : indiv (approbation_mediane, tous les adultes)/triple (contient en plus la distribution avant impôt)/seuls (célibs sans enfant > 25 ans)"
-  label(s$approbation_info) <<- "approbation_info: des exemples de l'effet de la réforme sur 7 niveaux de vie ont été affichés: 800>950/1100>1130/1500>1500/1800>1800/3000>2950/4000>3700/5000>4500/20k>16k"
+  s$revenu_conjoint <<- s$rev_tot - s$revenu
+  s$revdisp <<- round((s$rev_tot -  irpp(s$rev_tot, s$nb_adultes, s$taille_menage)))
+  s$uc <<- uc(s$taille_menage, s$nb_14_et_plus)
+  s$niveau_vie <<- s$revdisp / s$uc
 
-  temp <- label(s$diplome)
-  s$diplome <<- factor(s$diplome, c("","Aucun diplôme","Brevet des collèges","CAP ou BEP","Baccalauréat","Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)","Bac +3 (licence...)","Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)","NSP (Ne se prononce pas)","NSP","Q76 - Quel est votre plus haut diplôme (ou celui que vous comptez avoir si vous ê...") )
-  label(s$diplome) <<- temp
-  temp <- label(s$interet_politique)
-  s$interet_politique <<- factor(s$interet_politique, c("","Beaucoup","Un peu","Presque pas (ou pas du tout)","NSP","NSP (Je ne veux pas répondre)","Q20 - À quel point êtes-vous intéressé·e par la politique ?"))
-  label(s$interet_politique) <<- temp
-  temp <- label(s$refugies)  
-  s$refugies <<- factor(s$refugies, c("","Il faut accepter tous les réfugiés qui fuient la guerre ou la persécution","Il faut accepter beaucoup plus de réfugiés qu'actuellement","Il faut accepter un quota de réfugiés plus élevé qu'actuellement","Il faut accepter un quota de réfugiés correspondant au nombre actuel de personnes accueillies légalement sur le territoire","Il faut accepter moins de réfugiés qu'actuellement","Il faut refuser à tout réfugié l'entrée sur le territoire","Il faut laisser à chaque commune le choix de fixer son quota de réfugiés","Il faut autoriser chaque français à parrainer un réfugié, le parrain serait responsable de l'intégration et si besoin de l'hébergement et de l'entretien du réfugié","NSP","NSP (Je ne veux pas répondre)","Q111 - Quelle politique faut-il adopter vis-à-vis des réfugiés qui veulent entrer...", "Il faut accepter autant de réfugiés qu'actuellement","Il faut accepter plus de réfugiés plus élevé qu'actuellement","Il faut accepter plus de réfugiés qu'actuellement"))
-  s$refugies[s$refugies_info!=""] <<- s$refugies_info[s$refugies_info!=""]
-  s$refugies[s$refugies_info_bis!=""] <<- s$refugies_info_bis[s$refugies_info_bis!=""]
-  s$refugies[s$refugies=="Il faut accepter plus de réfugiés qu'actuellement" | s$refugies=="Il faut accepter plus de réfugiés plus élevé qu'actuellement"] <<- "Il faut accepter un quota de réfugiés plus élevé qu'actuellement"
-  s$refugies[s$refugies=="Il faut accepter autant de réfugiés qu'actuellement"] <<- "Il faut accepter un quota de réfugiés correspondant au nombre actuel de personnes accueillies légalement sur le territoire"
-  label(s$refugies) <<- temp
-  s$refugies_info_bis[s$refugies_info!=""] <<- s$refugies_info[s$refugies_info!=""]
-  s$refugies_info <<- FALSE
-  s$refugies_info[s$refugies_info_bis!=""] <<- TRUE
-  label(s$refugies_info) <<- "refugies_info: Le répondant a vu l'information sur le nombre et la proportion de demandeurs d'asile accueillis en France lors des cinq dernières années (20k/an soit un quart des demandes acceptées en moyenne)"
-  s$Refugies <<- as.character(s$refugies)
-  s$Refugies[s$refugies=="Il faut accepter tous les réfugiés qui fuient la guerre ou la persécution"] <<- "Tous"
-  s$Refugies[s$refugies=="Il faut accepter beaucoup plus de réfugiés qu'actuellement"] <<- "Beaucoup plus"
-  s$Refugies[s$refugies=="Il faut accepter un quota de réfugiés plus élevé qu'actuellement"] <<- "Plus"
-  s$Refugies[s$refugies=="Il faut accepter un quota de réfugiés correspondant au nombre actuel de personnes accueillies légalement sur le territoire"] <<- "Autant"
-  s$Refugies[s$refugies=="Il faut accepter moins de réfugiés qu'actuellement"] <<- "Moins"
-  s$Refugies[s$refugies=="Il faut refuser à tout réfugié l'entrée sur le territoire"] <<- "Aucun"
-  s$Refugies[s$refugies=="Il faut laisser à chaque commune le choix de fixer son quota de réfugiés"] <<- "Quota commune"
-  s$Refugies[s$refugies=="Il faut autoriser chaque français à parrainer un réfugié, le parrain serait responsable de l'intégration et si besoin de l'hébergement et de l'entretien du réfugié"] <<- "Parrainage"
-  s$Refugies <<- factor(s$Refugies, levels = c("", "Tous", "Beaucoup plus", "Plus", "Autant", "Moins",  "Aucun", "Quota commune", "Parrainage", "NSP"))
-  label(s$Refugies) <<- label(s$refugies)
-  
-  s$rev_tot <<- 12 * pmax(s$revenu, s$revenu + s$revenu_conjoint, na.rm=T) # TODO: check bien défini pour tous
-  s$revdisp <<- round((12 * s$revenu / s$rev_tot) * (s$rev_tot -  irpp_p(s$rev_tot,grepl("Mari", s$situation_maritale),s$taille_foyer))/12)
-  s$niveau_vie <<- ((s$rev_tot -  irpp_p(s$rev_tot,grepl("Mari", s$situation_maritale),s$taille_foyer))/12) / uc(grepl("Mari", s$situation_maritale), s$taille_foyer)
-  s$rev_tot <<- s$rev_tot/12
-  s$disadvantaged <<- FALSE
-  s$disadvantaged[s$revdisp>3000 & !is.na(s$revdisp) & s$Approbation_variante!="seuls"] <<- TRUE
-  s$disadvantaged[s$revenu>2800 & s$Approbation_variante=="seuls" & !is.na(s$revenu)] <<- TRUE
-  is.na(s$disadvantaged) <<- is.na(s$revenu)
-  
   s$Age <<- (s$age == "18 à 24 ans") + 2*(s$age == "25 à 34 ans") + 3.3*(s$age == "35 à 49 ans") + 4.6*(s$age == "50 à 64 ans") + 7*(s$age == "65 ans ou plus")
-  s$age <<- as.factor(as.character(s$age))
+  # s$age <<- as.factor(as.character(s$age))
   s$Diplome <<- (s$diplome == "Brevet des collèges") + 2*(s$diplome=="CAP ou BEP") + 3*(s$diplome=="Baccalauréat") + 4*(s$diplome=="Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)") + 5*(s$diplome=="Bac +3 (licence...)") + 6*(s$diplome=="Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)") - (s$diplome=="NSP (Ne se prononce pas)")
   s$diplome4 <<- as.character(s$diplome)
   s$diplome4[s$Diplome<2] <<- "Aucun diplôme ou brevet"
   s$diplome4[s$Diplome>3] <<- "Supérieur"
-  s$Region <<- as.character(s$region)
-  s$Region[s$region=="Bretagne" | s$region=="Normandie"] <<- "Bretagne et Normandie"
-  s$Region[s$region=="Centre-Val de Loire" | s$region=="Pays de la Loire"] <<- "Centre-Val de Loire et Pays de la Loire"
-  s$Region[s$region=="Grand Est" | s$region=="Bourgogne-Franche-Comté"] <<- "Grand Est et Bourgogne-Franche-Comté"
-  s$Region[s$region=="NSP" | s$region=="Autre (outre-mer)" | s$region=="Corse"] <<- "Autre"
-  s$Region <<- as.factor(s$Region)
-  s$taille_agglo <<- as.factor(gsub("[[:alpha:] ]", "", s$taille_agglo))
-  s <<- s[s$taille_agglo!="%1%",]
+  # s$Region <<- as.factor(as.character(s$region))
+  # s$taille_agglo <<- as.factor(gsub("[[:alpha:] ]", "", s$taille_agglo))
+  # s <<- s[s$taille_agglo!="%1%",] # TODO: taille_agglo as.item
   
-  for (i in 1:length(f)) {
-    if (grepl("victoire_", names(f)[i])) {
-      if (names(f)[i]!="victoire_bu" & names(f)[i]!="victoire_joueur") s[i][[1]] <<- as.logical(s[i][[1]]!="") 
-      is.na(s[i][[1]]) <<- as.numeric(substr(s$endDate,9,10))<=15
-    }
+  s$nb_vehicules <<- (s$nb_vehicules_texte=='Un') + 2*(s$nb_vehicules_texte=='Deux ou plus')
+  
+  s$variante_partielle <<- 'NA'
+  s$variante_partielle[!is.na(s$gain_taxe_chauffage)] <<- 'c'
+  s$variante_partielle[!is.na(s$gain_taxe_fuel)] <<- 'f'
+  label(s$variante_partielle) <<- "variante_partielle: Variante aléatoire (c/f) de la taxe partielle sur le chauffage ou les carburants (=fuel)"
+  
+  # s$gain_fuel <- NA
+  s$gain_fuel[s$gain_taxe_fuel=='Non affecté' & s$variante_partielle=='f'] <<- 0
+  s$gain_fuel[s$gain_taxe_fuel=='Gagnant' & s$variante_partielle=='f'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_hausse[s$gain_taxe_fuel=='Gagnant' & s$variante_partielle=='f']))))/25
+  s$gain_fuel[s$gain_taxe_fuel=='Perdant' & s$variante_partielle=='f'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_baisse[s$gain_taxe_fuel=='Perdant' & s$variante_partielle=='f']))))/25
+  label(s$gain_fuel) <<- "gain_fuel: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carburants compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
+  
+  s$gain_chauffage[s$gain_taxe_chauffage=='Non affecté' & s$variante_partielle=='c'] <<- 0
+  s$gain_chauffage[s$gain_taxe_chauffage=='Gagnant' & s$variante_partielle=='c'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_chauffage_hausse[s$gain_taxe_chauffage=='Gagnant' & s$variante_partielle=='c']))))/25
+  s$gain_chauffage[s$gain_taxe_chauffage=='Perdant' & s$variante_partielle=='c'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_chauffage_baisse[s$gain_taxe_chauffage=='Perdant' & s$variante_partielle=='c']))))/25
+  label(s$gain_chauffage) <<- "gain_fuel: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe chauffage compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
+
+  s$gain[s$gain_taxe=='Non affecté' & s$variante_partielle!='NA'] <<- 0
+  s$gain[s$gain_taxe=='Gagnant' & s$variante_partielle!='NA'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_hausse[s$gain_taxe=='Gagnant' & s$variante_partielle!='NA']))))/50
+  s$gain[s$gain_taxe=='Perdant' & s$variante_partielle!='NA'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_baisse[s$gain_taxe=='Perdant' & s$variante_partielle!='NA']))))/50
+  label(s$gain) <<- "gain: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carbone compensée, dans [-6;5] (seuils: -280/-190/-120/-70/-30/0/20/40/60/80)"
+
+  s$Elasticite_chauffage <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_chauffage))))
+  s$Elasticite_chauffage <<- (s$Elasticite_chauffage==0)*1.5 + (s$Elasticite_chauffage==3)*6.5 + (s$Elasticite_chauffage>3)*(s$Elasticite_chauffage + 5) # Take the average of thresholds, take 40% for >30%
+  s$Elasticite_chauffage <<- - round(s$Elasticite_chauffage / 30, 2) # converts into elasticity
+  label(s$Elasticite_chauffage) <<- "Elasticite_chauffage: Élasticité-prix des dépenses de chauffage des Français, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 30%)"
+
+  s$Elasticite_chauffage_perso <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_chauffage_perso))))
+  s$Elasticite_chauffage_perso <<- (s$Elasticite_chauffage_perso==0)*1.5 + (s$Elasticite_chauffage_perso==3)*6.5 + (s$Elasticite_chauffage_perso>3)*(s$Elasticite_chauffage_perso + 5) # Take the average of thresholds, take 40% for >30%
+  s$Elasticite_chauffage_perso <<- - round(s$Elasticite_chauffage_perso / 30, 2) # converts into elasticity
+  label(s$Elasticite_chauffage_perso) <<- "Elasticite_chauffage_perso: Élasticité-prix des dépenses de chauffage du ménage, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 30%)"
+
+  s$Elasticite_fuel <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_fuel))))
+  s$Elasticite_fuel <<- (s$Elasticite_fuel==0)*1.5 + (s$Elasticite_fuel==3)*6.5 + (s$Elasticite_fuel>3)*(s$Elasticite_fuel + 5) # Take the average of thresholds, take 40% for >30%
+  s$Elasticite_fuel <<- - round(s$Elasticite_fuel / 30, 2) # converts into elasticity
+  label(s$Elasticite_fuel) <<- "Elasticite_fuel: Élasticité-prix des dépenses de carburants des Français, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 0.5€/L)"
+
+  s$Elasticite_fuel_perso <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_fuel_perso))))
+  s$Elasticite_fuel_perso <<- (s$Elasticite_fuel_perso==0)*1.5 + (s$Elasticite_fuel_perso==3)*6.5 + (s$Elasticite_fuel_perso>3)*(s$Elasticite_fuel_perso + 5) # Take the average of thresholds, take 40% for >30%
+  s$Elasticite_fuel_perso <<- - round(s$Elasticite_fuel_perso / 30, 2) # converts into elasticity
+  label(s$Elasticite_fuel_perso) <<- "Elasticite_fuel_perso: Élasticité-prix des dépenses de carburants du ménage, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 0.5€/L)"
+  
+  s$variante_taxe_info <<- "p"
+  s$variante_taxe_info[s$gain_taxe_feedback!=""] <<- "f"
+  label(s$variante_taxe_info) <<- "variante_taxe_info: (f/p) Variante aléatoire entre f: feedback (=simulation, 2/3) et p: progressivité (1/3), dans l'information donnée sur la taxe compensée avant de demander à nouveau le gain et l'approbation, ainsi que les bénéfices et problèmes"
+  for (v in c('CC', 'sante', 'circulation', 'revenu', 'pauvres', 'independance', 'enjeu', 'aucun', 'autre_choix', 'autre')) {
+    s[[paste('taxe_benefices_', v, sep="")]] <<- s[paste('taxe_benefices_', v, '_p', sep="")][[1]]
+    s[[paste('taxe_benefices_', v, sep="")]][s$variante_taxe_info=='f'] <<- s[paste('taxe_benefices_', v, '_f', sep="")][[1]][s$variante_taxe_info=='f']
+    label(s[[paste('taxe_benefices_', v, sep="")]]) <<- sub("_f: \\* ", ": ", label(s[paste('taxe_benefices_', v, '_f', sep="")][[1]]))
   }
+  for (v in c('inefficace', 'alternatives', 'ruraux', 'revenu', 'pauvres', 'economie', 'pretexte', 'aucun', 'autre_choix', 'autre')) {
+    s[[paste('taxe_problemes_', v, sep="")]] <<- s[paste('taxe_problemes_', v, '_p', sep="")][[1]]
+    s[[paste('taxe_problemes_', v, sep="")]][s$variante_taxe_info=='f'] <<- s[paste('taxe_problemes_', v, '_f', sep="")][[1]][s$variante_taxe_info=='f']
+    label(s[[paste('taxe_problemes_', v, sep="")]]) <<- sub("_f: \\* ", ": ", label(s[paste('taxe_problemes_', v, '_f', sep="")][[1]]))
+  }
+  
+  s$cible[s$cible20==1] <<- 20
+  s$cible[s$cible30==1] <<- 30
+  s$cible[s$cible40==1] <<- 40
+  s$cible[s$cible50==1] <<- 50
+  label(s$cible) <<- "cible: Ciblage du recyclage de la hausse de la taxe carbone, attribué en fonction du revenu du répondant et de son ménage (20/30/40/50% les plus modestes)" 
+
+  # TODO: manage to use tidyverse without erasing observations
+  # s <<- merge(s, s %>% gather(key = temp, value = gain_cible, c(gain_taxe__20, gain_taxe_20_30, gain_taxe_30_40, gain_taxe_40_50, gain_taxe_50_70, gain_taxe_70_)) %>% filter(gain_cible != "") %>% select(-temp), sort=FALSE) # Warning: attributes are not identical across measure variables; they will be dropped
+  # label(s$gain_cible) <<- "gain_cible: Ménage Gagnant/Non affecté/Perdant avec hausse taxe carbone à recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
+  # s <<- merge(s, s %>% gather(key = temp, value = taxe_cible_approbation, c(taxe__20_approbation, taxe_20_30_approbation, taxe_30_40_approbation, taxe_40_50_approbation, taxe_50_70_approbation, taxe_70__approbation)) %>% filter(taxe_cible_approbation != "") %>% select(-temp), sort=FALSE)
+  # label(s$taxe_cible_approbation) <<- "taxe_cible_approbation: Approbation d'une hausse de la taxe carbone compensée par recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
+  # 
+  #   # s <<- s %>% gather(key = temp, value = km, c(km_0, km_1, km_2)) %>% filter(km != "") %>% select(-temp) # erases km_0, km_1, km_2
+  # s <<- merge(s, s %>% gather(key = temp, value = km, c(km_0, km_1, km_2)) %>% filter(km != "") %>% select(-temp), sort=FALSE) # Warning: attributes are not identical across measure variables; they will be dropped
+  # label(s$km) <<- "km: Nombre de kilomètres parcourus lors des 12 derniers mois en voiture ou moto (par le répondant pour nb_vehicules=0, par les véhicules sinon)"
+  # 
+  # s <<- merge(s, s %>% gather(key = temp, value = conso, c(conso_1, conso_2)) %>% filter(conso != "") %>% select(-temp), sort=FALSE)
+  # label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
+
+  s$gain_cible[!is.na(s$gain_taxe__20)] <<- s$gain_taxe__20[!is.na(s$gain_taxe__20)]
+  s$gain_cible[!is.na(s$gain_taxe_20_30)] <<- s$gain_taxe_20_30[!is.na(s$gain_taxe_20_30)]
+  s$gain_cible[!is.na(s$gain_taxe_30_40)] <<- s$gain_taxe_30_40[!is.na(s$gain_taxe_30_40)]
+  s$gain_cible[!is.na(s$gain_taxe_40_50)] <<- s$gain_taxe_40_50[!is.na(s$gain_taxe_40_50)]
+  s$gain_cible[!is.na(s$gain_taxe_50_70)] <<- s$gain_taxe_50_70[!is.na(s$gain_taxe_50_70)]
+  s$gain_cible[!is.na(s$gain_taxe_70_)] <<- s$gain_taxe_70_[!is.na(s$gain_taxe_70_)]
+  label(s$gain_cible) <<- "gain_cible: Ménage Gagnant/Non affecté/Perdant avec hausse taxe carbone à recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
+  s$taxe_cible_approbation[!is.na(s$taxe__20_approbation)] <<- s$taxe__20_approbation[!is.na(s$taxe__20_approbation)]
+  s$taxe_cible_approbation[!is.na(s$taxe_20_30_approbation)] <<- s$taxe_20_30_approbation[!is.na(s$taxe_20_30_approbation)]
+  s$taxe_cible_approbation[!is.na(s$taxe_30_40_approbation)] <<- s$taxe_30_40_approbation[!is.na(s$taxe_30_40_approbation)]
+  s$taxe_cible_approbation[!is.na(s$taxe_40_50_approbation)] <<- s$taxe_40_50_approbation[!is.na(s$taxe_40_50_approbation)]
+  s$taxe_cible_approbation[!is.na(s$taxe_50_70_approbation)] <<- s$taxe_50_70_approbation[!is.na(s$taxe_50_70_approbation)]
+  s$taxe_cible_approbation[!is.na(s$taxe_70__approbation)] <<- s$taxe_70__approbation[!is.na(s$taxe_70__approbation)]
+  label(s$taxe_cible_approbation) <<- "taxe_cible_approbation: Approbation d'une hausse de la taxe carbone compensée par recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
+
+  s$categorie_cible[!is.na(s$taxe__20_approbation)] <<- '_20'
+  s$categorie_cible[!is.na(s$taxe_20_30_approbation)] <<- '20_30'
+  s$categorie_cible[!is.na(s$taxe_30_40_approbation)] <<- '30_40'
+  s$categorie_cible[!is.na(s$taxe_40_50_approbation)] <<- '40_50'
+  s$categorie_cible[!is.na(s$taxe_50_70_approbation)] <<- '50_70'
+  s$categorie_cible[!is.na(s$taxe_70__approbation)] <<- '70_'
+  label(s$categorie_cible) <<- "categorie_cible: Catégorie de revenu du répondant (et de son ménage) taxe à recyclage ciblé - Catégories: percentile <20/20-30/30-40/40-50/50-70/>70, sachant que revenu_conjoint détermine la catégorie quand percentile de revenu > 70 (780/1140/1430/1670/2220)"
+
+  s$km[!is.na(s$km_0)] <<- s$km_0[!is.na(s$km_0)]
+  s$km[!is.na(s$km_1)] <<- s$km_1[!is.na(s$km_1)]
+  s$km[!is.na(s$km_2)] <<- s$km_2[!is.na(s$km_2)]
+  label(s$km) <<- "km: Nombre de kilomètres parcourus lors des 12 derniers mois en voiture ou moto (par le répondant pour nb_vehicules=0, par les véhicules sinon)"
+ 
+  s$conso[!is.na(s$conso_1)] <<- s$conso_1[!is.na(s$conso_1)]
+  s$conso[!is.na(s$conso_2)] <<- s$conso_2[!is.na(s$conso_2)]
+  label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
+
+  # TODO: remove useless colonnes, such as _f/_p
+  # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_tva/fuel, si_/non_, gaz-fioul -> T/F, nb_vehicules 0, transferts_inter/variante, enfant
+}
+# convert_s()
+
+weighting_s <- function(data, printWeights = T) { # cf. google sheet
+  d <- data
+  d$region[is.na(d$region)] <- 'autre'
+  # d$csp <- factor(d$csp)
+  # d$region <- factor(d$region)
+  # levels(d$csp) <- c(levels(d$csp),"missing")
+  # levels(d$region) <- c(levels(d$region),"missing")
+  # levels(d$taille_agglo) <- c(levels(d$taille_agglo),"missing")
+  # levels(d$sexe) <- c(levels(d$sexe),"missing")
+  # d$csp[is.na(d$csp) | d$csp=="" | d$csp=="NSP"] <- "missing"
+  # d$taille_agglo[is.na(d$taille_agglo)] <- "missing"
+  # d$sexe[d$sexe=="" | d$sexe=="Autre"] <- "missing"
+
+  unweigthed <- svydesign(ids=~1, data=d)
+  sexe <- data.frame(sexe = c("Féminin", "Masculin"), Freq=nrow(d)*c(0.516,0.484)) # http://www.insee.fr/fr/themes/detail.asp?ref_id=bilan-demo&reg_id=0&page=donnees-detaillees/bilan-demo/pop_age2.htm
+  csp <- data.frame(csp = c("Inactif", "Ouvrier", "Cadre", "Indépendant", "Intermédiaire", "Retraité", "Employé", "Agriculteur"),
+                    Freq=nrow(d)*c(0.1244,0.1214,0.0943,0.0341,0.1364,0.3279,0.1535,0.008))
+  region <- data.frame(region = c("autre","ARA", "Est", "Nord", "IDF", "Ouest", "SO", "Occ", "Centre", "PACA"), 
+                       Freq=nrow(d)*c(0.001,0.124,0.129,0.093,0.189,0.103,0.093,0.091,0.099,0.078))
+  age <- data.frame(age = c("18 à 24 ans", "25 à 34 ans", "35 à 49 ans", "50 à 64 ans", "65 ans ou plus"), 
+                    Freq=nrow(d)*c(0.117,0.147,0.242,0.242,0.252)) # Données/estim-pop-reg-sexe...
+  taille_agglo <- data.frame(taille_agglo = c(1:5), Freq=nrow(d)*c(0.2166,0.1710,0.1408,0.3083,0.1633))
+  # revenu <- data.frame(revenu = c(), Freq=nrow(d)*c())
+  diplome4 <- data.frame(diplome4 = c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur"),  # http://webcache.googleusercontent.com/search?q=cache:rUvf6u0uCnEJ:www.insee.fr/fr/themes/tableau.asp%3Freg_id%3D0%26ref_id%3Dnattef07232+&cd=1&hl=fr&ct=clnk&gl=fr&lr=lang_en%7Clang_es%7Clang_fr
+                        Freq=nrow(d)*c(0.301, 0.246, 0.168, 0.285))
+
+  if (length(which(d$taille_agglo==""))>0) raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~region,~csp,~age),
+                population.margins = list(sexe,diplome4,region,csp,age))    
+  else raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~taille_agglo,~region,~csp,~age),
+                population.margins = list(sexe,diplome4,taille_agglo,region,csp,age)) 
+
+  if (printWeights) {    print(summary(weights(raked))  )
+    print(sum( weights(raked) )^2/(length(weights(raked))*sum(weights(raked)^2)) ) # <0.5 : problématique   
+    print( length(which(weights(raked)<0.25 | weights(raked)>4))/ length(weights(raked)))
+  }
+  return(weights(trimWeights(raked, lower=0.25, upper=4, strict=TRUE)))
 }
 
-prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, exclude_quotas_full=TRUE, only_finished=TRUE, clean=TRUE, clean_all=FALSE) {
+prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished=TRUE) { # , exclude_quotas_full=TRUE
   # setwd("/home/adrien/Google Drive/Economie/Travail/enquete/codes")
   # setwd("C:/Users/a.fabre/Google Drive/Economie/Travail/enquete/codes")
   # pes <<- read.csv("fin.csv", sep=";")
   # s <<- read.delim("politique.tsv", fileEncoding="UTF-16")
   # f_data <- read.delim("fin.tsv", fileEncoding="UTF-16")
-  s <- read_csv("survey.csv")
-  for (i in 1:length(s)) { label(s[[i]]) <- toString(s[i][[1]][1]) } # Use the first line to create variable names labels then remove it - to run only once
-  s <- s[-c(1,2),]
-  if (exclude_screened) { s <<- s[s$Q_TerminateFlag=="",] } # remove Screened
-  if (exclude_speeder) { s <<- s[n(s$`Duration (in seconds)`) > 540,] } # remove speedest
+  s <<- read_csv("survey.csv")
+  for (i in 1:length(s)) { label(s[[i]]) <<- toString(s[i][[1]][1]) } # Use the first line to create variable names labels then remove it - to run only once
+  s <<- s[-c(1,2),]
+  # if (exclude_screened) { s <<- s[s$Q_TerminateFlag=="",] } # remove Screened
+  # if (exclude_speeder) { s <<- s[n(s$`Duration (in seconds)`) > 540,] } # remove speedest
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
-  if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
-  if (only_finished) { s <<- s[Vf("Finished")=="True",] }
+  # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
+  # if (only_finished) { s <<- s[as.vector(s$Finished)=="True",] }
   
   relabel_and_rename_s()
-  convert_s()
+  
+  convert_s() # TODO: check the Warnings, why s is empty when exclude_screened?
   
   s$sample <<- "a"
   s$sample[s$finished=="True"] <<- "e"
-  s$sample[s$finished=="True" & n(s$duree) >= 450] <<- "p"
-  s$sample[s$finished=="True" & n(s$duree) >= 450 & s$test_qualite=='Un peu'] <<- "f" # TODO:"q"? excluded because out of quotas
-  s$sample[s$finished=="True" & n(s$duree) >= 450 & s$exclu==""] <<- "r"
-  s$Sample <<- s$sample
+  s$sample[s$finished=="True" & n(s$duree) > 540] <<- "p"
+  s$sample[s$finished=="True" & n(s$duree) > 540 & s$test_qualite=='Un peu'] <<- "f" # TODO:"q"? excluded because out of quotas
+  s$sample[s$finished=="True" & n(s$duree) > 540 & s$exclu==""] <<- "r"
   
-  s <<- s[-which(is.element(s$id, s$id[duplicated(s$id)]) & !duplicated(s$id) & is.na(s$revenu)),]
-  
+  # s <<- s[-which(is.element(s$id, s$id[duplicated(s$id)]) & !duplicated(s$id) & is.na(s$revenu)),] # TODO: check duplicates
+
   s$weight <<- weighting_s(s)
+
+  if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
+  if (exclude_speeder) { s <<- s[s$duree > 540,] } # remove speedest
+  # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
+  # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
+  if (only_finished) { s <<- s[s$finished=="True",] }
 }
 
-prepare_f(exclude_screened=FALSE)
-tp <- merge(merge_f_m('p'), f, all=T)
-fp <- f
-# prepare_f(exclude_screened=FALSE, exclude_speeder=FALSE)
-# te <- merge(merge_f_m('e'), f, all=T)
-# fe <- f
-# prepare_f(clean=FALSE)
-# tc <- merge(merge_f_m('c'), f, all=T)
-# fc <- f
-prepare_f(exclude_quotas_full = FALSE)
-tq <- merge(merge_f_m('q'), f, all=T)
-fq <- f
-prepare_f()
-t <- merge(merge_f_m(), f, all=T)
-ff <- f
+# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
+# sa <- s
+# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
+# se <- s
+# prepare_s(exclude_screened=FALSE)
+# sp <- s
 
-f <- fq
-t <- tq
+prepare_s()
