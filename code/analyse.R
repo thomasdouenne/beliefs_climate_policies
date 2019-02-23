@@ -112,7 +112,7 @@ decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=
 summary(lm((enfant_CC=='Oui') ~ sexe, data=s))
 
 
-##### Connaissances CC #####
+##### Connaissances et opinions CC #####
 decrit(s$ges_avion, weights = s$weight) # 47%
 decrit(s$ges_boeuf, weights = s$weight) # 47%
 decrit(s$ges_nucleaire, weights = s$weight) # 48%
@@ -123,6 +123,7 @@ decrit(s$ges_pm, weights = s$weight) # 58%
 decrit(s$score_polluants, weights = s$weight)
 decrit(s$score_climate_call, weights = s$weight)
 decrit(s$emission_cible, weights = s$weight) # 5
+decrit(s$cause_CC, miss=T, weights = s$weight)
 
 
 ##### Transferts inter #####
@@ -130,6 +131,13 @@ decrit(s$transferts_inter, weights = s$weight)
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, weights = s$weight)) # 0 !
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, subset = transferts_inter!='NSP', weights = s$weight)) # 0 !
 decrit(s$variation_aide, weights = s$weight)
+load('p_data.RData')
+t <- merge(s, t_transferts_inter_a, all=T)
+t$transferts_inter[!is.na(t$taille_foyer)] <- t$transferts_inter_a[!is.na(t$taille_foyer)] 
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t)) # 0
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, subset = transferts_inter!='NSP')) # 0
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, weights = t$weight)) # 0
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, subset = transferts_inter!='NSP', weights = t$weight)) # 0
 
 
 ##### Dépenses publiques #####
@@ -139,6 +147,24 @@ for (v in categories_depenses) {
   print(summary(lm(s[[paste('variation', v, sep='_')]] ~ s[[paste('dep', i, 'en_position', sep='_')]], weights=s$weight)))
   i <- i+1 }
 # *** pour justice
+t_depenses$aleatoire <- FALSE
+s$aleatoire <- TRUE
+d <- merge(s, t_depenses, all=T)
+for (v in categories_depenses) {  print(summary(lm(d[[paste('variation', v, sep='_')]] ~ d$aleatoire))) } # * -: armee, securite, aide, 
+decrit(d$variation_aide)
+decrit(s$variation_aide)
+decrit(s$depenses_confiant)
+decrit(s$depenses_confiant[is.na(s$variation_aide)])
+decrit(t_depenses$variation_aide)
+for (v in categories_depenses) { # why not use tidyverse's gather?
+  temp <- d[, c(paste('variation', v, sep='_'), 'weight')]
+  temp$categorie <- v
+  temp$variation <- temp[[paste('variation', v, sep='_')]]
+  if (exists('dep')) dep <- merge(dep, temp, all=T)
+  else dep <- temp
+}
+dep$categorie <- relevel(as.factor(dep$categorie), "infrastructures")
+summary(lm(variation ~ categorie, data=dep)) # answers are not random, i.e. average depends significantly on category
 
 
 ##### Miscellanous #####

@@ -864,6 +864,8 @@ convert_s <- function() {
                 labels = structure(c("Gaz de ville", "Butane, propane, gaz en citerne", "Fioul, mazout, pétrole", "Électricité", "Bois, solaire, géothermie, aérothermie (pompe à chaleur)", "Autre","NSP"), names = c("Gaz réseau", "Gaz bouteille", "Fioul", "Électricité", "Bois, solaire...", "Autre", "NSP")), missing.values='NSP', annotation=Label(s$chauffage))
   s$schiste_CC <<- as.item(s$schiste_CC,
                 labels = structure(c("","Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir","Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"), names = c("NA","malvenue","valable","NSP")), missing.values='NSP', annotation=Label(s$schiste_CC))
+  s$cause_CC <<- as.item(s$cause_CC,
+                labels = structure(c("n'est pas une réalité","est principalement dû à la variabilité naturelle du climat", "est principalement dû à l'activité humaine", "NSP"), names = c("n'existe pas","naturel","anthropique","NSP")), missing.values='NSP', annotation=Label(s$cause_CC))
 
   s$gauche_droite <<- pmax(-2,pmin(2,-2 * grepl("extrême gauche", s$extr_gauche) - grepl("De gauche", s$gauche) + grepl("De droite", s$droite) + 2 * grepl("extrême droite", s$extr_droite)))
   is.na(s$gauche_droite) <<- (s$gauche_droite == 0) & !grepl("centre", s$centre)
@@ -1019,6 +1021,9 @@ convert_s <- function() {
   # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_tva/fuel, si_/non_, gaz-fioul -> T/F, transferts_inter/variante, enfant
 }
 # convert_s()
+# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
+# sa <- s
+# prepare_s()
 
 weighting_s <- function(data, printWeights = T) { # cf. google sheet
   d <- data
@@ -1104,3 +1109,4 @@ sa <- s
 # sp <- s
 
 prepare_s()
+
