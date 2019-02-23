@@ -62,6 +62,14 @@ summary(lm((taxe_progressif_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s
 summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (gain_taxe!='Perdant'), data=s, weights = s$weight))
 
+##### Elasticites #####
+decrit(s$Elasticite_fuel) # -0.42
+decrit(s$Elasticite_fuel_perso) # -0.29
+decrit(s$Elasticite_chauffage) # -0.41
+decrit(s$Elasticite_chauffage_perso) # -0.20
+summary(lm(Elasticite_fuel ~ (taxe_efficace=='Oui'), data=s, weights = s$weight))
+summary(lm(Elasticite_chauffage ~ (taxe_efficace=='Oui'), data=s, weights = s$weight)) # Aucun lien évident élasticité / efficacité environnementale
+
 
 ##### Ciblage #####
 decrit(s$categorie_cible)
@@ -95,7 +103,9 @@ summary(lm((schiste_CC=='Elle est valable : toute baisse des émissions va dans 
 
 
 ##### Enfant ######
-decrit(s$enfant_CC) # TODO: H/F
+decrit(s$enfant_CC)
+decrit(s$enfant_CC[s$sexe=='Masculin'])
+decrit(s$enfant_CC[s$sexe=='Féminin'])
 decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'])
 decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'])
 
@@ -113,7 +123,6 @@ decrit(s$score_climate_call)
 decrit(s$emission_cible) # 5
 
 
-
 ##### Transferts inter #####
 decrit(s$transferts_inter)
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, weights = s$weight)) # 0 !
@@ -129,10 +138,12 @@ for (v in categories_depenses) {
   i <- i+1 }
 # *** pour justice
 
+
 ##### Miscellanous #####
 decrit(s$rattrapage_diesel, miss = T) # TODO: correlation avec avoir diesel
 decrit(s$hausse_diesel) # This needs to be fixed !
 summary(lm((rattrapage_diesel!='Non') ~ (diesel==TRUE), data=s, weights = s$weight))
+for (j in names(s)) if (grepl('gilets_jaunes', j)) print(decrit(s[[j]], weights=s$weight))
 
 
 ##### Approbation politiques environnementales #####
