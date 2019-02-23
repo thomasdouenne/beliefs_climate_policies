@@ -15,16 +15,30 @@ from model_reforms_data.gains_losses_data import compute_gains_losses
 from utils import graph_builder_bar_percent
 
 
+def estimate_kde(df_hh, df_survey, bdw):
+    df_survey['gain_monetaire'] = 0 + (
+            - 280 * 1.5 * (df_survey['gain_taxe_carbone'] == -6)
+            - (280 + 190) / 2 * (df_survey['gain_taxe_carbone'] == -5)
+            - (190 + 120) / 2 * (df_survey['gain_taxe_carbone'] == -4)
+            - (120 + 70) / 2 * (df_survey['gain_taxe_carbone'] == -3)
+            - (70 + 30) / 2 * (df_survey['gain_taxe_carbone'] == -2)
+            - (30 + 0) / 2 * (df_survey['gain_taxe_carbone'] == -1)
+            + (0 + 20) / 2 * (df_survey['gain_taxe_carbone'] == 1)
+            + (20 + 40) / 2 * (df_survey['gain_taxe_carbone'] == 2)
+            + (40 + 60) / 2 * (df_survey['gain_taxe_carbone'] == 3)
+            + (60 + 80) / 2 * (df_survey['gain_taxe_carbone'] == 4)
+            + (80 + 100) / 2 * (df_survey['gain_taxe_carbone'] == 5)
+            )
+    
+    kde_1 = df_survey['gain_monetaire'].plot.kde(bw_method = bdw)
+    kde_2 = df_hh['gain_net_uc_taxe_carbone'].plot.kde(bw_method = bdw)
+
+    return kde_1, kde_2
+
 def compare_objective_subjective_beliefs_gains(df_hh, df_survey, energy):
     
     df_to_plot = pd.DataFrame(index = range(-6,6), columns = ['Objective_gains', 'Subjective_gains'])
         
-    df_hh['gain_net_uc_fuel'] = \
-        (60 * df_hh['nb_beneficiaries'] - df_hh['transport_expenditures_increase']) / df_hh['consumption_units']
-    df_hh['gain_net_uc_chauffage'] = \
-        (50 * df_hh['nb_beneficiaries'] - df_hh['housing_expenditures_increase']) / df_hh['consumption_units']
-    df_hh['gain_net_uc_taxe_carbone'] = \
-        (110 * df_hh['nb_beneficiaries'] - df_hh['total_expenditures_increase']) / df_hh['consumption_units']
     if energy != 'taxe_carbone':
         df_hh['gain_{}'.format(energy)] = 0 + (
                 - 6 * (df_hh['gain_net_uc_{}'.format(energy)] < -160)
@@ -73,9 +87,16 @@ if __name__ == "__main__":
     df_hh = prepare_dataset()
     df_hh = compute_gains_losses(df_hh)
     df_hh['weight'] = 1
+    df_hh['gain_net_uc_fuel'] = \
+        (60 * df_hh['nb_beneficiaries'] - df_hh['transport_expenditures_increase']) / df_hh['consumption_units']
+    df_hh['gain_net_uc_chauffage'] = \
+        (50 * df_hh['nb_beneficiaries'] - df_hh['housing_expenditures_increase']) / df_hh['consumption_units']
+    df_hh['gain_net_uc_taxe_carbone'] = \
+        (110 * df_hh['nb_beneficiaries'] - df_hh['total_expenditures_increase']) / df_hh['consumption_units']
     
     df_survey = pd.read_csv(r'C:\Users\thoma\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv')
     df_survey['weight'] = 1
     df_survey['gain_taxe_carbone'] = df_survey['gain']
 
-    df_to_plot = compare_objective_subjective_beliefs_gains(df_hh, df_survey, 'fuel')[0]
+    #df_to_plot = compare_objective_subjective_beliefs_gains(df_hh, df_survey, 'fuel')[0]
+    kde = estimate_kde(df_hh, df_survey, 0.6)
