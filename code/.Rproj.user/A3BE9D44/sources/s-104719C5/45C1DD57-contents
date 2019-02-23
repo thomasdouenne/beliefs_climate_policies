@@ -28,35 +28,36 @@ Ecdf(sa$duree_min)
 
 
 ##### Caractéristiques énergétiques #####
-decrit(s$surface) # 120
+decrit(s$surface, weights = s$weight) # 120
 decrit(s$chauffage, weights = s$weight) # 50% gaz ou fioul
-decrit(s$km) # 11k (moyenne 15k)
-decrit(s$conso) # 6
-decrit(s$nb_vehicules)
+decrit(s$km, weights = s$weight) # 11k (moyenne 15k)
+decrit(s$conso, weights = s$weight) # 6
+decrit(s$nb_vehicules, weights = s$weight)
 
 
 ##### Gain questions générales (TVA, transports, logement) #####
-decrit(s$perte_tva)
-decrit(s$perte_fuel)
-decrit(s$perte_chauffage) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
+decrit(s$perte_tva, weights = s$weight)
+decrit(s$perte_fuel, weights = s$weight)
+decrit(s$perte_chauffage, weights = s$weight) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
 
 
 ##### Gain (dividende - hausse dépenses énergétiques) #####
-decrit(110 * s$nb_adultes - s$hausse_depenses) # Ok !
-decrit(s$gain) 
-decrit(s$gain_taxe)
-decrit(s$gain_taxe_feedback)
-decrit(s$gain_taxe_feedback[s$hausse_depenses < 110 * s$nb_adultes], weights = s$weight[s$hausse_depenses < 110 * s$nb_adultes]) # On ne les convainc pas !!!
+decrit(110 * s$nb_adultes - s$hausse_depenses, weights = s$weight) # Ok !
+decrit(s$gain, weights = s$weight) 
+decrit(s$gain_taxe, weights = s$weight)
+decrit(s$gain_taxe_feedback, weights = s$weight)
+decrit(s$gain_taxe_feedback[s$hausse_depenses < 110 * s$nb_adultes], weights = s$weight[s$hausse_depenses < 110 * s$nb_adultes]) 
+# On ne les convainc pas !!!
 length(which(s$gain_taxe_feedback=='Gagnant' & s$hausse_depenses < 110 * s$nb_adultes))/length(which(!is.na(s$gain_taxe_feedback) & s$hausse_depenses < 110 * s$nb_adultes))
 length(which(s$gain_taxe_feedback=='Gagnant' & s$gain_taxe != 'Gagnant' & s$hausse_depenses < 110 * s$nb_adultes))/length(which(!is.na(s$gain_taxe_feedback) & s$hausse_depenses < 110 * s$nb_adultes & s$gain_taxe != 'Gagnant'))
-decrit(s$gain_taxe_progressif)
+decrit(s$gain_taxe_progressif, weights = s$weight)
 
 
 ##### Approbation #####
-decrit(s$taxe_approbation) # 11% Dur !!!
-decrit(s$taxe_feedback_approbation) # 17%
-decrit(s$taxe_efficace) # 18%
-decrit(s$taxe_progressif_approbation) # 19%
+decrit(s$taxe_approbation, weights = s$weight) # 11% Dur !!!
+decrit(s$taxe_feedback_approbation, weights = s$weight) # 17%
+decrit(s$taxe_efficace, weights = s$weight) # 18%
+decrit(s$taxe_progressif_approbation, weights = s$weight) # 19%
 summary(lm((taxe_feedback_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_progressif_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gain_taxe!='Perdant'), data=s, weights = s$weight))
@@ -64,8 +65,8 @@ summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (g
 
 
 ##### Ciblage #####
-decrit(s$categorie_cible)
-decrit(s$taxe_cible_approbation)
+decrit(s$categorie_cible, weights = s$weight)
+decrit(s$taxe_cible_approbation, weights = s$weight)
 summary(lm((taxe_cible_approbation=='Oui') ~ (cible==20), data=s, subset=categorie_cible=='20_30', weights = s$weight))
 summary(lm((taxe_cible_approbation=='Oui') ~ (cible==30), data=s, subset=categorie_cible=='30_40', weights = s$weight)) # *
 summary(lm((taxe_cible_approbation=='Oui') ~ (cible==40), data=s, subset=categorie_cible=='40_50', weights = s$weight))
@@ -84,38 +85,41 @@ summary(lm((taxe_cible_approbation=='Oui') ~ categorie_cible, data=s, subset=cib
 
 
 ##### Gaz de schiste #####
-decrit(s$schiste_approbation)
-decrit(s$schiste_approbation, miss=T)
-decrit(s$schiste_traite)
-decrit(s$schiste_avantage)
-decrit(s$schiste_CC)
+decrit(s$schiste_approbation, weights = s$weight)
+decrit(s$schiste_approbation, miss=T, weights = s$weight)
+decrit(s$schiste_traite, weights = s$weight)
+decrit(s$schiste_avantage, weights = s$weight)
+decrit(s$schiste_CC, weights = s$weight)
 summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==0), data=s, weights = s$weight)) # Encore rien de très significatif
 summary(lm((schiste_avantage=='Cela permettrait de créer des emplois et dynamiser les départements concernés') ~ (schiste_traite==1), data=s, subset=schiste_approbation=='Oui' & schiste_avantage !='Aucune de ces deux raisons', weights = s$weight))
 summary(lm((schiste_CC=='Elle est valable : toute baisse des émissions va dans la bonne direction') ~ (schiste_traite==1), data=s, subset=schiste_approbation=='Oui' & schiste_CC !='NSP (Ne sait pas, ne se prononce pas)', weights = s$weight))
 
 
-##### Enfant ######
-decrit(s$enfant_CC) # TODO: H/F
-decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'])
-decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'])
+##### Engagement personnel ######
+decrit(s$mode_vie_ecolo, weights = s$weight) # 79% !
+decrit(s$mode_vie_ecolo, miss=T, weights = s$weight) # 65%
+decrit(s$enfant_CC, weights = s$weight) # TODO: H/F
+decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui'])
+decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui'])
+summary(lm((enfant_CC=='Oui') ~ sexe, data=s))
 
 
 ##### Connaissances CC #####
-decrit(s$ges_avion) # 47%
-decrit(s$ges_boeuf) # 47%
-decrit(s$ges_nucleaire) # 48%
-decrit(s$ges_co2) # 81%
-decrit(s$ges_ch4) # 48%
-decrit(s$ges_o2) # 6%
-decrit(s$ges_pm) # 58%
-decrit(s$score_polluants)
-decrit(s$score_climate_call)
-decrit(s$emission_cible) # 5
+decrit(s$ges_avion, weights = s$weight) # 47%
+decrit(s$ges_boeuf, weights = s$weight) # 47%
+decrit(s$ges_nucleaire, weights = s$weight) # 48%
+decrit(s$ges_co2, weights = s$weight) # 81%
+decrit(s$ges_ch4, weights = s$weight) # 48%
+decrit(s$ges_o2, weights = s$weight) # 6%
+decrit(s$ges_pm, weights = s$weight) # 58%
+decrit(s$score_polluants, weights = s$weight)
+decrit(s$score_climate_call, weights = s$weight)
+decrit(s$emission_cible, weights = s$weight) # 5
 
 
 
 ##### Transferts inter #####
-decrit(s$transferts_inter)
+decrit(s$transferts_inter, weights = s$weight)
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, weights = s$weight)) # 0 !
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, subset = transferts_inter!='NSP', weights = s$weight)) # 0 !
 decrit(s$variation_aide, weights = s$weight)
@@ -130,12 +134,11 @@ for (v in categories_depenses) {
 # *** pour justice
 
 ##### Miscellanous #####
-decrit(s$rattrapage_diesel, miss = T) # TODO: correlation avec avoir diesel
-decrit(s$hausse_diesel) # This needs to be fixed !
+decrit(s$rattrapage_diesel, miss = T, weights = s$weight) # TODO: correlation avec avoir diesel
+decrit(s$hausse_diesel, weights = s$weight) # This needs to be fixed !
 summary(lm((rattrapage_diesel!='Non') ~ (diesel==TRUE), data=s, weights = s$weight))
 
 
 ##### Approbation politiques environnementales #####
-decrit(s$si_pauvres)
 for (j in names(s)) if (grepl('si_', j)) print(decrit(s[[j]], weights=s$weight))
 for (j in 141:148) print(decrit(s[[j]], weights=s$weight))
