@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1550777874065.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1318924825",
+    "id" : "EC50FB59",
+    "lastKnownWriteTime" : 1550925194,
+    "last_content_update" : 1550925196110,
+    "path" : "/var/www/beliefs_climate_policies/code/preparation.R",
+    "project_path" : "preparation.R",
+    "properties" : {
+        "cursorPosition" : "1048,1",
+        "scrollLine" : "728"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
