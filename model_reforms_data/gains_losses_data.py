@@ -120,8 +120,11 @@ if __name__ == "__main__":
     df_m = df_hh.query('consumption_units > 1.4').query('consumption_units < 2')
     df_l = df_hh.query('consumption_units > 1.9').query('consumption_units < 2.4')
     df_xl = df_hh.query('consumption_units > 2.3')
+    df_xxl = df_hh.query('consumption_units > 2.75')
     
-    print ((df_s['total_expenditures_increase'] - 110 *df_s['nb_beneficiaries']) / df_s['consumption_units']).quantile(0.9)
-    print ((df_m['total_expenditures_increase'] - 110 *df_m['nb_beneficiaries']) / df_m['consumption_units']).quantile(0.9)
-    print ((df_l['total_expenditures_increase'] - 110 *df_l['nb_beneficiaries']) / df_l['consumption_units']).quantile(0.9)
-    print ((df_xl['total_expenditures_increase']- 110 *df_xl['nb_beneficiaries']) / df_xl['consumption_units']).quantile(0.9)
+    print ((df_s['total_expenditures_increase'] - 110 *df_s['nb_beneficiaries'])).quantile(0.9)
+    print ((df_m['total_expenditures_increase'] - 110 *df_m['nb_beneficiaries'])).quantile(0.9)
+    print ((df_l['total_expenditures_increase'] - 110 *df_l['nb_beneficiaries'])).quantile(0.9)
+    print ((df_xl['total_expenditures_increase']- 110 *df_xl['nb_beneficiaries'])).quantile(0.9)
+    
+    
