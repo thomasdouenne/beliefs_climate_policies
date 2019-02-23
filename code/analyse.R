@@ -1,3 +1,17 @@
+package('pwr')
+package("foreign")
+package("memisc")
+package("DT")
+package("pastecs")
+package("lsr")
+package("ggplot2")
+package("stringr")
+package("survey")
+package("plotly")
+package('gdata')
+package('tidyverse')
+package("Hmisc")
+
 ##### Durées #####
 decrit(s$duree/60) # 18 min (moyenne 24)
 decrit(s$duree_depenses/60) # 2 min (moyenne 3.5)
@@ -98,6 +112,22 @@ decrit(s$score_polluants)
 decrit(s$score_climate_call)
 decrit(s$emission_cible) # 5
 
+
+
+##### Transferts inter #####
+decrit(s$transferts_inter)
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, weights = s$weight)) # 0 !
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, subset = transferts_inter!='NSP', weights = s$weight)) # 0 !
+decrit(s$variation_aide, weights = s$weight)
+
+
+##### Dépenses publiques #####
+categories_depenses <- c("sante", "education", "retraites", "securite", "recherche", "justice", "armee", "protection", "infrastructures", "loisirs", "aide")
+i <- 0
+for (v in categories_depenses) {
+  print(summary(lm(s[[paste('variation', v, sep='_')]] ~ s[[paste('dep', i, 'en_position', sep='_')]], weights=s$weight)))
+  i <- i+1 }
+# *** pour justice
 
 ##### Miscellanous #####
 decrit(s$rattrapage_diesel, miss = T) # TODO: correlation avec avoir diesel

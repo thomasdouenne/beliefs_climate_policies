@@ -12,7 +12,6 @@ package <- function(p) {
 package('pwr')
 package("foreign")
 package("memisc")
-package("Hmisc")
 package("DT")
 package("pastecs")
 package("lsr")
@@ -22,6 +21,7 @@ package("survey")
 package("plotly")
 package('gdata')
 package('tidyverse')
+package("Hmisc")
 
 # Fs <- function(QID) { s[QID][[1]] }
 # Vs <- function(QID) { as.vector(Fs(QID))  } 
@@ -955,9 +955,21 @@ convert_s <- function() {
   s$conso[!is.na(s$conso_1)] <<- s$conso_1[!is.na(s$conso_1)]
   s$conso[!is.na(s$conso_2)] <<- s$conso_2[!is.na(s$conso_2)]
   label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
+  
+	s$hausse_diesel[s$nb_vehicules == 0] <<- 0.5*6.39/100 * s$km * 1.4 * (1 - 0.4) * 0.090922 # share_diesel * conso * km * price * (1-elasticite) * price_increase
+	s$hausse_diesel[s$nb_vehicules == 1] <<- (s$fuel_1=='Diesel') * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
+  s$hausse_diesel[s$nb_vehicules == 1] <<- ((s$fuel_2_1=='Diesel')*2/3 + (s$fuel_2_2=='Diesel')/3) * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
 
+  for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
+  for (i in 0:10) {
+    for (o in 1:nrow(s)) {
+      j <- s[[paste('en_position', i, sep='_')]][o]
+      s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
+    }
+  }
+  
   # TODO: remove useless colonnes, such as _f/_p
-  # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_tva/fuel, si_/non_, gaz-fioul -> T/F, nb_vehicules 0, transferts_inter/variante, enfant
+  # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_tva/fuel, si_/non_, gaz-fioul -> T/F, transferts_inter/variante, enfant
 }
 # convert_s()
 
@@ -1015,6 +1027,8 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   # if (only_finished) { s <<- s[as.vector(s$Finished)=="True",] }
   
   relabel_and_rename_s()
+  print(paste(length(which(is.na(s$taille_agglo))), "tailles d'agglo sont manquantes"))
+  s <<- s[!is.na(s$taille_agglo),]
   
   convert_s() # TODO: check the Warnings, why s is empty when exclude_screened?
   
@@ -1029,14 +1043,14 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   s$weight <<- weighting_s(s)
 
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
-  if (exclude_speeder) { s <<- s[s$duree > 540,] } # remove speedest
+  if (exclude_speeder) { s <<- s[s$duree > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
   # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
   if (only_finished) { s <<- s[s$finished=="True",] }
 }
 
-# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
-# sa <- s
+prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
+sa <- s
 # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
 # se <- s
 # prepare_s(exclude_screened=FALSE)
