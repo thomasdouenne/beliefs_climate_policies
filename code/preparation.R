@@ -1104,8 +1104,3 @@ sa <- s
 # sp <- s
 
 prepare_s()
-
-decrit(s$si_pauvres)  # TODO: no numbers
-decrit(s$si_pauvres, miss=T)  # TODO: no numbers
-decrit(s$si_pauvres, numbers=T)  # TODO: no numbers
-decrit(s$si_pauvres, miss=T, numbers=T)  # TODO: no numbers
