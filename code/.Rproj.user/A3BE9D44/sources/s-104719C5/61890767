@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1550744161663.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "61890767",
+    "lastKnownWriteTime" : 1550155529,
+    "last_content_update" : 1550155529,
+    "path" : "~/Google Drive/Economie/Travail/enquete/codes/preparation_fin.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "557,271",
+        "scrollLine" : "550"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

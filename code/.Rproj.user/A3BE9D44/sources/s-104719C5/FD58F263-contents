@@ -1,0 +1,1101 @@
+options(download.file.method = "wget"); # For Ubuntu 14.04
+package <- function(p) { 
+  if (!is.element(p, installed.packages()[,1])) {
+  install.packages(p); 
+  }
+  library(p, character.only = TRUE)
+} # loads packages with automatical install if needed
+package("foreign")
+package("memisc")
+package("Hmisc")
+package("DT")
+package("pastecs")
+package("lsr")
+package("ggplot2")
+package("stringr")
+package("survey")
+package("plotly")
+Fp <- function(QID) { p[QID][[1]] }
+Vp <- function(QID) { as.vector(Fp(QID))  }
+n <- function(var) { as.numeric(as.vector(var)) }
+fp <- function(id) { p[paste("QID", id, sep="")][[1]] }
+vp <- function(id) { as.vector(f(id)) }
+NSPp <- function(QID) { length(V(QID)[V(QID) == "NSP (Je ne veux pas répondre)"])/length(V(QID)) }
+nspp <- function(id) { length(v(id)[v(id) == "NSP (Je ne veux pas répondre)"])/length(v(id)) }
+Label <- function(var) {
+  if (length(annotation(var))==1) { annotation(var)[1] }
+  else { label(var)  }
+}
+relabel_and_rename_p <- function() {
+  for (i in 1:length(p)) {
+    label(p[[i]]) <<- paste(names(p)[i], ": ", label(p[[i]]), sep="");
+  }
+  p <<- p[,c(1:30,39:191,31:38,192)]
+  names(p)[1] <<- "date";
+  label(p[[1]]) <<- "date: Date de commencement du sondage";
+  names(p)[2] <<- "endDate";
+  label(p[[2]]) <<- "endDate: Date de fin";
+  names(p)[3] <<- "status";
+  label(p[[3]]) <<- "status: 'IP Address'";
+  names(p)[4] <<- "ip";
+  label(p[[4]]) <<- "ip: Adresse IP";
+  names(p)[5] <<- "progress";
+  label(p[[5]]) <<- "progress: Progrès";
+  names(p)[6] <<- "duree";
+  label(p[[6]]) <<- "duree: Durée de complétion du questionnaire (pn secondes)";
+  names(p)[7] <<- "finished";
+  label(p[[7]]) <<- "finished: Terminé";
+  names(p)[8] <<- "recordedDate";
+  label(p[[8]]) <<- "recordedDate: Date enregistrée";
+  names(p)[9] <<- "X_recordId";
+  label(p[[9]]) <<- "X_recordId: ID de réponse";
+  names(p)[10] <<- "recipientLastName";
+  label(p[[10]]) <<- "recipientLastName: Nom du destinataire";
+  names(p)[11] <<- "recipientFirstName";
+  label(p[[11]]) <<- "recipientFirstName: Prénom du destinataire";
+  names(p)[12] <<- "recipientEmail";
+  label(p[[12]]) <<- "recipientEmail: Adresse e-mail du destinataire";
+  names(p)[13] <<- "externalDataReference";
+  label(p[[13]]) <<- "externalDataReference: Référence externe";
+  names(p)[14] <<- "locationLatitude";
+  label(p[[14]]) <<- "locationLatitude: LocationLatitude - Latitude de l'emplacement";
+  names(p)[15] <<- "locationLongitude";
+  label(p[[15]]) <<- "locationLongitude: LocationLongitude - Longitude de l'emplacement";
+  names(p)[16] <<- "distributionChannel";
+  label(p[[16]]) <<- "distributionChannel: DistributionChannel - Canal de distribution";
+  names(p)[17] <<- "bienvenu";
+  label(p[[17]]) <<- "Q66 - Bienvenu dans l'enquête \"fiscalité des français\". Ce sondage a été réalisé...";
+  names(p)[18] <<- "sexe";
+  label(p[[18]]) <<- "sexe: Sexe - Q74";
+  names(p)[19] <<- "age";
+  label(p[[19]]) <<- "age: Âge - Q75";
+  names(p)[20] <<- "revenu";
+  label(p[[20]]) <<- "revenu: Revenu mensuel net - Q39";
+  names(p)[21] <<- "patrimoine";
+  label(p[[21]]) <<- "patrimoine: Patrimoine (<10k/10-50k/50-150k/150-300k/300-600k/>600k/NSP) - Q40";
+  names(p)[22] <<- "heritage_futur";
+  label(p[[22]]) <<- "heritage_futur: Héritage prévu (<10k/10-50k/50-150k/150-300k/300-600k/>600k/NSP) - Q60";
+  names(p)[23] <<- "taille_foyer";
+  label(p[[23]]) <<- "taille_foyer: Taille de foyer #(vous, membres de votre famille vivant avec vous et personnes à votre charge) - Q41";
+  names(p)[24] <<- "situation_maritale";
+  label(p[[24]]) <<- "situation_maritale: Situation maritale (marié-e/seul-e/en couple) - Q42";
+  names(p)[25] <<- "revenu_conjoint";
+  label(p[[25]]) <<- "revenu_conjoint: Revenu du conjoint (mensuel net) - Q56";
+  names(p)[26] <<- "diplome";
+  label(p[[26]]) <<- "diplome: Diplôme le plus haut (obtenu ou prévu: Aucun/Brevet/CAP/Bac/+2/+3/>+4/NSP) - Q76";
+  names(p)[27] <<- "statut_emploi";
+  label(p[[27]]) <<- "statut_emploi: Statut d'emploi (Chômage/CDD/CDI/fonctionnaire/étudiant-e/retraité-e/précaire/autre actif/autre inactif/NSP) - Q43";
+  names(p)[28] <<- "satisfaction";
+  label(p[[28]]) <<- "satisfaction: Satisfaction du revenu actuel (Votre revenu actuel vous satisfait-il: Oui/Non/NSP) - Q1";
+  names(p)[29] <<- "contre_chomage";
+  label(p[[29]]) <<- "contre_chomage: Mesures soutenues pour lutter contre le chômage (Libéraliser/Baisse cotis'/Baisser SMIC/Baisser alloc chômage/Formation pro pour tous chômeurs longue durée (cld)/Subventionner embauches cld/Investissement public/Inciter à accords RTT/Autre (champ libre)/NSP) - Q110";
+  names(p)[30] <<- "contre_chomage_champ_libre";
+  label(p[[30]]) <<- "contre_chomage_champ_libre: Champ libre - Mesures soutenues pour lutter contre le chômage (Libéraliser/Baisse cotis'/Baisser SMIC/Baisser alloc chômage/Formation pro pour tous chômeurs longue durée (cld)/Subventionner embauches cld/Investissement public/Inciter à accords RTT/Autre (champ libre)/NSP) - Q110";
+  names(p)[31] <<- "dette";
+  label(p[[31]]) <<- "dette: Rembourser dette et/ou réduire déficit ? (Que faire de la dette et du déficit publics ?: Rembourser & revenir à l'eq/Rembourser & ramener déficit <3% PIB/Rembourser sans chercher à réduire déficit/Restructurer/NSP) - Q112";
+  names(p)[32] <<- "quelle_redistribution";
+  label(p[[32]]) <<- "quelle_redistribution: Hausse des bas revenus ou des bas salaires ? (Pour réduire les inégalités, préférez-vous ... ?: Augmentation du SMIC et des bas salaires/Augmentation des minima sociaux (RSA)/Pas de réduction des inégalités/NSP) - Q32";
+  names(p)[33] <<- "rsa_jeune";
+  label(p[[33]]) <<- "rsa_jeune: Extension du RSA aux moins de 25 ans (Êtes-vous favorable à ... sans ressource ? Pour info, RSA=525€/mois: Oui/Non/NSP) - Q113";
+  names(p)[34] <<- "quel_heritage";
+  label(p[[34]]) <<- "quel_heritage: Manière dont on devrait taxer les successions (Pas d'impôt/Première maison non imposée/Faible pour la moyenne, plus élevé pour les riches/Très progressif: personne ne devrait hériter plus de 10^7€/NSP) - Q114";
+  names(p)[35] <<- "quel_rdb";
+  label(p[[35]]) <<- "quel_rdb: Modalités préférée pour un revenu de base (Après explications sur RdB: RdB 700€/RdB 1000€/RdB 500€/RdB 850€/RdB 700€ remplaçant chômage/RdB 1000€ remplaçant chômage/RdB 1000€ remplaçant chômage et retraite/Maintien système actuel/Maintien + baisse RSA/Maintien + hausse RSA/NSP) - Q115";
+  names(p)[36] <<- "deduction_loyer_impots";
+  label(p[[36]]) <<- "deduction_loyer_impots: Déduction des loyers dans calcul revenu imposable couplée à baisse taxe foncière pour propriétaires accédants (Oui/Non/NSP) - Q122";
+  names(p)[37] <<- "retraite_modulee_csp";
+  label(p[[37]]) <<- "retraite_modulee_csp: Prise en compte de l'espérance de vie du métier pour le calcul de la retraite (Oui/Non/NSP) - Q124";
+  names(p)[38] <<- "retraite_libre";
+  label(p[[38]]) <<- "retraite_libre: Laisser la liberté de choisir le montant cotisé (dans une fourchette) ainsi que l'âge de départ à la retraite (Oui/Non/NSP) - Q125";
+  names(p)[39] <<- "rdb_aid_choix";
+  label(p[[39]]) <<- "rdb_aid_choix: Choix - RdB - aides de l'État pour les sans revenus - Q222";
+  names(p)[40] <<- "rdb_aid";
+  label(p[[40]]) <<- "rdb_aid: RdB - aides de l'État pour qui n'a aucun revenu (mensuel, Quel devrait être le montant ... ?: €/État ne devrait pas verser d'aider aux gens sans revenu/NSP) - Q222";
+  names(p)[41] <<- "rdb_rdb_choix";
+  label(p[[41]]) <<- "rdb_rdb_choix: Choix - RdB - revenu de base en France (mensuel, Quel devrait être le montant ... (allocation versée à chaque adulte sans condition en remplacement des minima sociaux) ?: €/On ne devrait pas instaurer de RdB/NSP) - Q23";
+  names(p)[42] <<- "rdb_rdb";
+  label(p[[42]]) <<- "rdb_rdb: RdB - revenu de base en France (mensuel, Quel devrait être le montant ... (allocation versée à chaque adulte sans condition en remplacement des minima sociaux) ?: €/On ne devrait pas instaurer de RdB/NSP) - Q23";
+  names(p)[43] <<- "rdb_gar_choix";
+  label(p[[43]]) <<- "rdb_gar_choix: Choix - RdB - minimal garanti à tous les français (mensuel, Quel devrait être le montant ...  ?: €/Il ne devrait pas y avoir de montant minimal garanti/NSP) - Q24";
+  names(p)[44] <<- "rdb_gar";
+  label(p[[44]]) <<- "rdb_gar: RdB - minimal garanti à tous les français (mensuel, Quel devrait être le montant ...  ?: €/Il ne devrait pas y avoir de montant minimal garanti/NSP) - Q24";
+  names(p)[45] <<- "rdb_ass_choix";
+  label(p[[45]]) <<- "rdb_ass_choix: Choix - RdB - revenu minimal que l'État devrait assurer à chacun-e (mensuel, Quel est le ...  ?: €/État ne devrait pas assurer un revenu minimal/NSP) - Q25";
+  names(p)[46] <<- "rdb_ass";
+  label(p[[46]]) <<- "rdb_ass: RdB - revenu minimal que l'État devrait assurer à chacun-e (mensuel, Quel est le ...  ?: €/État ne devrait pas assurer un revenu minimal/NSP) - Q25";
+  names(p)[47] <<- "premier_clic_des_av";
+  label(p[[47]]) <<- "premier_clic_des_av: Premier clic - (Dés)avantager - Q80";
+  names(p)[48] <<- "dernier_clic_des_av";
+  label(p[[48]]) <<- "dernier_clic_des_av: Dernier clic - (Dés)avantager- Q80";
+  names(p)[49] <<- "duree_des_av";
+  label(p[[49]]) <<- "duree_des_av: Temps de soumission - (Dés)avantager - Q80";
+  names(p)[50] <<- "nombre_clics_des_av";
+  label(p[[50]]) <<- "nombre_clics_des_av: Nombre de clics - (Dés)avantager - Q80";
+  names(p)[51] <<- "desavantager_choix";
+  label(p[[51]]) <<- "desavantager_choix: Choix - Proportion à désavantager - Q28";
+  names(p)[52] <<- "desavantager";
+  label(p[[52]]) <<- "desavantager: Proportion à désavantager (À l'occasion d'une réforme fiscale, quelle proportion de français (les plus riches) faudrait-il désavantager ?: %/NSP) - Q28";
+  names(p)[53] <<- "avantager_choix";
+  label(p[[53]]) <<- "avantager_choix: Choix - Proportion à avantager - Q29";
+  names(p)[54] <<- "avantager";
+  label(p[[54]]) <<- "avantager: Proportion à avantager (À l'occasion d'une réforme fiscale, quelle proportion de français (les plus riches) faudrait-il avantager ?: %/NSP) - Q29";
+  names(p)[55] <<- "premier_clic_notation";
+  label(p[[55]]) <<- "premier_clic_notation: Premier clic - Notation des distribution - Q81";
+  names(p)[56] <<- "dernier_clic_notation";
+  label(p[[56]]) <<- "dernier_clic_notation: Dernier clic - Notation des distribution- Q81";
+  names(p)[57] <<- "duree_notation";
+  label(p[[57]]) <<- "duree_notation: Temps de soumission - Notation des distribution - Q81";
+  names(p)[58] <<- "nombre_clics_notation";
+  label(p[[58]]) <<- "nombre_clics_notation: Nombre de clics - Notation des distribution - Q81";
+  names(p)[59] <<- "note_actuel";
+  label(p[[59]]) <<- "note_actuel: Note distribution actuelle (Selon vos préférences en matières d'inégalités, vous pouvez noter chaque graphe entre -2 (je n'aime pas cette répartition) et +2 (j'aime...): [-2;+2]/'') - Q35_1";
+  names(p)[60] <<- "note_mediane_rdb";
+  label(p[[60]]) <<- "note_mediane_rdb: Note distribution médiane des réponses du premier échantillon avec l'algo utilisant le RdB (Selon vos préférences en matières d'inégalités, vous pouvez noter chaque graphe entre -2 (je n'aime pas cette répartition) et +2 (j'aime...): [-2;+2]/'') - Q35_2";
+  names(p)[61] <<- "note_mediane";
+  label(p[[61]]) <<- "note_mediane: Note distribution médiane des réponses du premier échantillon avec l'algo utilisant la proportion à avantager (Selon vos préférences en matières d'inégalités, vous pouvez noter chaque graphe entre -2 (je n'aime pas cette répartition) et +2 (j'aime...): [-2;+2]/'') - Q35_3";
+  # names(p)[62] <<- "premier_clic_approbation";
+  # label(p[[62]]) <<- "premier_clic_approbation: Premier clic - Approbation de la réforme - Q53~126";
+  # names(p)[63] <<- "dernier_clic_approbation";
+  # label(p[[63]]) <<- "dernier_clic_approbation: Dernier clic - Approbation de la réforme - Q53~126";
+  # names(p)[64] <<- "duree_approbation";
+  # label(p[[64]]) <<- "duree_approbation: Temps de soumission - Approbation de la réforme - Q53~126";
+  # names(p)[65] <<- "nombre_clics_approbation";
+  # label(p[[65]]) <<- "nombre_clics_approbation: Nombre de clics - Approbation de la réforme - Q53~126";
+  names(p)[66] <<- "approbation_mediane";
+  label(p[[66]]) <<- "approbation_mediane: md Approbation de la réforme médiane simple (Courbes des revenus disponibles individuels et revenus du répondant avant/apres, proportion à avantager: 50%, à désavantager: 10%, revenu maximal:100k€/mois - données et issues des réponses de l'échantillon précédent) - Q53";
+  names(p)[67] <<- "approbation_mediane_aid";
+  label(p[[67]]) <<- "approbation_mediane_aid: ma Approbation de la réforme médiane avec un PIB amputé de 5% (Courbes des revenus disponibles individuels et revenus du répondant avant/apres, proportion à avantager: 50%, à désavantager: 10%, revenu maximal:100k€/mois - données et issues des réponses de l'échantillon précédent) - Q126";
+  names(p)[68] <<- "premier_clic_approbation2";
+  label(p[[68]]) <<- "premier_clic_approbation2: Premier clic - Approbation de la réforme (2) - Q143~134";
+  names(p)[69] <<- "dernier_clic_approbation2";
+  label(p[[69]]) <<- "dernier_clic_approbation2: Dernier clic - Approbation de la réforme (2) - Q143~134";
+  names(p)[70] <<- "duree_approbation2";
+  label(p[[70]]) <<- "duree_approbation2: Temps de soumission - Approbation de la réforme (2) - Q143~134";
+  names(p)[71] <<- "nombre_clics_approbation2";
+  label(p[[71]]) <<- "nombre_clics_approbation2: Nombre de clics - Approbation de la réforme (2) - Q143~134";
+  names(p)[72] <<- "approbation_mediane_rdb";
+  label(p[[72]]) <<- "approbation_mediane_rdb: mr Approbation de la réforme médiane RdB (Courbes des revenus disponibles individuels et revenus du répondant avant/apres, RdB: 800€/mois, proportion à dés/avantager: 77%, revenu maximal:100k€/mois - données et issues des réponses de l'échantillon précédent) - Q143";
+  names(p)[73] <<- "approbation_moyenne";
+  label(p[[73]]) <<- "approbation_moyenne: mo Approbation de la réforme moyenne (Courbes des revenus disponibles individuels et revenus du répondant avant/apres, la courbe après étant la moyenne des réponses Q71 de l'échantillon précédent) - Q134";
+  # names(p)[74] <<- "premier_clic_reforme";
+  # label(p[[74]]) <<- "premier_clic_reforme: Premier clic - Réforme personnelle - Q83";
+  # names(p)[75] <<- "dernier_clic_reforme";
+  # label(p[[75]]) <<- "dernier_clic_reforme: Dernier clic - Réforme personnelle - Q83";
+  # names(p)[76] <<- "duree_reforme";
+  # label(p[[76]]) <<- "duree_reforme: Temps de soumission - Réforme personnelle - Q83";
+  # names(p)[77] <<- "nombre_clics_reforme";
+  # label(p[[77]]) <<- "nombre_clics_reforme: Nombre de clics - Réforme personnelle - Q83";
+  names(p)[78] <<- "reforme_med_avantager";
+  label(p[[78]]) <<- "reforme_med_avantager: Proportion à avantager - Réforme personnelle simple (Choisir les paramètres d'une redistribution grâce aux courbes interactives et reporter les valeurs choisies des curseurs: %/'') - Q116_1";
+  names(p)[79] <<- "reforme_med_desavantager";
+  label(p[[79]]) <<- "reforme_med_desavantager: Proportion à désavantager - Réforme personnelle simple (Choisir les paramètres d'une redistribution grâce aux courbes interactives et reporter les valeurs choisies des curseurs: %/'') - Q116_2";
+  names(p)[80] <<- "reforme_med_transfert";
+  label(p[[80]]) <<- "reforme_med_transfert: Transfert - Réforme personnelle simple (Transfert des hauts revenus vers les bas revenus: échelle [0; 10]/'') - Q116_3";
+  names(p)[81] <<- "reforme_aid_avantager";
+  label(p[[81]]) <<- "reforme_aid_avantager: Proportion à avantager - Réforme personnelle avec -5% de PIB (Choisir les paramètres d'une redistribution grâce aux courbes interactives et reporter les valeurs choisies des curseurs: %/'') - Q127_1";
+  names(p)[82] <<- "reforme_aid_desavantager";
+  label(p[[82]]) <<- "reforme_aid_desavantager: Proportion à désavantager - Réforme personnelle avec -5% de PIB (Choisir les paramètres d'une redistribution grâce aux courbes interactives et reporter les valeurs choisies des curseurs: %/'') - Q127_2";
+  names(p)[83] <<- "reforme_aid_transfert";
+  label(p[[83]]) <<- "reforme_aid_transfert: Transfert - Réforme personnelle avec -5% de PIB (Transfert des hauts revenus vers les bas revenus: échelle [0; 10]/'') - Q127_3";
+  names(p)[84] <<- "transferts_inter_s";
+  label(p[[84]]) <<- "transferts_inter_s: s Transferts internationaux - simple (Quelle % des revenus des pays riches devrait être transférée aux pays pauvres ?) - Q5";
+  names(p)[85] <<- "transferts_inter_c";
+  label(p[[85]]) <<- "transferts_inter_c: c Transferts internationaux - complet (transferts_inter_s + arguments sur les pays riches et le climat, les occidentaux et la colonisation/esclavage, et la faim) - Q6";
+  names(p)[86] <<- "transferts_inter_i";
+  label(p[[86]]) <<- "transferts_inter_i: i Transferts internationaux - intermédiaire (transferts_inter_s + arguments sur le rôle des pays riches sur climat et la faim dans le monde) - Q78";
+  names(p)[87] <<- "transferts_inter_a";
+  label(p[[87]]) <<- "transferts_inter_a: a Transferts internationaux - approbation (Approuveriez-vous le transfert de 5% des revenus des pays riches aux pays pauvres ?: Oui/Non/NSP) - Q117";
+  names(p)[88] <<- "refugies";
+  label(p[[88]]) <<- "refugies: Quelle politique adopter en France ? Accepter tous/bcp plus/plus/autant/moins/aucun/laisser les communes fixer leur quota/autoriser chaque français à parrainer un réfugié/NSP - Q111";
+  names(p)[89] <<- "quota_commune";
+  label(p[[89]]) <<- "quota_commune: Quotas de réfugiés fixés par les communes plutôt qu'au niveau national ou européen (Êtes-vous favorable à...: Oui/Non/NSP) - Q120";
+  names(p)[90] <<- "parrainage_refugie";
+  label(p[[90]]) <<- "parrainage_refugie: Autoriser chaque français à parrainer un réfugié (pt à être repsonsable de son intégration, hébergement et entretien, Êtes-vous favrable à...: Oui/Non/NSP) - Q121";
+  names(p)[91] <<- "taxe_mondiale_capital";
+  label(p[[91]]) <<- "taxe_mondiale_capital: Instauration d'une taxation mondiale du capital (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q98";
+  names(p)[92] <<- "revenu_base_mondial";
+  label(p[[92]]) <<- "revenu_base_mondial: Instauration d'un revenu de base mondial. Environ 20€/mois serait versé à chaque adulte, ce qui doublerait le revenu du milliard d'humains les plus pauvres (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q99";
+  names(p)[93] <<- "taxe_mondiale_riches";
+  label(p[[93]]) <<- "taxe_mondiale_riches: Instauration d'une taxe mondiale sur les 1% les plus riches pour financer le développement des pays pauvres (vaccination, accès à l'eau potable, aux soins, à l'éducation...) (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q100";
+  names(p)[94] <<- "premier_clic_matrices";
+  label(p[[94]]) <<- "premier_clic_matrices: Premier clic - choix multiples - Q79";
+  names(p)[95] <<- "dernier_clic_matrices";
+  label(p[[95]]) <<- "dernier_clic_matrices: Dernier clic - choix multiples - Q79";
+  names(p)[96] <<- "duree_matrices";
+  label(p[[96]]) <<- "duree_matrices: Temps de soumission - choix multiples - Q79";
+  names(p)[97] <<- "nombre_clics_matrices";
+  label(p[[97]]) <<- "nombre_clics_matrices: Nombre de clics - choix multiples - Q79";
+  names(p)[98] <<- "conserver_constitution";
+  label(p[[98]]) <<- "conserver_constitution: Conserver notre Constitution actuelle (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_1";
+  names(p)[99] <<- "plus_democratie";
+  label(p[[99]]) <<- "plus_democratie: Rendre nos institutions encore plus démocratiques (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_3";
+  names(p)[100] <<- "referendums";
+  label(p[[100]]) <<- "referendums: Faire voter les réformes importantes par référendum (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_";
+  names(p)[101] <<- "budgets_participatifs";
+  label(p[[101]]) <<- "budgets_participatifs: Développer les budgets participatifs (où les citoyens choisissent directement les investissements de leur commune) (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_5";
+  names(p)[102] <<- "salaries_ca";
+  label(p[[102]]) <<- "salaries_ca: Réserver la moitié des sièges des conseils d'administration des grandes compagnies à des salariés (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_14";
+  names(p)[103] <<- "senat_aleatoire";
+  label(p[[103]]) <<- "senat_aleatoire: Remplacer le Sénat par une assemblée de citoyens tirés au sort (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_8";
+  names(p)[104] <<- "voter_propositions";
+  label(p[[104]]) <<- "voter_propositions: Voter davantage sur des propositions plutôt que sur des personnes (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_10";
+  names(p)[105] <<- "cyberdemocratie";
+  label(p[[105]]) <<- "cyberdemocratie: Créer un site internet officiel de débats et de consultation politique (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_11";
+  names(p)[106] <<- "mixed_member_proportional";
+  label(p[[106]]) <<- "mixed_member_proportional: Assurer une représentation proportionnelle à l'Assemblée nationale tout en conservant des représentants pour chaque département (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_12";
+  names(p)[107] <<- "voter_budget";
+  label(p[[107]]) <<- "voter_budget: Faire voter les citoyens directement sur le budget de l'État (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_7";
+  names(p)[108] <<- "droit_vote_etrangers";
+  label(p[[108]]) <<- "droit_vote_etrangers: Autoriser le droit de vote des étrangers en situation régulière (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_6";
+  names(p)[109] <<- "convoquer_constituante";
+  label(p[[109]]) <<- "convoquer_constituante: Convoquer une Assemblée constituante (Que pensez-vous de ... ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q48_13";
+  names(p)[110] <<- "taxe_ghg_monde";
+  label(p[[110]]) <<- "taxe_ghg_monde: Instaurer une taxe mondiale sur les émissions de gaz à effet de serre (Que pensez-vous de ... pour lutter contre le réchauffement climatique ?: Pas du tout/pas vraiment d'accord/Indifférent/Assez/tout à fait d'accord/NSP) - Q102_1";
+  names(p)[111] <<- "taxe_ghg_fr";
+  label(p[[111]]) <<- "taxe_ghg_fr: Instaurer une taxe sur les émissions de gaz à effet de serre en France (Que pensez-vous de ... pour lutter contre le réchauffement climatique ?: Pas du tout/pas vraiment d'accord/Indifférent/Assez/tout à fait d'accord/NSP) - Q102_3";
+  names(p)[112] <<- "electricite_sans_co2";
+  label(p[[112]]) <<- "electricite_sans_co2: Arrêter de produire de l'électricité à partir d'hydrocarbures (Que pensez-vous de ... pour lutter contre le réchauffement climatique ?: Pas du tout/pas vraiment d'accord/Indifférent/Assez/tout à fait d'accord/NSP) - Q102_4";
+  names(p)[113] <<- "isoler_batiments";
+  label(p[[113]]) <<- "isoler_batiments: Isoler thermiquement peu à peu tous les bâtiments pour qu'ils consomment moins d'énergie, grâce à un emprunt national (Que pensez-vous de ... pour lutter contre le réchauffement climatique ?: Pas du tout/pas vraiment d'accord/Indifférent/Assez/tout à fait d'accord/NSP) - Q102_5";
+  names(p)[114] <<- "test_qualite";
+  label(p[[114]]) <<- "test_qualite: Merci de sélectionner le choix 'Indifférent' (test de qualité de vos réponses) - Q102_11";
+  names(p)[115] <<- "baisser_conso_energie";
+  label(p[[115]]) <<- "baisser_conso_energie: Baisser notre consommation d'énergie (Que pensez-vous de ... pour lutter contre le réchauffement climatique ?: Pas du tout/pas vraiment d'accord/Indifférent/Assez/tout à fait d'accord/NSP) - Q102_10";
+  names(p)[116] <<- "favoriser_bio";
+  label(p[[116]]) <<- "favoriser_bio: Favoriser l'agriculture biologique et la permaculture (Que pensez-vous de ... pour lutter contre le réchauffement climatique ?: Pas du tout/pas vraiment d'accord/Indifférent/Assez/tout à fait d'accord/NSP) - Q102_6";
+  names(p)[117] <<- "voitures_electriques";
+  label(p[[117]]) <<- "voitures_electriques: Remplacer peu à peu le parc automobile par des voitures électriques en libre service (Que pensez-vous de ... pour lutter contre le réchauffement climatique ?: Pas du tout/pas vraiment d'accord/Indifférent/Assez/tout à fait d'accord/NSP) - Q102_7";
+  names(p)[118] <<- "baisser_conso_viande";
+  label(p[[118]]) <<- "baisser_conso_viande: Baisser votre consommation de viande rouge (ou la maintenir basse) (Que pensez-vous de ... pour lutter contre le réchauffement climatique ?: Pas du tout/pas vraiment d'accord/Indifférent/Assez/tout à fait d'accord/NSP) - Q102_8";
+  names(p)[119] <<- "loyers";
+  label(p[[119]]) <<- "loyers: Les loyers (Faut-il augmenter ou baisser les montants suivants ? Baisser fortement/légèrement/Maintenir au niveau actuel/Augmenter légèrement/fortement/NSP) - Q105_3";
+  names(p)[120] <<- "pib";
+  label(p[[120]]) <<- "pib: Le produit intérieur brut par habitant (PIB/hab) (Faut-il augmenter ou baisser les montants suivants ? Baisser fortement/légèrement/Maintenir au niveau actuel/Augmenter légèrement/fortement/NSP) - Q105_4";
+  names(p)[121] <<- "taxe_dividendes";
+  label(p[[121]]) <<- "taxe_dividendes: La taxation des dividendes (Faut-il augmenter ou baisser les montants suivants ? Baisser fortement/légèrement/Maintenir au niveau actuel/Augmenter légèrement/fortement/NSP) - Q105_5";
+  names(p)[122] <<- "taxe_revenus_fonciers";
+  label(p[[122]]) <<- "taxe_revenus_fonciers: La taxation des revenus fonciers (c'est-à-dire des loyers) (Faut-il augmenter ou baisser les montants suivants ? Baisser fortement/légèrement/Maintenir au niveau actuel/Augmenter légèrement/fortement/NSP) - Q105_21";
+  names(p)[123] <<- "taxe_plus_values";
+  label(p[[123]]) <<- "taxe_plus_values: La taxation des plus-values de court-terme (Faut-il augmenter ou baisser les montants suivants ? Baisser fortement/légèrement/Maintenir au niveau actuel/Augmenter légèrement/fortement/NSP) - Q105_16";
+  names(p)[124] <<- "is";
+  label(p[[124]]) <<- "is: L'impôt sur les bénéfices des sociétés (IS) (Faut-il augmenter ou baisser les montants suivants ? Baisser fortement/légèrement/Maintenir au niveau actuel/Augmenter légèrement/fortement/NSP) - Q105_11";
+  names(p)[125] <<- "premier_clic_multiples";
+  label(p[[125]]) <<- "premier_clic_multiples: Premier clic - choix multiples - Q216";
+  names(p)[126] <<- "dernier_clic_multiples";
+  label(p[[126]]) <<- "dernier_clic_multiples: Dernier clic - choix multiples - Q216";
+  names(p)[127] <<- "duree_multiples";
+  label(p[[127]]) <<- "duree_multiples: Temps de soumission - choix multiples - Q216";
+  names(p)[128] <<- "nombre_clics_multiples";
+  label(p[[128]]) <<- "nombre_clics_multiples: Nombre de clics - choix multiples - Q216";
+  names(p)[129] <<- "propositions_democratie";
+  label(p[[129]]) <<- "propositions_democratie: À quelles propositions ci-dessous adhérez-vous ?: conserver_constitution/plus_democratie/referendums/budgets_participatifs/salaries_ca/senat_aleatoire/voter_propositions/cyberdemocratie/mixed_member_proportional/voter_budget/droite_vote_etrangers/convoquer_constituante - Q129";
+  names(p)[130] <<- "propositions_climat";
+  label(p[[130]]) <<- "propositions_climat: À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?: taxe_mondiale_ghg/taxe_fr_ghg/electricite_sans_co2/isoler_batiments/test_qualite/baisser_conso_energie/favoriser_bio/voitures_electriques/baisser_conso_viande - Q118";
+  names(p)[131] <<- "pib_important";
+  label(p[[131]]) <<- "pib_important: Est-il important d'augmenter le produit intérieur brut par habitant (PIB/hab) en France ?: Oui/Non/NSP - Q119";
+  names(p)[132] <<- "rsa_etrangers";
+  label(p[[132]]) <<- "rsa_etrangers: minima sociaux devraient être versés aux étrangers résidant en France en situation régulière depuis 5 ans (Est-ce que ... (tels que le RSA) ... ?: Oui/Non/NSP) - Q138";
+  names(p)[133] <<- "assemblee_climat";
+  label(p[[133]]) <<- "assemblee_climat: Instauration d'une assemblée mondiale (élue à la proportionnelle sur des listes mondiales) dont le rôle serait uniquement de prendre les mesures nécessaires à la lutte contre le réchauffement climatique (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q16";
+  names(p)[134] <<- "assemblee_finance";
+  label(p[[134]]) <<- "assemblee_finance: Instauration d'une assemblée mondiale (élue à la proportionnelle sur des listes mondiales) dont le rôle serait uniquement de réguler le système financier (notamment pour éviter les crises financières) (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q36";
+  names(p)[135] <<- "revenu_max_monde_3m";
+  label(p[[135]]) <<- "revenu_max_monde_3m: Instauration d'un revenu maximal mondial de 3 millions d'euros par mois par personne (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q15";
+  names(p)[136] <<- "revenu_max_monde_100k";
+  label(p[[136]]) <<- "revenu_max_monde_100k: Instauration d'un revenu maximal mondial de 100 000€ par mois par personne (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q95";
+  names(p)[137] <<- "revenu_max_monde"; 
+  label(p[[137]]) <<- "revenu_max_monde: Instauration d'un revenu maximal mondial (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q96";
+  names(p)[138] <<- "impot_eu_benefices";
+  label(p[[138]]) <<- "impot_eu_benefices: Impôt européen sur les bénéfices des sociétés ? Chaque État pourrait fixer un taux d'imposition supérieur au taux européen, mais pas inférieur (Êtes-vous en faveur ... ?: Oui/Non/NSP) - Q7";
+  names(p)[139] <<- "france_et_ue";
+  label(p[[139]]) <<- "france_et_ue: Comment doit se positionner la France par rapport à l'UE ?: Quitter l'UE/Renégocier les traités pour + démocratie quitte à sortir si les autres refusent/proposer de renégocier/garder fonctionnement UE/renforcer l'intégration eur/garder traités mais désobéir parfois/NSP - Q9";
+  names(p)[140] <<- "heritage_rc5";
+  label(p[[140]]) <<- "heritage_rc5: rc5 Comment devrait-on taxer l'héritage ? - Héritage pour 10^5€, variante reçu croissante (Veuillez indiquer la somme que devrait recevoir après impôts un enfant unique dont les parents possèdent un patrimoine estimé à ..., 4 valeurs rangées par ordre croissant) - Q14_1";
+  names(p)[141] <<- "heritage_rc6";
+  label(p[[141]]) <<- "heritage_rc6: rc6 Comment devrait-on taxer l'héritage ? - Héritage pour 10^6€, variante reçu croissante (Veuillez indiquer la somme que devrait recevoir après impôts un enfant unique dont les parents possèdent un patrimoine estimé à ..., 4 valeurs rangées par ordre croissant) - Q14_2";
+  names(p)[142] <<- "heritage_rc7";
+  label(p[[142]]) <<- "heritage_rc7: rc7 Comment devrait-on taxer l'héritage ? - Héritage pour 10^7€, variante reçu croissante (Veuillez indiquer la somme que devrait recevoir après impôts un enfant unique dont les parents possèdent un patrimoine estimé à ..., 4 valeurs rangées par ordre croissant) - Q14_3";
+  names(p)[143] <<- "heritage_rc9";
+  label(p[[143]]) <<- "heritage_rc9: rc9 Comment devrait-on taxer l'héritage ? - Héritage pour 10^9€, variante reçu croissante (Veuillez indiquer la somme que devrait recevoir après impôts un enfant unique dont les parents possèdent un patrimoine estimé à ..., 4 valeurs rangées par ordre croissant) - Q14_4";
+  names(p)[144] <<- "heritage_rd9";
+  label(p[[144]]) <<- "heritage_rd9: rd9 Comment devrait-on taxer l'héritage ? - Héritage pour 10^9€, variante reçu croissante (Veuillez indiquer la somme que devrait recevoir après impôts un enfant unique dont les parents possèdent un patrimoine estimé à ..., 4 valeurs rangées par ordre décroissant) - Q90_1";
+  names(p)[145] <<- "heritage_rd7";
+  label(p[[145]]) <<- "heritage_rd7: rd7 Comment devrait-on taxer l'héritage ? - Héritage pour 10^7€, variante reçu croissante (Veuillez indiquer la somme que devrait recevoir après impôts un enfant unique dont les parents possèdent un patrimoine estimé à ..., 4 valeurs rangées par ordre décroissant) - Q90_2";
+  names(p)[146] <<- "heritage_rd6";
+  label(p[[146]]) <<- "heritage_rd6: rd6 Comment devrait-on taxer l'héritage ? - Héritage pour 10^6€, variante reçu croissante (Veuillez indiquer la somme que devrait recevoir après impôts un enfant unique dont les parents possèdent un patrimoine estimé à ..., 4 valeurs rangées par ordre décroissant) - Q90_3";
+  names(p)[147] <<- "heritage_rd5";
+  label(p[[147]]) <<- "heritage_rd5: rd5 Comment devrait-on taxer l'héritage ? - Héritage pour 10^5€, variante reçu croissante (Veuillez indiquer la somme que devrait recevoir après impôts un enfant unique dont les parents possèdent un patrimoine estimé à ..., 4 valeurs rangées par ordre décroissant) - Q90_4";
+  names(p)[148] <<- "heritage_tc5";
+  label(p[[148]]) <<- "heritage_tc5: tc5 Comment devrait-on taxer l'héritage ? - Taxe pour 10^5€, variante taxe croissante (Veuillez indiquer la somme que l'État devrait prélever sur une succession à un enfant unique pour un montant de ..., 4 valeurs rangées par ordre croissant) - Q91_1";
+  names(p)[149] <<- "heritage_tc6";
+  label(p[[149]]) <<- "heritage_tc6: tc6 Comment devrait-on taxer l'héritage ? - Taxe pour 10^6€, variante taxe croissante (Veuillez indiquer la somme que l'État devrait prélever sur une succession à un enfant unique pour un montant de ..., 4 valeurs rangées par ordre croissant) - Q91_2";
+  names(p)[150] <<- "heritage_tc7";
+  label(p[[150]]) <<- "heritage_tc7: tc7 Comment devrait-on taxer l'héritage ? - Taxe pour 10^7€, variante taxe croissante (Veuillez indiquer la somme que l'État devrait prélever sur une succession à un enfant unique pour un montant de ..., 4 valeurs rangées par ordre croissant) - Q91_3";
+  names(p)[151] <<- "heritage_tc9";
+  label(p[[151]]) <<- "heritage_tc9: tc9 Comment devrait-on taxer l'héritage ? - Taxe pour 10^9€, variante taxe croissante (Veuillez indiquer la somme que l'État devrait prélever sur une succession à un enfant unique pour un montant de ..., 4 valeurs rangées par ordre croissant) - Q91_4";
+  names(p)[152] <<- "heritage_td9";
+  label(p[[152]]) <<- "heritage_td9: td9 Comment devrait-on taxer l'héritage ? - Taxe pour 10^9€, variante taxe croissante (Veuillez indiquer la somme que l'État devrait prélever sur une succession à un enfant unique pour un montant de ..., 4 valeurs rangées par ordre décroissant) - Q92_1";
+  names(p)[153] <<- "heritage_td7";
+  label(p[[153]]) <<- "heritage_td7: td7 Comment devrait-on taxer l'héritage ? - Taxe pour 10^7€, variante taxe croissante (Veuillez indiquer la somme que l'État devrait prélever sur une succession à un enfant unique pour un montant de ..., 4 valeurs rangées par ordre décroissant) - Q92_2";
+  names(p)[154] <<- "heritage_td6";
+  label(p[[154]]) <<- "heritage_td6: td6 Comment devrait-on taxer l'héritage ? - Taxe pour 10^6€, variante taxe croissante (Veuillez indiquer la somme que l'État devrait prélever sur une succession à un enfant unique pour un montant de ..., 4 valeurs rangées par ordre décroissant) - Q92_3";
+  names(p)[155] <<- "heritage_td5";
+  label(p[[155]]) <<- "heritage_td5: td5 Comment devrait-on taxer l'héritage ? - Taxe pour 10^5€, variante taxe croissante (Veuillez indiquer la somme que l'État devrait prélever sur une succession à un enfant unique pour un montant de ..., 4 valeurs rangées par ordre décroissant) - Q92_5";
+  names(p)[156] <<- "heritage_moyens";
+  label(p[[156]]) <<- "heritage_moyens: La taxation sur les héritages moyens (<300k par enfant) (Faudrait-il augmenter ou baisser ...? + montants actuels des taxes sur les successions de 100k (0), 200k (9%), 300k (12,7%): Baisser fortement/légèrement/Maintenir au niveau actuel/Augmenter légèrement/fortement/NSP - Q219_1";
+  names(p)[157] <<- "heritage_eleves";
+  label(p[[157]]) <<- "heritage_eleves: La taxation sur les héritages très élevés (>10^7€ par enfant) (Faudrait-il augmenter ou baisser ...? + montants actuels des taxes sur les successions de 10^7 (42,6%) et 10^10€ (45%): Baisser fortement/légèrement/Maintenir au niveau actuel/Augmenter légèrement/fortement/NSP - Q219_2";
+  names(p)[158] <<- "revenu_max_ideal_choix"; 
+  label(p[[158]]) <<- "revenu_max_ideal_choix: Choix - Revenu maximal idéal en France - Q22";
+  names(p)[159] <<- "revenu_max_ideal";
+  label(p[[159]]) <<- "revenu_max_ideal: Revenu maximal idéal en France (Si la France était une société idéale, quel serait le revenu mensuel le plus élevé ?: champ libre/infini/NSP) - Q22";
+  names(p)[160] <<- "taux_trader";
+  label(p[[160]]) <<- "taux_trader: Taux désiré pour un trader gagnant 3 millions d'€ de revenus annuels: curseur/NSP - Q30_1";
+  names(p)[161] <<- "taux_rentier";
+  label(p[[161]]) <<- "taux_rentier: Taux désiré pour un rentier gagnant 3 millions d'€ de revenus annuels: curseur/NSP - Q34_1";
+  names(p)[162] <<- "revenu_max_fr_100k";
+  label(p[[162]]) <<- "revenu_max_fr_100k: Instauration d'un revenu maximal de 100 000€ par mois par personne, en France (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q31";
+  names(p)[163] <<- "revenu_max_fr_3m";
+  label(p[[163]]) <<- "revenu_max_fr_3m: Instauration d'un revenu maximal de 3 millions d'euros par mois par personne, en France (Êtes-vous favorable à ... ?: Oui/Non/NSP) - Q235";
+  names(p)[164] <<- "revenu_max_s_choix";
+  label(p[[164]]) <<- "revenu_max_s_choix: Choix - s Revenu maximal légal désiré en France - simple (mensuel net, €/On ne devrait pas instaurer de revenu maximal en France/NSP) - Q109";
+  names(p)[165] <<- "revenu_max_s";
+  label(p[[165]]) <<- "revenu_max_s: s Revenu maximal légal désiré en France - simple (mensuel net, €/On ne devrait pas instaurer de revenu maximal en France/NSP) - Q109";
+  names(p)[166] <<- "individualisation_progressive";
+  label(p[[166]]) <<- "individualisation_progressive: Individualisation progressive de l'IRPP, seuls les couples mariés avant la réforme bénéficieraient du quotient conjugal (Êtes-vous pour ou contre ... ? + explication mettant légèrement en avant l'individualisation: Pour/Contre/NSP) - Q33";
+  names(p)[167] <<- "quotient_progressif";
+  label(p[[167]]) <<- "quotient_progressif: Individualisation progressive de l'IRPP, seuls les couples mariés avant la réforme bénéficieraient du quotient conjugal (Êtes-vous pour ou contre ... ? + explication mettant légèrement en avant le quotient conjugal: Pour/Contre/NSP) - Q234";
+  names(p)[168] <<- "priorite";
+  label(p[[168]]) <<- "priorite: Vos priorités, 3 propositions parmi: meilleurs revenus/conditions de travail/soins, remboursement/éducation, formation/vivre-ensemble local/logement - cher/emploi stable/retraite + tôt/+ de temps/+ pour environnement/+ sécurité/- surveillance/fin des discriminations/Autre (champ libre) - Q135";
+  names(p)[169] <<- "priorite_champ_libre";
+  label(p[[169]]) <<- "priorite_champ_libre: Champ libre de 'priorite', Qu'est-ce qu'il est prioritaire de changer tout de suite dans votre vie quotidienne ? Si vous pouviez choisir 3 propositions, vous diriez..., choix 'Autre (préciser) :' - Q135_9";
+  names(p)[170] <<- "interet_politique"; #de même
+  label(p[[170]]) <<- "interet_politique: Intéressé-e par la politique (À quel point êtes-vous ... ?: Presque pas (ou pas du tout)/Un peu/Beaucoup/NSP)  - Q20";
+  names(p)[171] <<- "orientation";
+  label(p[[171]]) <<- "orientation: Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21";
+  names(p)[172] <<- "orientation_champ_libre";
+  label(p[[172]]) <<- "orientation_champ_libre: Champ de libre de 'orientation' (Comment vous définiriez-vous ? Plusieurs réponses possibles, choix 'Autre (précisez) :') - Q21_13";
+  names(p)[173] <<- "incompris";
+  label(p[[173]]) <<- "incompris: Incompréhension (Avez-vous eu du mal à répondre aux questions avec les graphiques ?: Oui/Non/Oui, certains graphiques ne se sont pas affichés) - Q85";
+  names(p)[174] <<- "champ_libre";
+  label(p[[174]]) <<- "champ_libre: Champ libre (Vous êtes libre de laisser toute idée proposition politique, ainsi que tout commentaire ou critique concernant ce sondage) - Q72";
+  names(p)[175] <<- "mail";
+  label(p[[175]]) <<- "mail: E-Mail (Si vous souhaitez recevoir les résultats de ce sondage et retrouver les graphiques interactifs) - Q73";
+  names(p)[176] <<- "duree2";
+  label(p[[176]]) <<- "duree2: Durée de complétion du questionnaire (en secondes)";
+  names(p)[177] <<- "exclu";
+  label(p[[177]]) <<- "exclu: Vide si tout est ok (Screened/QuotaMet sinon)";
+  names(p)[178] <<- "ID";
+  label(p[[178]]) <<- "ID: ";
+  names(p)[179] <<- "region";
+  label(p[[179]]) <<- "region: Région (UDA): [1;9]=IDF/Bassin parisien Ouest/Bassin parisien Est/Nord/Ouest/Sud-Ouest/Sud-Est/Méditerranée - embedded data";
+  names(p)[180] <<- "csp";
+  label(p[[180]]) <<- "csp: Catégorie Socio-Professionnelle: Agriculteurs exploitants/Artisans, commerçants et chefs d'entreprise/Cadres et professions intellectuelles supérieures/Professions intermédiaires/Employés/Ouvriers/Retraités/Autres inactifs - embedded data";
+  names(p)[181] <<- "taille_agglo";
+  label(p[[181]]) <<- "taille_agglo: Taille d'agglomération: [1;5]=rural/-20k/20-100k/+100k/Région parisienne - embedded data";
+  names(p)[182] <<- "variante_des_av";
+  label(p[[182]]) <<- "variante_des_av: Variante attribuée aléatoirement concernant la proportion à dés/avantager: des/av (=desavantager/avantager=)";
+  names(p)[183] <<- "variante_max";
+  label(p[[183]]) <<- "variante_max: Variante attribuée aléatoirement concernant le taux désiré pour les traders/rentiers: t/d (=taux_trader/taux_rentier (dividendes)=Q30,Q34, 160-161)";
+  names(p)[184] <<- "liberaliser";
+  label(p[[184]]) <<- "liberaliser: 'Libéraliser le marché du travail en assouplissant le droit du travail' (Que pensez-vous de cette proposition pour lutter contre le chômage ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q139_1";
+  names(p)[185] <<- "baisse_cotis";
+  label(p[[185]]) <<- "baisse_cotis: 'Baisser les cotisations sociales que paient les entreprises pour qu'elles puissent embaucher' (Que pensez-vous de cette proposition pour lutter contre le chômage ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q139_2";
+  names(p)[186] <<- "baisse_smic";
+  label(p[[186]]) <<- "baisse_smic: 'Baisser le salaire minimum (le SMIC)' (Que pensez-vous de cette proposition pour lutter contre le chômage ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q139_3";
+  names(p)[187] <<- "baisse_allocs";
+  label(p[[187]]) <<- "baisse_allocs: 'Baisser les allocations chômage' (Que pensez-vous de cette proposition pour lutter contre le chômage ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q139_4";
+  names(p)[188] <<- "formation";
+  label(p[[188]]) <<- "formation: 'Financer la formation professionnelle pour tous les chômeurs longue durée' (Que pensez-vous de cette proposition pour lutter contre le chômage ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q139_5";
+  names(p)[189] <<- "subventions";
+  label(p[[189]]) <<- "subventions: 'Subventionner l'embauche des chômeurs longue durée grâce aux allocations chômage économisées ' (Que pensez-vous de cette proposition pour lutter contre le chômage ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q139_6";
+  names(p)[190] <<- "investissement";
+  label(p[[190]]) <<- "investissement: 'Lancer un grand plan public d'investissement (notamment pour la transition écologique), avec de nombreux emplois à la clé' (Que pensez-vous de cette proposition pour lutter contre le chômage ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q139_7";
+  names(p)[191] <<- "rtt";
+  label(p[[191]]) <<- "rtt: 'Inciter les entreprises à conclure des accords de partage du travail associant embauches et réduction du temps de travail' (Que pensez-vous de cette proposition pour lutter contre le chômage ?: Pas du tout/Pas vraiment d'accord/Indifférent-e/Assez/Tout à fait d'accord/NSP) - Q139_8";
+  label(p[[192]]) <- "variante_transfert: Variante attribuée aléatoirement concernant les transferts internationaux: s/c/i (=transferts_inter_s/transferts_inter_c/transferts_inter_i/transferts_inter_a - Q5,Q6,Q78,Q117)"
+}
+create_political_orientation_p <- function() {
+  p$extr_gauche <<- as.logical(grepl("extrême gauche", p[[171]]))
+  p$gauche <<- as.logical(grepl("De gauche", p[[171]]))
+  p$centre <<- as.logical(grepl("centre", p[[171]]))
+  p$droite <<- as.logical(grepl("De droite", p[[171]]))
+  p$extr_droite <<- as.logical(grepl("extrême droite", p[[171]]))
+  p$liberal <<- as.logical(grepl("Libéral", p[[171]]))
+  p$humaniste <<- as.logical(grepl("Humaniste", p[[171]]))
+  p$nationaliste <<- as.logical(grepl("Nationaliste", p[[171]]))
+  p$marxiste <<- as.logical(grepl("Marxiste", p[[171]]))
+  p$ecologiste <<- as.logical(grepl("Écologiste", p[[171]]))
+  p$feministe <<- as.logical(grepl("Féministe", p[[171]]))
+  p$conservateur <<- as.logical(grepl("Conservateur", p[[171]]))
+  p$gauche_droite <<- pmax(-2,pmin(2,-2 * (p$extr_gauche==TRUE) - (p$gauche==TRUE) + (p$droite==TRUE) + 2 * (p$extr_droite==TRUE)))
+  is.na(p$gauche_droite) <<- (p$gauche_droite == 0) & (p$centre==FALSE)
+  p$Gauche_droite <<- as.factor(p$gauche_droite)
+  levels(p$Gauche_droite) <<- c("Extreme-left", "Left", "Center", "Right", "Extreme-right", "Indeterminate")
+  p$Gauche_droite[is.na(p$Gauche_droite)] <<- "Indeterminate"
+  label(p$extr_droite) <<- "extr_droite: Extrême-droite - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$droite) <<- "droite: Droite - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$centre) <<- "centre: Centre - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$gauche) <<- "gauche: Gauche - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$extr_gauche) <<- "extr_gauche: Extrême-gauche- Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$gauche_droite) <<- "gauche_droite: échelle de -2 (extr_gauche) à +2 (extr_droite) - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$conservateur) <<- "conservateur: Conservateur - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$feministe) <<- "feministe: Féministe - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$marxiste) <<- "marxiste: Marxiste - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$liberal) <<- "liberal: Libéral - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$humaniste) <<- "humaniste: Humaniste - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$nationaliste) <<- "nationaliste: Nationaliste - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+  label(p$ecologiste) <<- "ecologiste: Écologiste - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Nationaliste/Marxiste/Écologiste/Féministe/Autre (champ libre)/NSP) - Q21"
+} # 13 new variables (libl,hum,nat,mar,eco,fem,cons)
+patrimoine_futur <- function(patrimoine, heritage, categories=FALSE) {
+  if (!categories) {
+    res <- patri <- herit <- rep(0, length(patrimoine))
+    patri[patrimoine=="Moins de 10 000€" | patrimoine<=10000] <- 1
+    patri[patrimoine=="Entre 10 000€ et 50 000€" | (patrimoine>10000 & patrimoine<=50000)] <- 2
+    patri[patrimoine=="Entre 50 000€ et 150 000€" | (patrimoine>50000 & patrimoine<=150000)] <- 3
+    patri[patrimoine=="Entre 150 000€ et 300 000€" | (patrimoine>150000 & patrimoine<=300000)] <- 4
+    patri[patrimoine=="Entre 300 000€ et 600 000€" | (patrimoine>300000 & patrimoine<=600000)] <- 5
+    patri[patrimoine=="Plus de 600 000€" | (patrimoine>600000 & patrimoine < 999999999999)] <- 6
+    patri[patrimoine=="NSP (Je ne veux pas répondre)" | is.na(patrimoine)] <- -1
+    herit[heritage=="Je n'hériterai probablement pas à l'avenir." | heritage==0] <- 0
+    herit[heritage=="Moins de 10 000€" | heritage<=10000] <- 1
+    herit[heritage=="Entre 10 000€ et 50 000€" | (heritage>10000 & heritage<=50000)] <- 2
+    herit[heritage=="Entre 50 000€ et 150 000€" | (heritage>50000 & heritage<=150000)] <- 3
+    herit[heritage=="Entre 150 000€ et 300 000€" | (heritage>150000 & heritage<=300000)] <- 4
+    herit[heritage=="Entre 300 000€ et 600 000€" | (heritage>300000 & heritage<=600000)] <- 5
+    herit[heritage=="Plus de 600 000€" | (heritage>600000 & heritage < 999999999999)] <- 6
+    herit[heritage=="NSP (Ne sait pas, ne veut pas répondre)" | is.na(heritage)] <- -1
+  }
+  else {
+    res <- rep(0, length(patrimoine))
+    patri <- patrimoine
+    patri[is.na(patri)] <- -1
+    herit <- heritage
+    herit[is.na(herit)] <- -1
+  }
+  mi <- pmin(patri, herit)
+  ma <- pmax(patri, herit)
+  res[ma==6 | mi==5] <- 6
+  res[mi<=1] <- ma[mi<=1]
+  res[mi==-1] <- -1
+  res[mi==2 & ma==2] <- 2.5
+  res[mi==2 & ma==3] <- 3
+  res[(mi==3 & ma==3) | (mi==2 & ma==4)] <- 4
+  res[mi==3 & ma==4] <- 4.5
+  res[(mi==4 & ma==4) | (mi==2 & ma==5) | (mi==3 & ma==5)] <- 5
+  res[mi==4 & ma==5] <- 5.5
+  return(res)
+}
+uc <- function(marie, nb_pers) {
+  # https://www.insee.fr/fr/metadonnees/definition/c1802, on prend 0.38 au lieu de 0.3 ou 0.5 comme on ne connaît pas l'âge
+  return((marie) * (1.5 + 0.38 * (nb_pers - 2)) + (!(marie)) * (1 + 0.38 * (nb_pers - 1)))
+}
+irpp_p <- function(rev, marie, nb_pers) {
+	quotient <- (nb_pers < 2) + (nb_pers == 2) * 2 + (nb_pers == 3) * 2.5 + (nb_pers == 4) * 3 + (nb_pers > 4) * pmin(6, nb_pers - 1)
+	income <- 0.9334 * rev / quotient # (1 + (0.029 * 1.28))*0.9 : passage au brut (+28% en moyenne), CSG+CRDS non déductibles (2,90%), puis abattement de 10%
+	ir <- 0
+	ir <- ir + (income - 12676*12) * 0.45 * (income > 12676*12)
+	ir <- ir + (pmin(income, 12676*12) - 5986*12) * 0.41  * (income > 5986*12)
+	ir <- ir + (pmin(income, 5986*12) - 2233*12) * 0.3  * (income > 2233*12)
+	ir <- ir + (pmin(income, 2233*12) - 808*12) * 0.14  * (income > 808*12)
+	
+	ir <- quotient * ir
+	decote <- (1920 - 0.75 * ir) * (marie & ir<2560) + (1165 - 0.75 * ir) * (!(marie) & ir<1553)
+	return(pmax((ir-decote),0)) # vrai calcul
+	# return(ir-decote) # calcul erroné utilisé lors du sondage
+}
+clean_number <- function(vec, high_numbers='') { 
+   numeric_vec <- as.numeric(gsub(",", ".", gsub("[[:alpha:]  !#$%&')?/(@:;€_-]","",vec)))
+   if (high_numbers=='remove') { is.na(numeric_vec) <- numeric_vec>10000 }
+   else if (high_numbers=='divide') { numeric_vec[numeric_vec>10000 & !is.na(numeric_vec)] <- numeric_vec[numeric_vec>10000 & !is.na(numeric_vec)]/12 }
+   else if (high_numbers=='divide&remove') { numeric_vec[numeric_vec>10000 & !is.na(numeric_vec)] <- numeric_vec[numeric_vec>10000 & !is.na(numeric_vec)]/12
+     is.na(numeric_vec) <- numeric_vec>6000 }
+   return(numeric_vec)
+}
+convert_p <- function() {
+  lab <- label(p$csp)
+  p$csp <<- factor(p$csp, levels=c(levels(p$csp), "Cadres", "Indépendants", "Professions intermédiaires", "Retraités", "Employés", "Agriculteurs"))
+  p$csp[grepl("Cadres",p$csp)] <<- "Cadres"
+  p$csp[grepl("Artisans",p$csp)] <<- "Indépendants"
+  p$csp[grepl("iaire",p$csp)] <<- "Professions intermédiaires"
+  p$csp[grepl("etrait",p$csp)] <<- "Retraités"
+  p$csp[grepl("Employ",p$csp)] <<- "Employés"
+  p$csp[grepl("Agricul",p$csp)] <<- "Agriculteurs"
+  names(pep) <<- c("ID", "region_y", "taille_agglo_y", "csp_y")
+  p <<- merge(p, pep, by=c("ID"), all=T)
+  p <<- p[order(p$date),]
+  p$csp_y <<- factor(p$csp_y, levels=c(levels(p$csp_y),"Cadres", "Indépendants", "Professions intermédiaires", "Retraités", "Employés", "Agriculteurs"))
+  p$csp_y[grepl("Cadres",p$csp_y)] <<- "Cadres"
+  p$csp_y[grepl("Artisans",p$csp_y)] <<- "Indépendants"
+  p$csp_y[grepl("iaire",p$csp_y)] <<- "Professions intermédiaires"
+  p$csp_y[grepl("etrait",p$csp_y)] <<- "Retraités"
+  p$csp_y[grepl("Employ",p$csp_y)] <<- "Employés"
+  p$csp_y[grepl("Agricul",p$csp_y)] <<- "Agriculteurs"
+  length(which(is.na(p$date)))
+  p$region[p$region==""] <<- p$region_y[p$region==""]
+  p$taille_agglo[p$taille_agglo==""] <<- p$taille_agglo_y[p$taille_agglo==""]
+  p$csp[p$csp==""] <<- p$csp_y[p$csp==""]
+  label(p$csp) <<- lab
+  p <<- p[,c(2:178,1,179:(length(p)))]
+  p <<- p[,-c((length(p)-2):length(p))]
+
+  for (i in 1:length(p)) {
+    levels(p[[i]]) <<- c(levels(p[[i]]), "NSP")
+    p[[i]][p[[i]] == "NSP (Ne sait pas, ne se prononce pas)"] <<- "NSP"
+    p[[i]][p[[i]] == "NSP (Ne sait pas, ne veut pas répondre)"] <<- "NSP"
+    p[[i]][p[[i]] == "NSP (Ne veut pas répondre)"] <<- "NSP"
+  }
+
+  p$transferts_inter <<- -1
+  p$transferts_inter[p$transferts_inter_i != ""] <<- as.numeric(Vp("transferts_inter_i")[p$transferts_inter_i != ""])
+  p$transferts_inter[p$transferts_inter_s != ""] <<-  as.numeric(Vp("transferts_inter_s")[p$transferts_inter_s != ""])
+  p$transferts_inter[p$transferts_inter_c != ""] <<-  as.numeric(Vp("transferts_inter_c")[p$transferts_inter_c != ""])
+  is.na(p$transferts_inter) <<- (p$transferts_inter_a!="")
+  p$transferts_inter <<- as.item(as.numeric(p$transferts_inter), missing.values=-1, annotation="transferts_inter: Transferts internationaux, variantes simple, intermédiaire et complète (Quelle % des revenus des pays riches devrait être transférée aux pays pauvres ?) - Q5,Q6,Q78")
+  p$variante_transferts_inter <<- p$variante_transfert
+  p$variante_transferts_inter[p$transferts_inter_i != ""] <<- "i"
+  p$variante_transferts_inter[p$transferts_inter_s != ""] <<- "s"
+  # p$variante_transferts_inter[p$transferts_inter_c != ""] <<- "c"
+  # p$variante_transferts_inter[p$transferts_inter_a != ""] <<- "a"
+  label(p$variante_transferts_inter) <<- "variante_transferts_inter: Variante dans la formulation de transferts_inter; s/i/c/a: simple/intermédiaire/complète/approbation: (argument pauvreté,esponsabilité climatique des pays riches)/complète (i+ argument colonisation, esclavage)/pour ou contre un transfert de 5% des revenus des pays riches vers les pays pauvres (seulement en vague 2); Vague 1: curseur/NSP, Vague 2: champ de saisie (quelques données manquantes) - Q5,Q6,Q78"
+  
+  p$qualite_sincerite <<- 0  
+  # p$qualite_comprehension[] <- p$qualite_comprehension[] - 1
+  # p$qualite_sincerite[] <- p$qualite_sincerite[] - 1
+  
+  p$qualite_comprehension <<- 0
+  p$qualite_comprehension[which(p$reforme_med_transfert=="?")] <<- p$qualite_comprehension[which(p$reforme_med_transfert=="?")] - 1
+  p$qualite_comprehension[which(p$heritage_tc9=="5%")] <<- p$qualite_comprehension[which(p$heritage_tc9=="5%")] - 1
+  p$qualite_comprehension[which(p$heritage_tc7=="5%")] <<- p$qualite_comprehension[which(p$heritage_tc7=="5%")] - 1
+  p$qualite_comprehension[which(p$heritage_tc6=="5%")] <<- p$qualite_comprehension[which(p$heritage_tc6=="5%")] - 1
+  p$qualite_comprehension[which(p$heritage_td7=="10 millions")] <<- p$qualite_comprehension[which(p$heritage_td7=="10 millions")] - 1
+  
+  p$reforme_med_transfert[p$reforme_med_transfert=="?"] <<- ""
+  levels(p$heritage_tc9) <<- c(levels(p$heritage_tc9), "50000000")
+  p$heritage_tc9[p$heritage_tc9=="5%"] <<- "50000000"
+  p$heritage_tc7[p$heritage_tc7=="5%"] <<- "500000"
+  p$heritage_tc6[p$heritage_tc6=="5%"] <<- "50000"
+  p$heritage_td7[p$heritage_td7=="10 millions"] <<- "10000000"
+  for (i in c("t","r")) { for (j in c("c", "d")) { for (k in c(5:7,9)) { 
+    lab <- label(p[paste("heritage_", i, j, k, sep="")][[1]])
+    p[paste("heritage_", i, j, k, sep="")][[1]] <<- gsub("[[:space:]]", "", p[paste("heritage_", i, j, k, sep="")][[1]])
+    label(p[paste("heritage_", i, j, k, sep="")][[1]]) <<- lab } } }
+  
+  p$revenu <<- clean_number(p$revenu, high_numbers = 'divide')
+  p$revenu_conjoint <<- clean_number(p$revenu_conjoint, high_numbers = 'divide')
+  
+  for (i in c(
+     "revenu", "revenu_conjoint","taille_foyer", "transferts_inter_s", "transferts_inter_c", "transferts_inter_i",
+              "heritage_td9", "heritage_td6", "heritage_td7", "heritage_td5", "heritage_tc9", "reforme_med_transfert",
+              "heritage_tc6", "heritage_tc7", "heritage_tc5", "heritage_rd9", "heritage_rd6",
+              "heritage_rd7", "heritage_rd5", "heritage_rc9", "heritage_rc6", "heritage_rc7", "heritage_rc5",
+              "premier_clic_matrices", "nombre_clics_matrices", "duree_matrices", "dernier_clic_matrices", "premier_clic_multiples", "nombre_clics_multiples", "duree_multiples", "dernier_clic_multiples",
+              "revenu_max_ideal", "taux_trader", "taux_rentier", "revenu_max_s", "premier_clic_approbation2", "nombre_clics_approbation2", "duree_approbation2", "dernier_clic_approbation2",
+              "premier_clic_des_av", "nombre_clics_des_av", "duree_des_av", "dernier_clic_des_av", "premier_clic_notation", "nombre_clics_notation", "duree_notation", "dernier_clic_notation",
+              # "premier_clic_approbation", "nombre_clics_approbation", "duree_approbation", "dernier_clic_approbation", "premier_clic_reforme", "nombre_clics_reforme", "duree_reforme", "dernier_clic_reforme", 
+              "avantager", "desavantager", "rdb_aid", "rdb_rdb", "rdb_gar", "rdb_ass", "reforme_med_avantager", "reforme_med_desavantager", "duree",
+              "note_actuel", "note_mediane", "note_mediane_rdb", "reforme_aid_avantager", "reforme_aid_desavantager", "reforme_aid_transfert"
+              )) {
+    lab <- label(p[[i]])
+    p[[i]] <<- as.numeric(as.vector(p[[i]]))
+    label(p[[i]]) <<- lab
+  }
+
+  for (j in c("rsa_jeune", "retraite_modulee_csp", "retraite_libre", "rsa_etrangers", "pib_important", "taxe_mondiale_riches", "revenu_base_mondial",
+              "parrainage_refugie", "quota_commune", "approbation_moyenne", "approbation_mediane_aid", "approbation_mediane_rdb", "approbation_mediane",
+              "revenu_max_fr_3m", "revenu_max_fr_100k", "impot_eu_benefices", "taxe_mondiale_capital",
+              "revenu_max_monde", "revenu_max_monde_100k", "revenu_max_monde_3m", "assemblee_finance", "assemblee_climat"
+              )) {
+    p[j][[1]] <<- as.item(as.character(p[j][[1]]),
+                labels = structure(c("","Non","NSP","Oui"), names = c("NA","Non","NSP","Oui")), 
+                missing.values = c("","NSP"), annotation=attr(p[j][[1]], "label"))
+  }
+  
+  for (j in c("quotient_progressif", "individualisation_progressive")) {
+    p[j][[1]] <<- as.item(as.character(p[j][[1]]),
+                labels = structure(c("","Contre","NSP","Pour"), names = c("NA","Contre","NSP","Pour")), 
+                missing.values = c("","NSP"), annotation=attr(p[j][[1]], "label"))
+  }
+  
+  is.na(p$satisfaction) <<-  grepl("NSP",p$satisfaction)
+  p$satisfaction <<- (p$satisfaction == "Oui")
+  label(p$satisfaction) <<- "satisfaction: Satisfaction du revenu actuel (Votre revenu actuel vous satisfait-il: Oui/Non/NSP) - Q1";
+
+  # for (j in c("avantager_choix", "desavantager_choix")) {
+  #   p[j][[1]] <<- (!grepl("NSP",p[j][[1]]))
+  # }
+
+  for (k in c(119:124,156,157)) {
+    temp <-  2 * (p[k][[1]]=="Augmenter fortement") + (p[k][[1]]=="Augmenter légèrement") - (p[k][[1]]=="Baisser légèrement") - 2 * (p[k][[1]]=="Baisser fortement")
+    temp[p[k][[1]]=="NSP"] <- "NSP"
+    is.na(temp) <- (p[k][[1]]=="")
+    temp <- as.item(temp,
+                        labels = structure(c(-2:2,"NSP"),
+                          names = c("Baisser fortement","Baisser légèrement","Maintenir au niveau actuel","Augmenter légèrement","Augmenter fortement","NSP")),
+                        missing.values="NSP", annotation=attr(p[k][[1]], "label"))
+    p[k][[1]] <<- temp
+  }
+
+  for (k in c(98:118,184:191)) {
+    temp <-  2 * (p[k][[1]]=="Tout à fait d'accord") + (p[k][[1]]=="Assez d'accord") - (p[k][[1]]=="Pas vraiment d'accord") - 2 * (p[k][[1]]=="Pas du tout d'accord")
+    temp[p[k][[1]]=="NSP"] <- "NSP"
+    is.na(temp) <- (p[k][[1]]=="")
+    temp <- as.item(temp,
+                        labels = structure(c(-2:2,"NSP"),
+                          names = c("Pas du tout d'accord","Pas vraiment d'accord","Indifférent-e","Assez d'accord","Tout à fait d'accord","NSP")),
+                        missing.values="NSP", annotation=attr(p[k][[1]], "label"))
+    p[k][[1]] <<- temp
+  }
+  
+  p$gauche_droite <<- as.item(as.numeric(as.vector(p$gauche_droite)),
+                        labels = structure(c(-2:2),
+                          names = c("Extrême gauche","Gauche","Centre","Droite","Extrême droite")), annotation=attr(p$gauche_droite, "label"))
+    
+  p$revenu_max_ideal <<- as.item(as.numeric(p$revenu_max_ideal),  missing.values = -1, annotation=attr(p$revenu_max_ideal, "label"))
+  p$revenu_max_ideal[grepl("infini", p$revenu_max_ideal_choix)] <<- Inf
+  p$revenu_max_ideal[p$revenu_max_ideal_choix == "NSP"] <<- -1
+  p$revenu_max_s <<- as.item(as.numeric(p$revenu_max_s),  missing.values = c(-1), annotation=attr(p$revenu_max_s, "label"))
+  p$revenu_max_s[p$revenu_max_s_choix == "NSP"] <<- -1
+  p$revenu_max_s[grepl("devrait pas", p$revenu_max_s_choix)] <<- Inf
+  p$revenu_max <<- p$revenu_max_s
+  annotation(p$revenu_max) <<- "revenu_max: Revenu maximal légal désiré en France: champ de saisire/NSP/on devrait pas; variante simple et complète (avec argument contre imposition élevée) - Q31,Q35"
+  p$rdb_aid <<- as.item(as.numeric(p$rdb_aid),  missing.values = -1, annotation=attr(p$rdb_aid, "label"))
+  p$rdb_aid[p$rdb_aid_choix == "pas"] <<- 0
+  p$rdb_aid[p$rdb_aid_choix == "NSP"] <<- -1
+  p$rdb_ass <<- as.item(as.numeric(p$rdb_ass),  missing.values = -1, annotation=attr(p$rdb_ass, "label"))
+  p$rdb_ass[p$rdb_ass_choix == "pas"] <<- 0
+  p$rdb_ass[p$rdb_ass_choix == "NSP"] <<- -1
+  p$rdb_rdb <<- as.item(as.numeric(p$rdb_rdb),  missing.values = -1, annotation=attr(p$rdb_rdb, "label"))
+  p$rdb_rdb[p$rdb_rdb_choix == "pas"] <<- 0
+  p$rdb_rdb[p$rdb_rdb_choix == "NSP"] <<- -1
+  p$rdb_gar <<- as.item(as.numeric(p$rdb_gar),  missing.values = -1, annotation=attr(p$rdb_gar, "label"))
+  p$rdb_gar[p$rdb_gar_choix == "pas"] <<- 0
+  p$rdb_gar[p$rdb_gar_choix == "NSP"] <<- -1
+  p$rdb[!is.na(p$rdb_gar)] <<- p$rdb_gar[!is.na(p$rdb_gar)]
+  p$rdb[!is.na(p$rdb_ass)] <<- p$rdb_ass[!is.na(p$rdb_ass)]
+  p$rdb[!is.na(p$rdb_rdb)] <<- p$rdb_rdb[!is.na(p$rdb_rdb)]
+  p$rdb[!is.na(p$rdb_aid)] <<- p$rdb_aid[!is.na(p$rdb_aid)]
+  p$rdb <<- as.item(as.numeric(p$rdb),  missing.values = -1, annotation="rdb: Revenu de base désiré, variantes gar/ass/rdb/aid: montant minimal garanti tous français/minimal qu'État devrait assurer à chacun-e/du rdb + explication/aides de l'État pour sans revenus; Vague 1: champ de saisie/NSP, Vague 2: champ de saisie/NSP/on devrait pas - Q122,Q23,Q24,Q25")
+  p$variante_rdb[!is.na(p$rdb_gar)] <<- "gar"
+  p$variante_rdb[!is.na(p$rdb_ass)] <<- "ass"
+  p$variante_rdb[!is.na(p$rdb_aid)] <<- "aid"
+  p$variante_rdb[!is.na(p$rdb_rdb)] <<- "rdb"
+  p$variante_rdb <<- factor(p$variante_rdb, c("gar","ass","rdb","aid")) # Pour l'ordre d'affichage dans les graphiques # c("aid","rdb","ass","gar")
+  label(p$variante_rdb) <<- "variante_rdb: Variante dans la formulation de rdb (revenu de base); gar/ass/rdb/aid: montant minimal garanti tous français/minimal qu'État devrait assurer à chacun-e/du rdb + explication/aides de l'État pour sans revenus; Vague 1: champ de saisie/NSP, Vague 2: champ de saisie/NSP/on devrait pas - Q122,Q23,Q24,Q25"
+  p$desavantager <<- as.item(as.numeric(p$desavantager),  missing.values = -1, annotation=attr(p$desavantager, "label"))
+  p$desavantager[p$desavantager_choix == "NSP"] <<- -1
+  p$avantager <<- as.item(as.numeric(p$avantager),  missing.values = -1, annotation=attr(p$avantager, "label"))
+  p$avantager[p$avantager_choix == "NSP"] <<- -1
+
+  # p$approbation <<- (p$approbation_s == "Oui")
+  # p$approbation[p$approbation_c != ""] <<- (p$approbation_c[p$approbation_c != ""] == "Oui")
+  # p$approbation <<- as.item(as.numeric(p$approbation),  missing.values = c(-1,-2))
+  # p$approbation[p$approbation_c == "NSP" | p$approbation_s == "NSP"] <<- -1
+
+  p$taux_max <<- p$taux_rentier
+  p$taux_max[!is.na(p$taux_trader)] <<- p$taux_trader[!is.na(p$taux_trader)]
+  p$taux_max[is.na(p$taux_max) & p$variante_max!=""] <<- -1
+  p$taux_max <<- as.item(as.numeric(p$taux_max), missing.values=-1, annotation="taux_max: Taux désiré pour 3 millions d'€ de revenus annuels (d'imposition): curseur/NSP; Vague 1 : variantes simple et complète (avec argument contre imposition élevée), Vague 2 : variante pour un trader et pour un rentier - Q30_1,34_1")
+
+  p$quotient_indiv[p$individualisation_progressive == "Pour" | p$quotient_progressif=="Pour"] <<- "indiv"
+  p$quotient_indiv[p$individualisation_progressive == "Contre" | p$quotient_progressif=="Contre"] <<- "quotient"
+  p$quotient_indiv[p$individualisation_progressive == "NSP" | p$quotient_progressif=="NSP"] <<- "NSP"
+  label(p$quotient_indiv) <<- "quotient_indiv: Individualisation de l'IRPP (Êtes-vous favorable à ...? Vague 1: variante simple , Vague 2: réforme progressive; variante mettant en valeur l'indiv ou le quotient dans chaque vague) - Q33,Q34"
+
+  p$heritage_9 <<- -1
+  p$heritage_7 <<- -1
+  p$heritage_6 <<- -1
+  p$heritage_5 <<- -1
+  p$heritage_9 <<- pmax(p$heritage_rd9, p$heritage_rc9, 10^9 - p$heritage_td9, 10^9 - p$heritage_tc9, na.rm=T) / 10^9
+  p$heritage_7 <<- pmax(p$heritage_rd7, p$heritage_rc7, 10^7 - p$heritage_td7, 10^7 - p$heritage_tc7, na.rm=T) / 10^7
+  p$heritage_6 <<- pmax(p$heritage_rd6, p$heritage_rc6, 10^6 - p$heritage_td6, 10^6 - p$heritage_tc6, na.rm=T) / 10^6
+  p$heritage_5 <<- pmax(p$heritage_rd5, p$heritage_rc5, 10^5 - p$heritage_td5, 10^5 - p$heritage_tc5, na.rm=T) / 10^5
+  is.na(p$heritage_9) <<- !is.na(p$heritage_eleves)
+  is.na(p$heritage_7) <<- !is.na(p$heritage_eleves)
+  is.na(p$heritage_6) <<- !is.na(p$heritage_eleves)
+  is.na(p$heritage_5) <<- !is.na(p$heritage_eleves)
+  p$heritage_9 <<- as.item(as.numeric(p$heritage_9), missing.values=-1, annotation="heritage_9: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^9€ (en proportion), 4 variantes selon que l'on demande le montant de la taxe ou de l'héritage reçu et selon que l'ordre des montants est présenté de façon croissante ou décroissante - Q14,Q90,Q91,Q92")
+  p$heritage_7 <<- as.item(as.numeric(p$heritage_7), missing.values=-1, annotation="heritage_7: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^7€ (en proportion), 4 variantes selon que l'on demande le montant de la taxe ou de l'héritage reçu et selon que l'ordre des montants est présenté de façon croissante ou décroissante - Q14,Q90,Q91,Q92")
+  p$heritage_6 <<- as.item(as.numeric(p$heritage_6), missing.values=-1, annotation="heritage_6: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^6€ (en proportion), 4 variantes selon que l'on demande le montant de la taxe ou de l'héritage reçu et selon que l'ordre des montants est présenté de façon croissante ou décroissante - Q14,Q90,Q91,Q92")
+  p$heritage_5 <<- as.item(as.numeric(p$heritage_5), missing.values=-1, annotation="heritage_5: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^5€ (en proportion), 4 variantes selon que l'on demande le montant de la taxe ou de l'héritage reçu et selon que l'ordre des montants est présenté de façon croissante ou décroissante - Q14,Q90,Q91,Q92")
+  # label(p$heritage_9) <<- "heritage_9: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^9€ (en proportion), 4 variantes selon que l'on demande le montant de la taxe ou de l'héritage reçu et selon que l'ordre des montants est présenté de façon croissante ou décroissante - Q14,Q90,Q91,Q92"
+  # label(p$heritage_7) <<- "heritage_7: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^7€ (en proportion), 4 variantes selon que l'on demande le montant de la taxe ou de l'héritage reçu et selon que l'ordre des montants est présenté de façon croissante ou décroissante - Q14,Q90,Q91,Q92"
+  # label(p$heritage_6) <<- "heritage_6: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^6€ (en proportion), 4 variantes selon que l'on demande le montant de la taxe ou de l'héritage reçu et selon que l'ordre des montants est présenté de façon croissante ou décroissante - Q14,Q90,Q91,Q92"
+  # label(p$heritage_5) <<- "heritage_5: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^5€ (en proportion), 4 variantes selon que l'on demande le montant de la taxe ou de l'héritage reçu et selon que l'ordre des montants est présenté de façon croissante ou décroissante - Q14,Q90,Q91,Q92"
+  p$variante_heritage[!is.na(p$heritage_rd9) | !is.na(p$heritage_rd7) | !is.na(p$heritage_rd6) | !is.na(p$heritage_rd5)] <<- "rd"
+  p$variante_heritage[!is.na(p$heritage_rc9) | !is.na(p$heritage_rc7) | !is.na(p$heritage_rc6) | !is.na(p$heritage_rc5)] <<- "rc"
+  p$variante_heritage[!is.na(p$heritage_td9) | !is.na(p$heritage_td7) | !is.na(p$heritage_td6) | !is.na(p$heritage_td5)] <<- "td"
+  p$variante_heritage[!is.na(p$heritage_tc9) | !is.na(p$heritage_tc7) | !is.na(p$heritage_tc6) | !is.na(p$heritage_tc5)] <<- "tc"
+  p$variante_heritage[!is.na(p$heritage_eleves)] <<- "me"
+  label(p$variante_heritage) <<- "variante_heritage: Variante attribuée aléatoirement concernant le montant désiré de l'héritage, rd/rc/td/tc/me:héritage reçu souhaité avec présentation en ordre décroissant/croissant des valeurs des successions/taxe souhaitée décroissant/croissant/évolution souhaitée pour héritages moyens et élevés - Q14,90-92,119"
+  p$heritage_9_corr <<- -1
+  p$heritage_7_corr <<- -1
+  p$heritage_6_corr <<- -1
+  p$heritage_5_corr <<- -1
+  p$heritage_9_corr <<- pmax(p$heritage_rd9 + (p$heritage_rd9 <= 100 & p$heritage_rd9 > 1) * (p$heritage_rd9 * (10^7 - 1)), p$heritage_rc9 + (p$heritage_rc9 <= 100 & p$heritage_rc9 > 1) * (p$heritage_rc9 * (10^7 - 1)), 10^9 - (p$heritage_td9 + (p$heritage_td9 <= 100 & p$heritage_td9 > 1) * (p$heritage_td9 * (10^7 - 1))), 10^9 - (p$heritage_tc9 + (p$heritage_tc9 <= 100 & p$heritage_tc9 > 1) * (p$heritage_tc9 * (10^7 - 1))), na.rm=T) / 10^9
+  p$heritage_7_corr <<- pmax(p$heritage_rd7 + (p$heritage_rd7 <= 100 & p$heritage_rd7 > 1) * (p$heritage_rd7 * (10^5 - 1)), p$heritage_rc7 + (p$heritage_rc7 <= 100 & p$heritage_rc7 > 1) * (p$heritage_rc7 * (10^5 - 1)), 10^7 - (p$heritage_td7 + (p$heritage_td7 <= 100 & p$heritage_td7 > 1) * (p$heritage_td7 * (10^5 - 1))), 10^7 - (p$heritage_tc7 + (p$heritage_tc7 <= 100 & p$heritage_tc7 > 1) * (p$heritage_tc7 * (10^5 - 1))), na.rm=T) / 10^7
+  p$heritage_6_corr <<- pmax(p$heritage_rd6 + (p$heritage_rd6 <= 100 & p$heritage_rd6 > 1) * (p$heritage_rd6 * (10^4 - 1)), p$heritage_rc6 + (p$heritage_rc6 <= 100 & p$heritage_rc6 > 1) * (p$heritage_rc6 * (10^4 - 1)), 10^6 - (p$heritage_td6 + (p$heritage_td6 <= 100 & p$heritage_td6 > 1) * (p$heritage_td6 * (10^4 - 1))), 10^6 - (p$heritage_tc6 + (p$heritage_tc6 <= 100 & p$heritage_tc6 > 1) * (p$heritage_tc6 * (10^4 - 1))), na.rm=T) / 10^6
+  p$heritage_5_corr <<- pmax(p$heritage_rd5 + (p$heritage_rd5 <= 100 & p$heritage_rd5 > 1) * (p$heritage_rd5 * (10^3 - 1)), p$heritage_rc5 + (p$heritage_rc5 <= 100 & p$heritage_rc5 > 1) * (p$heritage_rc5 * (10^3 - 1)), 10^5 - (p$heritage_td5 + (p$heritage_td5 <= 100 & p$heritage_td5 > 1) * (p$heritage_td5 * (10^3 - 1))), 10^5 - (p$heritage_tc5 + (p$heritage_tc5 <= 100 & p$heritage_tc5 > 1) * (p$heritage_tc5 * (10^3 - 1))), na.rm=T) / 10^5
+  p$heritage_progressif <<- ((p$heritage_9_corr <= p$heritage_7_corr) & (p$heritage_7_corr <= p$heritage_6_corr) & (p$heritage_6_corr <= p$heritage_5_corr))
+  is.na(p$heritage_9_corr) <<-!is.na(p$heritage_eleves) | p$heritage_9_corr > 1 | p$heritage_9_corr < 0
+  is.na(p$heritage_7_corr) <<-!is.na(p$heritage_eleves) | p$heritage_7_corr > 1 | p$heritage_7_corr < 0
+  is.na(p$heritage_6_corr) <<-!is.na(p$heritage_eleves) | p$heritage_6_corr > 1 | p$heritage_6_corr < 0
+  is.na(p$heritage_5_corr) <<-!is.na(p$heritage_eleves) | p$heritage_5_corr > 1 | p$heritage_5_corr < 0
+  p$heritage_9_corr <<- as.item(as.numeric(p$heritage_9_corr), missing.values=-1, annotation="heritage_9_corr: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^9€ (en proportion), après exclusion des valeurs < 0 ou > -1 et correction pour ramener les 20% de valeurs initialement comprises entre 0 et 100 en montant réels (la question n'était pas posée en proportion, mais on interprète ici ces réponses comme des pourcentages) - Q14,Q90,Q91,Q92")
+  p$heritage_7_corr <<- as.item(as.numeric(p$heritage_7_corr), missing.values=-1, annotation="heritage_7_corr: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^7€ (en proportion), après exclusion des valeurs < 0 ou > -1 et correction pour ramener les 20% de valeurs initialement comprises entre 0 et 100 en montant réels (la question n'était pas posée en proportion, mais on interprète ici ces réponses comme des pourcentages) - Q14,Q90,Q91,Q92")
+  p$heritage_6_corr <<- as.item(as.numeric(p$heritage_6_corr), missing.values=-1, annotation="heritage_6_corr: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^6€ (en proportion), après exclusion des valeurs < 0 ou > -1 et correction pour ramener les 20% de valeurs initialement comprises entre 0 et 100 en montant réels (la question n'était pas posée en proportion, mais on interprète ici ces réponses comme des pourcentages) - Q14,Q90,Q91,Q92")
+  p$heritage_5_corr <<- as.item(as.numeric(p$heritage_5_corr), missing.values=-1, annotation="heritage_5_corr: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^5€ (en proportion), après exclusion des valeurs < 0 ou > -1 et correction pour ramener les 20% de valeurs initialement comprises entre 0 et 100 en montant réels (la question n'était pas posée en proportion, mais on interprète ici ces réponses comme des pourcentages) - Q14,Q90,Q91,Q92")
+  # label(p$heritage_9_corr) <<- "heritage_9_corr: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^9€ (en proportion), après correction pour ramener les 20% de valeurs initialement comprises entre 0 et 100 en montant réels (la question n'était pas posée en proportion, mais on interprète ici ces réponses comme des pourcentages) - Q14,Q90,Q91,Q92"
+  # label(p$heritage_7_corr) <<- "heritage_7_corr: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^7€ (en proportion), après correction pour ramener les 20% de valeurs initialement comprises entre 0 et 100 en montant réels (la question n'était pas posée en proportion, mais on interprète ici ces réponses comme des pourcentages) - Q14,Q90,Q91,Q92"
+  # label(p$heritage_6_corr) <<- "heritage_6_corr: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^6€ (en proportion), après correction pour ramener les 20% de valeurs initialement comprises entre 0 et 100 en montant réels (la question n'était pas posée en proportion, mais on interprète ici ces réponses comme des pourcentages) - Q14,Q90,Q91,Q92"
+  # label(p$heritage_5_corr) <<- "heritage_5_corr: Héritage qui devrait être reçu par un enfant unique sur une succession de 10^5€ (en proportion), après correction pour ramener les 20% de valeurs initialement comprises entre 0 et 100 en montant réels (la question n'était pas posée en proportion, mais on interprète ici ces réponses comme des pourcentages) - Q14,Q90,Q91,Q92"
+  is.na(p$heritage_progressif) <<- ((p$variante_heritage == "me") | is.missing(p$heritage_5_corr))
+  label(p$heritage_progressif) <<- "heritage_progressif: Indicatrice de progressivité (faible) de la taxation souhaitée sur l'héritage : TRUE si heritage_5_corr >= heritage_6_corr >= heritage_7_corr >= heritage_9_corr - Q14,Q90,Q91,Q92"
+  p$patrimoine_futur <<- as.item(patrimoine_futur(as.numeric(p$patrimoine), as.numeric(p$heritage_futur)),
+                        labels = structure(c(-1,1,2,2.5,3,4,4.5,5,5.5,6),
+                          names = c("NSP","Moins de 10 000€","Entre 10 000€ et 50 000€","Entre 20 000€ et 100 000€","Entre 50 000€ et 200 000€","Entre 100 000€ et 350 000€", "Entre 200 000€ et 450 000€", "Entre 300 000€ et 750 000€", "Plus que 600 000€")),
+                        missing.values="NSP", annotation="patrimoine_futur: Estimation du patrimoine futur à partir du patrimoine actuel et de l'héritage prévu, -1/1/2/2.5/3/4/4.5/5.5/6=NSP/<10k/10-50k/20-100k/50-200k/100-350k/200-450k/300-750k/>600k - Q40,60")
+  temp <- label(p$diplome)
+  p$diplome <<- factor(p$diplome, c("","Aucun diplôme","Brevet des collèges","CAP ou BEP","Baccalauréat","Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)","Bac +3 (licence...)","Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)","NSP (Ne se prononce pas)","NSP","Q76 - Quel est votre plus haut diplôme (ou celui que vous comptez avoir si vous ê...") )
+  label(p$diplome) <<- temp
+  temp <- label(p$patrimoine)
+  p$patrimoine <<- factor(p$patrimoine, c("","Moins de 10 000€","Entre 10 000€ et 50 000€","Entre 50 000€ et 150 000€","Entre 150 000€ et 300 000€","Entre 300 000€ et 600 000€","Plus de 600 000€","NSP","NSP (Je ne veux pas répondre)","Q40 - À combien estimez-vous votre patrimoine (en euros) ? Sont incluses ici tout..."))
+  label(p$patrimoine) <<- temp
+  temp <- label(p$heritage_futur)
+  p$heritage_futur <<- factor(p$heritage_futur, c("","Moins de 10 000€","Entre 10 000€ et 50 000€","Entre 50 000€ et 150 000€","Entre 150 000€ et 300 000€","Entre 300 000€ et 600 000€","Plus de 600 000€","Je n'hériterai probablement pas à l'avenir.","NSP","NSP (Je ne veux pas répondre)","NSP (Ne sait pas, ne veut pas répondre)","Q40 - À combien estimez-vous votre patrimoine (en euros) ? Sont incluses ici tout..."))
+  label(p$heritage_futur) <<- temp
+  temp <- label(p$interet_politique)
+  p$interet_politique <<- factor(p$interet_politique, c("","Beaucoup","Un peu","Presque pas (ou pas du tout)","NSP","NSP (Je ne veux pas répondre)","Q20 - À quel point êtes-vous intéressé·e par la politique ?"))
+  label(p$interet_politique) <<- temp
+  temp <- label(p$quel_rdb)
+  p$quel_rdb <<- factor(p$quel_rdb, c("","L'instauration d'un revenu de base de 700€/mois, pour simplifier le système actuel","L'instauration d'un revenu de base de 1000€/mois, pour vraiment redistribuer les richesses","L'instauration d'un revenu de base de 500€/mois","L'instauration d'un revenu de base de 850€/mois","L'instauration d'un revenu de base de 700€/mois qui remplacerait aussi les allocations chômage","L'instauration d'un revenu de base de 1000€/mois qui remplacerait aussi les allocations chômage","L'instauration d'un revenu de base de 1000€/mois qui remplacerait aussi les allocations chômage et les retraites","Le maintien du système actuel","Le maintien du système actuel mais en baissant le montant des minima sociaux (RSA, APL...)","Le maintien du système actuel mais en augmentant le RSA","NSP","NSP (Je ne veux pas répondre)","Q115 - Le revenu de base serait une allocation versée à chaque adulte sans aucune..."))
+  label(p$quel_rdb) <<- temp
+  temp <- label(p$refugies)  
+  p$refugies <<- factor(p$refugies, c("","Il faut accepter tous les réfugiés qui fuient la guerre ou la persécution","Il faut accepter beaucoup plus de réfugiés qu'actuellement","Il faut accepter un quota de réfugiés plus élevé qu'actuellement","Il faut accepter un quota de réfugiés correspondant au nombre actuel de personnes accueillies légalement sur le territoire","Il faut accepter moins de réfugiés qu'actuellement","Il faut refuser à tout réfugié l'entrée sur le territoire","Il faut laisser à chaque commune le choix de fixer son quota de réfugiés","Il faut autoriser chaque français à parrainer un réfugié, le parrain serait responsable de l'intégration et si besoin de l'hébergement et de l'entretien du réfugié","NSP","NSP (Je ne veux pas répondre)","Q111 - Quelle politique faut-il adopter vis-à-vis des réfugiés qui veulent entrer..."))
+  label(p$refugies) <<- temp
+  temp <- label(p$france_et_ue)
+  p$france_et_ue <<- factor(p$france_et_ue, c("","La France doit quitter la zone euro et l'Union Européenne","La France doit renégocier les traités européens pour les rendre plus démocratiques, quitte à sortir de l'UE si les autres États membres refusent","La France doit proposer de renégocier les traités européens","La France doit se conformer aux traités européens et ne pas chercher à modifier le fonctionnement de l'UE","La France doit chercher à renforcer l'intégration européenne dans le cadre des traités","La France ne doit pas chercher à changer les traités européens, mais elle devrait désobéir à certaines règles de l'UE","NSP","NSP (Je ne veux pas répondre)","Q9 - Comment doit se positionner la France par rapport à l'Union Européenne ?"))
+  label(p$france_et_ue) <<- temp
+  temp <- label(p$dette)
+  p$dette <<- factor(p$dette, c("","Il faut continuer à rembourser la dette publique et ramener notre budget à l'équilibre","Il faut continuer à rembourser la dette publique et ramener le déficit sous les 3% du PIB (comme l'y obligent les traités européens)","Il faut continuer à rembourser la dette publique sans chercher à réduire le déficit","Il faut choisir de ne pas rembourser une partie de la dette (ie. la restructurer)" ,"NSP","NSP (Je ne veux pas répondre)","Q112 - Que faut-il faire de la dette et du déficit publics ?"))
+  label(p$dette) <<- temp
+  temp <- label(p$quel_heritage)  
+  p$quel_heritage <<- factor(p$quel_heritage, c("","Chaque personne, aussi riche soit-elle, devrait pouvoir transmettre tout son patrimoine à ses enfants sans payer d'impôt","Chaque personne devrait pouvoir transmettre l'équivalent d'une maison à chacun de ses enfants sans être taxée, mais les plus riches devraient payer un impôt sur les successions","L'impôt sur les successions devrait être faible pour la plupart des gens mais il devrait être plus élevé pour les riches","L'impôt sur les successions devrait être faible pour les plus modestes mais il devrait augmenter ensuite, jusqu'à être très élevé pour les plus riches : personne ne devrait hériter de plus de 10 millions d'euros","NSP","NSP (Je ne veux pas répondre)","Q114 - À laquelle de ces propositions adhérez-vous le plus ?"))
+  label(p$quel_heritage) <<- temp
+  
+  p$rev_tot <<- 12 * pmax(p$revenu, p$revenu + p$revenu_conjoint, na.rm=T)
+  p$revdisp <<- round((12 * p$revenu / p$rev_tot) * (p$rev_tot -  irpp_p(p$rev_tot,grepl("Mari", p$situation_maritale),p$taille_foyer))/12)
+  p$niveau_vie <<- ((p$rev_tot -  irpp_p(p$rev_tot,grepl("Mari", p$situation_maritale),p$taille_foyer))/12) / uc(grepl("Mari", p$situation_maritale), p$taille_foyer)
+  p$rev_tot <<- p$rev_tot/12
+    
+  p$revenu_conjoint[which(p$mail=="gueguenbouchynolwenn@wanadoo.fr")] <<- 1200
+}
+create_multiples <- function() {
+  p$pour_conserver_constitution <<- grepl("Conserver notre Constitution", p[[129]])
+  p$pour_plus_democratie <<- grepl("Rendre nos institutions encore plus démocratiques", p[[129]])
+  p$pour_referendums <<- grepl("réformes importantes par référendum", p[[129]])
+  p$pour_budgets_participatifs <<- grepl("budgets participatifs", p[[129]])
+  p$pour_salaries_ca <<- grepl("moitié des sièges des conseils d'administration des grandes compagnies à des salariés", p[[129]])
+  p$pour_senat_aleatoire <<- grepl("citoyens tirés au sort", p[[129]])
+  p$pour_voter_propositions <<- grepl("Voter davantage sur des propositions", p[[129]])
+  p$pour_cyberdemocratie <<- grepl("site internet officiel de débats", p[[129]])
+  p$pour_mixed_member_proportional <<- grepl("Assemblée nationale", p[[129]])
+  p$pour_voter_budget <<- grepl("Faire voter les citoyens directement sur le budget de l'État", p[[129]])
+  p$pour_droit_vote_etrangers <<- grepl("Autoriser le droit de vote des étrangers", p[[129]])
+  p$pour_convoquer_constituante <<- grepl("Assemblée constituante", p[[129]])
+  label(p$pour_conserver_constitution) <<- "pour_conserver_constitution: Conserver notre Constitution actuelle - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_1"
+  label(p$pour_plus_democratie) <<- "pour_plus_democratie: Rendre nos institutions encore plus démocratiques - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_3"
+  label(p$pour_referendums) <<- "pour_referendums: Faire voter les réformes importantes par référendum - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_4"
+  label(p$pour_budgets_participatifs) <<- "pour_budgets_participatifs: Développer les budgets participatifs (où les citoyens choisissent directement les investissements de leur commune) - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_5"
+  label(p$pour_salaries_ca) <<- "pour_salaries_ca: Réserver la moitié des sièges des conseils d'administration des grandes compagnies à des salariés - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_14"
+  label(p$pour_senat_aleatoire) <<- "pour_senat_aleatoire: Remplacer le Sénat par une assemblée de citoyens tirés au sort - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_8"
+  label(p$pour_voter_propositions) <<- "pour_voter_propositions: Voter davantage sur des propositions plutôt que sur des personnes - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_10"
+  label(p$pour_cyberdemocratie) <<- "pour_cyberdemocratie: Créer un site internet officiel de débats et de consultation politique - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_11"
+  label(p$pour_mixed_member_proportional) <<- "pour_mixed_member_proportional: Assurer une représentation proportionnelle à l'Assemblée nationale tout en conservant des représentants pour chaque département - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_12"
+  label(p$pour_voter_budget) <<- "pour_voter_budget: Faire voter les citoyens directement sur le budget de l'État - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_7"
+  label(p$pour_droit_vote_etrangers) <<- "pour_droit_vote_etrangers: Autoriser le droit de vote des étrangers en situation régulière - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_6"
+  label(p$pour_convoquer_constituante) <<- "pour_convoquer_constituante: Convoquer une Assemblée constituante - choisi dans 'À quelles propositions ci-dessous adhérez-vous ?' Q129 - Q48_13"
+  p$variante_multiples <<- "choix"
+  p$variante_multiples[!is.na(p$conserver_constitution)] <<- "matrice"
+  label(p$variante_multiples) <<- "variante_multiples: Variant attribuée aléatoirement dans la formulation des questions sur la démocratie et le climat, choix/matrice : choix à cocher si on les supporte / items à noter dans [-2;2]"
+  is.na(p$pour_conserver_constitution) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_plus_democratie) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_referendums) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_budgets_participatifs) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_salaries_ca) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_senat_aleatoire) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_voter_propositions) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_cyberdemocratie) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_mixed_member_proportional) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_voter_budget) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_convoquer_constituante) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_droit_vote_etrangers) <<- (p$variante_multiples == "matrice")
+  is.na(p$conserver_constitution) <<- (p$variante_multiples == "choix")
+  is.na(p$plus_democratie) <<- (p$variante_multiples == "choix")
+  is.na(p$referendums) <<- (p$variante_multiples == "choix")
+  is.na(p$budgets_participatifs) <<- (p$variante_multiples == "choix")
+  is.na(p$salaries_ca) <<- (p$variante_multiples == "choix")
+  is.na(p$senat_aleatoire) <<- (p$variante_multiples == "choix")
+  is.na(p$voter_propositions) <<- (p$variante_multiples == "choix")
+  is.na(p$cyberdemocratie) <<- (p$variante_multiples == "choix")
+  is.na(p$mixed_member_proportional) <<- (p$variante_multiples == "choix")
+  is.na(p$voter_budget) <<- (p$variante_multiples == "choix")
+  is.na(p$convoquer_constituante) <<- (p$variante_multiples == "choix")
+  is.na(p$droit_vote_etrangers) <<- (p$variante_multiples == "choix")
+} # 12 new variables: pour_(cons_cons,+dem,refr,bp,s_ca,s~,prop,e-dem,mmp,votb,dtetr,conv_cons) TDO: rajouter la matrice dans les définitions
+create_climat <- function() {
+  p$pour_taxe_ghg_monde <<- grepl("taxe mondiale", p[[130]])
+  # is.na(p$pour_taxe_ghg_monde) <<- (!is.na(p[[100]]))
+  p$pour_taxe_ghg_fr <<- grepl("serre en France", p[[130]])
+  # is.na(p$pour_taxe_ghg_fr) <<- (!is.na(p[[100]]))
+  p$pour_electricite_sans_co2 <<- grepl("électricité", p[[130]])
+  # is.na(p$pour_electricite_sans_co2) <<- (!is.na(p[[100]]))
+  p$pour_isoler_batiments <<- grepl("Isoler", p[[130]])
+  # is.na(p$pour_isoler_batiments) <<- (!is.na(p[[100]]))
+  p$pour_baisser_conso_energie <<- grepl("consommation d'énergie", p[[130]])
+  # is.na(p$pour_baisser_conso_energie) <<- (!is.na(p[[100]]))
+  p$pour_favoriser_bio <<- grepl("biologique", p[[130]])
+  # is.na(p$pour_favoriser_bio) <<- (!is.na(p[[100]]))
+  p$pour_voitures_electriques <<- grepl("voitures élect", p[[130]])
+  # is.na(p$pour_voitures_electriques) <<- (!is.na(p[[100]]))
+  p$pour_baisser_conso_viande <<- grepl("viande rouge", p[[130]])
+  # is.na(p$pour_baisser_conso_viande) <<- (!is.na(p[[100]]))
+  label(p$pour_taxe_ghg_monde) <<- "pour_taxe_ghg_monde: Instaurer une taxe mondiale sur les émissions de gaz à effet de serre - choisi dans 'À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?' Q130 - Q102_1"
+  label(p$pour_taxe_ghg_fr) <<- "pour_taxe_ghg_fr: Instaurer une taxe sur les émissions de gaz à effet de serre en France - choisi dans 'À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?' Q130 - Q102_3"
+  label(p$pour_electricite_sans_co2) <<- "pour_electricite_sans_co2: Arrêter de produire de l'électricité à partir d'hydrocarbures - choisi dans 'À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?' Q130 - Q102_4"
+  label(p$pour_isoler_batiments) <<- "pour_isoler_batiments: Isoler thermiquement peu à peu tous les bâtiments pour qu'ils consomment moins d'énergie, grâce à un emprunt national - choisi dans 'À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?' Q130 - Q102_5"
+  label(p$pour_baisser_conso_energie) <<- "pour_baisser_conso_energie: Baisser notre consommation d'énergie - choisi dans 'À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?' Q130 - Q102_10"
+  label(p$pour_favoriser_bio) <<- "pour_favoriser_bio: Favoriser l'agriculture biologique et la permaculture - choisi dans 'À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?' Q130 - Q102_6"
+  label(p$pour_voitures_electriques) <<- "pour_voitures_electriques: Remplacer peu à peu le parc automobile par des voitures électriques en libre service - choisi dans 'À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?' Q130 - Q102_7"
+  label(p$pour_baisser_conso_viande) <<- "pour_baisser_conso_viande: Baisser votre consommation de viande rouge (ou la maintenir basse) - choisi dans 'À quelles propositions pour lutter contre le réchauffement climatique adhérez-vous ?' Q130 - Q102_8"
+  is.na(p$pour_taxe_ghg_monde) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_taxe_ghg_fr) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_electricite_sans_co2) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_isoler_batiments) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_baisser_conso_energie) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_favoriser_bio) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_voitures_electriques) <<- (p$variante_multiples == "matrice")
+  is.na(p$pour_baisser_conso_viande) <<- (p$variante_multiples == "matrice")
+  is.na(p$taxe_ghg_monde) <<- (p$variante_multiples == "choix")
+  is.na(p$taxe_ghg_fr) <<- (p$variante_multiples == "choix")
+  is.na(p$electricite_sans_co2) <<- (p$variante_multiples == "choix")
+  is.na(p$isoler_batiments) <<- (p$variante_multiples == "choix")
+  is.na(p$baisser_conso_energie) <<- (p$variante_multiples == "choix")
+  is.na(p$favoriser_bio) <<- (p$variante_multiples == "choix")
+  is.na(p$voitures_electriques) <<- (p$variante_multiples == "choix")
+  is.na(p$baisser_conso_viande) <<- (p$variante_multiples == "choix")
+} # 8 new variables: pour_(tax_m,tax_fr,isol,-ener,+bio,voitelec,-vian) TDO: rajouter la matrice dans les définitions
+create_priorite <- function() {
+  p$pouvoir_achat <<- grepl("revenus", p[[168]])
+  p$conditions_travail <<- grepl("conditions de travail", p[[168]])
+  p$soins <<- grepl("soigné", p[[168]])
+  p$education <<- grepl("éducation", p[[168]])
+  p$vivre_ensemble <<- grepl("ensemble", p[[168]])
+  p$logement <<- grepl("logement", p[[168]])
+  p$stabilite_emploi <<- grepl("emploi stable", p[[168]])
+  p$avancer_retraite <<- grepl("retraite", p[[168]])
+  p$moins_travail <<- grepl("plus de temps", p[[168]])
+  p$environnement <<- grepl("environnement", p[[168]])
+  p$insecurite <<- grepl("sécurité", p[[168]])
+  p$moins_surveillance <<- grepl("surveill", p[[168]])
+  p$discriminations <<- grepl("discriminations", p[[168]])
+  label(p$pouvoir_achat) <<- "pouvoir_achat: 'Je veux un meilleur salaire, de meilleurs revenus' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$conditions_travail) <<- "conditions_travail: 'Je veux de meilleures conditions de travail' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$soins) <<- "soins: 'Je veux être mieux soigné et mieux remboursé' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$education) <<- "education: 'Je veux une meilleure éducation, une meilleure formation pour moi ou mes enfants' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$vivre_ensemble) <<- "vivre_ensemble: 'Je veux un meilleur vivre-ensemble dans ma ville, mon quartier, mon village' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$logement) <<- "logement: 'Je veux moins dépenser pour mon logement' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$stabilite_emploi) <<- "stabilite_emploi: 'Je veux un emploi stable' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$avancer_retraite) <<- "avancer_retraite: 'Je veux partir à la retraite plus tôt' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$moins_travail) <<- "moins_travail: 'Je veux plus de temps pour me cultiver, faire du sport, etc...' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$environnement) <<- "environnement: 'Je veux une action plus forte pour l'environnement' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$insecurite) <<- "insecurite: 'Je veux plus de sécurité' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$moins_surveillance) <<- "moins_surveillance: 'Je veux être moins surveillé' choisi dans Vos priorités (3 choix possibles) - Q135"
+  label(p$discriminations) <<- "discriminations: 'Je veux que cessent les discriminations' choisi dans Vos priorités (3 choix possibles) - Q135"
+} # 13 new variables: (pa,cond,soin,edu,ens,log,stab,+retr,-trav,env,secu,surv,discr)
+create_chomage <- function() {
+  p$pour_liberaliser <<- grepl("Libéraliser", p[[29]])
+  is.na(p$pour_liberaliser) <<- !is.na(p$rtt) # (p[[29]]=="")
+  p$pour_baisse_cotis <<- grepl("cotisations", p[[29]])
+  is.na(p$pour_baisse_cotis) <<- !is.na(p$rtt)
+  p$pour_baisse_smic <<- grepl("SMIC", p[[29]])
+  is.na(p$pour_baisse_smic) <<- !is.na(p$rtt)
+  p$pour_baisse_allocs <<- grepl("allocations", p[[29]])
+  is.na(p$pour_baisse_allocs) <<- !is.na(p$rtt)
+  p$pour_formation <<- grepl("formation", p[[29]])
+  is.na(p$pour_formation) <<- !is.na(p$rtt)
+  p$pour_subventions <<- grepl("Subventionner", p[[29]])
+  is.na(p$pour_subventions) <<- !is.na(p$rtt)
+  p$pour_investissement <<- grepl("investissement", p[[29]])
+  is.na(p$pour_investissement) <<- !is.na(p$rtt)
+  p$pour_rtt <<- grepl("Inciter", p[[29]])
+  is.na(p$pour_rtt) <<- !is.na(p$rtt)
+  label(p$pour_liberaliser) <<- "pour_liberaliser: 'Libéraliser le marché du travail en assouplissant le droit du travail' soutenu dans Mesures pour lutter contre le chômage - Q11"
+  label(p$pour_baisse_cotis) <<- "pour_baisse_cotis: 'Baisser les cotisations sociales que paient les entreprises pour qu'elles puissent embaucher' soutenu dans Mesures pour lutter contre le chômage - Q11"
+  label(p$pour_baisse_smic) <<- "pour_baisse_smic: 'Baisser le salaire minimum (le SMIC)' soutenu dans Mesures pour lutter contre le chômage - Q11"
+  label(p$pour_baisse_allocs) <<- "pour_baisse_allocs: 'Baisser les allocations chômage' soutenu dans Mesures pour lutter contre le chômage - Q11"
+  label(p$pour_formation) <<- "pour_formation: 'Financer la formation professionnelle pour tous les chômeurs longue durée' soutenu dans Mesures pour lutter contre le chômage - Q11"
+  label(p$pour_subventions) <<- "pour_subventions: 'Subventionner l'embauche des chômeurs longue durée grâce aux allocations chômage économisées' soutenu dans Mesures pour lutter contre le chômage - Q11"
+  label(p$pour_investissement) <<- "pour_investissement: 'Lancer un grand plan public d'investissement (notamment pour la transition écologique), avec de nombreux emplois à la clé' soutenu dans Mesures pour lutter contre le chômage - Q11"
+  label(p$pour_rtt) <<- "pour_rtt: 'Inciter les entreprises à conclure des accords de partage du travail associant embauches et réduction du temps de travail' soutenu dans Mesures pour lutter contre le chômage - Q11"
+} # 8 new variables: (libl,-cot,-smic,-alloc,form,subv,inv,rtt)
+qualite_p <- function() {  
+  p$nombre_nsp <<- 0
+  for (i in 1:length(p)) { p$nombre_nsp[!is.na(p[[i]]) & grepl("NSP", p[[i]])] <<- p$nombre_nsp[!is.na(p[[i]]) & grepl("NSP", p[[i]])] + 1 }
+  label(p$nombre_nsp) <<- "nombre_nsp: Nombre de 'NSP (Ne sait pas, ne se prononce pas)' parmi les réponses du répondant (entre 0 et 47, médiane à 4 ; quartiles à 2 et 8)"
+  p$qualite_comprehension[(!is.missing(p[[114]]) & n(p[[114]])!=0) | (p[[130]]!="" & !grepl("Merci",p[[130]]))] <- p$qualite_comprehension[(!is.missing(p[[114]]) & n(p[[114]])!=0) | (p[[130]]!="" & !grepl("Merci",p[[130]]))] - 1 # 
+  p$qualite_comprehension[grepl("compréhension", p$incompris)] <<- p$qualite_comprehension[grepl("compréhension", p$incompris)] - 1 # 
+  p$qualite_sincerite[p$champ_libre!=""] <<- p$qualite_sincerite[p$champ_libre!=""] + 0.8 # 
+  p$qualite_sincerite[p$mail!=""] <<- p$qualite_sincerite[p$mail!=""] + 0.8 # 
+  p$qualite_sincerite[!is.na(p[[98]]) & p[[98]]==p[[99]] & p[[99]]==p[[100]] & p[[100]]==p[[101]] & p[[101]]==p[[102]] & p[[102]]==p[[103]] & p[[103]]==p[[104]] & p[[104]]==p[[105]] & p[[105]]==p[[106]] & p[[106]]==p[[107]] & p[[107]]==p[[108]] & p[[108]]==p[[109]] & p[[109]]==p[[124]] & p[[110]]==p[[124]] & p[[111]]==p[[124]] & p[[112]]==p[[124]] & p[[113]]==p[[124]] & p[[114]]==p[[124]] & p[[115]]==p[[124]] & p[[116]]==p[[124]] & p[[117]]==p[[124]] & p[[118]]==p[[124]] & p[[119]]==p[[124]] & p[[120]]==p[[124]] & p[[121]]==p[[124]] & p[[122]]==p[[124]] & p[[123]]==p[[124]]] <<- p$qualite_sincerite[!is.na(p[[98]]) & p[[98]]==p[[99]] & p[[99]]==p[[100]] & p[[100]]==p[[101]] & p[[101]]==p[[102]] & p[[102]]==p[[103]] & p[[103]]==p[[104]] & p[[104]]==p[[105]] & p[[105]]==p[[106]] & p[[106]]==p[[107]] & p[[107]]==p[[108]] & p[[108]]==p[[109]] & p[[109]]==p[[124]] & p[[110]]==p[[124]] & p[[111]]==p[[124]] & p[[112]]==p[[124]] & p[[113]]==p[[124]] & p[[114]]==p[[124]] & p[[115]]==p[[124]] & p[[116]]==p[[124]] & p[[117]]==p[[124]] & p[[118]]==p[[124]] & p[[119]]==p[[124]] & p[[120]]==p[[124]] & p[[121]]==p[[124]] & p[[122]]==p[[124]] & p[[123]]==p[[124]]] - 2.1 # 
+  #TDO: indicators of qualité: too much NSPs, timing, clicks, all the same in matrices, consistency, screened, jeune et retraité, 0 heures et statut emploi
+  p$qualite_sincerite[grepl("etrait", p$statut_emploi) & (grepl("18",p$age) | grepl("35", p$age))] <<- p$qualite_sincerite[grepl("etrait", p$statut_emploi) & (grepl("18",p$age) | grepl("35", p$age))] - 1 # 2
+  p$qualite_sincerite[p$nombre_nsp>25] <<- p$qualite_sincerite[p$nombre_nsp>25] - 1 # 4
+  p$qualite_comprehension <<- p$qualite_comprehension - p$nombre_nsp/46 # 45 est le nombre maximum de NSP, atteint par 1 répondant
+  # length(which((1-p$taux_max)*3*10^6 > p$revenu_max_s*12)) # 0
+  p$qualite_comprehension[!is.na(n(p$taux_max)) & !is.missing(p$revenu_max_s) & (1-n(p$taux_max)/100)*3*10^6 > 12*p$revenu_max_s] <<- p$qualite_comprehension[!is.na(n(p$taux_max)) & !is.missing(p$revenu_max_s) & (1-n(p$taux_max)/100)*3*10^6 > 12*p$revenu_max_s] - 0.5 # 47% d'incohérence: 79/163
+  p$qualite_comprehension[!is.na(p$revenu_max_fr_100k) & !is.na(n(p$taux_max)) & p$revenu_max_fr_100k=="Oui" & n(p$taux_max) < 60] <<- p$qualite_comprehension[!is.na(p$revenu_max_fr_100k) & !is.na(n(p$taux_max)) & p$revenu_max_fr_100k=="Oui" & n(p$taux_max) < 60] - 0.5 # 8% d'incohérence
+  # p$qualite_sincerite[p$duree_multiples < 30 & !is.na(p$duree_multiples)] <<- p$qualite_sincerite[p$duree_multiples < 30 & !is.na(p$duree_multiples)] - 1 # 78
+  # # p$qualite_sincerite[p$duree_reforme < 30 & !is.na(p$duree_reforme)] <<- p$qualite_sincerite[p$duree_reforme < 30 & !is.na(p$duree_reforme)] - 1 # 139
+  # p$qualite_sincerite[p$duree_notation < 30 & !is.na(p$duree_notation)] <<- p$qualite_sincerite[p$duree_notation < 30 & !is.na(p$duree_notation)] - 1 # 177
+  # p$qualite_sincerite[p$duree_matrices < 30 & !is.na(p$duree_matrices)] <<- p$qualite_sincerite[p$duree_matrices < 30 & !is.na(p$duree_matrices)] - 1 # 63
+  # # p$qualite_sincerite[p$duree_approbation < 15 & !is.na(p$duree_approbation)] <<- p$qualite_sincerite[p$duree_approbation < 15 & !is.na(p$duree_approbation)] - 1 # 134
+  # p$qualite_sincerite[p$duree_approbation2 < 15 & !is.na(p$duree_approbation2)] <<- p$qualite_sincerite[p$duree_approbation2 < 15 & !is.na(p$duree_approbation2)] - 1 # 134
+  # p$qualite_sincerite[p$duree_des_av < 10 & !is.na(p$duree_des_av)] <<- p$qualite_sincerite[p$duree_des_av < 10 & !is.na(p$duree_des_av)] - 1 # 106 TODO: sincérité des NA
+  p$qualite_sincerite[p$duree_multiples < 80 & !is.na(p$duree_multiples)] <- p$qualite_sincerite[p$duree_multiples < 80 & !is.na(p$duree_multiples)] - ((80-p$duree_multiples[p$duree_multiples < 80 & !is.na(p$duree_multiples)])/80)^2 
+  p$qualite_sincerite[p$duree_des_av < 10 & !is.na(p$duree_des_av)] <<- p$qualite_sincerite[p$duree_des_av < 10 & !is.na(p$duree_des_av)] - ((10-p$duree_des_av[p$duree_des_av < 10 & !is.na(p$duree_des_av)])/10)^2 
+  p$qualite_sincerite[p$duree_notation < 50 & !is.na(p$duree_notation)] <<- p$qualite_sincerite[p$duree_notation < 50 & !is.na(p$duree_notation)] - ((50-p$duree_notation[p$duree_notation < 50 & !is.na(p$duree_notation)])/50)^2
+  p$qualite_sincerite[p$duree_matrices < 80 & !is.na(p$duree_matrices)] <<- p$qualite_sincerite[p$duree_matrices < 80 & !is.na(p$duree_matrices)] - ((80-p$duree_matrices[p$duree_matrices < 80 & !is.na(p$duree_matrices)])/80)^2 
+  p$qualite_sincerite[p$duree_approbation2 < 10 & !is.na(p$duree_approbation2)] <<- p$qualite_sincerite[p$duree_approbation2 < 10 & !is.na(p$duree_approbation2)] - ((10-p$duree_approbation2[p$duree_approbation2 < 10 & !is.na(p$duree_approbation2)])/10)^2 
+  # p$qualite_sincerite[p$duree_approbation < 10 & !is.na(p$duree_approbation)] <<- p$qualite_sincerite[p$duree_approbation < 10 & !is.na(p$duree_approbation)] - ((10-p$duree_approbation[p$duree_approbation < 10 & !is.na(p$duree_approbation)])/10)^2 
+  # p$qualite_sincerite[p$duree_reforme < 40 & !is.na(p$duree_reforme)] <<- p$qualite_sincerite[p$duree_reforme < 40 & !is.na(p$duree_reforme)] - ((40-p$duree_reforme[p$duree_reforme < 40 & !is.na(p$duree_reforme)])/40)^2
+
+  p$qualite_sincerite[p$ID==30449849159787 | p$ID==30449848212590] <<- p$qualite_sincerite[p$ID==30449849159787 | p$ID==30449848212590] - 1 # car respectivement ip en double avec réponses complètement différentes, et ip en double avec Uda différents
+  # TODO: bonus de qualité pour les longues durées, prendre en compte nombre de clics
+  # TODO: prendre en compte duree totale
+  label(p$qualite_sincerite) <<- "qualite_sincerite: Score de qualité établi principalement avec des malus pour les temps de réponses trop courts et des réponses toutes semblables dans les matrices, et des bonus pour le remplissage du champ libre et de l'adresse mail (entre -1.3 et 0.8, médiane à 0 ; quartiles à -0.05 et 0.8)"
+  label(p$qualite_comprehension) <<- "qualite_comprehension: Score de qualité établi principalement avec des malus lors d'une incompréhension déclarée des graphiques et lors de contradictions dans les réponses sur le revenu maximal et l'impôt pour pour les hauts revenus (entre -3 et 0, médiane à -0.11 ; quartiles à -0.24 et -0.04)"
+}
+# TODO: test_qualite climat
+# champ_libre_p <- function() {
+#   for (i in 1:length(p$champ_libre)) { if (p$champ_libre[i]!="") { print(paste(p$ID[i], p$champ_libre[i], sep=" "))  } }
+#   p$[is.element(p$ID,)] <<- TRUE
+#   label(p$) <<- ": - Q72"
+# } #TODO: champ libre, nombre missings
+remove_duplicated <- function() {
+  # which(duplicated(p$ip))
+  # for (i in which(duplicated(p$ip)))   print(decrit(p$sample[p$ip==p$ip[i]]))
+  to_remove <- c()
+  for (i in which(duplicated(p$ip))) { if (is.element("r", p$sample[p$ip==p$ip[i]])) to_remove <- c(to_remove, which(p$ip==p$ip[i] & p$sample!="r")) }
+  if (length(to_remove)>0) p <<- p[-to_remove,]
+  # p$ip[which(duplicated(p$ip))]
+  p <<- p[-(which(is.element(p$ip, p$ip[which(duplicated(p$ip))]) & !duplicated(p$ip))),]
+  p <<- p[-(which(is.element(p$ip, p$ip[which(duplicated(p$ip))]) & !duplicated(p$ip))),]
+  # length(which(duplicated(p$ip)))
+  # length(which(is.element(p$ip, p$ip[which(duplicated(p$ip))]) & !duplicated(p$ip)))
+  # which(is.element(p$ip, p$ip[which(duplicated(p$ip))]))
+  # (which(is.element(p$ip, p$ip[which(duplicated(p$ip))]) & !duplicated(p$ip)))
+  # View(p[which(is.element(p$ip, p$ip[which(duplicated(p$ip))])), c(4:7,18,19,178:181,174,171,175,20:40)])()
+}
+prepare_p <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished=TRUE, clean=TRUE, clean_all=FALSE) {
+  setwd("/home/adrien/Google Drive/Economie/Travail/enquete/codes")
+  pep <<- read.csv("perso_p.csv", sep=";")
+  # p <<- read.delim("politique.tsv", fileEncoding="UTF-16")
+  p <<- read.delim("politique.tsv", fileEncoding="UTF-16")
+  for (i in 1:length(p)) { label(p[[i]]) <<- toString(p[i][[1]][1]) } # Use the first line to create variable names labels then remove it - to run only once
+  p <<- p[-c(1),]
+  ### CLEANING
+  p <<- p[order(p$startDate)[8:length(p$startDate)], ] # remove pre-field entries
+  if (exclude_screened) { p <<- p[p$Q_TerminateFlag=="",] } # remove Screened
+  if (exclude_speeder) { p <<- p[as.numeric(as.vector(p$duration)) >= 540,] } # remove speedest
+  if (only_finished) { p <<- p[Vp("finished")=="True",] }
+  
+  # for (i in 1:length(p)) { print(paste(i, label(p[[i]]))) }
+  relabel_and_rename_p()
+  create_political_orientation_p()
+  convert_p()
+  qualite_p()
+  p$qualite <<- p$qualite_comprehension + p$qualite_sincerite
+  label(p$qualite) <<- "qualite: Score de qualité globale, somme des deux scores de qualité : compréhension et sincérité (entre -3.5 et 0.8, médiane à -0.1 ; quartiles à -0.3 et 0.3)"
+  create_multiples()
+  create_climat()
+  create_priorite()
+  create_chomage()
+  # champ_libre_p()
+  
+  p$sample <<- "a"
+  p$sample[p$finished=="True"] <<- "e"
+  p$sample[p$finished=="True" & n(p$duree) >= 540] <<- "p"
+  p$sample[p$finished=="True" & n(p$duree) >= 540 & (n(p$test_qualite)==0 | grepl("Merci",p$propositions_climat))] <<- "q" # excluded because out of quotas
+  p$sample[p$finished=="True" & n(p$duree) >= 540 & p$exclu==""] <<- "r"
+  p$Sample <<- p$sample
+  p$Sample[p$sample=="q"] <<- "p"
+  
+  remove_duplicated() 
+  
+  # removing one third of variables
+  r <- c(3,9:17,176) # completely useless columns
+  r <- c(r,47:50,55:58,62:65,68:71,74:77,94:97,125:128) # + columns to be removed after cleaning (durations, click counts)
+  r <- c(r,9,39:46,51,53,84:86,129,130,140:155,158,160,161,164,168,171,192) # + columns to be removed because we can infer their values from other columns
+  if (clean_all) { p <<- p[,-c(r,1,2,4,5,7,8,177,178,182)] } # remove also semi-useless columns: date, variantes, ID, ip, finished
+  else if (clean) { p <<- p[,-r] } 
+  rm(pep, pos = ".GlobalEnv")
+  p$weight <<- weighting(p, Sondage="p")
+}
+prepare_p(exclude_screened=FALSE)
+pp <- p
+prepare_p(exclude_screened=FALSE, exclude_speeder=FALSE)
+pe <- p
+prepare_p(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished = FALSE)
+pa <- p
+prepare_p(clean=FALSE)
+pc <- p
+prepare_p()
+export(p)
+export(pp)
+export(pe)
+export(pa)
+# TODO: doc .R, genre e/p, Label, decrit et autres fonctions, nommage dans /images
+# TODO: Label(m$taxation_capital), niveau_vie, revdisp, niveau_vie_desire
+# TODO: transferts_inter == -1 : missing
+# merge #TODO: préciser la vague dans les labels
+e$vague <- 1
+ee$vague <- 1
+ep$vague <- 1
+ea$vague <- 1
+ec$vague <- 1
+p$vague <- 2
+pp$vague <- 2
+pe$vague <- 2
+pa$vague <- 2
+pc$vague <- 2
+m <- merge(e, p, all=T)
+me <- merge(ee, pe, all=T)
+mp <- merge(ep, pp, all=T)
+ma <- merge(ea, pa, all=T)
+mc <- merge(ec, pc, all=T)
+socio_demo <- function(d) {
+  temp <- d
+  temp$Age <- (temp$age == "18 - 24") + 2*(temp$age == "25 - 34") + 3*(temp$age == "35 - 44") + 4*(temp$age == "45 - 54") + 5*(temp$age == "55 - 64") + 6*(temp$age == "65 - 74") + 7*(temp$age == "75 - 84") + 8*(temp$age == "85 or older")
+  temp$Diplome <- (temp$diplome == "Brevet des collèges") + 2*(temp$diplome=="CAP ou BEP") + 3*(temp$diplome=="Baccalauréat") + 4*(temp$diplome=="Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)") + 5*(temp$diplome=="Bac +3 (licence...)") + 6*(temp$diplome=="Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)") - (temp$diplome=="NSP (Ne se prononce pas)")
+  temp$Patrimoine[temp$vague==1] <- 0 + (as.numeric(temp$patrimoine[temp$vague==1]) <=10000 & as.numeric(temp$patrimoine[temp$vague==1])>0) + 2*((as.numeric(temp$patrimoine[temp$vague==1]) <=50000 & as.numeric(temp$patrimoine[temp$vague==1]) >10000)) + 3*((as.numeric(temp$patrimoine[temp$vague==1]) <=150000 & as.numeric(temp$patrimoine[temp$vague==1]) >50000)) + 4*((as.numeric(temp$patrimoine[temp$vague==1]) <=300000 & as.numeric(temp$patrimoine[temp$vague==1]) >150000)) + 5*((as.numeric(temp$patrimoine[temp$vague==1]) <=600000 & as.numeric(temp$patrimoine[temp$vague==1]) >300000)) + 6*((as.numeric(temp$patrimoine[temp$vague==1]) >600000 & as.numeric(temp$patrimoine[temp$vague==1]) <99999999999))
+  temp$Patrimoine[temp$vague==2] <- (temp$patrimoine[temp$vague==2]=="Moins de 10 000€") + 2*( temp$patrimoine[temp$vague==2]=="Entre 10 000€ et 50 000€") + 3*( temp$patrimoine[temp$vague==2]=="Entre 50 000€ et 150 000€") + 4*(temp$patrimoine[temp$vague==2]=="Entre 150 000€ et 300 000€") + 5*(temp$patrimoine[temp$vague==2]=="Entre 300 000€ et 600 000€") + 6*(temp$patrimoine[temp$vague==2]=="Plus de 600 000€")
+  is.na(temp$Patrimoine) <- (is.na(temp$patrimoine) | grepl("NSP", temp$patrimoine))
+  temp$Heritage_futur[temp$vague==1] <- 0 + (as.numeric(temp$heritage_futur[temp$vague==1]) <=10000 & as.numeric(temp$heritage_futur[temp$vague==1])>0) + 2*((as.numeric(temp$heritage_futur[temp$vague==1]) <=50000 & as.numeric(temp$heritage_futur[temp$vague==1]) >10000)) + 3*((as.numeric(temp$heritage_futur[temp$vague==1]) <=150000 & as.numeric(temp$heritage_futur[temp$vague==1]) >50000)) + 4*((as.numeric(temp$heritage_futur[temp$vague==1]) <=300000 & as.numeric(temp$heritage_futur[temp$vague==1]) >150000)) + 5*((as.numeric(temp$heritage_futur[temp$vague==1]) <=600000 & as.numeric(temp$heritage_futur[temp$vague==1]) >300000)) + 6*((as.numeric(temp$heritage_futur[temp$vague==1]) >600000 & as.numeric(temp$heritage_futur[temp$vague==1]) <99999999999))
+  temp$Heritage_futur[temp$vague==2] <- (temp$heritage_futur[temp$vague==2]=="Moins de 10 000€") + 2*(temp$heritage_futur[temp$vague==2]=="Entre 10 000€ et 50 000€") + 3*(temp$heritage_futur[temp$vague==2]=="Entre 50 000€ et 150 000€") + 4*(temp$heritage_futur[temp$vague==2]=="Entre 150 000€ et 300 000€") + 5*(temp$heritage_futur[temp$vague==2]=="Entre 300 000€ et 600 000€") + 6*(temp$heritage_futur[temp$vague==2]=="Plus de 600 000€")
+  is.na(temp$Heritage_futur) <- (is.na(temp$heritage_futur) | grepl("NSP", temp$heritage_futur))
+  temp$Patrimoine_futur <- as.item(patrimoine_futur(temp$Patrimoine, temp$Heritage_futur, categories = T),
+                      labels = structure(c(-1,0,1,2,2.5,3,4,4.5,5,5.5),
+                        names = c("NSP","0","Moins de 10 000€","Entre 10 000€ et 50 000€","Entre 20 000€ et 100 000€","Entre 50 000€ et 200 000€","Entre 100 000€ et 350 000€", "Entre 200 000€ et 450 000€", "Entre 300 000€ et 750 000€", "Plus que 600 000€")),
+                      missing.values="NSP", annotation="Patrimoine_futur: Estimation du patrimoine futur à partir du patrimoine actuel et de l'héritage prévu, -1/1/2/2.5/3/4/4.5/5.5/6=NSP/<10k/10-50k/20-100k/50-200k/100-350k/200-450k/300-750k/>600k - Q40,60")
+  temp$Patrimoine_futur[temp$Patrimoine_futur==6] <- 5.5
+  return(temp)
+}
+m <- socio_demo(m)
+me <- socio_demo(me)
+mp <- socio_demo(mp)
+ma <- socio_demo(ma)
+mc <- socio_demo(mc)
+
+save(m, file="/home/adrien/Google Drive/Economie/Travail/enquete/codes/echantillon_restreint_merged.Rda")
+write.table(m, file="/home/adrien/Google Drive/Economie/Travail/enquete/codes/echantillon_restreint_merged.csv", sep=";")
