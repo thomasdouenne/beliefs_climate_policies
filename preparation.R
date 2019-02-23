@@ -849,6 +849,8 @@ convert_s <- function() {
   # s <<- s[s$taille_agglo!="%1%",] # TODO: taille_agglo as.item
   
   s$nb_vehicules <<- (s$nb_vehicules_texte=='Un') + 2*(s$nb_vehicules_texte=='Deux ou plus')
+  s$diesel <<- (s$hausse_diesel > 0)
+  s$essence <<- (s$hausse_essence > 0)
   
   s$variante_partielle <<- 'NA'
   s$variante_partielle[!is.na(s$gain_taxe_chauffage)] <<- 'c'
@@ -955,21 +957,11 @@ convert_s <- function() {
   s$conso[!is.na(s$conso_1)] <<- s$conso_1[!is.na(s$conso_1)]
   s$conso[!is.na(s$conso_2)] <<- s$conso_2[!is.na(s$conso_2)]
   label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
-  
-	s$hausse_diesel[s$nb_vehicules == 0] <<- 0.5*6.39/100 * s$km * 1.4 * (1 - 0.4) * 0.090922 # share_diesel * conso * km * price * (1-elasticite) * price_increase
-	s$hausse_diesel[s$nb_vehicules == 1] <<- (s$fuel_1=='Diesel') * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
-  s$hausse_diesel[s$nb_vehicules == 1] <<- ((s$fuel_2_1=='Diesel')*2/3 + (s$fuel_2_2=='Diesel')/3) * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
 
-  for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
-  for (i in 0:10) {
-    for (o in 1:nrow(s)) {
-      j <- s[[paste('en_position', i, sep='_')]][o]
-      s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
-    }
-  }
-  
-  # TODO: remove useless colonnes, such as _f/_p
-  # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_tva/fuel, si_/non_, gaz-fioul -> T/F, transferts_inter/variante, enfant
+  s$score_polluants <<- 1*(s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) - 1*(s$ges_O2 == TRUE) - 1*(s$ges_pm == TRUE)
+  s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) - 1*(s$ges_nucleaire == TRUE)
+  # TODO: remove useless colonnes, such as _f/_p, pb peages_urbains
+  # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_tva/fuel, si_/non_, gaz-fioul -> T/F, nb_vehicules 0, transferts_inter/variante, enfant
 }
 # convert_s()
 
@@ -1027,8 +1019,6 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   # if (only_finished) { s <<- s[as.vector(s$Finished)=="True",] }
   
   relabel_and_rename_s()
-  print(paste(length(which(is.na(s$taille_agglo))), "tailles d'agglo sont manquantes"))
-  s <<- s[!is.na(s$taille_agglo),]
   
   convert_s() # TODO: check the Warnings, why s is empty when exclude_screened?
   
@@ -1043,7 +1033,7 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   s$weight <<- weighting_s(s)
 
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
-  if (exclude_speeder) { s <<- s[s$duree > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
+  if (exclude_speeder) { s <<- s[s$duree > 420,] } # remove speedest /!\ speeder was 540 before 22-02-11h00 (Est Coast)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
   # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
   if (only_finished) { s <<- s[s$finished=="True",] }
@@ -1057,3 +1047,5 @@ sa <- s
 # sp <- s
 
 prepare_s()
+
+write.csv(s, "survey_prepared.csv")
