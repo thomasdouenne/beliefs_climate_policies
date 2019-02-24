@@ -24,7 +24,7 @@ package('tidyverse')
 package("Hmisc")
 
 # Fs <- function(QID) { s[QID][[1]] }
-# Vs <- function(QID) { as.vector(Fs(QID))  } 
+# Vs <- function(QID) { as.vector(Fs(sQID))  } 
 n <- function(var) { as.numeric(as.vector(var)) }
 NSPs <- function(QID) { length(V(QID)[V(QID) == "NSP (Je ne veux pas répondre)"])/length(V(QID)) }
 nsps <- function(id) { length(v(id)[v(id) == "NSP (Je ne veux pas répondre)"])/length(v(id)) }

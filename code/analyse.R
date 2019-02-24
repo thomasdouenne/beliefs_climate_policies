@@ -54,6 +54,8 @@ decrit(s$gain_taxe_progressif)
 
 ##### Approbation #####
 decrit(s$taxe_approbation) # 11% Dur !!!
+decrit(s$taxe_approbation[s$gilets_jaunes_soutien==TRUE])
+decrit(s$taxe_approbation[s$gilets_jaunes_oppose==TRUE])
 decrit(s$taxe_feedback_approbation) # 17%
 decrit(s$taxe_efficace) # 18%
 decrit(s$taxe_progressif_approbation) # 19%
