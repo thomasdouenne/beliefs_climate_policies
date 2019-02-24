@@ -54,10 +54,12 @@ decrit(s$gain_taxe_progressif, weights = s$weight)
 
 
 ##### Approbation #####
-decrit(s$taxe_approbation, weights = s$weight) # 11% Dur !!!
-decrit(s$taxe_feedback_approbation, weights = s$weight) # 17%
-decrit(s$taxe_efficace, weights = s$weight) # 18%
-decrit(s$taxe_progressif_approbation, weights = s$weight) # 19%
+decrit(s$taxe_approbation) # 11% Dur !!!
+decrit(s$taxe_approbation[s$gilets_jaunes_soutien==TRUE])
+decrit(s$taxe_approbation[s$gilets_jaunes_oppose==TRUE])
+decrit(s$taxe_feedback_approbation) # 17%
+decrit(s$taxe_efficace) # 18%
+decrit(s$taxe_progressif_approbation) # 19%
 summary(lm((taxe_feedback_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_progressif_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gain_taxe!='Perdant'), data=s, weights = s$weight))
