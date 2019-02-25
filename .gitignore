@@ -1,5 +1,5 @@
 *.pyc
 *.csv
-.Rproj.user/
-.Rproj.user
-*.Rproj
+code/.Rproj.user/
+code/.Rproj.user
+code/beliefs_climate_policies.Rproj
