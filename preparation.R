@@ -1,5 +1,6 @@
 setwd("/var/www/beliefs_climate_policies/code")
 setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 
 # options(download.file.method = "wget"); # For Ubuntu 14.04
 package <- function(p) { 
@@ -383,15 +384,15 @@ relabel_and_rename_s <- function() {
   names(s)[136] <<- "taxe__20_approbation"
   label(s[[136]]) <<- "taxe__20_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q115"
   names(s)[137] <<- "gain_taxe_20_30"
-  label(s[[137]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€ /an/adulte concerné) - Q120"
+  label(s[[137]]) <<- "gain_taxe_20_30: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€ /an/adulte concerné) - Q120"
   names(s)[138] <<- "taxe_20_30_approbation"
   label(s[[138]]) <<- "taxe_20_30_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€/an/adulte concerné) - Q121"
   names(s)[139] <<- "gain_taxe_30_40"
-  label(s[[139]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€ /an/adulte concerné) - Q169"
+  label(s[[139]]) <<- "gain_taxe_30_40: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€ /an/adulte concerné) - Q169"
   names(s)[140] <<- "taxe_30_40_approbation"
   label(s[[140]]) <<- "taxe_30_40_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€/an/adulte concerné) - Q124"
   names(s)[141] <<- "gain_taxe_40_50"
-  label(s[[141]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€ /an/adulte concerné) - Q170"
+  label(s[[141]]) <<- "gain_taxe_40_50: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€ /an/adulte concerné) - Q170"
   names(s)[142] <<- "taxe_40_50_approbation"
   label(s[[142]]) <<- "taxe_40_50_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€/an/adulte concerné) - Q127"
   names(s)[143] <<- "gain_taxe_50_70"

@@ -65,13 +65,19 @@ summary(lm((taxe_progressif_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s
 summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (gain_taxe!='Perdant'), data=s, weights = s$weight))
 
+
 ##### Elasticites #####
-decrit(s$Elasticite_fuel) # -0.42
-decrit(s$Elasticite_fuel_perso) # -0.29
-decrit(s$Elasticite_chauffage) # -0.41
-decrit(s$Elasticite_chauffage_perso) # -0.20
+decrit(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)]) # To do : r�soudre probl�me avec le calcul des �lasticit�s (moyenne � -17...)
+decrit(s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)]) #
+decrit(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)]) #
+decrit(s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)]) #
+
 summary(lm(Elasticite_fuel ~ (taxe_efficace=='Oui'), data=s, weights = s$weight))
 summary(lm(Elasticite_chauffage ~ (taxe_efficace=='Oui'), data=s, weights = s$weight)) # Aucun lien évident élasticité / efficacité environnementale
+
+cor(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)], s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)])
+cor(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)], s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)])
+# Correlation positive entre �lasticit� perso et �lasticit� globale
 
 
 ##### Ciblage #####
