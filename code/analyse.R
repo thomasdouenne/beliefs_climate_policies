@@ -64,13 +64,19 @@ summary(lm((taxe_progressif_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s
 summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (gain_taxe!='Perdant'), data=s, weights = s$weight))
 
+
 ##### Elasticites #####
-decrit(s$Elasticite_fuel) # -0.42
-decrit(s$Elasticite_fuel_perso) # -0.29
-decrit(s$Elasticite_chauffage) # -0.41
-decrit(s$Elasticite_chauffage_perso) # -0.20
+decrit(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)]) # To do : rÈsoudre problËme avec le calcul des ÈlasticitÈs (moyenne ‡ -17...)
+decrit(s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)]) #
+decrit(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)]) #
+decrit(s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)]) #
+
 summary(lm(Elasticite_fuel ~ (taxe_efficace=='Oui'), data=s, weights = s$weight))
 summary(lm(Elasticite_chauffage ~ (taxe_efficace=='Oui'), data=s, weights = s$weight)) # Aucun lien √©vident √©lasticit√© / efficacit√© environnementale
+
+cor(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)], s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)])
+cor(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)], s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)])
+# Correlation positive entre ÈlasticitÈ perso et ÈlasticitÈ globale
 
 
 ##### Ciblage #####
@@ -93,21 +99,10 @@ summary(lm((taxe_cible_approbation=='Oui') ~ categorie_cible, data=s, subset=cib
 summary(lm((taxe_cible_approbation=='Oui') ~ categorie_cible, data=s, subset=cible==50 & taxe_cible_approbation!='NSP', weights = s$weight))
 
 
-##### Gaz de schiste #####
-decrit(s$schiste_approbation)
-decrit(s$schiste_approbation, miss=T)
-decrit(s$schiste_traite)
-decrit(s$schiste_avantage)
-decrit(s$schiste_CC)
-summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==0), data=s, weights = s$weight)) # Encore rien de tr√®s significatif
-summary(lm((schiste_avantage=='Cela permettrait de cr√©er des emplois et dynamiser les d√©partements concern√©s') ~ (schiste_traite==1), data=s, subset=schiste_approbation=='Oui' & schiste_avantage !='Aucune de ces deux raisons', weights = s$weight))
-summary(lm((schiste_CC=='Elle est valable : toute baisse des √©missions va dans la bonne direction') ~ (schiste_traite==1), data=s, subset=schiste_approbation=='Oui' & schiste_CC !='NSP (Ne sait pas, ne se prononce pas)', weights = s$weight))
-
-
 ##### Enfant ######
 decrit(s$enfant_CC)
 decrit(s$enfant_CC[s$sexe=='Masculin'])
-decrit(s$enfant_CC[s$sexe=='F√©minin'])
+decrit(s$enfant_CC[s$sexe=='FÈminin'])
 decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'])
 decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'])
 
