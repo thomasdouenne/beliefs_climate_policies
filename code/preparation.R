@@ -46,6 +46,10 @@ decrit <- function(variable, miss = FALSE, weights = NULL, numbers=FALSE) {
       else describe(variable[variable!="" & !is.missing(variable)], weights = weights[variable!="" & !is.missing(variable)], descript=paste(length(which(is.missing(variable))), "missing obs.", Label(variable)))
     } else describe(variable[variable!=""], weights = weights[variable!=""])  }
 }
+CImedian <- function(vec) { # 95% confidence interval
+  res <- tryCatch(unlist(ci.median(vec[!is.na(vec) & vec!=-1])), error=function(e) {print('NA')})
+  return(paste(res[paste('ci.lower')], res[paste('ci.median')], res[paste('ci.upper')], length(which(!is.na(vec) & vec!=-1)))) 
+}
 clean_number <- function(vec, high_numbers='') { 
    numeric_vec <- as.numeric(gsub(",", ".", gsub("[[:alpha:]  !#$%&')?/(@:;€_-]","",vec)))
    if (high_numbers=='remove') { is.na(numeric_vec) <- numeric_vec>10000 }
@@ -1013,7 +1017,7 @@ convert_s <- function() {
   for (i in 0:10) {
     for (o in 1:nrow(s)) {
       j <- s[[paste('en_position', i, sep='_')]][o]
-      s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
+      if (!is.na(j)) s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
     }
   }
   

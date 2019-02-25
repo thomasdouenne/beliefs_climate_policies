@@ -135,13 +135,17 @@ decrit(s$cause_CC, miss=T, weights = s$weight)
 
 
 ##### Transferts inter #####
-decrit(s$transferts_inter, weights = s$weight)
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, weights = s$weight)) # 0 !
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, subset = transferts_inter!='NSP', weights = s$weight)) # 0 !
 decrit(s$variation_aide, weights = s$weight)
 load('p_data.RData')
 t <- merge(s, t_transferts_inter_a, all=T)
 t$transferts_inter[!is.na(t$taille_foyer)] <- t$transferts_inter_a[!is.na(t$taille_foyer)] 
+decrit(t$transferts_inter, weights = t$weight)
+decrit(t$transferts_inter, weights = t$weight, miss=T)
+decrit(t$transferts_inter, miss=T)
+binconf(sum(t$weight[!is.na(t$transferts_inter) & t$transferts_inter=='Oui']), sum(t$weight[!is.missing(t$transferts_inter)]))
+binconf(sum(t$weight[!is.na(t$transferts_inter) & t$transferts_inter=='Oui']), sum(t$weight[!is.na(t$transferts_inter)]))
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t)) # 0
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, subset = transferts_inter!='NSP')) # 0
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, weights = t$weight)) # 0
@@ -154,7 +158,7 @@ i <- 0
 for (v in categories_depenses) {
   print(summary(lm(s[[paste('variation', v, sep='_')]] ~ s[[paste('dep', i, 'en_position', sep='_')]], weights=s$weight)))
   i <- i+1 }
-# *** pour justice
+# *** pour justice, loisirs, éducation
 t_depenses$aleatoire <- FALSE
 s$aleatoire <- TRUE
 d <- merge(s, t_depenses, all=T)
