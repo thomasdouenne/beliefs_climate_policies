@@ -1,9 +1,0 @@
-{
-    "path" : "/var/www/beliefs_climate_policies",
-    "sortOrder" : [
-        {
-            "ascending" : true,
-            "columnIndex" : 2
-        }
-    ]
-}

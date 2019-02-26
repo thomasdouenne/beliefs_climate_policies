@@ -32,14 +32,23 @@ Label <- function(var) {
   if (length(annotation(var))==1) { annotation(var)[1] }
   else { label(var)  }
 }
-decrit <- function(variable, miss = FALSE, weights = NULL) { 
-  if (length(annotation(variable))>0) {
+decrit <- function(variable, miss = FALSE, weights = NULL, numbers=FALSE) { 
+  if (length(annotation(variable))>0 & !numbers) {
     if (!miss) {
-      if (is.element("Oui", levels(as.factor(variable))) | grepl("(char)", annotation(variable)) | is.element("quotient", levels(as.factor(variable)))  | is.element("Pour", levels(as.factor(variable)))) { describe(as.factor(variable[variable!="" & !is.na(variable)]), weights = weights[variable!="" & !is.na(variable)]) }
-      else { describe(as.numeric(as.vector(variable[variable!="" & !is.na(variable)])), weights = weights[variable!="" & !is.na(variable)]) }
+      if (is.element("Oui", levels(as.factor(variable))) | grepl("(char)", annotation(variable)) | is.element("quotient", levels(as.factor(variable)))  | is.element("Pour", levels(as.factor(variable))) | is.element("Plutôt", levels(as.factor(variable))) ) { describe(as.factor(variable[variable!="" & !is.na(variable)]), weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
+      else { describe(as.numeric(as.vector(variable[variable!="" & !is.na(variable)])), weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
+      # else { describe(variable[variable!="" & !is.na(variable)], weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
     }
-    else describe(as.factor(include.missings(variable[variable!="" & !is.na(variable)])), weights = weights[variable!="" & !is.na(variable)]) }
-  else {  describe(variable[variable!=""], weights = weights[variable!=""])  }
+    else describe(as.factor(include.missings(variable[variable!="" & !is.na(variable)])), weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
+  else {  
+    if (length(annotation(variable))>0) {
+      if (miss) describe(variable[variable!=""], weights = weights[variable!=""], descript=Label(variable))
+      else describe(variable[variable!="" & !is.missing(variable)], weights = weights[variable!="" & !is.missing(variable)], descript=paste(length(which(is.missing(variable))), "missing obs.", Label(variable)))
+    } else describe(variable[variable!=""], weights = weights[variable!=""])  }
+}
+CImedian <- function(vec) { # 95% confidence interval
+  res <- tryCatch(unlist(ci.median(vec[!is.na(vec) & vec!=-1])), error=function(e) {print('NA')})
+  return(paste(res[paste('ci.lower')], res[paste('ci.median')], res[paste('ci.upper')], length(which(!is.na(vec) & vec!=-1)))) 
 }
 clean_number <- function(vec, high_numbers='') { 
    numeric_vec <- as.numeric(gsub(",", ".", gsub("[[:alpha:]  !#$%&')?/(@:;€_-]","",vec)))
@@ -251,9 +260,9 @@ relabel_and_rename_s <- function() {
   names(s)[70] <<- "gain_taxe"
   label(s[[70]]) <<- "gain_taxe: Ménage Gagnant/Non affecté/Perdant par hausse taxe carbone redistribuée à tous (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence) - Q164"
   names(s)[71] <<- "gain_taxe_hausse"
-  label(s[[71]]) <<- "gain_taxe_hausse: ~ (gain_taxe=Gagnant) Hausse de pouvoir d'achat du ménage suite à hausse taxe carbone redistribuée à tous (seuils à 20/40/60/80 €/an /UC) - Q165"
+  label(s[[71]]) <<- "gain_taxe_hausse: (gain_taxe=Gagnant) Hausse de pouvoir d'achat du ménage suite à hausse taxe carbone redistribuée à tous (seuils à 20/40/60/80 €/an /UC) - Q165"
   names(s)[72] <<- "gain_taxe_baisse"
-  label(s[[72]]) <<- "gain_taxe_baisse: ~ (gain_taxe=Perdant) Baisse de pouvoir d'achat du ménage suite à hausse taxe carbone redistribuée à tous (seuils à 30/70/120/190/280 €/an /UC) - Q166"
+  label(s[[72]]) <<- "gain_taxe_baisse: (gain_taxe=Perdant) Baisse de pouvoir d'achat du ménage suite à hausse taxe carbone redistribuée à tous (seuils à 30/70/120/190/280 €/an /UC) - Q166"
   names(s)[73] <<- "taxe_efficace"
   label(s[[73]]) <<- "taxe_efficace: Une hausse de taxe carbone compensée permettrait de réduire la pollution et de lutter contre le changement climatique (Oui/Non/NSP) - Q10"
   names(s)[74] <<- "taxe_perdant_personne"
@@ -379,199 +388,199 @@ relabel_and_rename_s <- function() {
   names(s)[134] <<- "taxe_problemes_autre_p" # TODO: enlever 'taxe_' de 73 à 134
   label(s[[134]]) <<- "taxe_problemes_autre_p: * Champ libre - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
   names(s)[135] <<- "gain_taxe__20"
-  label(s[[135]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q117"
+  label(s[[135]]) <<- "gain_taxe__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q117"
   names(s)[136] <<- "taxe__20_approbation"
-  label(s[[136]]) <<- "taxe__20_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q115"
+  label(s[[136]]) <<- "taxe__20_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q115"
   names(s)[137] <<- "gain_taxe_20_30"
-  label(s[[137]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€ /an/adulte concerné) - Q120"
+  label(s[[137]]) <<- "gain_taxe__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€ /an/adulte concerné) - Q120"
   names(s)[138] <<- "taxe_20_30_approbation"
-  label(s[[138]]) <<- "taxe_20_30_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€/an/adulte concerné) - Q121"
+  label(s[[138]]) <<- "taxe_20_30_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€/an/adulte concerné) - Q121"
   names(s)[139] <<- "gain_taxe_30_40"
-  label(s[[139]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€ /an/adulte concerné) - Q169"
+  label(s[[139]]) <<- "gain_taxe__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€ /an/adulte concerné) - Q169"
   names(s)[140] <<- "taxe_30_40_approbation"
-  label(s[[140]]) <<- "taxe_30_40_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€/an/adulte concerné) - Q124"
+  label(s[[140]]) <<- "taxe_30_40_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€/an/adulte concerné) - Q124"
   names(s)[141] <<- "gain_taxe_40_50"
-  label(s[[141]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€ /an/adulte concerné) - Q170"
+  label(s[[141]]) <<- "gain_taxe__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€ /an/adulte concerné) - Q170"
   names(s)[142] <<- "taxe_40_50_approbation"
-  label(s[[142]]) <<- "taxe_40_50_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€/an/adulte concerné) - Q127"
+  label(s[[142]]) <<- "taxe_40_50_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€/an/adulte concerné) - Q127"
   names(s)[143] <<- "gain_taxe_50_70"
-  label(s[[143]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 50% des plus modestes (+220€ /an/adulte concerné) - Q171"
+  label(s[[143]]) <<- "gain_taxe__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 50% des plus modestes (+220€ /an/adulte concerné) - Q171"
   names(s)[144] <<- "taxe_50_70_approbation"
-  label(s[[144]]) <<- "taxe_50_70_approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 50% des plus modestes (+220€/an/adulte concerné) - Q130"
+  label(s[[144]]) <<- "taxe_50_70_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 50% des plus modestes (+220€/an/adulte concerné) - Q130"
   names(s)[145] <<- "gain_taxe_70_"
-  label(s[[145]]) <<- "gain_taxe__20: ~ Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q172"
+  label(s[[145]]) <<- "gain_taxe__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q172"
   names(s)[146] <<- "taxe_70__approbation"
-  label(s[[146]]) <<- "taxe_70__approbation: ~ Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q133"
+  label(s[[146]]) <<- "taxe_70__approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q133"
   names(s)[147] <<- "si_pauvres"
-  label(s[[147]]) <<- "si_pauvres: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées aux 50% des plus modestes - Q53"
+  label(s[[147]]) <<- "si_pauvres: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées aux 50% des plus modestes - Q53"
   names(s)[148] <<- "si_compensee"
-  label(s[[148]]) <<- "si_compensee: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées à tous les français - Q53"
+  label(s[[148]]) <<- "si_compensee: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées à tous les français - Q53"
   names(s)[149] <<- "si_contraints"
-  label(s[[149]]) <<- "si_contraints: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées aux ménages contraints à consommer des produits pétroliers - Q53"
+  label(s[[149]]) <<- "si_contraints: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées aux ménages contraints à consommer des produits pétroliers - Q53"
   names(s)[150] <<- "si_baisse_cotsoc"
-  label(s[[150]]) <<- "si_baisse_cotsoc: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse des cotisations sociales - Q53"
+  label(s[[150]]) <<- "si_baisse_cotsoc: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse des cotisations sociales - Q53"
   names(s)[151] <<- "si_baisse_tva"
-  label(s[[151]]) <<- "si_baisse_tva: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse de la TVA - Q53"
+  label(s[[151]]) <<- "si_baisse_tva: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse de la TVA - Q53"
   names(s)[152] <<- "si_baisse_deficit"
-  label(s[[152]]) <<- "si_baisse_deficit: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse du déficit public - Q53"
+  label(s[[152]]) <<- "si_baisse_deficit: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse du déficit public - Q53"
   names(s)[153] <<- "si_renovation"
-  label(s[[153]]) <<- "si_renovation: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient la rénovation thermique des bâtiments - Q53"
+  label(s[[153]]) <<- "si_renovation: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient la rénovation thermique des bâtiments - Q53"
   names(s)[154] <<- "si_renouvelables"
-  label(s[[154]]) <<- "si_renouvelables: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient des énergies renouvelables - Q53"
+  label(s[[154]]) <<- "si_renouvelables: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient des énergies renouvelables - Q53"
   names(s)[155] <<- "si_transports"
-  label(s[[155]]) <<- "si_transports: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient des transports non polluants - Q53"
+  label(s[[155]]) <<- "si_transports: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient des transports non polluants - Q53"
   names(s)[156] <<- "test_qualite"
   label(s[[156]]) <<- "test_qualite: Merci de sélectionner 'Un peu' (Pas du tout/Un peu/Beaucoup/Complètement/NSP) - Q177"
   names(s)[157] <<- "taxe_kerosene"
-  label(s[[157]]) <<- "taxe_kerosene: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à une taxe sur le kérosène (aviation) - Q74"
+  label(s[[157]]) <<- "taxe_kerosene: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à une taxe sur le kérosène (aviation) - Q74"
   names(s)[158] <<- "taxe_viande"
-  label(s[[158]]) <<- "taxe_viande: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à une taxe sur la viande rouge - Q74"
+  label(s[[158]]) <<- "taxe_viande: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à une taxe sur la viande rouge - Q74"
   names(s)[159] <<- "normes_isolation"
-  label(s[[159]]) <<- "normes_isolation: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à des normes plus strictes sur l'isolation pour les nouveaux bâtiments - Q74"
+  label(s[[159]]) <<- "normes_isolation: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à des normes plus strictes sur l'isolation pour les nouveaux bâtiments - Q74"
   names(s)[160] <<- "normes_vehicules"
-  label(s[[160]]) <<- "normes_vehicules: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à des normes plus strictes sur la pollution des nouveaux véhicules - Q74"
+  label(s[[160]]) <<- "normes_vehicules: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à des normes plus strictes sur la pollution des nouveaux véhicules - Q74"
   names(s)[161] <<- "controle_technique"
-  label(s[[161]]) <<- "controle_technique: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à des normes plus strictes sur la pollution lors du contrôle technique - Q74"
+  label(s[[161]]) <<- "controle_technique: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à des normes plus strictes sur la pollution lors du contrôle technique - Q74"
   names(s)[162] <<- "interdiction_polluants"
-  label(s[[162]]) <<- "interdiction_polluants: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'interdiction des véhicules polluants dans les centre-villes - Q74"
+  label(s[[162]]) <<- "interdiction_polluants: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'interdiction des véhicules polluants dans les centre-villes - Q74"
   names(s)[163] <<- "peages_urbains"
-  label(s[[163]]) <<- "peages_urbains: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'instauration de péages urbains - Q74"
+  label(s[[163]]) <<- "peages_urbains: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'instauration de péages urbains - Q74"
   names(s)[164] <<- "fonds_mondial"
-  label(s[[164]]) <<- "fonds_mondial: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à une contribution pour un fond mondial pour le climat - Q74"
+  label(s[[164]]) <<- "fonds_mondial: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à une contribution pour un fond mondial pour le climat - Q74"
   names(s)[165] <<- "rattrapage_diesel"
-  label(s[[165]]) <<- "rattrapage_diesel: ~ Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) au rattrapage de la fiscalité du diesel sur celle de l'essence (on explique que pour des raisons historiques le diesel est moins taxé) - Q140"
+  label(s[[165]]) <<- "rattrapage_diesel: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) au rattrapage de la fiscalité du diesel sur celle de l'essence (on explique que pour des raisons historiques le diesel est moins taxé) - Q140"
   names(s)[166] <<- "parle_CC"
-  label(s[[166]]) <<- "parle_CC: ~ Fréquence à laquelle le répondant parle du changement climatique (Plusieurs fois par mois / par an / Presque jamais / NSP) - Q60"
+  label(s[[166]]) <<- "parle_CC: Fréquence à laquelle le répondant parle du changement climatique (Plusieurs fois par mois / par an / Presque jamais / NSP) - Q60"
   names(s)[167] <<- "cause_CC"
-  label(s[[167]]) <<- "cause_CC: ~ Cause principale du changement climatique selon le répondant (N'est pas une réalité / Causes naturelles / Activité humaine / NSP) - Q1"
+  label(s[[167]]) <<- "cause_CC: Cause principale du changement climatique selon le répondant (N'est pas une réalité / Causes naturelles / Activité humaine / NSP) - Q1"
   names(s)[168] <<- "ges_CO2" # TODO: majuscules (tva aussi)
-  label(s[[168]]) <<- "ges_CO2: ~ Le répondant pense que le CO2 participe au réchauffement climatique - Q48"
+  label(s[[168]]) <<- "ges_CO2: Le répondant pense que le CO2 participe au réchauffement climatique - Q48"
   names(s)[169] <<- "ges_CH4"
-  label(s[[169]]) <<- "ges_CH4: ~ Le répondant pense que le CH4 participe au réchauffement climatique - Q48"
+  label(s[[169]]) <<- "ges_CH4: Le répondant pense que le CH4 participe au réchauffement climatique - Q48"
   names(s)[170] <<- "ges_O2"
-  label(s[[170]]) <<- "ges_O2: ~ Le répondant pense que l'oxygène participe au réchauffement climatique - Q48"
+  label(s[[170]]) <<- "ges_O2: Le répondant pense que l'oxygène participe au réchauffement climatique - Q48"
   names(s)[171] <<- "ges_pm"
-  label(s[[171]]) <<- "ges_pm: ~ Le répondant pense que les particules fines participent au réchauffement climatique - Q48"
+  label(s[[171]]) <<- "ges_pm: Le répondant pense que les particules fines participent au réchauffement climatique - Q48"
   names(s)[172] <<- "ges_boeuf"
-  label(s[[172]]) <<- "ges_boeuf: ~ Le répondant pense que la consommation d'un steak haché de boeuf émet environ 20 fois plus de GES que deux portions de pâtes - Q179"
+  label(s[[172]]) <<- "ges_boeuf: Le répondant pense que la consommation d'un steak haché de boeuf émet environ 20 fois plus de GES que deux portions de pâtes - Q179"
   names(s)[173] <<- "ges_nucleaire"
   label(s[[173]]) <<- "ges_nucleaire: Le répondant pense que l'électricité produite au nucléaire émet eviron 20 fois plus de GES que celle produite par les éoliennes - Q179"
   names(s)[174] <<- "ges_avion"
   label(s[[174]]) <<- "ges_avion: Le répondant pense qu'une place dans un trajet Bordeaux - Nice émet environ20 fois plus de GES en avion qu'en train - Q179"
   names(s)[175] <<- "effets_CC"
-  label(s[[175]]) <<- "effets_CC: ~ Le répondant pense qu'en l'absence de mesures ambitieuse, les effets du changement climatiques seraient (Insignifiants / Faibles / Graves / Désastreux / Cataclysmiques / NSP) - Q5"
+  label(s[[175]]) <<- "effets_CC: Le répondant pense qu'en l'absence de mesures ambitieuse, les effets du changement climatiques seraient (Insignifiants / Faibles / Graves / Désastreux / Cataclysmiques / NSP) - Q5"
   names(s)[176] <<- "region_CC"
-  label(s[[176]]) <<- "region_CC: ~ Le répondant pense que le changement climatique aura les plus grandes conséquences en Inde/Europe/autant les deux - Q181"
+  label(s[[176]]) <<- "region_CC: Le répondant pense que le changement climatique aura les plus grandes conséquences en Inde/Europe/autant les deux - Q181"
   names(s)[177] <<- "generation_CC_1960"
-  label(s[[177]]) <<- "generation_CC_1960: ~ Le répondant estime qu'en France les générations nés dans les années 1960 seront gravement affectées par le changeent climatique - Q71"
+  label(s[[177]]) <<- "generation_CC_1960: Le répondant estime qu'en France les générations nés dans les années 1960 seront gravement affectées par le changeent climatique - Q71"
   names(s)[178] <<- "generation_CC_1990"
-  label(s[[178]]) <<- "generation_CC_1990: ~ Le répondant estime qu'en France les générations nés dans les années 1990 seront gravement affectées par le changeent climatique - Q71"
+  label(s[[178]]) <<- "generation_CC_1990: Le répondant estime qu'en France les générations nés dans les années 1990 seront gravement affectées par le changeent climatique - Q71"
   names(s)[179] <<- "generation_CC_2020"
-  label(s[[179]]) <<- "generation_CC_2020: ~ Le répondant estime qu'en France les générations nés dans les années 2020 seront gravement affectées par le changeent climatique - Q71"
+  label(s[[179]]) <<- "generation_CC_2020: Le répondant estime qu'en France les générations nés dans les années 2020 seront gravement affectées par le changeent climatique - Q71"
   names(s)[180] <<- "generation_CC_2050"
-  label(s[[180]]) <<- "generation_CC_2050: ~ Le répondant estime qu'en France les générations nés dans les années 2050 seront gravement affectées par le changeent climatique - Q71"
+  label(s[[180]]) <<- "generation_CC_2050: Le répondant estime qu'en France les générations nés dans les années 2050 seront gravement affectées par le changeent climatique - Q71"
   names(s)[181] <<- "generation_CC_aucune"
-  label(s[[181]]) <<- "generation_CC_aucune: ~ Le répondant estime qu'en France les générations nées dans les années 1960, 1990, 2020 et 2050 ne seront pas gravement affectées par le changement climatique - Q71"
+  label(s[[181]]) <<- "generation_CC_aucune: Le répondant estime qu'en France les générations nées dans les années 1960, 1990, 2020 et 2050 ne seront pas gravement affectées par le changement climatique - Q71"
   names(s)[182] <<- "responsable_CC_chacun"
-  label(s[[182]]) <<- "responsable_CC_chacun: ~ Le répondant estime que chacun d'entre nous est responsabe du changement climatique - Q6"
+  label(s[[182]]) <<- "responsable_CC_chacun: Le répondant estime que chacun d'entre nous est responsabe du changement climatique - Q6"
   names(s)[183] <<- "responsable_CC_riches"
-  label(s[[183]]) <<- "responsable_CC_riches: ~ Le répondant estime que les plus riches sont responsables du changement climatique - Q6"
+  label(s[[183]]) <<- "responsable_CC_riches: Le répondant estime que les plus riches sont responsables du changement climatique - Q6"
   names(s)[184] <<- "responsable_CC_govts"
-  label(s[[184]]) <<- "responsable_CC_govts: ~ Le répondant estime que les gouvernements sont responsables du changement climatique - Q6"
+  label(s[[184]]) <<- "responsable_CC_govts: Le répondant estime que les gouvernements sont responsables du changement climatique - Q6"
   names(s)[185] <<- "responsable_CC_etranger"
-  label(s[[185]]) <<- "responsable_CC_etranger: ~ Le répondant estime que certains pays étrangers sont responsables du changement climatique - Q6"
+  label(s[[185]]) <<- "responsable_CC_etranger: Le répondant estime que certains pays étrangers sont responsables du changement climatique - Q6"
   names(s)[186] <<- "responsable_CC_passe"
-  label(s[[186]]) <<- "responsable_CC_passe: ~ Le répondant estime que les générations passées sont responsables du changement climatique - Q6"
+  label(s[[186]]) <<- "responsable_CC_passe: Le répondant estime que les générations passées sont responsables du changement climatique - Q6"
   names(s)[187] <<- "responsable_CC_nature"
-  label(s[[187]]) <<- "responsable_CC_nature: ~ Le répondant estime que des causes naturelles sont responsables du changement climatique - Q6"
+  label(s[[187]]) <<- "responsable_CC_nature: Le répondant estime que des causes naturelles sont responsables du changement climatique - Q6"
   names(s)[188] <<- "emission_cible"
-  label(s[[188]]) <<- "emission_cible: ~ Le répondant estime que les émissions de CO2 en France (actuellement à 10t/pers./an) devraient être ramenées à Xt/pers/an pour contenir le réchauffement climatique à +2 degrés si tous les pays faisaient de même - Q47"
+  label(s[[188]]) <<- "emission_cible: Le répondant estime que les émissions de CO2 en France (actuellement à 10t/pers./an) devraient être ramenées à Xt/pers/an pour contenir le réchauffement climatique à +2 degrés si tous les pays faisaient de même - Q47"
   names(s)[189] <<- "enfant_CC"
-  label(s[[189]]) <<- "enfant_CC: ~ Le changement climatique a, a eu ou aura une influence dans la décision du répondant de faire un enfant (Oui/Non/NSP) - Q58"
+  label(s[[189]]) <<- "enfant_CC: Le changement climatique a, a eu ou aura une influence dans la décision du répondant de faire un enfant (Oui/Non/NSP) - Q58"
   names(s)[190] <<- "enfant_CC_pour_lui"
-  label(s[[190]]) <<- "enfant_CC_pour_lui: ~ Le changement climatique a, a eu ou aura une influence dans la décision du répondant de faire un enfant parce qu'il ne veut pas que l'enfant vive dans un monde dévasté - Q59"
+  label(s[[190]]) <<- "enfant_CC_pour_lui: Le changement climatique a, a eu ou aura une influence dans la décision du répondant de faire un enfant parce qu'il ne veut pas que l'enfant vive dans un monde dévasté - Q59"
   names(s)[191] <<- "enfant_CC_pour_CC"
-  label(s[[191]]) <<- "enfant_CC_pour_CC: ~ Le changement climatique a, a eu ou aura une influence dans la décision du répondant de faire un enfant parce qu'il ne veut pas que son enfant aggrave le changement climatique - Q59"
+  label(s[[191]]) <<- "enfant_CC_pour_CC: Le changement climatique a, a eu ou aura une influence dans la décision du répondant de faire un enfant parce qu'il ne veut pas que son enfant aggrave le changement climatique - Q59"
   names(s)[192] <<- "changer_si_politiques"
-  label(s[[192]]) <<- "changer_si_politiques: ~ Le répondant serait prêt à changer son mode de vie pour lutter contre le changement climatique si les politiques allaient dans ce sens - Q76"
+  label(s[[192]]) <<- "changer_si_politiques: Le répondant serait prêt à changer son mode de vie pour lutter contre le changement climatique si les politiques allaient dans ce sens - Q76"
   names(s)[193] <<- "changer_si_moyens"
-  label(s[[193]]) <<- "changer_si_moyens: ~ Le répondant serait prêt à changer son mode de vie pour lutter contre le changement climatique s'il en avait les moyens financiers - Q76"
+  label(s[[193]]) <<- "changer_si_moyens: Le répondant serait prêt à changer son mode de vie pour lutter contre le changement climatique s'il en avait les moyens financiers - Q76"
   names(s)[194] <<- "changer_si_tous"
-  label(s[[194]]) <<- "changer_si_tous: ~ Le répondant serait prêt à changer son mode de vie pour lutter contre le changement climatique si tout le monde en faisait autant - Q76"
+  label(s[[194]]) <<- "changer_si_tous: Le répondant serait prêt à changer son mode de vie pour lutter contre le changement climatique si tout le monde en faisait autant - Q76"
   names(s)[195] <<- "changer_non_riches"
-  label(s[[195]]) <<- "changer_non_riches: ~ Le répondant ne serait pas prêt à changer son mode de vie pour lutter contre le changement climatique car seuls les plus riches doivent changer leur mode de vie - Q76"
+  label(s[[195]]) <<- "changer_non_riches: Le répondant ne serait pas prêt à changer son mode de vie pour lutter contre le changement climatique car seuls les plus riches doivent changer leur mode de vie - Q76"
   names(s)[196] <<- "changer_non_interet"
-  label(s[[196]]) <<- "changer_non_interet: ~ Le répondant ne serait pas prêt à changer son mode de vie pour lutter contre le changement climatique car s'oppose à son intérêt personnel - Q76"
+  label(s[[196]]) <<- "changer_non_interet: Le répondant ne serait pas prêt à changer son mode de vie pour lutter contre le changement climatique car s'oppose à son intérêt personnel - Q76"
   names(s)[197] <<- "changer_non_negation"
-  label(s[[197]]) <<- "changer_non_negation: ~ Le répondant ne serait pas prêt à changer son mode de vie pour lutter contre le changement climatique car il pense que le changement climatique n'est pas un vrai problème - Q76"
+  label(s[[197]]) <<- "changer_non_negation: Le répondant ne serait pas prêt à changer son mode de vie pour lutter contre le changement climatique car il pense que le changement climatique n'est pas un vrai problème - Q76"
   names(s)[198] <<- "changer_deja_fait"
-  label(s[[198]]) <<- "changer_deja_fait: ~ Le répondant ne serait pas prêt à changer son mode de vie pour lutter contre le changement climatique car il a déjà adopté un mode de vie soutenable - Q76"
+  label(s[[198]]) <<- "changer_deja_fait: Le répondant ne serait pas prêt à changer son mode de vie pour lutter contre le changement climatique car il a déjà adopté un mode de vie soutenable - Q76"
   names(s)[199] <<- "changer_essaie"
-  label(s[[199]]) <<- "changer_essaie: ~ Le répondant essaie de changer son mode de vie pour lutter contre le changement climatique mais a du mal à changer ses habitudes - Q76"
+  label(s[[199]]) <<- "changer_essaie: Le répondant essaie de changer son mode de vie pour lutter contre le changement climatique mais a du mal à changer ses habitudes - Q76"
   names(s)[200] <<- "mode_vie_ecolo"
-  label(s[[200]]) <<- "mode_vie_ecolo: ~ Dans l'hypothèse où tous les Etats du monde se mettraient d'accord pour lutter contre le changement climatique, mettraient à contribution les plus riches, et si la France investissait dans les transports non polluants, le répondant serait prêt (Oui/Non/NSP) à adopter un mode de vie écologique - Q51"
+  label(s[[200]]) <<- "mode_vie_ecolo: Dans l'hypothèse où tous les Etats du monde se mettraient d'accord pour lutter contre le changement climatique, mettraient à contribution les plus riches, et si la France investissait dans les transports non polluants, le répondant serait prêt (Oui/Non/NSP) à adopter un mode de vie écologique - Q51"
   names(s)[201] <<- "fume"
-  label(s[[201]]) <<- "fume: ~ Le répondant fume régulièrement (Oui/Non) - Q191"
+  label(s[[201]]) <<- "fume: Le répondant fume régulièrement (Oui/Non) - Q191"
   names(s)[202] <<- "schiste_approbation"
   label(s[[202]]) <<- "schiste_approbation: Après avoir été informé des avantages du gaz de schiste vis-à-vis de la réduction des émissions, de son effet négatif sur la qualité de l'eau à l'échelle locale, et des potentiels d'exploitation dans son département, le répondant serait favorable (Oui/Non/NSP) à son exploitation - Q197"
   names(s)[203] <<- "schiste_avantage"
-  label(s[[203]]) <<- "schiste_avantage: ~ Le répondant considère que le principal avantage de l'exploitation du gaz de schiste serait la lutte contre le changement climatique / la création d'emploi dans les départements concernés / aucune de ces deux raisons - Q199"
+  label(s[[203]]) <<- "schiste_avantage: Le répondant considère que le principal avantage de l'exploitation du gaz de schiste serait la lutte contre le changement climatique / la création d'emploi dans les départements concernés / aucune de ces deux raisons - Q199"
   names(s)[204] <<- "schiste_CC"
-  label(s[[204]]) <<- "schiste_cc: ~ Le répondant estime que l'idée que le gaz de schiste permettrait de lutter contre le changement climatique est valable / malvenue / il ne sait pas - Q198"
+  label(s[[204]]) <<- "schiste_cc: Le répondant estime que l'idée que le gaz de schiste permettrait de lutter contre le changement climatique est valable / malvenue / il ne sait pas - Q198"
   names(s)[205] <<- "transports_distance_choix"
-  label(s[[205]]) <<- "transports_distance_choix: ~ Le répondant peut estimer la distance de l'arrêt de transport en commun le plus proche de chez lui en minutes de marche, ou il ne sait pas - Q42"
+  label(s[[205]]) <<- "transports_distance_choix: Le répondant peut estimer la distance de l'arrêt de transport en commun le plus proche de chez lui en minutes de marche, ou il ne sait pas - Q42"
   names(s)[206] <<- "transports_distance"
-  label(s[[206]]) <<- "transports_distance: ~ L'arrêt de transport en commun le plus proche de chez le répondant est à X minutes de marche - Q42"
+  label(s[[206]]) <<- "transports_distance: L'arrêt de transport en commun le plus proche de chez le répondant est à X minutes de marche - Q42"
   names(s)[207] <<- "transports_frequence"
-  label(s[[207]]) <<- "transports_frequence: ~ Le moyen de transports en commun le plus proche de chez le répondant passe en moyenne moins de trois fois par jours / entre quatre fois par jour et une fois par heure / une ou deux fois par heure / plus que trois fois par heure / NSP - Q43"
+  label(s[[207]]) <<- "transports_frequence: Le moyen de transports en commun le plus proche de chez le répondant passe en moyenne moins de trois fois par jours / entre quatre fois par jour et une fois par heure / une ou deux fois par heure / plus que trois fois par heure / NSP - Q43"
   names(s)[208] <<- "transports_avis"
-  label(s[[208]]) <<- "ransports_avis: ~ Le répondant estime l'offre de transports en commun là où il habite comme étant satisfaisante / convenable / limitée / insuffisante / NSP - Q41"
+  label(s[[208]]) <<- "ransports_avis: Le répondant estime l'offre de transports en commun là où il habite comme étant satisfaisante / convenable / limitée / insuffisante / NSP - Q41"
   names(s)[209] <<- "transports_travail"
-  label(s[[209]]) <<- "transports_travail: ~ Le répondant utilise principalement (la voiture/les TC/la marche ou le vélo/un deux roues motorisé/le covoiturage/non conerné) pour ses trajets domiciles-travail (ou études) - Q39"
+  label(s[[209]]) <<- "transports_travail: Le répondant utilise principalement (la voiture/les TC/la marche ou le vélo/un deux roues motorisé/le covoiturage/non conerné) pour ses trajets domiciles-travail (ou études) - Q39"
   names(s)[210] <<- "transports_courses"
-  label(s[[210]]) <<- "transports_courses: ~ Le répondant utilise principalement (la voiture/les TC/la marche ou le vélo/un deux roues motorisé/le covoiturage/non conerné) pour faire ses courses - Q39"
+  label(s[[210]]) <<- "transports_courses: Le répondant utilise principalement (la voiture/les TC/la marche ou le vélo/un deux roues motorisé/le covoiturage/non conerné) pour faire ses courses - Q39"
   names(s)[211] <<- "transports_loisirs"
   label(s[[211]]) <<- "transports_loisirs~ Le répondant utilise principalement (la voiture/les TC/la marche ou le vélo/un deux roues motorisé/le covoiturage/non conerné) pour ses loisirs (hors vacances) - Q39"
   names(s)[212] <<- "transports_travail_commun"
-  label(s[[212]]) <<- "transports_travail_commun: ~ Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture (Non/Oui mais ça l'embetterait/Oui ça ne lui poserait pas de grande difficulté/NSP) de prendre les transports en commun pour ses trajets domicile-travail - Q40"
+  label(s[[212]]) <<- "transports_travail_commun: Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture (Non/Oui mais ça l'embetterait/Oui ça ne lui poserait pas de grande difficulté/NSP) de prendre les transports en commun pour ses trajets domicile-travail - Q40"
   names(s)[213] <<- "transports_travail_actif"
-  label(s[[213]]) <<- "transports_travail_actif: ~ Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture (Non/Oui mais ça l'embetterait/Oui ça ne lui poserait pas de grande difficulté/NSP) d'effectuer ses trajets domicile-travail en marchant ou en vélo - Q40"
+  label(s[[213]]) <<- "transports_travail_actif: Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture (Non/Oui mais ça l'embetterait/Oui ça ne lui poserait pas de grande difficulté/NSP) d'effectuer ses trajets domicile-travail en marchant ou en vélo - Q40"
   names(s)[214] <<- "interet_politique"
-  label(s[[214]]) <<- "interet_politique: ~ Le répondant est intéressé par la politique (Presque pas/Un peu/Beaucoup) - Q32"
+  label(s[[214]]) <<- "interet_politique: Le répondant est intéressé par la politique (Presque pas/Un peu/Beaucoup) - Q32"
   names(s)[215] <<- "extr_gauche"
-  label(s[[215]]) <<- "extr_gauche: ~ Le répondant se considère comme étant d'extrême gauche - Q34"
+  label(s[[215]]) <<- "extr_gauche: Le répondant se considère comme étant d'extrême gauche - Q34"
   names(s)[216] <<- "gauche"
-  label(s[[216]]) <<- "gauche: ~ Le répondant se considère comme étant de gauche - Q34"
+  label(s[[216]]) <<- "gauche: Le répondant se considère comme étant de gauche - Q34"
   names(s)[217] <<- "centre"
-  label(s[[217]]) <<- "centre: ~ Le répondant se considère comme étant du centre - Q34"
+  label(s[[217]]) <<- "centre: Le répondant se considère comme étant du centre - Q34"
   names(s)[218] <<- "droite"
-  label(s[[218]]) <<- "droite: ~ Le répondant se considère comme étant de droite - Q34"
+  label(s[[218]]) <<- "droite: Le répondant se considère comme étant de droite - Q34"
   names(s)[219] <<- "extr_droite"
-  label(s[[219]]) <<- "extr_droite: ~ Le répondant se considère comme étant d'extrême droite - Q34"
+  label(s[[219]]) <<- "extr_droite: Le répondant se considère comme étant d'extrême droite - Q34"
   names(s)[220] <<- "conservateur"
-  label(s[[220]]) <<- "conservateur: ~ Le répondant se considère comme étant conservateur - Q34"
+  label(s[[220]]) <<- "conservateur: Le répondant se considère comme étant conservateur - Q34"
   names(s)[221] <<- "liberal"
-  label(s[[221]]) <<- "liberal: ~ Le répondant se considère comme étant libéral - Q34"
+  label(s[[221]]) <<- "liberal: Le répondant se considère comme étant libéral - Q34"
   names(s)[222] <<- "humaniste"
-  label(s[[222]]) <<- "humaniste: ~ Le répondant se considère comme étant humaniste - Q34"
+  label(s[[222]]) <<- "humaniste: Le répondant se considère comme étant humaniste - Q34"
   names(s)[223] <<- "patriote"
-  label(s[[223]]) <<- "patriote: ~ Le répondant se considère comme étant patriote - Q34"
+  label(s[[223]]) <<- "patriote: Le répondant se considère comme étant patriote - Q34"
   names(s)[224] <<- "apolitique"
-  label(s[[224]]) <<- "apolitique: ~ Le répondant se considère comme étant apolitique - Q34"
+  label(s[[224]]) <<- "apolitique: Le répondant se considère comme étant apolitique - Q34"
   names(s)[225] <<- "ecologiste"
-  label(s[[225]]) <<- "ecologiste: ~ Le répondant se considère comme étant écologiste - Q34"
+  label(s[[225]]) <<- "ecologiste: Le répondant se considère comme étant écologiste - Q34"
   names(s)[226] <<- "actualite"
-  label(s[[226]]) <<- "actualite: ~ Le répondant se tient principalement informé de l'actualité via la télévision / la presse (écrite ou en ligne) / les réseaux sociaux / la radio - Q182"
+  label(s[[226]]) <<- "actualite: Le répondant se tient principalement informé de l'actualité via la télévision / la presse (écrite ou en ligne) / les réseaux sociaux / la radio - Q182"
   names(s)[227] <<- "gilets_jaunes_dedans"
-  label(s[[227]]) <<- "gilets_jaunes_dedans: ~ Le répondant déclare faire partie des gilets jaunes - Q35"
+  label(s[[227]]) <<- "gilets_jaunes_dedans: Le répondant déclare faire partie des gilets jaunes - Q35"
   names(s)[228] <<- "gilets_jaunes_soutien"
-  label(s[[228]]) <<- "gilets_jaunes_soutien: ~ Le répondant soutient les gilets jaunes - Q35"
+  label(s[[228]]) <<- "gilets_jaunes_soutien: Le répondant soutient les gilets jaunes - Q35"
   names(s)[229] <<- "gilets_jaunes_compris"
-  label(s[[229]]) <<- "gilets_jaunes_compris: ~ Le répondant comprend les gilets jaunes - Q35"
+  label(s[[229]]) <<- "gilets_jaunes_compris: Le répondant comprend les gilets jaunes - Q35"
   names(s)[230] <<- "gilets_jaunes_oppose"
-  label(s[[230]]) <<- "gilets_jaunes_oppose: ~ Le répondant est opposé aux gilets jaunes - Q35"
+  label(s[[230]]) <<- "gilets_jaunes_oppose: Le répondant est opposé aux gilets jaunes - Q35"
   names(s)[231] <<- "gilets_jaunes_NSP"
-  label(s[[231]]) <<- "gilets_jaunes_NSP: ~ Le répondant ne sait pas s'il fait partie / s'il soutient / s'il comprend / s'il s'oppose aux gilets jaunes - Q35"
+  label(s[[231]]) <<- "gilets_jaunes_NSP: Le répondant ne sait pas s'il fait partie / s'il soutient / s'il comprend / s'il s'oppose aux gilets jaunes - Q35"
   names(s)[232] <<- "transferts_inter_a"
   label(s[[232]]) <<- "transferts_inter_a: ~ Transferts internationaux - approbation (Approuveriez-vous le transfert de 5% des revenus des pays riches aux pays pauvres ?: Oui/Non/NSP) - Q47"
   names(s)[233] <<- "transferts_inter_a_info"
@@ -800,8 +809,9 @@ convert_s <- function() {
               )) {
     s[j][[1]] <<- as.item(as.character(s[j][[1]]),
                 labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))), 
-                missing.values = c("","NSP"), annotation=paste(attr(s[j][[1]], "label"), "(char)"))
+                missing.values = c("","NSP"), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb
   }  
+ # TODO: as.item region_CC, gain_taxe_fuel, gain_taxe_chauffage, gain_taxe, gain_taxe_feedback, gain_taxe_progressif, gain_taxe_cible, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
 
   for (j in names(s)) {
     if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_', j)) {
@@ -809,14 +819,57 @@ convert_s <- function() {
       s[[j]][is.na(s[[j]])] <<- FALSE
     }
   }
-  
+
+  for (k in c("perte_tva", "perte_fuel", "perte_chauffage")) {
+    temp <-  2 * (s[[k]]=="Oui, beaucoup plus") + (s[[k]]=="Oui, un peu plus") - (s[[k]]=="Non, un peu moins") - 2 * (s[[k]]=="Non, beaucoup moins")
+    s[[k]] <<- as.item(temp, labels = structure(c(-2:2),
+                          names = c("Beaucoup moins","Un peu moins","= Moyenne","Un peu plus","Beaucoup plus")),
+                          # names = c("Non, beaucoup moins","Non, un peu moins","Autant que la moyenne","Oui, un peu plus","Oui, beaucoup plus")),
+                        annotation=Label(s[[k]]))
+  }
+
+  for (k in c(131:139,141:148)) {
+    temp <-  2 * (s[k][[1]]=="Oui, tout à fait") + (s[k][[1]]=="Oui, plutôt") - (s[k][[1]]=="Non, pas vraiment") - 2 * (s[k][[1]]=="Non, pas du tout")
+    s[k][[1]] <<- as.item(temp, labels = structure(c(-2:2),
+                          names = c("Pas du tout","Pas vraiment","Indifférent/NSP","Plutôt","Tout à fait")),
+                          # names = c("Non, pas du tout","Non, pas vraiment","Indifférent ou Ne sais pas","Oui, plutôt","Oui, tout à fait")),
+                        annotation=Label(s[k][[1]]))
+  }
+
+  temp <- (s$parle_CC=='Plusieurs fois par an') + 2*(s$parle_CC=='Plusieurs fois par mois') - (s$parle_CC=="NSP")
+  s$parle_CC <<- as.item(temp, labels = structure(c(-1:2),
+                          names = c("NSP","Presque jamais","Plusieurs fois par an","Plusieurs fois par mois")),
+                        missing.values = -1, annotation=Label(s$parle_CC))
+
+  temp <- grepl("Faibles", s$effets_CC) + 2*grepl("Graves", s$effets_CC) + 3*grepl("Désastreux", s$effets_CC) + 4*grepl("Cataclysmiques", s$effets_CC) - (s$effets_CC=="NSP")
+  s$effets_CC <<- as.item(temp, labels = structure(c(-1:4),
+                          names = c("NSP","Insignifiants","Faibles","Graves","Désastreux","Cataclysmiques")),
+                          # names = c("NSP","Insignifiants, voire bénéfiques","Faibles, car les humains sauraient vivre avec","Graves, car il y aurait plus de catastrophes naturelles","Désastreux, les modes de vie seraient largement altérés","Cataclysmiques, l'humanité disparaîtrait")),
+                        missing.values = -1, annotation=Label(s$effets_CC))
+
+  temp <- (s$transports_frequence=="Entre quatre fois par jour et une fois par heure") + 2*(s$transports_frequence=="Une ou deux fois par heure") + 3*(s$transports_frequence=="Plus que trois fois par heure") - (s$transports_frequence=="NSP")
+  s$transports_frequence <<- as.item(temp, labels = structure(c(-1:3),
+                          names = c("NSP","< 3/jour","1/h - 4/jour","1/h - 2/h","> 3/heure")),
+                          # names = c("NSP","Moins de trois fois par jour","Entre quatre fois par jour et une fois par heure","Une ou deux fois par heure","Plus que trois fois par heure")),
+                        missing.values = -1, annotation=Label(s$transports_frequence))
+
+  temp <- (s$transports_avis=="Limitée, mais suffisante") + 2*(s$transports_avis=="Convenable, mais devrait être accrue") + 3*(s$transports_avis=="Satisfaisante") - (s$transports_avis=="NSP")
+  s$transports_avis <<- as.item(temp, labels = structure(c(-1:3),
+                          names = c("NSP","Insuffisante","Limitée","Convenable","Satisfaisante")),
+                          # names = c("NSP","Insuffisante","Limitée, mais suffisante","Convenable, mais devrait être accrue","Satisfaisante")),
+                        missing.values = -1, annotation=Label(s$transports_avis))
+
   # s$compris_depenses <<- as.item(as.character(s$compris_depenses),
   s$compris_depenses <<- as.item(as.character(s$compris_depenses),
                 labels = structure(c("","Oui","Non","Bug: le graphique ne s'est pas affiché correctement."), names = c("NA","Oui","Non","Bug")), annotation=attr(s$compris_depenses, "label"))
-  s$mode_chauffage <<- as.item(as.character(s$mode_chauffage),
-                labels = structure(c("","Chauffage individuel","Chauffage collectif", "NSP"), names = c("NA","individuel","collectif","NSP")), annotation=attr(s$mode_chauffage, "label"))
-  s$schiste_CC <<- as.item(as.character(s$schiste_CC),
-                labels = structure(c("","Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir","Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"), names = c("NA","malvenue","valable","NSP")), annotation=attr(s$mode_chauffage, "label"))
+  s$mode_chauffage <<- as.item(s$mode_chauffage,
+                labels = structure(c("","Chauffage individuel","Chauffage collectif", "NSP"), names = c("NA","individuel","collectif","NSP")), missing.values='NSP', annotation=Label(s$mode_chauffage))
+  s$chauffage <<- as.item(s$chauffage,
+                labels = structure(c("Gaz de ville", "Butane, propane, gaz en citerne", "Fioul, mazout, pétrole", "Électricité", "Bois, solaire, géothermie, aérothermie (pompe à chaleur)", "Autre","NSP"), names = c("Gaz réseau", "Gaz bouteille", "Fioul", "Électricité", "Bois, solaire...", "Autre", "NSP")), missing.values='NSP', annotation=Label(s$chauffage))
+  s$schiste_CC <<- as.item(s$schiste_CC,
+                labels = structure(c("","Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir","Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"), names = c("NA","malvenue","valable","NSP")), missing.values='NSP', annotation=Label(s$schiste_CC))
+  s$cause_CC <<- as.item(s$cause_CC,
+                labels = structure(c("n'est pas une réalité","est principalement dû à la variabilité naturelle du climat", "est principalement dû à l'activité humaine", "NSP"), names = c("n'existe pas","naturel","anthropique","NSP")), missing.values='NSP', annotation=Label(s$cause_CC))
 
   s$gauche_droite <<- pmax(-2,pmin(2,-2 * grepl("extrême gauche", s$extr_gauche) - grepl("De gauche", s$gauche) + grepl("De droite", s$droite) + 2 * grepl("extrême droite", s$extr_droite)))
   is.na(s$gauche_droite) <<- (s$gauche_droite == 0) & !grepl("centre", s$centre)
@@ -964,7 +1017,7 @@ convert_s <- function() {
   for (i in 0:10) {
     for (o in 1:nrow(s)) {
       j <- s[[paste('en_position', i, sep='_')]][o]
-      s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
+      if (!is.na(j)) s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
     }
   }
   
@@ -972,6 +1025,9 @@ convert_s <- function() {
   # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_tva/fuel, si_/non_, gaz-fioul -> T/F, transferts_inter/variante, enfant
 }
 # convert_s()
+# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
+# sa <- s
+# prepare_s()
 
 weighting_s <- function(data, printWeights = T) { # cf. google sheet
   d <- data
@@ -1057,3 +1113,4 @@ sa <- s
 # sp <- s
 
 prepare_s()
+

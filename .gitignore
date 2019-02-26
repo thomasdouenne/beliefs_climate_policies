@@ -1,4 +1,4 @@
 *.pyc
 *.csv
-.#Rproj.user/
-.#Rproj.user
+code/*.Rproj.user
+code/*.Rproj
