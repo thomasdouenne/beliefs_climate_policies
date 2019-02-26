@@ -93,4 +93,11 @@ summary(tsls1)
 d.hat<-fitted.values(tsls1)
 tsls2<-lm(y ~ c + d.hat)
 summary(tsls2)
-# The effect (around 0.6, similar to OLS) is very substantial
+# L'effet (environ 0.6, pareil qu'OLS) est très substantiel - mais potentiellement toujours biaisé
+# To do: IV en probit pour avoir une valeur peut-être moins biaisée du coefficient (d'autant plus pertinent qu'il est proche de 1). Cf. paquet Stata ivprobit
+
+# Test effet des seuils sur les ménages jamais éligibles pour écarter l'effet gagnant/perdant de l'acceptation #
+s_70_plus <- subset(s, revenu > 2220) # To do : mieux définir ce sample, ce critère revenu n'est pas suffisant du fait du revenu du conjoint
+ols_approuve_seuils <- lm(dummy_approbation_cible ~ (cible==20) + (cible==30) + (cible==40), data=s_70_plus, weights = s$weight)
+summary(ols_approuve_seuils)
+# Aucun effet significatif du seuil pour les non-éligibles
