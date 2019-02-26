@@ -1,3 +1,5 @@
+require(margins)
+
 ### Instrumental variable ###
 s$dummy_approbation <- 1*(s$taxe_approbation=='Oui')
 
@@ -7,6 +9,7 @@ y <- s$dummy_approbation
 x <- s$dummy_taxe_efficace
 z1 <- as.numeric(s$info_CC)
 z2 <- as.numeric(s$info_PM)
+z3 <- as.numeric(s$info_PM) * as.numeric(s$info_CC)
 c <- s$score_climate_call # This is just here as an example of control variable
 
 # Simple OLS #
@@ -15,9 +18,10 @@ summary(ols_approuve_efficace) # Effet assez fort : +0.39, si l'on ne contrôle 
 
 # 2SLS #
 cor(z1,x)
-cor(z2,x) # Problème : weak instruments ! Nos informations ne changent pas leur croyance vis-à-vis de l'efficacité de la taxe
+cor(z2,x)
+cor(z3,x) # Problème : weak instruments ! Nos informations ne changent pas leur croyance vis-à-vis de l'efficacité de la taxe
 
-tsls1<-lm(x ~ z1 + z2)
+tsls1<-lm(x ~ z1 + z2 + z3)
 summary(tsls1)
 
 d.hat<-fitted.values(tsls1)
@@ -64,3 +68,11 @@ summary(lm(s$effets_CC_desastreux ~ s$info_CC + s$info_PM + (s$info_CC * s$info_
 summary(lm(s$effets_CC_cataclysmiques ~ s$info_CC + s$info_PM + (s$info_CC * s$info_PM), data=s, weights = s$weight))
 summary(lm(s$effets_CC_NSP ~ s$info_CC + s$info_PM + (s$info_CC * s$info_PM), data=s, weights = s$weight))
 # Nos informations n'ont pas d'effet significatif sur les croyances relatives aux effets du CC
+
+
+### Logit ###
+# Attention : l'instrument étant faible, on utilise une régression en faisant reposer l'identification sur l'usage des variables de contrôle
+# La difficulté est d'inclure des contrôles suffisant, mais pas de "mauvais contrôles" qui captureraient une partie de l'effet que l'on souhaite identifier
+logit_taxe_approbation <- glm(dummy_approbation ~ dummy_taxe_efficace + revenu + fioul + gaz + taille_menage + surface, data=s, family=binomial(link="logit"))
+summary(logit_taxe_approbation) # To do : ajouter les variables de contrôle pertinentes pour avoir une bonne spécification
+margins(logit_taxe_approbation)

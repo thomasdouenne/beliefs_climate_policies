@@ -94,9 +94,9 @@ if __name__ == "__main__":
     df_hh['gain_net_uc_taxe_carbone'] = \
         (110 * df_hh['nb_beneficiaries'] - df_hh['total_expenditures_increase']) / df_hh['consumption_units']
     
-    df_survey = pd.read_csv(r'C:\Users\thoma\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv')
-    df_survey['weight'] = 1
-    df_survey['gain_taxe_carbone'] = df_survey['gain']
+    df_ptc = pd.read_csv(r'C:\Users\thoma\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv')
+    df_ptc['weight'] = 1
+    df_ptc['gain_taxe_carbone'] = df_ptc['gain']
 
-    #df_to_plot = compare_objective_subjective_beliefs_gains(df_hh, df_survey, 'fuel')[0]
-    kde = estimate_kde(df_hh, df_survey, 0.6)
+    df_to_plot = compare_objective_subjective_beliefs_gains(df_hh, df_ptc, 'fuel')[0]
+    #kde = estimate_kde(df_hh, df_survey, 0.6)
