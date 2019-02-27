@@ -17,12 +17,12 @@ df_bdf = prepare_dataset()
 
 # Energies : les gens ne consomment pas assez de fioul ou de gaz dans notre sondage par rapport à BdF
 print 'Fioul:', 'PTC:', df_ptc['fioul'].mean(), " / BDF:", df_bdf['domestic_fuel'].mean()
-print 'Fioul:', 'PTC:', df_ptc['gaz'].mean(), " / BDF:", df_bdf['natural_gas'].mean()
+print 'Gaz:', 'PTC:', df_ptc['gaz'].mean(), " / BDF:", df_bdf['natural_gas'].mean()
 
 
-# KM parcourus :
+# KM parcourus : à peu près OK, légèrement plus dispersé dans notre sondage
 for i in [.1, .2, .3, .4, .5, .6, .7, .8, .9, .95]:
-    print i, "PTC:", df_ptc['km'].quantile(i)
+    print i, "PTC:", df_ptc['km'].quantile(i), " / BDF:", df_bdf['distance'].quantile(i)
 
 
 # Revenu : Pas si loin des seuils supposés pour chaque décile
