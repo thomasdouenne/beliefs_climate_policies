@@ -64,40 +64,49 @@ summary(lm(dummy_approbation_cible ~ taxe_approbation + traite_transfert + trait
 # Vérifier sur quelle population appliquer estimer l'effet (l'allocation n'est aléatoire que pour les déciles 3, 4 et 5).
 
 ### Instrumental variable ###
+s$gain_taxe__20[is.na(s$gain_taxe__20)] <- 0
+s$gain_taxe_20_30[is.na(s$gain_taxe_20_30)] <- 0
+s$gain_taxe_30_40[is.na(s$gain_taxe_30_40)] <- 0
+s$gain_taxe_40_50[is.na(s$gain_taxe_40_50)] <- 0
+s$transfert_seuil_gagnant <- 1 * (s$gain_taxe__20=='Gagnant') + 1 * (s$gain_taxe_20_30=='Gagnant') + 1 * (s$gain_taxe_30_40=='Gagnant') + 1 * (s$gain_taxe_40_50=='Gagnant')
+
 s_20_50 <- subset(s, revenu > 780 & revenu < 1670)
-s_20_50$gain_taxe__20[is.na(s_20_50$gain_taxe__20)] <- 0
-s_20_50$gain_taxe_20_30[is.na(s_20_50$gain_taxe_20_30)] <- 0
-s_20_50$gain_taxe_30_40[is.na(s_20_50$gain_taxe_30_40)] <- 0
-s_20_50$gain_taxe_40_50[is.na(s_20_50$gain_taxe_40_50)] <- 0
 
-s_20_50$transfert_seuil_gagnant <- 1 * (s_20_50$gain_taxe__20=='Gagnant') + 1 * (s_20_50$gain_taxe_20_30=='Gagnant') + 1 * (s_20_50$gain_taxe_30_40=='Gagnant') + 1 * (s_20_50$gain_taxe_40_50=='Gagnant')
-decrit(s_20_50$transfert_seuil_gagnant)
-
-y <- s_20_50$dummy_approbation_cible
-x <- s_20_50$transfert_seuil_gagnant
-z1 <- s_20_50$traite_transfert
-z2 <- s_20_50$traite_transfert_conjoint
-c <- s_20_50$score_climate_call # This is just here as an example of control variable
+y_dummy_approbation_cible <- s_20_50$dummy_approbation_cible
+x_transfert_seuil_gagnant <- s_20_50$transfert_seuil_gagnant
+z1_traite_transfert <- s_20_50$traite_transfert
+z2_traite_transfert_conjoint <- s_20_50$traite_transfert_conjoint
+c1_taxe_approbation <- s_20_50$taxe_approbation # Peut-être ajouter d'autres variables de contrôle
 
 # Simple OLS #
-ols_approve_winner <- lm(y ~ x, data=s_20_50, weights = s$weight)
+ols_approve_winner <- lm(y_dummy_approbation_cible ~ x_transfert_seuil_gagnant + c1_taxe_approbation, data=s_20_50, weights = s$weight)
 summary(ols_approve_winner)
 
 # 2SLS #
-cor(z1,x)
-cor(z2,x)
+cor(z1_traite_transfert,x_transfert_seuil_gagnant)
+cor(z2_traite_transfert_conjoint,x_transfert_seuil_gagnant)
 
-tsls1<-lm(x ~ z1 + z2)
+tsls1 <- lm(x_transfert_seuil_gagnant ~ z1_traite_transfert + z2_traite_transfert_conjoint + c1_taxe_approbation)
 summary(tsls1)
 
-d.hat<-fitted.values(tsls1)
-tsls2<-lm(y ~ c + d.hat)
+d.hat <- fitted.values(tsls1)
+tsls2 <- lm(y_dummy_approbation_cible ~ d.hat + c1_taxe_approbation)
 summary(tsls2)
 # L'effet (environ 0.6, pareil qu'OLS) est très substantiel - mais potentiellement toujours biaisé
 # To do: IV en probit pour avoir une valeur peut-être moins biaisée du coefficient (d'autant plus pertinent qu'il est proche de 1). Cf. paquet Stata ivprobit
+
+### IV avec equation du RDD pour first stage ###
+tsls_rdd_1 <- lm(transfert_seuil_gagnant ~ taxe_approbation + traite_transfert + traite_transfert_conjoint + revenu + revenu_conjoint, data=s_20_50, weights = s$weight)
+
+d_rdd.hat <- fitted.values(tsls_rdd_1)
+tsls_rdd_2 <- lm(dummy_approbation_cible ~ d_rdd.hat + taxe_approbation + revenu + revenu_conjoint, data=s_20_50, weights = s$weight)
+summary(tsls_rdd_2)
+# De nouveau autour de 0.6 / Question : pourquoi ce chiffre est-il sensible à l'inclusion des variables de contrôle ?
+
 
 # Test effet des seuils sur les ménages jamais éligibles pour écarter l'effet gagnant/perdant de l'acceptation #
 s_70_plus <- subset(s, revenu > 2220) # To do : mieux définir ce sample, ce critère revenu n'est pas suffisant du fait du revenu du conjoint
 ols_approuve_seuils <- lm(dummy_approbation_cible ~ (cible==20) + (cible==30) + (cible==40), data=s_70_plus, weights = s$weight)
 summary(ols_approuve_seuils)
 # Aucun effet significatif du seuil pour les non-éligibles
+
