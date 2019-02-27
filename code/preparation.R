@@ -1029,7 +1029,10 @@ convert_s <- function() {
   s$variante_progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- "fb_no_info"
   s$variante_progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- "fb_info"
   s$variante_progressivite[!is.na(s$progressivite_progressif)] <<- "prog"
-  label(s$variante_progressivite) <<- "variante_progressivite: prog/fb_info/fb_no_info Variante aléatoire du bloc de questions où figure 'progressivite'. prog: info sur la progressivité / fb: feedback sur le statut gagnant/perdant simulé, info/no_info: avec/sans info sur la progressivité de la mesure"
+  label(s$variante_progressivite) <<- "variante_progressivite: prog/fb_info/fb_no_info Variante aléatoire du bloc de questions où figure 'progressivite', seulement pour apres_modifs=T. prog: info sur la progressivité / fb: feedback sur le statut gagnant/perdant simulé, info/no_info: avec/sans info sur la progressivité de la mesure"
+  s$info_progressivite <<- FALSE
+  s$info_progressivite[s$variante_taxe_info=='p' | s$variante_progressivite=='fb_info'] <<- T
+  label(s$info_progressivite) <<- "info_progressivite: Indicatrice qu'a été montrée l'information que la hausse de la taxe carbone compensée avantagerait les plus modestes"
   
   for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
   for (i in 0:10) {
