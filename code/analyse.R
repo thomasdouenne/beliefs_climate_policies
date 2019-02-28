@@ -152,6 +152,7 @@ summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, subset =
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, weights = t$weight)) # 0
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, subset = transferts_inter!='NSP', weights = t$weight)) # 0
 
+# use m_global (in enquete/codes) to redo graph with new data for transferts_inter
 
 ##### Dépenses publiques #####
 categories_depenses <- c("sante", "education", "retraites", "securite", "recherche", "justice", "armee", "protection", "infrastructures", "loisirs", "aide")
