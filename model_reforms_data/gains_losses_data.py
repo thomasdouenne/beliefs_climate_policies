@@ -24,22 +24,22 @@ def compute_gains_losses(df_hh):
             
         if element == 'gasoline':
             current_price = 1.441 # This is roughly the value of gasoline prices
-            e = -0.0
+            e = -0.4
             carbon_intensity = 0.002286
             initial_excise_tax = 0.6069 - 0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'diesel':
             current_price = 1.399 # This is roughly the value of diesel prices
-            e = -0.0
+            e = -0.4
             carbon_intensity = 0.002651
             initial_excise_tax = 0.4284 + 2*0.026 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         elif element == 'domestic_fuel':
             current_price = 0.859 # This is roughly the value of domestic fuel prices
-            e = -0.0
+            e = -0.2
             carbon_intensity = 0.00265
             initial_excise_tax = 0.038 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         else:
             current_price = 0.0651 # For someone in zone 3 that use gas for heating
-            e = -0.0
+            e = -0.2
             carbon_intensity = 0.000182
             initial_excise_tax = 0.0003 # Cf. excel, level of the TICGN if carbon price was null
         

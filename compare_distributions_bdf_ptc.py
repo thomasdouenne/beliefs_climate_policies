@@ -51,7 +51,7 @@ df_bdf['age_25_34'] = 1 * (df_bdf['age_hh_representative'] >= 25) * (df_bdf['age
 df_bdf['age_35_49'] = 1 * (df_bdf['age_hh_representative'] >= 35) * (df_bdf['age_hh_representative'] <= 49)
 df_bdf['age_50_64'] = 1 * (df_bdf['age_hh_representative'] >= 50) * (df_bdf['age_hh_representative'] <= 64)
 df_bdf['age_65_plus'] = 1 * (df_bdf['age_hh_representative'] >= 65)
-    
+
 print '18-24:', 'PTC:', df_ptc['age_18_24'].mean(), " / BDF:", df_bdf['age_18_24'].mean()
 print '25-34:', 'PTC:', df_ptc['age_25_34'].mean(), " / BDF:", df_bdf['age_25_34'].mean()
 print '35-49:', 'PTC:', df_ptc['age_35_49'].mean(), " / BDF:", df_bdf['age_35_49'].mean()

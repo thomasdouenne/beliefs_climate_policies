@@ -29,10 +29,10 @@ z1_traite_transfert <- s_0_70$traite_transfert
 z2_traite_transfert_conjoint <- s_0_70$traite_transfert_conjoint
 c1_taxe_approbation <- s_0_70$taxe_approbation # Peut-être ajouter d'autres variables de contrôle
 
-tsls_rdd_1 <- lm(transfert_seuil_gagnant ~ taxe_approbation + traite_transfert + traite_transfert_conjoint + revenu + revenu_conjoint + revenu_2 + revenu_conjoint_2, data=s_0_70, weights = s$weight)
+tsls_rdd_1 <- lm(transfert_seuil_gagnant ~ taxe_approbation + traite_transfert + traite_transfert_conjoint + revenu + revenu_conjoint + revenu_2 + revenu_conjoint_2, data=s_0_70, weights = s_0_70$weight)
 
 d_rdd.hat <- fitted.values(tsls_rdd_1)
-tsls_rdd_2 <- lm(dummy_approbation_cible ~ d_rdd.hat + taxe_approbation + revenu + revenu_conjoint, data=s_0_70, weights = s$weight)
+tsls_rdd_2 <- lm(dummy_approbation_cible ~ d_rdd.hat + taxe_approbation + revenu + revenu_conjoint, data=s_0_70, weights = s_0_70$weight)
 summary(tsls_rdd_2)
 # On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
 # Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
