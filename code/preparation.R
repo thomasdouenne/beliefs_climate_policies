@@ -1,6 +1,6 @@
 setwd("/var/www/beliefs_climate_policies/code")
 setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
-setwd("/home/adrien/Documents/beliefs_climate_policies/code")
+# setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 
 # options(download.file.method = "wget"); # For Ubuntu 14.04
 package <- function(p) { 
@@ -1106,6 +1106,13 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   # if (only_finished) { s <<- s[as.vector(s$Finished)=="True",] }
   
   relabel_and_rename_s()
+  
+  if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
+  if (exclude_speeder) { s <<- s[n(s$duree) > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
+  # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
+  # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
+  if (only_finished) { s <<- s[s$finished=="True",] }
+  
   print(paste(length(which(is.na(s$taille_agglo))), "tailles d'agglo sont manquantes"))
   s <<- s[!is.na(s$taille_agglo),]
   
@@ -1119,16 +1126,10 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   
   # s <<- s[-which(is.element(s$id, s$id[duplicated(s$id)]) & !duplicated(s$id) & is.na(s$revenu)),] # TODO: check duplicates
 
-  if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
-  if (exclude_speeder) { s <<- s[s$duree > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
-  # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
-  # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
-  if (only_finished) { s <<- s[s$finished=="True",] }
-
   s$weight <<- weighting_s(s)
 }
 
-prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
+prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T)
 sa <- s
 # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
 # se <- s
