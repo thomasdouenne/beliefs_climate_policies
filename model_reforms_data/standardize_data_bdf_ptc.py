@@ -71,3 +71,38 @@ def compute_gains_nets_uc(df_hh):
                 )
 
     return df_hh
+
+
+def impute_barycentre_in_bins(df_ptc, df_bdf):
+    for energy in ['chauffage', 'fuel']:
+        df_ptc['gain_net_numeric_uc_{}'.format(energy)] = 0 + (
+                df_bdf.query('gain_{} == -6'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
+                + ((-160 * df_ptc.query('gain_{} == -6'.format(energy))['weight'].sum() - 110 * df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -6'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -5)
+                + ((-110 * df_ptc.query('gain_{} == -5'.format(energy))['weight'].sum() - 70 * df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -5'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -4)
+                + ((-70 * df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum() - 40 * df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -3)
+                + ((-40 * df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum() - 15 * df_ptc.query('gain_{} == -1'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -1'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -2)
+                + ((-15 * df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum() - 0 * df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -1)
+                + 0 * (df_ptc['gain_{}'.format(energy)] == 0)
+                + ((0 * df_ptc.query('gain_{} == -1'.format(energy))['weight'].sum() + 10 * df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -1'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 1)
+                + ((10 * df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum() + 20 * df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 2)
+                + ((20 * df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum() + 30 * df_ptc.query('gain_{} == 4'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 4'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 3)
+                + ((30 * df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum() + 40 * df_ptc.query('gain_{} == 5'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 5'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 4)
+                + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
+                )
+    for energy in ['taxe_carbone']:
+        df_ptc['gain_net_numeric_uc_{}'.format(energy)] = 0 + (
+                df_bdf.query('gain_{} == -6'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
+                + ((-280 * df_ptc.query('gain_{} == -6'.format(energy))['weight'].sum() - 190 * df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -6'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -5)
+                + ((-190 * df_ptc.query('gain_{} == -5'.format(energy))['weight'].sum() - 120 * df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -5'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -4)
+                + ((-120 * df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum() - 70 * df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -3)
+                + ((-70 * df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum() - 30 * df_ptc.query('gain_{} == -1'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -1'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -2)
+                + ((-30 * df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum() - 0 * df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -1)
+                + 0 * (df_ptc['gain_{}'.format(energy)] == 0)
+                + ((0 * df_ptc.query('gain_{} == -1'.format(energy))['weight'].sum() + 20 * df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -1'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 1)
+                + ((20 * df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum() + 40 * df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 2)
+                + ((40 * df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum() + 60 * df_ptc.query('gain_{} == 4'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 4'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 3)
+                + ((60 * df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum() + 80 * df_ptc.query('gain_{} == 5'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 5'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 4)
+                + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
+                )
+
+    return df_ptc

@@ -13,7 +13,7 @@ from model_reforms_data.regression_feedback import compute_gains_losses_housing,
     regress_ols_housing_expenditures_increase
 from model_reforms_data.gains_losses_data import compute_gains_losses
 from model_reforms_data.standardize_data_bdf_ptc import variables_names_bdf_to_ptc, \
-    create_new_variables_bdf_ptc, compute_gains_nets_uc
+    create_new_variables_bdf_ptc, compute_gains_nets_uc, impute_barycentre_in_bins
 from utils import graph_builder_bar_percent
 
 
@@ -36,6 +36,7 @@ def estimate_kde(df_hh, df_survey, bdw):
     kde_2 = df_hh['gain_net_uc_taxe_carbone'].plot.kde(bw_method = bdw)
 
     return kde_1, kde_2
+
 
 def compare_objective_subjective_beliefs_gains(df_hh, df_survey, energy, cumulative = False):
     
@@ -84,6 +85,8 @@ if __name__ == "__main__":
     df_ptc['weight'] = 1
     df_ptc['gain_taxe_carbone'] = df_ptc['gain']
 
+    df_ptc = impute_barycentre_in_bins(df_ptc, df_hh)
+
     # Comparison on sub-samples:
     variable = None
     sign = '=='
@@ -94,5 +97,5 @@ if __name__ == "__main__":
     except:
         pass
 
-    df_to_plot = compare_objective_subjective_beliefs_gains(df_hh, df_ptc, 'chauffage', True)
+    df_to_plot = compare_objective_subjective_beliefs_gains(df_hh, df_ptc, 'taxe_carbone', False)
     #kde = estimate_kde(df_hh, df_ptc, 0.6)
