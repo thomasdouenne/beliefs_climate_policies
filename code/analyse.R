@@ -13,6 +13,23 @@ package('tidyverse')
 package("Hmisc")
 package("quantreg")
 
+
+##### Distributions de revenus #####
+decrit(s$revenu, weights = s$weight)
+round(deciles_erfs_inflates_weighted)
+distribution_revenu <- wtd.Ecdf(s$revenu, weights = s$weight)
+plot(distribution_revenu_erfs_weighted$x/12, distribution_revenu_erfs_weighted$ecdf, xlim=c(0,5000), type='l', lwd=2, col="blue", xlab = "Net individual income (in €/month)", ylab="Distribution of incomes")
+lines(distribution_revenu$x, distribution_revenu$ecdf, col="orange", type='l', lwd=2) + grid()
+legend("bottomright", lwd=2, col=c("blue", "orange"), title = "Income distribution from:", title.col = "black", text.col = c("blue", "orange"), legend=c("ERFS (true)", "BCP (our survey)"))
+
+decrit(s$rev_tot, weights = s$weight)
+round(deciles_menage_erfs_inflates_weighted)
+distribution_rev_tot <- wtd.Ecdf(s$rev_tot, weights = s$weight)
+plot(distribution_rev_tot_erfs_weighted$x/12, distribution_rev_tot_erfs_weighted$ecdf, xlim=c(0,5000), type='l', lwd=2, col="blue", xlab = "Net household income (in €/month)", ylab="Distribution of incomes")
+lines(distribution_rev_tot$x, distribution_rev_tot$ecdf, col="orange", type='l', lwd=2) + grid()
+legend("bottomright", lwd=2, col=c("blue", "orange"), title = "Income distribution from:", title.col = "black", text.col = c("blue", "orange"), legend=c("ERFS (true)", "BCP (our survey)"))
+
+
 ##### Durées #####
 decrit(s$duree/60) # 18 min (moyenne 24)
 decrit(s$duree_depenses/60) # 2 min (moyenne 3.5)
@@ -52,6 +69,10 @@ decrit(s$gain_taxe_feedback[s$hausse_depenses < 110 * s$nb_adultes], weights = s
 length(which(s$gain_taxe_feedback=='Gagnant' & s$hausse_depenses < 110 * s$nb_adultes))/length(which(!is.na(s$gain_taxe_feedback) & s$hausse_depenses < 110 * s$nb_adultes))
 length(which(s$gain_taxe_feedback=='Gagnant' & s$gain_taxe != 'Gagnant' & s$hausse_depenses < 110 * s$nb_adultes))/length(which(!is.na(s$gain_taxe_feedback) & s$hausse_depenses < 110 * s$nb_adultes & s$gain_taxe != 'Gagnant'))
 decrit(s$gain_taxe_progressif, weights = s$weight)
+
+## Plot CDF
+cdf_gain <- wtd.Ecdf(s$gain, weights = s$weight)
+plot(cdf_gain$x, cdf_gain$ecdf, type='s', lwd=2, col='orange', xlab="Category of subjective gain", ylab="Distribution of answers") + grid()
 
 
 ##### Approbation #####

@@ -1,5 +1,5 @@
 setwd("/var/www/beliefs_climate_policies/code")
-setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+# setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 
 # options(download.file.method = "wget"); # For Ubuntu 14.04
@@ -23,6 +23,7 @@ package("plotly")
 package('gdata')
 package('tidyverse')
 package("Hmisc")
+package("readstata13")
 
 # Fs <- function(QID) { s[QID][[1]] }
 # Vs <- function(QID) { as.vector(Fs(QID))  } 
@@ -108,6 +109,84 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # sum(taille_agglo$share[taille_agglo$taille_agglo<=5 & taille_agglo$taille_agglo>3]) # <100k
 # sum(taille_agglo$share[taille_agglo$taille_agglo<8 & taille_agglo$taille_agglo>5]) # >100k
 # taille_agglo$share[taille_agglo$taille_agglo==8] # Paris
+
+
+##### Quantiles de revenus ERFS 2014 #####
+# quantiles <- function(data, weights = NULL)  {
+#   if (is.null(weights)) return(function(q) { pmax(0,quantile(data, probs = q, na.rm = TRUE, names = FALSE) / 12)} )
+#   else return(function(q) { pmax(0, wtd.quantile(data, probs = q, na.rm = TRUE, weights = weights) / 12)} )
+# }
+# seuils_all <- function(q) {
+#   s <- vector("numeric", length=5)
+#   for (i in 1:9) s[i] <- q(i/10)
+#   # s[1] <- q(0.1, weights = weights)
+#   # s[2] <- q(0.2, weights = weights)
+#   # s[3] <- q(0.3, weights = weights)
+#   # s[4] <- q(0.4, weights = weights)
+#   # s[5] <- q(0.5, weights = weights)
+#   # s[6] <- q(0.6, weights = weights)
+#   # s[7] <- q(0.7, weights = weights)
+#   # s[8] <- q(0.8, weights = weights)
+#   # s[9] <- q(0.9, weights = weights)
+#   return(round(s,0))
+# }
+# wd <- getwd()
+# setwd("U:/Données/ERFS_2014")
+# setwd("/media/adrien/dd/adrien/DD/Économie/Données/ERFS_2014/Stata")
+# indiv <- read.dta13("fpr_indiv_2014.dta")
+# irft4 <- read.dta13("fpr_irf14e14t4.dta")
+# menage <- read.dta13("fpr_menage_2014.dta")
+# menage$presta_sociales <- menage$prest_fam_petite_enfance + menage$prest_fam_autres + menage$prest_precarite_rsa + menage$m_rsa_actm + menage$prest_precarite_hand + menage$prest_precarite_vieil + menage$prest_logement + menage$ppe
+# irft4 <- irft4[,which(is.element(colnames(irft4),c("noindiv", "noiprm", "nbinde", "nbenf18", "ag", "mchoe", "ancinatm")))]
+# menage <- menage[,which(is.element(colnames(menage),c("ident14", "revdispm","impots" ,"revdecm", "nivviem", "presta_sociales", "revenu_ajuste", "rev_cat_net", "wpri")))]
+# # Prestas aux parents, i.e. aux deux adultes les plus âgés du ménage
+# temp <- merge(indiv, irft4, by="noindiv")
+# db <- merge(temp, menage, by="ident14")
+# names(db)[1] <- "group"
+# names(db)[28] <- "age"
+# db$age <- as.numeric(db$age)
+# temp <- aggregate(age ~ group, db, function(vec) {
+#   if (length(vec) >= 2) return(max(vec[-which.max(vec)]))
+#   else return(-1)})
+# names(temp)[2] <- "age_second"
+# db$order <- seq(len=nrow(db))
+# db <- merge(db, temp, all=TRUE, by="group")
+# temp <- aggregate((age >= pmax(age_second, 18)) ~ group, db, sum)
+# names(temp)[2] <- "adult_above_second"
+# db$order <- seq(len=nrow(db))
+# db <- merge(db, temp, all=TRUE, by="group")
+# temp <- aggregate((age > 17) ~ group, db, sum)
+# names(temp)[2] <- "nb_adultes"
+# db$order <- seq(len=nrow(db))
+# db <- merge(db, temp, all=TRUE, by="group")
+# db$revenu_imputable_i <- db$salaires_i + db$chomage_i + db$retraites_i + db$rag_i + db$rnc_i + db$ric_i + db$pens_alim_recue_i # Ce dernier, dont l'ajout est discutable, ne représente que  5 milliards
+# temp <- aggregate(revenu_imputable_i ~ group, db, sum)
+# names(temp)[2] <- "revenu_imputable_m"
+# db <- merge(temp, db, all=TRUE,by="group")
+# db <- db[sort.list(db$order),]
+# # On exclut les revenus négatifs
+# db$proportion_imputee[db$revenu_imputable_m > 0] <- db$revenu_imputable_i[db$revenu_imputable_m > 0] / db$revenu_imputable_m[db$revenu_imputable_m > 0]
+# db$proportion_imputee[db$revenu_imputable_m == 0 & db$age > 17 & db$nb_adultes>0] <- 1 / db$nb_adultes[db$revenu_imputable_m == 0 & db$age > 17 & db$nb_adultes>0]
+# db$proportion_imputee[db$revenu_imputable_m == 0 & db$age < 18] <- 0
+# 
+# db$revtot_i_par <- db$revdecm * db$proportion_imputee + db$presta_sociales * (db$age >= pmax(db$age_second, 18)) /  pmax(1, db$adult_above_second)
+# sum(db$revtot_i_par, na.rm=T)/sum(menage$presta_sociales + menage$revdecm, na.rm=T) # 1.000032
+# 
+# # Déciles de revenus inflatés : (croissance PIB 2014-2018	1.06075007	https://www.insee.fr/fr/statistiques/2830613#tableau-Tableau1 )
+# deciles_erfs_inflates <- 1.06075007*seuils_all(quantiles(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17]))
+# round(deciles_erfs_inflates) # 229 779 1142 1429 1671 1922 2222 2641 3436
+# deciles_erfs_inflates_weighted <- 1.06075007*seuils_all(quantiles(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17], weights = db$wprm[!is.na(db$revtot_i_par) & db$age > 17]))
+# round(deciles_erfs_inflates_weighted) # 237 789 1151 1436 1677 1927 2231 2657 3462
+# deciles_menage_erfs_inflates_weighted <- 1.06075007*seuils_all(quantiles(db$revdecm + db$presta_sociales, weights = db$wprm))
+# 
+# distribution_revenu_erfs <- wtd.Ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)])
+# distribution_revenu_erfs_weighted <- wtd.Ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)], weights = db$wprm[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)])
+# # plot(distribution_revenu_erfs$x, distribution_revenu_erfs$ecdf, type='l', xlim=c(0,60000), col="blue")
+# distribution_rev_tot_erfs <- wtd.Ecdf(db$revdecm + db$presta_sociales)
+# distribution_rev_tot_erfs_weighted <- wtd.Ecdf(db$revdecm + db$presta_sociales, weights = db$wprm)
+# 
+# rm(db, temp, irft4, menage, indiv)
+# setwd(wd)
 
 
 ##### Preparation #####
@@ -901,6 +980,7 @@ convert_s <- function() {
   s$uc <<- uc(s$taille_menage, s$nb_14_et_plus)
   s$niveau_vie <<- s$revdisp / s$uc
 
+  # TODO: age as item avec moyenne de l'âge de chaque groupe
   s$Age <<- (s$age == "18 à 24 ans") + 2*(s$age == "25 à 34 ans") + 3.3*(s$age == "35 à 49 ans") + 4.6*(s$age == "50 à 64 ans") + 7*(s$age == "65 ans ou plus")
   # s$age <<- as.factor(as.character(s$age))
   s$Diplome <<- (s$diplome == "Brevet des collèges") + 2*(s$diplome=="CAP ou BEP") + 3*(s$diplome=="Baccalauréat") + 4*(s$diplome=="Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)") + 5*(s$diplome=="Bac +3 (licence...)") + 6*(s$diplome=="Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)") - (s$diplome=="NSP (Ne se prononce pas)")
@@ -1034,6 +1114,17 @@ convert_s <- function() {
   s$info_progressivite <<- FALSE
   s$info_progressivite[s$variante_taxe_info=='p' | s$variante_progressivite=='fb_info'] <<- T
   label(s$info_progressivite) <<- "info_progressivite: Indicatrice qu'a été montrée l'information que la hausse de la taxe carbone compensée avantagerait les plus modestes"
+
+  s$age_18_24 <<- 1*(s$age == '18 à 24 ans')
+  s$age_25_34 <<- 1*(s$age == '25 à 34 ans')
+  s$age_35_49 <<- 1*(s$age == '35 à 49 ans')
+  s$age_50_64 <<- 1*(s$age == '50 à 64 ans')
+  s$age_65_plus <<- 1*(s$age == '65 ans ou plus')
+  
+  s$score_polluants <<- 1 * (s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) + 1*(s$ges_O2 == FALSE) + 1*(s$ges_pm == FALSE)
+  label(s$score_polluants) <<- "score_polluants: Somme des bonnes réponses au questionnaire gaz à effet de serre (ges_O2/CH4/pm/CO2)"
+  s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) + 1*(s$ges_nucleaire == FALSE)
+  label(s$score_climate_call) <<- "score_climate_call: Somme des bonnes réponses au questionnaire Climate Call (avion-train / boeuf-pates / nucleaire-eolien) ges_avion/boeuf/nucleaire"  
   
   for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
   for (i in 0:10) {
@@ -1129,7 +1220,7 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   s$weight <<- weighting_s(s)
 }
 
-prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T)
+prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T) # TODO: let only_finished = FALSE
 sa <- s
 # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
 # se <- s
