@@ -11,6 +11,7 @@ package("plotly")
 package('gdata')
 package('tidyverse')
 package("Hmisc")
+package("quantreg")
 
 ##### Durées #####
 decrit(s$duree/60) # 18 min (moyenne 24)
@@ -20,7 +21,7 @@ decrit(s$duree_info_CC_PM/60) # 0.4 min (moyenne 1)
 decrit(s$duree_info_CC/60) # 0.3 min (moyenne 1.7)
 decrit(s$duree_info_PM/60) # 0.2 min (moyenne 0.5)
 decrit(s$duree_no_info/60) # 0.05 min (moyenne 0.1)
-length(which(!is.na(s$depenses_confiant)))/nrow(s) # 27%
+length(which(!is.na(s$depenses_confiant)))/nrow(s) # 32%
 plot(density(sa$duree/60), xlim=c(0,30))
 plot(Ecdf(sa$duree/60)$x, Ecdf(sa$duree/60)$ecdf)
 sa$duree_min <- sa$duree/60
@@ -163,7 +164,9 @@ t_depenses$aleatoire <- FALSE
 s$aleatoire <- TRUE
 d <- merge(s, t_depenses, all=T)
 for (v in categories_depenses) {  print(summary(lm(d[[paste('variation', v, sep='_')]] ~ d$aleatoire))) } # * -: armee, securite, aide, 
-decrit(d$variation_aide)
+summary(lm(d$variation_aide ~ d$aleatoire, weights = d$weight))
+summary(rq(d$variation_aide ~ d$aleatoire, weights = d$weight))
+decrit(d$variation_aide, weights = d$weight)
 decrit(s$variation_aide)
 decrit(s$depenses_confiant)
 decrit(s$depenses_confiant[is.na(s$variation_aide)])

@@ -736,8 +736,16 @@ relabel_and_rename_s <- function() {
   label(s[[303]]) <<- "cible40: Indicatrice aléatoire que la réforme ciblée compense les 40% les plus modestes (20/30/40/50)"
   names(s)[304] <<- "cible50"
   label(s[[304]]) <<- "cible50: Indicatrice aléatoire que la réforme ciblée compense les 50% les plus modestes (20/30/40/50)"
+  names(s)[305] <<- "progressivite_feedback_avec_info"
+  label(s[[305]]) <<- "progressivite_feedback_avec_info: ~ Une hausse de la taxe carbone compensée avantagerait les plus modestes - après information sur la progressivité - Q208"
+  names(s)[306] <<- "progressivite_feedback_sans_info"
+  label(s[[306]]) <<- "progressivite_feedback_sans_info: ~ Une hausse de la taxe carbone compensée avantagerait les plus modestes - sans information sur la progressivité - Q207"
+  names(s)[307] <<- "progressivite_progressif"
+  label(s[[307]]) <<- "progressivite_progressif: Une hausse de la taxe carbone compensée avantagerait les plus modestes - après information sur la progressivité - Q206"
+  names(s)[308] <<- "apres_modifs"
+  label(s[[308]]) <<- "apres_modifs: Indicatrice de la seconde moitié de l'échantillon, avec des questions et informations sur la progressivité (progressivite_feedback_avec/sans_info, progressivite_progressif) et une reformulation des questions transferts_inter (aide publique au développement des Français)"
 
-  s <<- s[,c(1,2,7,20:304)]
+  s <<- s[,c(1,2,7,20:308)]
 }
 
 convert_s <- function() {
@@ -796,7 +804,8 @@ convert_s <- function() {
   for (j in c("taxe_efficace", "rattrapage_diesel", "enfant_CC", "mode_vie_ecolo", "schiste_approbation", 
               "transferts_inter_a", "transferts_inter_a_info", "transferts_inter", "taxe_approbation",
               "taxe_feedback_approbation", "taxe_progressif_approbation", "taxe__20_approbation", "taxe_20_30_approbation",
-              "taxe_30_40_approbation", "taxe_40_50_approbation", "taxe_50_70_approbation", "taxe_70__approbation"
+              "taxe_30_40_approbation", "taxe_40_50_approbation", "taxe_50_70_approbation", "taxe_70__approbation",
+              "progressivite_feedback_sans_info", "progressivite_feedback_avec_info", "progressivite_progressif"
               )) {
     s[j][[1]] <<- as.item(as.character(s[j][[1]]),
                 labels = structure(c("","Non","NSP","Oui"), names = c("NA","Non","NSP","Oui")), 
@@ -814,7 +823,7 @@ convert_s <- function() {
  # TODO: as.item region_CC, gain_taxe_fuel, gain_taxe_chauffage, gain_taxe, gain_taxe_feedback, gain_taxe_progressif, gain_taxe_cible, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
 
   for (j in names(s)) {
-    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_', j)) {
+    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif', j)) {
       s[[j]][s[[j]]!=""] <<- TRUE
       s[[j]][is.na(s[[j]])] <<- FALSE
     }
@@ -1013,6 +1022,18 @@ convert_s <- function() {
 	s$hausse_diesel[s$nb_vehicules == 1] <<- (s$fuel_1=='Diesel') * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
   s$hausse_diesel[s$nb_vehicules == 1] <<- ((s$fuel_2_1=='Diesel')*2/3 + (s$fuel_2_2=='Diesel')/3) * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
 
+  s$progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- s$progressivite_feedback_sans_info[!is.na(s$progressivite_feedback_sans_info)]
+  s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
+  s$progressivite[!is.na(s$progressivite_progressif)] <<- s$progressivite_progressif[!is.na(s$progressivite_progressif)]
+  label(s$progressivite) <<- "progressivite: ~ Une hausse de la taxe carbone compensée avantagerait les plus modestes (réunion des trois variante_progressivite: prog/fb_info/fb_no_info où seule fb_no_info est sans information préalable sur la progressivité) - Q206-208"
+  s$variante_progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- "fb_no_info"
+  s$variante_progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- "fb_info"
+  s$variante_progressivite[!is.na(s$progressivite_progressif)] <<- "prog"
+  label(s$variante_progressivite) <<- "variante_progressivite: prog/fb_info/fb_no_info Variante aléatoire du bloc de questions où figure 'progressivite', seulement pour apres_modifs=T. prog: info sur la progressivité / fb: feedback sur le statut gagnant/perdant simulé, info/no_info: avec/sans info sur la progressivité de la mesure"
+  s$info_progressivite <<- FALSE
+  s$info_progressivite[s$variante_taxe_info=='p' | s$variante_progressivite=='fb_info'] <<- T
+  label(s$info_progressivite) <<- "info_progressivite: Indicatrice qu'a été montrée l'information que la hausse de la taxe carbone compensée avantagerait les plus modestes"
+  
   for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
   for (i in 0:10) {
     for (o in 1:nrow(s)) {
@@ -1075,7 +1096,8 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   # f_data <- read.delim("fin.tsv", fileEncoding="UTF-16")
   s <<- read_csv("survey.csv")
   for (i in 1:length(s)) { label(s[[i]]) <<- toString(s[i][[1]][1]) } # Use the first line to create variable names labels then remove it - to run only once
-  s <<- s[-c(1,2),]
+  s <<- s[-c(1,2),c(1:91,94:115,117:300,302:308,92,93,116,301)]
+
   # if (exclude_screened) { s <<- s[s$Q_TerminateFlag=="",] } # remove Screened
   # if (exclude_speeder) { s <<- s[n(s$`Duration (in seconds)`) > 540,] } # remove speedest
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
@@ -1096,13 +1118,13 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   
   # s <<- s[-which(is.element(s$id, s$id[duplicated(s$id)]) & !duplicated(s$id) & is.na(s$revenu)),] # TODO: check duplicates
 
-  s$weight <<- weighting_s(s)
-
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
   if (exclude_speeder) { s <<- s[s$duree > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
   # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
   if (only_finished) { s <<- s[s$finished=="True",] }
+
+  s$weight <<- weighting_s(s)
 }
 
 prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
