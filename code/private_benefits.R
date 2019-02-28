@@ -19,6 +19,7 @@ s$gain_taxe_20_30[is.na(s$gain_taxe_20_30)] <- 0
 s$gain_taxe_30_40[is.na(s$gain_taxe_30_40)] <- 0
 s$gain_taxe_40_50[is.na(s$gain_taxe_40_50)] <- 0
 s$transfert_seuil_gagnant <- 1 * (s$gain_taxe__20=='Gagnant') + 1 * (s$gain_taxe_20_30=='Gagnant') + 1 * (s$gain_taxe_30_40=='Gagnant') + 1 * (s$gain_taxe_40_50=='Gagnant')
+#  COMM: définitions variable dans preparation, encodage, transfert_seuil_gagnant c'est gain_cible, package pour IV?
 
 s_0_70 <- subset(s, categorie_cible != '70_')
 

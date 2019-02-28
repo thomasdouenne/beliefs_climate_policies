@@ -1,5 +1,6 @@
 setwd("/var/www/beliefs_climate_policies/code")
 setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 
 # options(download.file.method = "wget"); # For Ubuntu 14.04
 package <- function(p) { 
