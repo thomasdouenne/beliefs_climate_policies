@@ -58,7 +58,7 @@ energy = 'taxe_carbone'
 if plot_step_distribution == True:
     df_to_plot = compare_objective_subjective_beliefs_gain(df_bdf, df_ptc, energy, True)    
 if plot_kde == True:
-    extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy, bw_size = 0.4)
+    extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy, bw_size = None)
 
 
 """ Imputate numerical values for net gain for BCP """
