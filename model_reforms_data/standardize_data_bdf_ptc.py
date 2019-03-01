@@ -2,6 +2,11 @@
 
 from __future__ import division
 
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+import random
+
 
 def variables_names_bdf_to_ptc(df_hh):
     df_hh.rename(
@@ -106,3 +111,38 @@ def impute_barycentre_in_bins(df_ptc, df_bdf):
                 )
 
     return df_ptc
+
+
+def extrapolate_distribution_bcp_from_bdf(df_ptc, df_hh, energy = 'chauffage'):
+    df_to_plot = pd.DataFrame(index = range(0,1000),
+        columns = ['subjective_gains_category', 'subjective_gains_numeric'])
+    df_to_plot = df_to_plot.reset_index()
+    df_to_plot['subjective_gains_category'] = 0
+    df_to_plot['subjective_gains_numeric'] = 0.0
+    df_ptc.dropna(subset = ['gain_{}'.format(energy)], inplace = True)
+    hh_index = 0
+    for i in range(-6,6):
+        hh_index_old = hh_index
+        hh_index = hh_index_old + float(df_ptc.query('gain_chauffage == {}'.format(i))['weight'].sum()) / df_ptc['weight'].sum() * len(df_to_plot)
+        df_to_plot['subjective_gains_category'] = df_to_plot['subjective_gains_category'] + i * (df_to_plot['index'] >= hh_index_old) * (df_to_plot['index'] < hh_index)
+    
+        if i != 0:
+            local_hh = df_hh.query('gain_chauffage == {}'.format(i))
+        else:
+            local_hh = df_hh.query('gain_chauffage <= 1').query('gain_chauffage >= -1')
+        local_hh = local_hh.sort_values(by=['gain_net_uc_chauffage'])
+        # parametric fit: assume normal distribution
+        loc_param, scale_param = stats.norm.fit(local_hh['gain_net_uc_chauffage'])
+        param_density = stats.norm.cdf(local_hh['gain_net_uc_chauffage'], loc=loc_param, scale=scale_param)
+        vector_weights = np.vstack((local_hh['gain_net_uc_chauffage'], param_density)).T
+                
+        for j in range(int(hh_index_old), int(hh_index)):
+            index = (np.abs(param_density-float(random.randint(1,101)) / 100)).argmin()
+            df_to_plot['subjective_gains_numeric'][j] = vector_weights[index][0]
+
+    df_to_plot_limited = df_to_plot.query('subjective_gains_numeric > -300')
+    df_to_plot_limited['subjective_gains_numeric'].plot.density(bw_method = 0.25)
+    df_hh_limited = df_hh.query('gain_net_uc_chauffage > -300')
+    df_hh_limited['gain_net_uc_chauffage'].plot.density(bw_method = 0.25)
+    
+    return df_to_plot

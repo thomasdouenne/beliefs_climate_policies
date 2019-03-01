@@ -13,7 +13,7 @@ from model_reforms_data.regression_feedback import compute_gains_losses_housing,
     regress_ols_housing_expenditures_increase
 from model_reforms_data.gains_losses_data import compute_gains_losses
 from model_reforms_data.standardize_data_bdf_ptc import variables_names_bdf_to_ptc, \
-    create_new_variables_bdf_ptc, compute_gains_nets_uc, impute_barycentre_in_bins
+    create_new_variables_bdf_ptc, compute_gains_nets_uc, impute_barycentre_in_bins, extrapolate_distribution_bcp_from_bdf
 from utils import graph_builder_bar_percent
 
 
@@ -74,7 +74,10 @@ def compare_objective_subjective_beliefs_gains(df_hh, df_survey, energy, cumulat
 
 if __name__ == "__main__":
     df_hh = prepare_dataset()
-    df_ptc = pd.read_csv(r'C:\Users\thoma\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv')
+    try:
+        df_ptc = pd.read_csv(r'C:\Users\thoma\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv')
+    except:
+        df_ptc = pd.read_csv(r'C:\Users\t.douenne\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv')
 
     df_hh = compute_gains_losses(df_hh)
     df_hh = compute_gains_nets_uc(df_hh)
@@ -93,9 +96,9 @@ if __name__ == "__main__":
     value = 1
     try:
         df_hh = df_hh.query('{0} {1} {2}'.format(variable, sign, value))
-        df_ptc_1 = df_ptc.query('{0} {1} {2}'.format(variable, sign, value))
+        df_ptc = df_ptc.query('{0} {1} {2}'.format(variable, sign, value))
     except:
         pass
 
-    df_to_plot = compare_objective_subjective_beliefs_gains(df_hh, df_ptc, 'taxe_carbone', False)
+    df_to_plot = compare_objective_subjective_beliefs_gains(df_hh, df_ptc, 'taxe_carbone', True)
     #kde = estimate_kde(df_hh, df_ptc, 0.6)
