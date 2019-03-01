@@ -37,9 +37,14 @@ summary(tsls_rdd_2)
 # On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
 # Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
 
+# Avec effet hétérogène par seuil
+tsls_rdd_2_heterogeneous <- lm(dummy_approbation_cible ~ d_rdd.hat + (d_rdd.hat * (categorie_cible == '20_30')) + (d_rdd.hat * (categorie_cible == '30_40')) + (d_rdd.hat * (categorie_cible == '40_50')) + (d_rdd.hat * (categorie_cible == '50_70')) + taxe_approbation + revenu + revenu_conjoint, data=s_0_70, weights = s_0_70$weight)
+summary(tsls_rdd_2_heterogeneous)
+# Les résultats ne sont pas significatifs pour les effets par seuil. L'effet d_rdd.hat varie selon la catégorie omise, et perd en significativité.
+
 
 ##### 2. RDD paramétrique à multiples seuils (20-30-40-50) #####
-rdd_ms <- lm(dummy_approbation_cible ~ traite_transfert + traite_transfert_conjoint + (traite_transfert * traite_transfert_conjoint) + taxe_approbation + revenu + revenu_2 + revenu_conjoint + revenu_conjoint_2, data=s_0_70, weights = s$weight)
+rdd_ms <- lm(dummy_approbation_cible ~ traite_transfert + traite_transfert_conjoint + (traite_transfert * traite_transfert_conjoint) + taxe_approbation + revenu + revenu_2 + revenu_conjoint + revenu_conjoint_2, data=s_0_70, weights = s_0_70$weight)
 summary(rdd_ms)
 # On estime que lorsque le répondant est éligible au transfert, ceteris paribus la probabilité d'approbation augmente de 10 p.p.
 # On estime que lorsque son conjoint est éligible au transfert, ceteris paribus la probabilité d'approbation de 5 p.p.
@@ -57,7 +62,7 @@ z2_traite_transfert_conjoint <- s_20_50$traite_transfert_conjoint
 c1_taxe_approbation <- s_20_50$taxe_approbation # Peut-être ajouter d'autres variables de contrôle
 
 # Simple OLS #
-ols_approve_winner <- lm(y_dummy_approbation_cible ~ x_transfert_seuil_gagnant + c1_taxe_approbation, data=s_20_50, weights = s$weight)
+ols_approve_winner <- lm(y_dummy_approbation_cible ~ x_transfert_seuil_gagnant + c1_taxe_approbation, data=s_20_50, weights = s_20_50$weight)
 summary(ols_approve_winner)
 # Une OLS standard nous donne qu'une personne se percevant gagnante a une probabilité d'approbation supérieure de 51 p.p.
 
