@@ -171,7 +171,7 @@ def impute_average_bdf_in_bins(df_bdf, df_ptc): # More consistent with method us
     return df_ptc
 
 
-def extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone', bw_size = 0.25):
+def extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone', bw_size = 0.3, vector = True):
     df_to_plot = pd.DataFrame(index = range(0,10000),
         columns = ['subjective_gain_category_{}'.format(energy), 'subjective_gain_numeric_{}'.format(energy)])
     df_to_plot = df_to_plot.reset_index()
@@ -192,19 +192,27 @@ def extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone
         # parametric fit: assume normal distribution
         loc_param, scale_param = stats.norm.fit(local_hh['gain_net_numeric_uc_{}'.format(energy)])
         param_density = stats.norm.cdf(local_hh['gain_net_numeric_uc_{}'.format(energy)], loc=loc_param, scale=scale_param)
-
-        array_size = int(hh_index) - int(hh_index_old)
-        random_array = np.random.randint(1,100001, size = array_size)
-        random_array = np.array([random_array,] * 1).astype(float) / 100000
-        local_hh_matrix = np.array([local_hh['gain_net_numeric_uc_{}'.format(energy)],] * array_size)
+        vector_weights = np.vstack((local_hh['gain_net_numeric_uc_{}'.format(energy)], param_density)).T
+                
+        if vector == True:
+            array_size = int(hh_index) - int(hh_index_old)
+            random_array = np.random.randint(1,100001, size = array_size)
+            random_array = np.array([random_array,] * 1).astype(float) / 100000
+            local_hh_matrix = np.array([local_hh['gain_net_numeric_uc_{}'.format(energy)],] * array_size)
+            
+            density_array = np.array([param_density,] * array_size)
+            index_matrix = density_array - random_array.T
+            
+            index = (np.abs(index_matrix)).argmin(1)
+            array_values = local_hh_matrix[0][index]
+            
+            df_to_plot['subjective_gain_numeric_{}'.format(energy)][int(hh_index_old):int(hh_index)] = array_values
         
-        density_array = np.array([param_density,] * array_size)
-        index_matrix = density_array - random_array.T
-        
-        index = (np.abs(index_matrix)).argmin(1)
-        array_values = local_hh_matrix[0][index]
-        
-        df_to_plot['subjective_gain_numeric_{}'.format(energy)][int(hh_index_old):int(hh_index)] = array_values
+        # Unvectorized calculation: takes longer but avoid issues with empty arrays
+        else:
+            for j in range(int(hh_index_old), int(hh_index)):
+                index = (np.abs(param_density-float(random.randint(1,10001)) / 10000)).argmin()
+                df_to_plot['subjective_gain_numeric_{}'.format(energy)][j] = vector_weights[index][0]
 
     # Cut extreme values for more readable figures
     df_bdf_limited = df_bdf.query('gain_net_numeric_uc_{} > -300'.format(energy))
