@@ -10,8 +10,8 @@ import random
 from utils import graph_builder_bar_percent
 
 
-def variables_names_bdf_to_ptc(df_hh):
-    df_hh.rename(
+def variables_names_bdf_to_ptc(df_bdf):
+    df_bdf.rename(
             columns = {
                 'age_hh_representative' : 'age_hh_representative',
                 'domestic_fuel_expenditures' : 'domestic_fuel_expenditures',
@@ -30,84 +30,84 @@ def variables_names_bdf_to_ptc(df_hh):
             inplace = True,
             )
 
-    return df_hh
+    return df_bdf
 
 
-def create_new_variables_bdf_ptc(df_hh, df_ptc):
-    df_hh['ni_fioul_ni_gaz'] = 1 * ((df_hh['fioul'] + df_hh['gaz']) == 0)
+def create_new_variables_bdf_ptc(df_bdf, df_ptc):
+    df_bdf['ni_fioul_ni_gaz'] = 1 * ((df_bdf['fioul'] + df_bdf['gaz']) == 0)
     df_ptc['ni_fioul_ni_gaz'] = 1 * ((df_ptc['fioul'] + df_ptc['gaz']) == 0)
   
-    return df_hh, df_ptc
+    return df_bdf, df_ptc
 
 
-def compute_gains_nets_uc(df_hh):
-    df_hh['gain_net_uc_fuel'] = \
-        (60 * df_hh['nb_beneficiaries'] - df_hh['transport_expenditures_increase']) / df_hh['consumption_units']
-    df_hh['gain_net_uc_chauffage'] = \
-        (50 * df_hh['nb_beneficiaries'] - df_hh['housing_expenditures_increase']) / df_hh['consumption_units']
-    df_hh['gain_net_uc_taxe_carbone'] = \
-        (110 * df_hh['nb_beneficiaries'] - df_hh['total_expenditures_increase']) / df_hh['consumption_units']
+def compute_gain_net_uc(df_bdf):
+    df_bdf['gain_net_numeric_uc_fuel'] = \
+        (60 * df_bdf['nb_beneficiaries'] - df_bdf['transport_expenditures_increase']) / df_bdf['consumption_units']
+    df_bdf['gain_net_numeric_uc_chauffage'] = \
+        (50 * df_bdf['nb_beneficiaries'] - df_bdf['housing_expenditures_increase']) / df_bdf['consumption_units']
+    df_bdf['gain_net_numeric_uc_taxe_carbone'] = \
+        (110 * df_bdf['nb_beneficiaries'] - df_bdf['total_expenditures_increase']) / df_bdf['consumption_units']
 
     for energy in ['chauffage', 'fuel']:
-        df_hh['gain_{}'.format(energy)] = 0 + (
-                - 6 * (df_hh['gain_net_uc_{}'.format(energy)] < -160)
-                - 5 * (df_hh['gain_net_uc_{}'.format(energy)] >= -160) * (df_hh['gain_net_uc_{}'.format(energy)] < -110)
-                - 4 * (df_hh['gain_net_uc_{}'.format(energy)] >= -110) * (df_hh['gain_net_uc_{}'.format(energy)] < -70)
-                - 3 * (df_hh['gain_net_uc_{}'.format(energy)] >= -70) * (df_hh['gain_net_uc_{}'.format(energy)] < -40)
-                - 2 * (df_hh['gain_net_uc_{}'.format(energy)] >= -40) * (df_hh['gain_net_uc_{}'.format(energy)] < -15)
-                - 1 * (df_hh['gain_net_uc_{}'.format(energy)] >= -15) * (df_hh['gain_net_uc_{}'.format(energy)] < -0)
-                + 1 * (df_hh['gain_net_uc_{}'.format(energy)] >= 0) * (df_hh['gain_net_uc_{}'.format(energy)] <= 10)
-                + 2 * (df_hh['gain_net_uc_{}'.format(energy)] > 10) * (df_hh['gain_net_uc_{}'.format(energy)] <= 20)
-                + 3 * (df_hh['gain_net_uc_{}'.format(energy)] > 20) * (df_hh['gain_net_uc_{}'.format(energy)] <= 30)
-                + 4 * (df_hh['gain_net_uc_{}'.format(energy)] > 30) * (df_hh['gain_net_uc_{}'.format(energy)] <= 40)
-                + 5 * (df_hh['gain_net_uc_{}'.format(energy)] > 40)
+        df_bdf['gain_{}'.format(energy)] = 0 + (
+                - 6 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -160)
+                - 5 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -160) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -110)
+                - 4 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -110) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -70)
+                - 3 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -70) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -40)
+                - 2 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -40) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -15)
+                - 1 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -15) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -0)
+                + 1 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= 0) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] <= 10)
+                + 2 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] > 10) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] <= 20)
+                + 3 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] > 20) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] <= 30)
+                + 4 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] > 30) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] <= 40)
+                + 5 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] > 40)
                 )
     for energy in ['taxe_carbone']:
-        df_hh['gain_{}'.format(energy)] = 0 + (
-                - 6 * (df_hh['gain_net_uc_{}'.format(energy)] < -280)
-                - 5 * (df_hh['gain_net_uc_{}'.format(energy)] >= -280) * (df_hh['gain_net_uc_{}'.format(energy)] < -190)
-                - 4 * (df_hh['gain_net_uc_{}'.format(energy)] >= -190) * (df_hh['gain_net_uc_{}'.format(energy)] < -120)
-                - 3 * (df_hh['gain_net_uc_{}'.format(energy)] >= -120) * (df_hh['gain_net_uc_{}'.format(energy)] < -70)
-                - 2 * (df_hh['gain_net_uc_{}'.format(energy)] >= -70) * (df_hh['gain_net_uc_{}'.format(energy)] < -30)
-                - 1 * (df_hh['gain_net_uc_{}'.format(energy)] >= -30) * (df_hh['gain_net_uc_{}'.format(energy)] < -0)
-                + 1 * (df_hh['gain_net_uc_{}'.format(energy)] >= 0) * (df_hh['gain_net_uc_{}'.format(energy)] <= 20)
-                + 2 * (df_hh['gain_net_uc_{}'.format(energy)] > 20) * (df_hh['gain_net_uc_{}'.format(energy)] <= 40)
-                + 3 * (df_hh['gain_net_uc_{}'.format(energy)] > 40) * (df_hh['gain_net_uc_{}'.format(energy)] <= 60)
-                + 4 * (df_hh['gain_net_uc_{}'.format(energy)] > 60) * (df_hh['gain_net_uc_{}'.format(energy)] <= 80)
-                + 5 * (df_hh['gain_net_uc_{}'.format(energy)] > 80)
+        df_bdf['gain_{}'.format(energy)] = 0 + (
+                - 6 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -280)
+                - 5 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -280) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -190)
+                - 4 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -190) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -120)
+                - 3 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -120) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -70)
+                - 2 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -70) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -30)
+                - 1 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= -30) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] < -0)
+                + 1 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] >= 0) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] <= 20)
+                + 2 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] > 20) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] <= 40)
+                + 3 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] > 40) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] <= 60)
+                + 4 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] > 60) * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] <= 80)
+                + 5 * (df_bdf['gain_net_numeric_uc_{}'.format(energy)] > 80)
                 )
 
-    return df_hh
+    return df_bdf
 
 
-def compare_objective_subjective_beliefs_gains(df_hh, df_survey, energy = 'taxe_carbone', cumulative = False):
+def compare_objective_subjective_beliefs_gain(df_bdf, df_survey, energy = 'taxe_carbone', cumulative = False):
     
     df_to_plot = pd.DataFrame(index = range(-6,6),
-        columns = ['Objective_gains', 'Objective_gains_cumulative', 'Subjective_gains', 'Subjective_gains_cumulative'])
+        columns = ['Objective_gain', 'Objective_gain_cumulative', 'Subjective_gain', 'Subjective_gain_cumulative'])
         
     for i in range(-6,6):
-        df_to_plot['Objective_gains'][i] = df_hh.query('gain_{0} == {1}'.format(energy, i))['weight'].sum() / df_hh['weight'].sum()
+        df_to_plot['Objective_gain'][i] = df_bdf.query('gain_{0} == {1}'.format(energy, i))['weight'].sum() / df_bdf['weight'].sum()
         if i == -6:
-            df_to_plot['Objective_gains_cumulative'][i] = 0 + df_to_plot['Objective_gains'][i]
+            df_to_plot['Objective_gain_cumulative'][i] = 0 + df_to_plot['Objective_gain'][i]
         else:
-            df_to_plot['Objective_gains_cumulative'][i] = df_to_plot['Objective_gains_cumulative'][i-1] + df_to_plot['Objective_gains'][i]
+            df_to_plot['Objective_gain_cumulative'][i] = df_to_plot['Objective_gain_cumulative'][i-1] + df_to_plot['Objective_gain'][i]
 
     df_survey.dropna(subset = ['gain_{}'.format(energy)], inplace = True)
     for i in range(-6,6):
-        df_to_plot['Subjective_gains'][i] = df_survey.query('gain_{0} == {1}'.format(energy, i))['weight'].sum() / df_survey['weight'].sum()
+        df_to_plot['Subjective_gain'][i] = df_survey.query('gain_{0} == {1}'.format(energy, i))['weight'].sum() / df_survey['weight'].sum()
         if i == -6:
-            df_to_plot['Subjective_gains_cumulative'][i] = 0 + df_to_plot['Subjective_gains'][i]
+            df_to_plot['Subjective_gain_cumulative'][i] = 0 + df_to_plot['Subjective_gain'][i]
         else:
-            df_to_plot['Subjective_gains_cumulative'][i] = df_to_plot['Subjective_gains_cumulative'][i-1] + df_to_plot['Subjective_gains'][i]
+            df_to_plot['Subjective_gain_cumulative'][i] = df_to_plot['Subjective_gain_cumulative'][i-1] + df_to_plot['Subjective_gain'][i]
 
-    df_to_plot['Subjective_gains'][-1] = df_to_plot['Subjective_gains'][-1] + 0.5 * df_to_plot['Subjective_gains'][0]
-    df_to_plot['Subjective_gains'][1] = df_to_plot['Subjective_gains'][1] + 0.5 * df_to_plot['Subjective_gains'][0]        
+    df_to_plot['Subjective_gain'][-1] = df_to_plot['Subjective_gain'][-1] + 0.5 * df_to_plot['Subjective_gain'][0]
+    df_to_plot['Subjective_gain'][1] = df_to_plot['Subjective_gain'][1] + 0.5 * df_to_plot['Subjective_gain'][0]        
     df_to_plot = df_to_plot.drop(0)
     
     if cumulative == True:
-        df_to_plot[['Objective_gains_cumulative'] + ['Subjective_gains_cumulative']].plot(drawstyle="steps", linewidth=2)
+        df_to_plot[['Objective_gain_cumulative'] + ['Subjective_gain_cumulative']].plot(drawstyle="steps", linewidth=2)
     else:
-        graph_builder_bar_percent(df_to_plot[['Objective_gains'] + ['Subjective_gains']])
+        graph_builder_bar_percent(df_to_plot[['Objective_gain'] + ['Subjective_gain']])
     
     return df_to_plot
 
@@ -115,7 +115,7 @@ def compare_objective_subjective_beliefs_gains(df_hh, df_survey, energy = 'taxe_
 def impute_barycentre_in_bins(df_bdf, df_ptc): # Maybe add weights for bins size
     for energy in ['chauffage', 'fuel']:
         df_ptc['gain_net_numeric_barycentre_uc_{}'.format(energy)] = 0 + (
-                df_bdf.query('gain_{} == -6'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
+                df_bdf.query('gain_{} == -6'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
                 + ((-160 * df_ptc.query('gain_{} == -6'.format(energy))['weight'].sum() - 110 * df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -6'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -5)
                 + ((-110 * df_ptc.query('gain_{} == -5'.format(energy))['weight'].sum() - 70 * df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -5'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -4)
                 + ((-70 * df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum() - 40 * df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -3)
@@ -126,11 +126,11 @@ def impute_barycentre_in_bins(df_bdf, df_ptc): # Maybe add weights for bins size
                 + ((10 * df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum() + 20 * df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 2)
                 + ((20 * df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum() + 30 * df_ptc.query('gain_{} == 4'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 4'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 3)
                 + ((30 * df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum() + 40 * df_ptc.query('gain_{} == 5'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 5'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 4)
-                + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
+                + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
                 )
     for energy in ['taxe_carbone']:
         df_ptc['gain_net_numeric_barycentre_uc_{}'.format(energy)] = 0 + (
-                df_bdf.query('gain_{} == -6'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
+                df_bdf.query('gain_{} == -6'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
                 + ((-280 * df_ptc.query('gain_{} == -6'.format(energy))['weight'].sum() - 190 * df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -6'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -5)
                 + ((-190 * df_ptc.query('gain_{} == -5'.format(energy))['weight'].sum() - 120 * df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -5'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -3'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -4)
                 + ((-120 * df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum() - 70 * df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == -4'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == -2'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == -3)
@@ -141,7 +141,7 @@ def impute_barycentre_in_bins(df_bdf, df_ptc): # Maybe add weights for bins size
                 + ((20 * df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum() + 40 * df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 1'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 2)
                 + ((40 * df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum() + 60 * df_ptc.query('gain_{} == 4'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 2'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 4'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 3)
                 + ((60 * df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum() + 80 * df_ptc.query('gain_{} == 5'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{} == 3'.format(energy))['weight'].sum() + df_ptc.query('gain_{} == 5'.format(energy))['weight'].sum())) * (df_ptc['gain_{}'.format(energy)] == 4)
-                + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
+                + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
                 )
 
     return df_ptc
@@ -151,48 +151,48 @@ def impute_average_bdf_in_bins(df_bdf, df_ptc): # More consistent with method us
     # Maybe we should first discard outliers from BdF
     for energy in ['chauffage', 'fuel', 'taxe_carbone']:
         df_ptc['gain_net_numeric_uc_{}'.format(energy)] = 0 + (
-                df_bdf.query('gain_{} == -6'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
-                + df_bdf.query('gain_{} == -5'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -5)
-                + df_bdf.query('gain_{} == -4'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -4)
-                + df_bdf.query('gain_{} == -3'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -3)
-                + df_bdf.query('gain_{} == -2'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -2)
-                + df_bdf.query('gain_{} == -1'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -1)
+                df_bdf.query('gain_{} == -6'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
+                + df_bdf.query('gain_{} == -5'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -5)
+                + df_bdf.query('gain_{} == -4'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -4)
+                + df_bdf.query('gain_{} == -3'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -3)
+                + df_bdf.query('gain_{} == -2'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -2)
+                + df_bdf.query('gain_{} == -1'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -1)
                 + (
-                    0.5 * df_bdf.query('gain_{} == -1'.format(energy))['gain_net_uc_{}'.format(energy)].mean()
-                    + 0.5 * df_bdf.query('gain_{} == 1'.format(energy))['gain_net_uc_{}'.format(energy)].mean()
+                    0.5 * df_bdf.query('gain_{} == -1'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean()
+                    + 0.5 * df_bdf.query('gain_{} == 1'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean()
                     ) * (df_ptc['gain_{}'.format(energy)] == 0)
-                + df_bdf.query('gain_{} == 1'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 1)
-                + df_bdf.query('gain_{} == 2'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 2)
-                + df_bdf.query('gain_{} == 3'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 3)
-                + df_bdf.query('gain_{} == 4'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 4)
-                + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
+                + df_bdf.query('gain_{} == 1'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 1)
+                + df_bdf.query('gain_{} == 2'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 2)
+                + df_bdf.query('gain_{} == 3'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 3)
+                + df_bdf.query('gain_{} == 4'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 4)
+                + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
                 )
 
     return df_ptc
 
 
-def extrapolate_distribution_bcp_from_bdf(df_hh, df_ptc, energy = 'taxe_carbone', bw_size = 0.25):
+def extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone', bw_size = 0.25):
     df_to_plot = pd.DataFrame(index = range(0,300),
-        columns = ['subjective_gains_category_{}'.format(energy), 'subjective_gains_numeric_{}'.format(energy)])
+        columns = ['subjective_gain_category_{}'.format(energy), 'subjective_gain_numeric_{}'.format(energy)])
     df_to_plot = df_to_plot.reset_index()
-    df_to_plot['subjective_gains_category_{}'.format(energy)] = 0
-    df_to_plot['subjective_gains_numeric_{}'.format(energy)] = 0.0
+    df_to_plot['subjective_gain_category_{}'.format(energy)] = 0
+    df_to_plot['subjective_gain_numeric_{}'.format(energy)] = 0.0
     df_ptc_energy = df_ptc.dropna(subset = ['gain_{}'.format(energy)])
     hh_index = 0
     for i in range(-6,6):
         hh_index_old = hh_index
         hh_index = hh_index_old + float(df_ptc_energy.query('gain_{0} == {1}'.format(energy, i))['weight'].sum()) / df_ptc_energy['weight'].sum() * len(df_to_plot)
-        df_to_plot['subjective_gains_category_{}'.format(energy)] = df_to_plot['subjective_gains_category_{}'.format(energy)] + i * (df_to_plot['index'] >= hh_index_old) * (df_to_plot['index'] < hh_index)
+        df_to_plot['subjective_gain_category_{}'.format(energy)] = df_to_plot['subjective_gain_category_{}'.format(energy)] + i * (df_to_plot['index'] >= hh_index_old) * (df_to_plot['index'] < hh_index)
     
         if i != 0:
-            local_hh = df_hh.query('gain_{0} == {1}'.format(energy, i))
+            local_hh = df_bdf.query('gain_{0} == {1}'.format(energy, i))
         else:
-            local_hh = df_hh.query('gain_{} <= 1'.format(energy)).query('gain_{} >= -1'.format(energy))
-        local_hh = local_hh.sort_values(by=['gain_net_uc_{}'.format(energy)])
+            local_hh = df_bdf.query('gain_{} <= 1'.format(energy)).query('gain_{} >= -1'.format(energy))
+        local_hh = local_hh.sort_values(by=['gain_net_numeric_uc_{}'.format(energy)])
         # parametric fit: assume normal distribution
-        loc_param, scale_param = stats.norm.fit(local_hh['gain_net_uc_{}'.format(energy)])
-        param_density = stats.norm.cdf(local_hh['gain_net_uc_{}'.format(energy)], loc=loc_param, scale=scale_param)
-        vector_weights = np.vstack((local_hh['gain_net_uc_{}'.format(energy)], param_density)).T
+        loc_param, scale_param = stats.norm.fit(local_hh['gain_net_numeric_uc_{}'.format(energy)])
+        param_density = stats.norm.cdf(local_hh['gain_net_numeric_uc_{}'.format(energy)], loc=loc_param, scale=scale_param)
+        vector_weights = np.vstack((local_hh['gain_net_numeric_uc_{}'.format(energy)], param_density)).T
                 
         #random_array = np.random.randint(1,101, size=int(hh_index) - int(hh_index_old))
         #index = (np.abs(param_density * 100 - random_array)).argmin()
@@ -200,12 +200,12 @@ def extrapolate_distribution_bcp_from_bdf(df_hh, df_ptc, energy = 'taxe_carbone'
         # To be vectorized for efficiency
         for j in range(int(hh_index_old), int(hh_index)):
             index = (np.abs(param_density-float(random.randint(1,10001)) / 10000)).argmin()
-            df_to_plot['subjective_gains_numeric_{}'.format(energy)][j] = vector_weights[index][0]
+            df_to_plot['subjective_gain_numeric_{}'.format(energy)][j] = vector_weights[index][0]
 
     # Cut extreme values for more readable figures
-    df_hh_limited = df_hh.query('gain_net_uc_{} > -300'.format(energy))
-    plot_2 = df_hh_limited['gain_net_uc_{}'.format(energy)].plot.density(bw_method = bw_size)
-    df_to_plot_limited = df_to_plot.query('subjective_gains_numeric_{} > -300'.format(energy))
-    plot_1 = df_to_plot_limited['subjective_gains_numeric_{}'.format(energy)].plot.density(bw_method = bw_size)
+    df_bdf_limited = df_bdf.query('gain_net_numeric_uc_{} > -300'.format(energy))
+    plot_2 = df_bdf_limited['gain_net_numeric_uc_{}'.format(energy)].plot.density(bw_method = bw_size)
+    df_to_plot_limited = df_to_plot.query('subjective_gain_numeric_{} > -300'.format(energy))
+    plot_1 = df_to_plot_limited['subjective_gain_numeric_{}'.format(energy)].plot.density(bw_method = bw_size)
     
     return plot_1, plot_2
