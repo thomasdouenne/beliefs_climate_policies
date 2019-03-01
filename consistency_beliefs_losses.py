@@ -32,10 +32,10 @@ df_ptc['weight'] = 1
 df_ptc['gain_taxe_carbone'] = df_ptc['gain']
 
 
-""" Define sub-samples to study """
+""" Define sub-samples to study """ # Put None to variable, value or sign to get full sample
 variable = 'gaz'
 sign = '=='
-value = None
+value = 1
 try:
     df_bdf = df_bdf.query('{0} {1} {2}'.format(variable, sign, value))
     df_ptc = df_ptc.query('{0} {1} {2}'.format(variable, sign, value))
@@ -44,26 +44,26 @@ except:
     print "### Estimation on full samples:"
 
 
-""" Choose which function to perform """
+""" Choose which function to perform """ # True to compute and display results, False otherwise
 plot_step_distribution = False
 plot_kde = True
 test_imputationn_methods = False # The two methods provide quite similar results
 regress = False
 
 
-""" Compare distributions BdF/BCP """
+""" Compare distributions BdF/BCP """ # pdf and CDF net gains of both samples (step function or Kernel density estimation)
 
-energy = 'taxe_carbone'
+energy = 'chauffage'
 
 if plot_step_distribution == True:
     df_to_plot = compare_objective_subjective_beliefs_gain(df_bdf, df_ptc, energy, True)    
 if plot_kde == True:
-    extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy, bw_size = None)
+    extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy, bw_size = None, vector = True)
 
 
-""" Imputate numerical values for net gain for BCP """
+""" Imputate numerical values for net gain for BCP """ # Two different imputation methods: provide very similar results
 df_ptc = impute_barycentre_in_bins(df_bdf, df_ptc) 
-df_ptc = impute_average_bdf_in_bins(df_bdf, df_ptc) 
+df_ptc = impute_average_bdf_in_bins(df_bdf, df_ptc)
 
 if test_imputationn_methods == True:
     print "Sample means:", df_ptc['gain_net_numeric_uc_{}'.format(energy)].mean(), \
