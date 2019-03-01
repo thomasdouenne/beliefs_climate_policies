@@ -113,36 +113,62 @@ def impute_barycentre_in_bins(df_ptc, df_bdf):
     return df_ptc
 
 
-def extrapolate_distribution_bcp_from_bdf(df_ptc, df_hh, energy = 'chauffage'):
-    df_to_plot = pd.DataFrame(index = range(0,1000),
-        columns = ['subjective_gains_category', 'subjective_gains_numeric'])
+def impute_average_bdf_in_bins(df_ptc, df_bdf, energy = 'taxe_carbone'):
+    df_ptc['gain_net_numeric_uc_{}'.format(energy)] = 0 + (
+            df_bdf.query('gain_{} == -6'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -6)
+            + df_bdf.query('gain_{} == -5'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -5)
+            + df_bdf.query('gain_{} == -4'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -4)
+            + df_bdf.query('gain_{} == -3'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -3)
+            + df_bdf.query('gain_{} == -2'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -2)
+            + df_bdf.query('gain_{} == -1'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == -1)
+            + (
+                0.5 * df_bdf.query('gain_{} == -1'.format(energy))['gain_net_uc_{}'.format(energy)].mean()
+                + 0.5 * df_bdf.query('gain_{} == 1'.format(energy))['gain_net_uc_{}'.format(energy)].mean()
+                ) * (df_ptc['gain_{}'.format(energy)] == 0)
+            + df_bdf.query('gain_{} == 1'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 1)
+            + df_bdf.query('gain_{} == 2'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 2)
+            + df_bdf.query('gain_{} == 3'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 3)
+            + df_bdf.query('gain_{} == 4'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 4)
+            + df_bdf.query('gain_{} == 5'.format(energy))['gain_net_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}'.format(energy)] == 5)
+            )
+
+    return df_ptc
+
+
+def extrapolate_distribution_bcp_from_bdf(df_ptc, df_hh, energy = 'taxe_carbone', bw_size = 0.25):
+    df_to_plot = pd.DataFrame(index = range(0,300),
+        columns = ['subjective_gains_category_{}'.format(energy), 'subjective_gains_numeric_{}'.format(energy)])
     df_to_plot = df_to_plot.reset_index()
-    df_to_plot['subjective_gains_category'] = 0
-    df_to_plot['subjective_gains_numeric'] = 0.0
-    df_ptc.dropna(subset = ['gain_{}'.format(energy)], inplace = True)
+    df_to_plot['subjective_gains_category_{}'.format(energy)] = 0
+    df_to_plot['subjective_gains_numeric_{}'.format(energy)] = 0.0
+    df_ptc_energy = df_ptc.dropna(subset = ['gain_{}'.format(energy)])
     hh_index = 0
     for i in range(-6,6):
         hh_index_old = hh_index
-        hh_index = hh_index_old + float(df_ptc.query('gain_chauffage == {}'.format(i))['weight'].sum()) / df_ptc['weight'].sum() * len(df_to_plot)
-        df_to_plot['subjective_gains_category'] = df_to_plot['subjective_gains_category'] + i * (df_to_plot['index'] >= hh_index_old) * (df_to_plot['index'] < hh_index)
+        hh_index = hh_index_old + float(df_ptc_energy.query('gain_{0} == {1}'.format(energy, i))['weight'].sum()) / df_ptc_energy['weight'].sum() * len(df_to_plot)
+        df_to_plot['subjective_gains_category_{}'.format(energy)] = df_to_plot['subjective_gains_category_{}'.format(energy)] + i * (df_to_plot['index'] >= hh_index_old) * (df_to_plot['index'] < hh_index)
     
         if i != 0:
-            local_hh = df_hh.query('gain_chauffage == {}'.format(i))
+            local_hh = df_hh.query('gain_{0} == {1}'.format(energy, i))
         else:
-            local_hh = df_hh.query('gain_chauffage <= 1').query('gain_chauffage >= -1')
-        local_hh = local_hh.sort_values(by=['gain_net_uc_chauffage'])
+            local_hh = df_hh.query('gain_{} <= 1'.format(energy)).query('gain_{} >= -1'.format(energy))
+        local_hh = local_hh.sort_values(by=['gain_net_uc_{}'.format(energy)])
         # parametric fit: assume normal distribution
-        loc_param, scale_param = stats.norm.fit(local_hh['gain_net_uc_chauffage'])
-        param_density = stats.norm.cdf(local_hh['gain_net_uc_chauffage'], loc=loc_param, scale=scale_param)
-        vector_weights = np.vstack((local_hh['gain_net_uc_chauffage'], param_density)).T
+        loc_param, scale_param = stats.norm.fit(local_hh['gain_net_uc_{}'.format(energy)])
+        param_density = stats.norm.cdf(local_hh['gain_net_uc_{}'.format(energy)], loc=loc_param, scale=scale_param)
+        vector_weights = np.vstack((local_hh['gain_net_uc_{}'.format(energy)], param_density)).T
                 
+        #random_array = np.random.randint(1,101, size=int(hh_index) - int(hh_index_old))
+        #index = (np.abs(param_density * 100 - random_array)).argmin()
+        
+        # To be vectorized for efficiency
         for j in range(int(hh_index_old), int(hh_index)):
-            index = (np.abs(param_density-float(random.randint(1,101)) / 100)).argmin()
-            df_to_plot['subjective_gains_numeric'][j] = vector_weights[index][0]
+            index = (np.abs(param_density-float(random.randint(1,10001)) / 10000)).argmin()
+            df_to_plot['subjective_gains_numeric_{}'.format(energy)][j] = vector_weights[index][0]
 
-    df_to_plot_limited = df_to_plot.query('subjective_gains_numeric > -300')
-    df_to_plot_limited['subjective_gains_numeric'].plot.density(bw_method = 0.25)
-    df_hh_limited = df_hh.query('gain_net_uc_chauffage > -300')
-    df_hh_limited['gain_net_uc_chauffage'].plot.density(bw_method = 0.25)
+    df_to_plot_limited = df_to_plot.query('subjective_gains_numeric_{} > -300'.format(energy))
+    plot_1 = df_to_plot_limited['subjective_gains_numeric_{}'.format(energy)].plot.density(bw_method = bw_size)
+    df_hh_limited = df_hh.query('gain_net_uc_{} > -300'.format(energy))
+    plot_2 = df_hh_limited['gain_net_uc_{}'.format(energy)].plot.density(bw_method = bw_size)
     
-    return df_to_plot
+    return plot_1, plot_2
