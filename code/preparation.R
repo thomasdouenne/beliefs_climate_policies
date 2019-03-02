@@ -6,7 +6,7 @@ setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 # options(download.file.method = "wget"); # For Ubuntu 14.04
 package <- function(p) { 
   if (!is.element(p, installed.packages()[,1])) {
-    install.packages(p); 
+    install.packages(p, dependencies = T); 
   }
   library(p, character.only = TRUE)
 } # loads packages with automatical install if needed
@@ -904,7 +904,7 @@ convert_s <- function() {
  # TODO: as.item region_CC, gain_taxe_fuel, gain_taxe_chauffage, gain_taxe, gain_taxe_feedback, gain_taxe_progressif, gain_taxe_cible, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
 
   for (j in names(s)) {
-    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif', j)) {
+    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|humaniste|ecologiste|conservateur|liberal|patriote|apolitique', j)) {
       s[[j]][s[[j]]!=""] <<- TRUE
       s[[j]][is.na(s[[j]])] <<- FALSE
     }
@@ -1103,7 +1103,9 @@ convert_s <- function() {
 	s$hausse_diesel[s$nb_vehicules == 0] <<- 0.5*6.39/100 * s$km * 1.4 * (1 - 0.4) * 0.090922 # share_diesel * conso * km * price * (1-elasticite) * price_increase
 	s$hausse_diesel[s$nb_vehicules == 1] <<- (s$fuel_1=='Diesel') * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
   s$hausse_diesel[s$nb_vehicules == 1] <<- ((s$fuel_2_1=='Diesel')*2/3 + (s$fuel_2_2=='Diesel')/3) * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
-
+  s$hausse_carburants <<- s$hausse_diesel + s$hausse_essence
+  label(s$hausse_carburants) <<- "hausse_carburants: Hausse des dépenses de carburants simulées pour le ménage, suite à la taxe (élasticité de 0.4)"
+  
   s$progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- s$progressivite_feedback_sans_info[!is.na(s$progressivite_feedback_sans_info)]
   s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
   s$progressivite[!is.na(s$progressivite_progressif)] <<- s$progressivite_progressif[!is.na(s$progressivite_progressif)]
@@ -1122,8 +1124,8 @@ convert_s <- function() {
   s$age_50_64 <<- 1*(s$age == '50 à 64 ans')
   s$age_65_plus <<- 1*(s$age == '65 ans ou plus')
   
-  s$score_polluants <<- 1 * (s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) + 1*(s$ges_O2 == FALSE) + 1*(s$ges_pm == FALSE)
-  label(s$score_polluants) <<- "score_polluants: Somme des bonnes réponses au questionnaire gaz à effet de serre (ges_O2/CH4/pm/CO2)"
+  s$score_ges <<- 1 * (s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) + 1*(s$ges_O2 == FALSE) + 1*(s$ges_pm == FALSE)
+  label(s$score_ges) <<- "score_ges: Somme des bonnes réponses au questionnaire gaz à effet de serre (ges_O2/CH4/pm/CO2)"
   s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) + 1*(s$ges_nucleaire == FALSE)
   label(s$score_climate_call) <<- "score_climate_call: Somme des bonnes réponses au questionnaire Climate Call (avion-train / boeuf-pates / nucleaire-eolien) ges_avion/boeuf/nucleaire"  
   

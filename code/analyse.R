@@ -12,6 +12,10 @@ package('gdata')
 package('tidyverse')
 package("Hmisc")
 package("quantreg")
+package("rms")
+package("rcompanion")
+package("DescTools")
+package("VCA")
 
 
 ##### Distributions de revenus #####
@@ -54,7 +58,7 @@ decrit(s$nb_vehicules, weights = s$weight)
 
 
 ##### Gain questions générales (TVA, transports, logement) #####
-decrit(s$perte_tva, weights = s$weight)
+decrit(s$perte_tva, weights = s$weight) # TODO: différence TVA et autres
 decrit(s$perte_fuel, weights = s$weight)
 decrit(s$perte_chauffage, weights = s$weight) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
 
@@ -86,6 +90,57 @@ summary(lm((taxe_feedback_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s, 
 summary(lm((taxe_progressif_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gain_taxe!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (gain_taxe!='Perdant'), data=s, weights = s$weight))
+
+
+##### OLS Approbation ####
+summary(lm((taxe_approbation=='Oui') ~ revenu + rev_tot + hausse_carburants + hausse_chauffage + score_climate_call + score_ges
+              + Gauche_droite + emission_cible + effets_CC + ecologiste + conservateur + liberal + humaniste + patriote + apolitique
+              + sexe + age + diplome4 + statut_emploi + csp + region, 
+            data=s))
+
+
+
+###### ANOVA Approbation #####
+anova <- summary(aov((taxe_approbation=='Oui') ~ revenu + rev_tot + hausse_carburants + hausse_chauffage + score_climate_call + score_ges
+              + Gauche_droite + emission_cible + effets_CC + ecologiste + conservateur + liberal + humaniste + patriote + apolitique
+              + sexe + age + diplome4 + statut_emploi + csp + region, 
+            data=s))
+anova
+sum_sq <- anova[[1]]$'Sum Sq'
+
+
+##### Logit Approbation #####
+# All variables we can think of (TODO: complete the list)
+logit_all <- glm((taxe_approbation=='Oui') ~ revenu + rev_tot + hausse_carburants + hausse_chauffage + score_climate_call + score_ges
+              + Gauche_droite + emission_cible + effets_CC + ecologiste + conservateur + liberal + humaniste + patriote + apolitique
+              + sexe + age + diplome4 + statut_emploi + csp + region, 
+            family = "binomial", data=s)
+summary(logit_all)
+PseudoR2(logit_all)
+
+# Only significant variables
+summary(glm((taxe_approbation=='Oui') ~ hausse_chauffage + score_climate_call + ecologiste + conservateur + humaniste + sexe , 
+            binomial, data=s))
+
+# Only demographics
+summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + age + region, 
+            family = "binomial", data=s)) # *: -age, +revenu, -rev_tot, +Homme, qq regions
+summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region, 
+            family = "binomial", data=s)) # *: +revenu, -rev_tot, +Homme, qq regions
+summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + Age + Diplome + region, 
+            family = "binomial", data=s)) # *: +revenu, -rev_tot, +Homme, qq regions
+
+# Demographics + politics
+summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region
+            + Gauche_droite + ecologiste + conservateur + liberal + humaniste + patriote + apolitique, 
+            family = "binomial", data=s)) # *: apolitique, ecologiste, conservateur, +revenu, -rev_tot, +Homme, qq regions
+summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region
+            + Gauche_droite + ecologiste + conservateur + liberal + humaniste + patriote + apolitique, 
+            family = "binomial", data=s)) # *: apolitique, ecologiste, conservateur, +revenu, -rev_tot, +Homme, qq regions
+
+
+##### Probit Approbation #####
+summary(glm(, family = binomial(link = "probit", data=s)))
 
 
 ##### Elasticites #####
@@ -154,6 +209,17 @@ decrit(s$score_polluants, weights = s$weight)
 decrit(s$score_climate_call, weights = s$weight)
 decrit(s$emission_cible, weights = s$weight) # 5
 decrit(s$cause_CC, miss=T, weights = s$weight)
+
+
+##### Orientation politiques #####
+decrit(s$gauche_droite, weights = s$weight, miss=T)
+decrit(s$gauche_droite, miss=T) # TODO: pb (should not be number, and missing should be here)
+decrit(s$apolitique, weights = s$weight) # 21%
+decrit(s$ecologiste, weights = s$weight) # 15%
+decrit(s$humaniste, weights = s$weight) # 11%
+decrit(s$patriote, weights = s$weight) # 8%
+decrit(s$liberal, weights = s$weight) # 5%
+decrit(s$conservateur, weights = s$weight) # 2%
 
 
 ##### Transferts inter #####
