@@ -6,7 +6,7 @@ setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 # options(download.file.method = "wget"); # For Ubuntu 14.04
 package <- function(p) { 
   if (!is.element(p, installed.packages()[,1])) {
-    install.packages(p, dependencies = T); 
+    install.packages(p); 
   }
   library(p, character.only = TRUE)
 } # loads packages with automatical install if needed
@@ -775,7 +775,7 @@ relabel_and_rename_s <- function() {
   label(s[[282]]) <<- "hausse_depenses: Hausse des dépenses énergétiques simulées pour le ménage, suite à la taxe (élasticité de 0.4/0.2 pour carburants/chauffage)"
   names(s)[283] <<- "gagnant"
   label(s[[283]]) <<- "gagnant: Indicatrice sur la prédiction que le ménage serait gagnant avec la taxe compensée, d'après nos simulations"
-  names(s)[284] <<- "hausse_chauffage"
+  names(s)[284] <<- "hausse_chauffage" # TODO: calculer les manquants
   label(s[[284]]) <<- "hausse_chauffage:  Hausse des dépenses de chauffage simulées pour le ménage, suite à la taxe (élasticité de 0.2)"
   names(s)[285] <<- "hausse_diesel"
   label(s[[285]]) <<- "hausse_diesel: Hausse des dépenses de diesel simulées pour le ménage, suite à la taxe (élasticité de 0.4)"
@@ -904,7 +904,7 @@ convert_s <- function() {
  # TODO: as.item region_CC, gain_taxe_fuel, gain_taxe_chauffage, gain_taxe, gain_taxe_feedback, gain_taxe_progressif, gain_taxe_cible, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
 
   for (j in names(s)) {
-    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|humaniste|ecologiste|conservateur|liberal|patriote|apolitique', j)) {
+    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif', j)) {
       s[[j]][s[[j]]!=""] <<- TRUE
       s[[j]][is.na(s[[j]])] <<- FALSE
     }
@@ -988,10 +988,10 @@ convert_s <- function() {
   s$diplome4 <<- as.character(s$diplome)
   s$diplome4[s$Diplome<2] <<- "Aucun diplôme ou brevet"
   s$diplome4[s$Diplome>3] <<- "Supérieur"
-  # s$Region <<- as.factor(as.character(s$region))
+  # s$Region <<- as.factor(as.character(s$region)) 
   # s$taille_agglo <<- as.factor(gsub("[[:alpha:] ]", "", s$taille_agglo))
   # s <<- s[s$taille_agglo!="%1%",] # TODO: taille_agglo as.item
-  
+  # TODO: pourquoi 91 missing regions? (pas un problème de recodage du département)
   s$nb_vehicules <<- (s$nb_vehicules_texte=='Un') + 2*(s$nb_vehicules_texte=='Deux ou plus')
   
   s$variante_partielle <<- 'NA'
@@ -1103,9 +1103,7 @@ convert_s <- function() {
 	s$hausse_diesel[s$nb_vehicules == 0] <<- 0.5*6.39/100 * s$km * 1.4 * (1 - 0.4) * 0.090922 # share_diesel * conso * km * price * (1-elasticite) * price_increase
 	s$hausse_diesel[s$nb_vehicules == 1] <<- (s$fuel_1=='Diesel') * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
   s$hausse_diesel[s$nb_vehicules == 1] <<- ((s$fuel_2_1=='Diesel')*2/3 + (s$fuel_2_2=='Diesel')/3) * s$conso * s$km * 1.4 * (1 - 0.4) * 0.090922
-  s$hausse_carburants <<- s$hausse_diesel + s$hausse_essence
-  label(s$hausse_carburants) <<- "hausse_carburants: Hausse des dépenses de carburants simulées pour le ménage, suite à la taxe (élasticité de 0.4)"
-  
+
   s$progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- s$progressivite_feedback_sans_info[!is.na(s$progressivite_feedback_sans_info)]
   s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
   s$progressivite[!is.na(s$progressivite_progressif)] <<- s$progressivite_progressif[!is.na(s$progressivite_progressif)]
@@ -1124,8 +1122,8 @@ convert_s <- function() {
   s$age_50_64 <<- 1*(s$age == '50 à 64 ans')
   s$age_65_plus <<- 1*(s$age == '65 ans ou plus')
   
-  s$score_ges <<- 1 * (s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) + 1*(s$ges_O2 == FALSE) + 1*(s$ges_pm == FALSE)
-  label(s$score_ges) <<- "score_ges: Somme des bonnes réponses au questionnaire gaz à effet de serre (ges_O2/CH4/pm/CO2)"
+  s$score_polluants <<- 1 * (s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) + 1*(s$ges_O2 == FALSE) + 1*(s$ges_pm == FALSE)
+  label(s$score_polluants) <<- "score_polluants: Somme des bonnes réponses au questionnaire gaz à effet de serre (ges_O2/CH4/pm/CO2)"
   s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) + 1*(s$ges_nucleaire == FALSE)
   label(s$score_climate_call) <<- "score_climate_call: Somme des bonnes réponses au questionnaire Climate Call (avion-train / boeuf-pates / nucleaire-eolien) ges_avion/boeuf/nucleaire"  
   

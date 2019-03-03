@@ -16,6 +16,8 @@ package("rms")
 package("rcompanion")
 package("DescTools")
 package("VCA")
+package("glmnet")
+package("doMC")
 
 
 ##### Distributions de revenus #####
@@ -101,12 +103,44 @@ summary(lm((taxe_approbation=='Oui') ~ revenu + rev_tot + hausse_carburants + ha
 
 
 ###### ANOVA Approbation #####
-anova <- summary(aov((taxe_approbation=='Oui') ~ revenu + rev_tot + hausse_carburants + hausse_chauffage + score_climate_call + score_ges
-              + Gauche_droite + emission_cible + effets_CC + ecologiste + conservateur + liberal + humaniste + patriote + apolitique
-              + sexe + age + diplome4 + statut_emploi + csp + region, 
-            data=s))
+variables_big_regression <- c("revenu", "rev_tot", "hausse_carburants", "hausse_chauffage", "score_climate_call", "score_ges", "Gauche_droite", 
+                              "emission_cible", "effets_CC", "ecologiste", "conservateur", "liberal", "humaniste", "patriote", "apolitique", 
+                              "sexe", "age", "diplome4", "statut_emploi", "csp", "region")
+ols <- summary(lm(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), data=s))
+ols
+anova <- summary(aov(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), data=s))
 anova
 sum_sq <- anova[[1]]$'Sum Sq'
+explained_variance <- sum(sum_sq[-length(sum_sq)])
+print(paste("Share of explained variance: ", round(explained_variance/sum(sum_sq), 2), ". Among which, share of explained variance explained by each variable:", sep=""))
+for (i in 1:length(variables_big_regression)) print(paste(variables_big_regression[order(sum_sq[-length(sum_sq)], decreasing = T)][i], round(sort(sum_sq[-length(sum_sq)], decreasing = T)[i]/explained_variance,3)))
+summary(lm((taxe_approbation=='Oui') ~ ecologiste + conservateur, data=s))
+
+
+##### LASSO Approbation #####
+for (v in variables_big_regression) { # display and remove variables with missing values
+  if ("labelled" %in% class(s[[v]])) na_v <- length(which(is.na(s[[v]]))) # hausse_carburants hausse_chauffage region
+  else na_v <- length(which(is.missing(s[[v]]))) # TODO: effets_CC
+  if (na_v>0) {
+    print(paste(v, na_v))
+    variables_big_regression <- variables_big_regression[variables_big_regression!=v] }
+}
+  
+x <- model.matrix(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))),  data=s)
+y <- ifelse(s$taxe_approbation=="Oui", 1, 0)
+#perform grid search to find optimal value of lambda
+#family= binomial => logistic regression, alpha=1 => lasso 
+# check docs to explore other type.measure options
+cv.out <- cv.glmnet(x, y, alpha=1, family="binomial", weights = s$weight, type.multinomial = "grouped") # TODO: how to choose alpha?; run parallel computing: parallel = T
+plot(cv.out)
+coefs_lasso <- coef(cv.out, s="lambda.1se") # lambda.min lambda.1se
+coefs_lasso <- coef(cv.out, s="lambda.min") # TODO: group variables
+data.frame(name = coefs_lasso@Dimnames[[1]][coefs_lasso@i + 1], coefficient = coefs_lasso@x)
+selected_variables <- coefs_lasso@i - 1
+selected_variables <- selected_variables[selected_variables > 0 & selected_variables <= length(variables_big_regression)]
+selected_variables <- variables_big_regression[selected_variables]
+summary(glm(as.formula(paste("(taxe_approbation=='Oui') ~", paste(selected_variables, collapse=' + '))), binomial, data=s, weights=s$weight))
+# lasso <- glmnet(x, y, alpha=1, family="binomial")
 
 
 ##### Logit Approbation #####
