@@ -17,10 +17,11 @@ seaborn.set_palette(seaborn.color_palette("Set1", 2))
 
 """ Load samples - BdF/BCP """
 df_bdf = prepare_dataset()
-try:
-    df_ptc = pd.read_csv(r'C:\Users\thoma\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv')
-except:
-    df_ptc = pd.read_csv(r'C:\Users\t.douenne\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv')
+df_ptc = pd.read_csv(r'code/survey_prepared.csv')
+#try:
+#    df_ptc = pd.read_csv(r'../code/survey_prepared.csv')
+#except:
+#    df_ptc = pd.read_csv(r'..\code\survey_prepared.csv')
 
 df_bdf = compute_gains_losses(df_bdf)
 df_bdf = compute_gain_net_uc(df_bdf)
@@ -35,7 +36,7 @@ df_ptc['gain_taxe_carbone'] = df_ptc['gain']
 """ Define sub-samples to study """ # Put None to variable, value or sign to get full sample
 variable = 'gaz'
 sign = '=='
-value = 1
+value = None
 try:
     df_bdf = df_bdf.query('{0} {1} {2}'.format(variable, sign, value))
     df_ptc = df_ptc.query('{0} {1} {2}'.format(variable, sign, value))
@@ -47,13 +48,13 @@ except:
 """ Choose which function to perform """ # True to compute and display results, False otherwise
 plot_step_distribution = False
 plot_kde = True
-test_imputationn_methods = False # The two methods provide quite similar results
+test_imputationn_methods = True # The two methods provide quite similar results
 regress = False
 
 
 """ Compare distributions BdF/BCP """ # pdf and CDF net gains of both samples (step function or Kernel density estimation)
 
-energy = 'chauffage'
+energy = 'fuel' # chauffage, fuel ou taxe_carbone
 
 if plot_step_distribution == True:
     df_to_plot = compare_objective_subjective_beliefs_gain(df_bdf, df_ptc, energy, True)    

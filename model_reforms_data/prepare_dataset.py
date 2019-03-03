@@ -39,10 +39,10 @@ def prepare_dataset():
         df_hh = pd.read_csv(r'C:\Users\t.douenne\Documents\Data\assets\data_menages.csv')
     except:
         try:
-            df_hh = pd.read_csv(r'../data_menages.csv')
+            df_hh = pd.read_csv(r'../code/data_menages.csv')
         except:
             try:
-                df_hh = pd.read_csv(r'data_menages.csv')
+                df_hh = pd.read_csv(r'code/data_menages.csv')
             except:
                 df_hh = pd.read_csv(r'C:\Users\thoma\Documents\Data\assets\data_menages.csv')
     
