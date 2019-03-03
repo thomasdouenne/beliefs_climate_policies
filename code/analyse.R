@@ -60,9 +60,18 @@ decrit(s$nb_vehicules, weights = s$weight)
 
 
 ##### Gain questions générales (TVA, transports, logement) #####
-decrit(s$perte_tva, weights = s$weight) # TODO: différence TVA et autres
+decrit(s$perte_tva, weights = s$weight)
 decrit(s$perte_fuel, weights = s$weight)
 decrit(s$perte_chauffage, weights = s$weight) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
+temp1 <- temp2 <- s[,c("perte_tva", "perte_fuel", "perte_chauffage", "perte_partielle", "variante_partielle", "weight")]
+temp1$perte <- temp1$perte_tva
+temp1$variante_perte <- "tva"
+temp2$perte <- temp2$perte_partielle
+temp2$variante_perte <- temp2$variante_partielle
+s_perte <- merge(temp1, temp2, all=T)
+# s_perte$variante_perte <- relevel(as.factor(s_perte$variante_perte), "tva")
+summary(lm(perte ~ variante_perte, data = s_perte, weights = s_perte$weight)) # *** -0.31 chauffage, -0.18 fuel: les gens s'estiment plus perdants avec hausse TVA
+# TODO: restreindre aux seuls gagnants/perdants
 
 
 ##### Gain (dividende - hausse dépenses énergétiques) #####
@@ -119,9 +128,10 @@ summary(lm((taxe_approbation=='Oui') ~ ecologiste + conservateur, data=s))
 
 ##### LASSO Approbation #####
 for (v in variables_big_regression) { # display and remove variables with missing values
-  if ("labelled" %in% class(s[[v]])) na_v <- length(which(is.na(s[[v]]))) # hausse_carburants hausse_chauffage region
-  else na_v <- length(which(is.missing(s[[v]]))) # TODO: effets_CC
-  if (na_v>0) {
+  # if ("labelled" %in% class(s[[v]])) na_v <- length(which(is.na(s[[v]]))) #
+  # else na_v <- length(which(is.missing(s[[v]]))) 
+  # if (na_v>0) {
+  if (length(which(is.na(s[[v]])))>0) {
     print(paste(v, na_v))
     variables_big_regression <- variables_big_regression[variables_big_regression!=v] }
 }
@@ -225,7 +235,7 @@ summary(lm((schiste_CC=='Elle est valable : toute baisse des émissions va dans 
 ##### Engagement personnel ######
 decrit(s$mode_vie_ecolo, weights = s$weight) # 79% !
 decrit(s$mode_vie_ecolo, miss=T, weights = s$weight) # 65%
-decrit(s$enfant_CC, weights = s$weight) # TODO: H/F
+decrit(s$enfant_CC, weights = s$weight)
 decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui'])
 decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui'])
 summary(lm((enfant_CC=='Oui') ~ sexe, data=s))
@@ -257,21 +267,29 @@ decrit(s$conservateur, weights = s$weight) # 2%
 
 
 ##### Transferts inter #####
-summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, weights = s$weight)) # 0 !
-summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = s, subset = transferts_inter!='NSP', weights = s$weight)) # 0 !
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = s, weights = s$weight)) # 0 !
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = s, subset = transferts_inter!='NSP', weights = s$weight)) # 0 !
 decrit(s$variation_aide, weights = s$weight)
 load('p_data.RData')
 t <- merge(s, t_transferts_inter_a, all=T)
 t$transferts_inter[!is.na(t$taille_foyer)] <- t$transferts_inter_a[!is.na(t$taille_foyer)] 
 decrit(t$transferts_inter, weights = t$weight)
 decrit(t$transferts_inter, weights = t$weight, miss=T)
+decrit(t$transferts_inter[t$apres_modifs==T], weights = t$weight[t$apres_modifs==T], miss=T)
+decrit(t$transferts_inter[t$apres_modifs==FALSE], weights = t$weight[t$apres_modifs==FALSE], miss=T)
+decrit(t$transferts_inter[t$transferts_inter_info==T], weights = t$weight[t$transferts_inter_info==T], miss=T)
+decrit(t$transferts_inter[t$transferts_inter_info==FALSE], weights = t$weight[t$transferts_inter_info==FALSE], miss=T)
+decrit(t$transferts_inter[t$apres_modifs==T & t$transferts_inter_info==T], weights = t$weight[t$apres_modifs==T & t$transferts_inter_info==T], miss=T)
+decrit(t$transferts_inter[t$apres_modifs==T & t$transferts_inter_info==FALSE], weights = t$weight[t$apres_modifs==T & t$transferts_inter_info==FALSE], miss=T)
+decrit(t$transferts_inter[t$apres_modifs==FALSE & t$transferts_inter_info==T], weights = t$weight[t$apres_modifs==FALSE & t$transferts_inter_info==T], miss=T)
+decrit(t$transferts_inter[t$apres_modifs==FALSE & t$transferts_inter_info==FALSE], weights = t$weight[t$apres_modifs==FALSE & t$transferts_inter_info==FALSE], miss=T)
 decrit(t$transferts_inter, miss=T)
 binconf(sum(t$weight[!is.na(t$transferts_inter) & t$transferts_inter=='Oui']), sum(t$weight[!is.missing(t$transferts_inter)]))
 binconf(sum(t$weight[!is.na(t$transferts_inter) & t$transferts_inter=='Oui']), sum(t$weight[!is.na(t$transferts_inter)]))
-summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t)) # 0
-summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, subset = transferts_inter!='NSP')) # 0
-summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, weights = t$weight)) # 0
-summary(lm((transferts_inter=='Oui') ~ transferts_inter_info, data = t, subset = transferts_inter!='NSP', weights = t$weight)) # 0
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = t)) # 0
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = t, subset = transferts_inter!='NSP')) # 0
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = t, weights = t$weight)) # 0
+summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = t, subset = transferts_inter!='NSP', weights = t$weight)) # 0
 
 # use m_global (in enquete/codes) to redo graph with new data for transferts_inter
 
@@ -305,8 +323,8 @@ summary(lm(variation ~ categorie, data=dep)) # answers are not random, i.e. aver
 
 
 ##### Miscellanous #####
-decrit(s$rattrapage_diesel, miss = T, weights = s$weight) # TODO: correlation avec avoir diesel
-decrit(s$hausse_diesel, weights = s$weight) # This needs to be fixed !
+decrit(s$rattrapage_diesel, miss = T, weights = s$weight)
+decrit(s$hausse_diesel, weights = s$weight) 
 summary(lm((rattrapage_diesel!='Non') ~ (diesel==TRUE), data=s, weights = s$weight))
 for (j in names(s)) if (grepl('gilets_jaunes', j)) print(decrit(s[[j]], weights=s$weight))
 
