@@ -1,3 +1,5 @@
+package('tidyverse')
+package("rms")
 package('pwr')
 package("foreign")
 package("memisc")
@@ -9,15 +11,14 @@ package("stringr")
 package("survey")
 package("plotly")
 package('gdata')
-package('tidyverse')
 package("Hmisc")
 package("quantreg")
-package("rms")
 package("rcompanion")
 package("DescTools")
 package("VCA")
 package("glmnet")
-package("doMC")
+package("installr")
+# package("doMC") # for parallel computing, does not work on Windows
 
 
 ##### Distributions de revenus #####
@@ -111,12 +112,20 @@ summary(lm((taxe_approbation=='Oui') ~ revenu + rev_tot + hausse_carburants + ha
 
 
 
-###### ANOVA Approbation #####
+###### Approbation: ANOVA #####
+# ANalysis Of VAriance partitions sequentially the error terms of a regression where regressors are categorical variables. 
+#   This gives the Sum of squares (SS) of each variable, which depends on the rank of the variable in the list (I think that variables 
+#   have higher sum of squares when they are treated first). (SS are rank-independent when the sample is balanced, i.e. when there are the same number of observations in each category)
+#   This generalizes from OLS to logit (and other) using deviance; to continuous regressors (TODO: how? if we don't know, we could still make them categorical)
+# Is there a canonical way to decompose the variance for unbalanced samples? Like averaging SS from random draws on the ordering of the variables?
+#   I haven't found. en.wikipedia.org/wiki/Repeated_measures is something else. The more I dig, the more I realize ANOVA is fit for another
+#   purpose: when we can decompose the sample into several groups (as if there were only one categorical variable, or different but with all interaction terms)
 variables_big_regression <- c("revenu", "rev_tot", "hausse_carburants", "hausse_chauffage", "score_climate_call", "score_ges", "Gauche_droite", 
                               "emission_cible", "effets_CC", "ecologiste", "conservateur", "liberal", "humaniste", "patriote", "apolitique", 
-                              "sexe", "age", "diplome4", "statut_emploi", "csp", "region")
+                              "sexe", "age", "diplome4", "statut_emploi", "csp", "region") # TODO: complete the list
 ols <- summary(lm(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), data=s))
 ols
+sum(ols$residuals^2)
 anova <- summary(aov(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), data=s))
 anova
 sum_sq <- anova[[1]]$'Sum Sq'
@@ -126,12 +135,32 @@ for (i in 1:length(variables_big_regression)) print(paste(variables_big_regressi
 summary(lm((taxe_approbation=='Oui') ~ ecologiste + conservateur, data=s))
 
 
-##### LASSO Approbation #####
+##### Approbation: Model Selection #####
+# Other method of model selection exists (like forward/backward stepwise selection), but seem less reliable as they do not
+#   explore exhaustively all possible models nor do they minimize anything. Best-subset selection is exhaustive, but I am
+#   afraid that it be too computationally intensive. TODO: test them (cf. medium.com/cracking-the-data-science-interview/1ef6dbd531f7)
+# (as far as I understood) There are two ways to use LASSO: (cf. web.stanford.edu/~hastie/glmnet/glmnet_alpha.html, wikipedia for lasso and CV)
+#   - glmnet (without cross-validation) decreases lambda (i.e. increases the norm of beta and the number of regressors)
+#     until the minimum of (null) deviance explained (~ max adj-R^2) is reached, "lassoing" variables one after the other
+#   - cv.glmnet (with cross-validation (CV)) uses 10-fold CV (cf. wikipedia>CV) to select the lambda that minimizes
+#     "out-of-the-sample" deviance* (avoiding too low lambda that induce overfitting): lambda.min. lambda.1se is an
+#     alternative choice for lambda that allow less regressors but stays with 1 s.e. of deviance relative to lambda.min
+#       * actually type.measure = class/mae/deviance/auc minimizes misclassification/mean absolute error/deviance/area under ROC curve
+# Elastic net is a compromise between Ridge regression (L^2 norm penalty) and lasso (L^1 penalty), with a penalty
+#   alpha*lasso + (1-alpha)*Ridge. Ridge bias all estimates to 0 instead of removing some of them (and biasing some others)
+#   as lasso does. But Ridge allows to keep variables that are correlated (while lasso would then to keep only of one them). 
+#   How to choose alpha? Define a 10-fold, use it to run cv.glmnet on different values for alpha, and select the one 
+#   whose lambda.min minimizes deviance (cf. Zou & Hastie, 2005). 
+# The Composite Absolute Penalties allows to group categorical variables: all in or all out of the model for a given variable 
+#   (introduced by Zhao, Rocha &  Yu (2009) who only coded it in matlab; R package quadrupen provides a related method cran.r-project.org/web/packages/quadrupen/quadrupen.pdf)
+# Multinomial regression is an alternative to logit, as we have 3 categories in our dependant variable (Oui/Non/NSP)
+#   This is family="multinomial". type.multinomial="grouped" forces that the same variables be taken for our categories (Oui/Non/NSP)
+
 for (v in variables_big_regression) { # display and remove variables with missing values
+  na_v <- length(which(is.na(s[[v]])))
   # if ("labelled" %in% class(s[[v]])) na_v <- length(which(is.na(s[[v]]))) #
   # else na_v <- length(which(is.missing(s[[v]]))) 
-  # if (na_v>0) {
-  if (length(which(is.na(s[[v]])))>0) {
+  if (na_v>0) {
     print(paste(v, na_v))
     variables_big_regression <- variables_big_regression[variables_big_regression!=v] }
 }
@@ -141,17 +170,23 @@ y <- ifelse(s$taxe_approbation=="Oui", 1, 0)
 #perform grid search to find optimal value of lambda
 #family= binomial => logistic regression, alpha=1 => lasso 
 # check docs to explore other type.measure options
+fit <- glmnet(x, y, alpha=1, family="binomial", weights = s$weight, type.multinomial = "grouped")
 cv.out <- cv.glmnet(x, y, alpha=1, family="binomial", weights = s$weight, type.multinomial = "grouped") # TODO: how to choose alpha?; run parallel computing: parallel = T
 plot(cv.out)
 coefs_lasso <- coef(cv.out, s="lambda.1se") # lambda.min lambda.1se
 coefs_lasso <- coef(cv.out, s="lambda.min") # TODO: group variables
-data.frame(name = coefs_lasso@Dimnames[[1]][coefs_lasso@i + 1], coefficient = coefs_lasso@x)
+data.frame(name = coefs_lasso@Dimnames[[1]][coefs_lasso@i + 1], coefficient = coefs_lasso@x) # doesn't work for multinomial
 selected_variables <- coefs_lasso@i - 1
 selected_variables <- selected_variables[selected_variables > 0 & selected_variables <= length(variables_big_regression)]
 selected_variables <- variables_big_regression[selected_variables]
 summary(glm(as.formula(paste("(taxe_approbation=='Oui') ~", paste(selected_variables, collapse=' + '))), binomial, data=s, weights=s$weight))
 # lasso <- glmnet(x, y, alpha=1, family="binomial")
 
+# find alpha
+foldid=sample(1:10,size=length(y),replace=TRUE)
+cv1=cv.glmnet(x,y,foldid=foldid,alpha=1)
+cv.5=cv.glmnet(x,y,foldid=foldid,alpha=.5)
+cv0=cv.glmnet(x,y,foldid=foldid,alpha=0)
 
 ##### Logit Approbation #####
 # All variables we can think of (TODO: complete the list)
@@ -188,7 +223,7 @@ summary(glm(, family = binomial(link = "probit", data=s)))
 
 
 ##### Elasticites #####
-decrit(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)]) # To do : r�soudre probl�me avec le calcul des �lasticit�s (moyenne � -17...)
+decrit(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)])
 decrit(s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)]) #
 decrit(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)]) #
 decrit(s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)]) #

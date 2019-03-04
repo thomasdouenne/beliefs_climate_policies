@@ -11,6 +11,7 @@ package <- function(p) {
   library(p, character.only = TRUE)
 } # loads packages with automatical install if needed
 
+package('tidyverse')
 package('pwr')
 package("foreign")
 package("memisc")
@@ -22,7 +23,6 @@ package("stringr")
 package("survey")
 package("plotly")
 package('gdata')
-package('tidyverse')
 package("Hmisc")
 package("readstata13")
 
@@ -918,7 +918,7 @@ convert_s <- function() {
  # TODO: as.item region_CC, gain_taxe_fuel, gain_taxe_chauffage, gain_taxe, gain_taxe_feedback, gain_taxe_progressif, gain_taxe_cible, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
 
   for (j in names(s)) {
-    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p', j)) {
+    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p|ecologiste|conservateur|liberal|patriote|humaniste|apolitique', j)) {
       s[[j]][s[[j]]!=""] <<- TRUE
       s[[j]][is.na(s[[j]])] <<- FALSE
     }
@@ -1187,8 +1187,8 @@ convert_s <- function() {
   s$age_50_64 <<- 1*(s$age == '50 à 64 ans')
   s$age_65_plus <<- 1*(s$age == '65 ans ou plus')
   
-  s$score_polluants <<- 1 * (s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) + 1*(s$ges_O2 == FALSE) + 1*(s$ges_pm == FALSE)
-  label(s$score_polluants) <<- "score_polluants: Somme des bonnes réponses au questionnaire gaz à effet de serre (ges_O2/CH4/pm/CO2)"
+  s$score_ges <<- 1 * (s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) + 1*(s$ges_O2 == FALSE) + 1*(s$ges_pm == FALSE)
+  label(s$score_ges) <<- "score_ges: Somme des bonnes réponses au questionnaire gaz à effet de serre (ges_O2/CH4/pm/CO2)"
   s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) + 1*(s$ges_nucleaire == FALSE)
   label(s$score_climate_call) <<- "score_climate_call: Somme des bonnes réponses au questionnaire Climate Call (avion-train / boeuf-pates / nucleaire-eolien) ges_avion/boeuf/nucleaire"  
 
@@ -1272,7 +1272,7 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   
   relabel_and_rename_s()
   
-  s$fini[s$exclu=="QuotaMet"] <<- "False"
+  s$fini[s$exclu=="QuotaMet"] <<- "False" # To check the number of QuotaMet that shouldn't have incremented the quota: decrit(ss$each_strate[ss$exclu=="QuotaMet" & ss$csp=="Employé" & !grepl("2019-03-04 07", ss$date)])
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
   if (exclude_speeder) { s <<- s[as.numeric(as.vector(s$duree)) > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
@@ -1304,4 +1304,4 @@ sa <- s
 
 prepare_s()
 
-write.csv(s, "survey_prepared.csv")
+# write.csv(s, "survey_prepared.csv")
