@@ -173,7 +173,7 @@ oui_non <- function(vars, file, labels = vars, data = s, display_value = T, weig
   # api_create(bars, filename=file, sharing="public")
   return(bars) # bugs most often than not
 }
-data5 <- function(vars, data=m, miss=T, weights=T) {
+data5 <- function(vars, data=s, miss=T, weights=T) {
   matrice <- c()
   colors <-  c(rainbow(4, end=4/15), "forestgreen") # c("red", "orange", "yellow", "green", "darkgreen") # rainbow(5, end=1/3)
   for (var in vars) {
@@ -703,6 +703,23 @@ for (j in names(s)) if (grepl('gilets_jaunes', j)) print(decrit(s[[j]], weights=
 ##### Approbation politiques environnementales #####
 for (j in names(s)) if (grepl('si_', j)) print(decrit(s[[j]], weights=s$weight))
 for (j in 141:148) print(decrit(s[[j]], weights=s$weight))
+labels_politiques_env <- c()
+for (j in 141:148) labels_politiques_env <- c(labels_politiques_env, gsub(" - Q74", "", gsub(".*) à ", "", Label(s[[j]]))))  
+labels_taxe_condition <- c()
+for (j in 131:139) labels_taxe_condition <- c(labels_taxe_condition, gsub(" - .*", "", gsub(".*: ", "", Label(s[[j]])))) 
+labels_taxe_condition[1] <- "un versement pour les 50% de Français les plus modestes<br> (ceux gagnant moins de 1670€/mois)"
+labels_taxe_condition[3] <- "une compensation pour les ménages contraints<br> dans leur consommation de produits pétroliers"
+labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", "stricter standards on pollution from new vehicles", "stricter standards on pollution during roadworthiness tests", "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
+labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
+labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
+barres(file="politiques_environnementales", title="<b>Seriez-vous favorable aux politiques environnementales suivantes ?</b>", 
+       data=data5(names(s)[141:148], miss=FALSE), nsp=FALSE, sort=T, color=color5, legend = c(oui_non5), labels=labels_politiques_env)
+barres(file="environmental_policies", title="<b>Would you agree with the following environnemental policies?</b>", 
+       data=data5(names(s)[141:148], miss=FALSE), nsp=FALSE, sort=T, color=color5, legend = c(yes_no5), labels=labels_environmental_policies)
+barres(file="taxe_condition", title="Dans quels cas seriez-vous favorable à l'augmentation de la taxe carbone ?<br><b>Je serais favorable si les recettes de la taxe étaient utilisées pour financer ...</b>", 
+       data=data5(names(s)[131:139], miss=FALSE), nsp=FALSE, margin_l = 270, sort=T, color=color5, legend = c(oui_non5), labels=labels_taxe_condition)
+barres(file="tax_condition", title="In what cases would you be in favour of increasing the carbon tax? <br><b>I would be in favour if the tax revenues were used to finance...</b>", 
+       data=data5(names(s)[131:139], miss=FALSE), nsp=FALSE, margin_l = 205, sort=T, color=color5, legend = c(yes_no5), labels=labels_tax_condition)
 
 
 ##### Bénéfices/problèmes taxe carbone #####
@@ -719,8 +736,8 @@ for (v in variables_problemes[1:(length(variables_problemes)-2)]) {
   labels_problemes <- c(labels_problemes, gsub(" - .*", "", gsub(".*: ", "", Label(s[[v]]))))
   values_problemes <- c(values_problemes, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
 
-oui_non(margin_l=430, variables_benefices[1:(length(variables_benefices)-2)], "barres_benefices", labels_benefices)
-oui_non(margin_l=430, variables_problemes[1:(length(variables_problemes)-2)], "barres_problemes", labels_problemes)
+# oui_non(margin_l=430, variables_benefices[1:(length(variables_benefices)-2)], "barres_benefices", labels_benefices)
+# oui_non(margin_l=430, variables_problemes[1:(length(variables_problemes)-2)], "barres_problemes", labels_problemes)
 
 # TODO: créer variables avec nombre de bénéfices / problèmes cochés
 
@@ -728,7 +745,7 @@ barres_benefices <- barres(file="benefices", title="<b>Bénéfices d'une taxe ca
 barres_problemes <- barres(file="problemes", title="<b>Problèmes d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_problemes, ncol=length(values_problemes)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_problemes, hover=labels_problemes, legend="empty")
 barres_benefices
 dev.print(png, '../images/benefice.png')
-dev.copy(png, filename="../images/benefice.png")
+dev.copy(png, filename="../images/benefice.png") # TODO: manage expost image
 dev.off()
 barres_problemes
 dev.print(png, '../images/probleme.png')

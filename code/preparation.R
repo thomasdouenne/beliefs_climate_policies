@@ -1,5 +1,5 @@
-#setwd("/var/www/beliefs_climate_policies/code")
-setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+# setwd("/var/www/beliefs_climate_policies/code")
+# setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 #setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 
@@ -494,23 +494,23 @@ relabel_and_rename_s <- function() {
   names(s)[146] <<- "taxe_70__approbation"
   label(s[[146]]) <<- "taxe_70__approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q133"
   names(s)[147] <<- "si_pauvres"
-  label(s[[147]]) <<- "si_pauvres: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées aux 50% des plus modestes - Q53"
+  label(s[[147]]) <<- "si_pauvres: un versement pour les 50% de Français les plus modestes (ceux gagnant moins de 1670€/mois) - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[148] <<- "si_compensee"
-  label(s[[148]]) <<- "si_compensee: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées à tous les français - Q53"
+  label(s[[148]]) <<- "si_compensee: un versement à tous les Français - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[149] <<- "si_contraints"
-  label(s[[149]]) <<- "si_contraints: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes étaient redistribuées aux ménages contraints à consommer des produits pétroliers - Q53"
+  label(s[[149]]) <<- "si_contraints: une compensation pour les ménages contraints dans leur consommation de produits pétroliers - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[150] <<- "si_baisse_cotsoc"
-  label(s[[150]]) <<- "si_baisse_cotsoc: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse des cotisations sociales - Q53"
+  label(s[[150]]) <<- "si_baisse_cotsoc: une baisse des cotisations sociales - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[151] <<- "si_baisse_tva"
-  label(s[[151]]) <<- "si_baisse_tva: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse de la TVA - Q53"
+  label(s[[151]]) <<- "si_baisse_tva: une baisse de la TVA - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[152] <<- "si_baisse_deficit"
-  label(s[[152]]) <<- "si_baisse_deficit: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient une baisse du déficit public - Q53"
+  label(s[[152]]) <<- "si_baisse_deficit: une baisse du déficit public - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[153] <<- "si_renovation"
-  label(s[[153]]) <<- "si_renovation: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient la rénovation thermique des bâtiments - Q53"
+  label(s[[153]]) <<- "si_renovation: la rénovation thermique des bâtiments - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[154] <<- "si_renouvelables"
-  label(s[[154]]) <<- "si_renouvelables: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient des énergies renouvelables - Q53"
+  label(s[[154]]) <<- "si_renouvelables: des énergies renouvelables (éoliennes, solaire, etc.) - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[155] <<- "si_transports"
-  label(s[[155]]) <<- "si_transports: Le répondant serait favorable (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) à l'augmentation de la taxe carbone si les recettes financaient des transports non polluants - Q53"
+  label(s[[155]]) <<- "si_transports: des transports non polluants - Approbation l'augmentation de la taxe carbone si les recettes étaient utilisées pour financer ... (Oui tout à fait/Oui plutôt/Indifférent ou NSP/Non pas vraiment/Non pas du tout) - Q53"
   names(s)[156] <<- "test_qualite"
   label(s[[156]]) <<- "test_qualite: Merci de sélectionner 'Un peu' (Pas du tout/Un peu/Beaucoup/Complètement/NSP) - Q177"
   names(s)[157] <<- "taxe_kerosene"
@@ -968,6 +968,12 @@ convert_s <- function() {
   # s$Age <<- (s$age == "18 à 24 ans") + 2*(s$age == "25 à 34 ans") + 3.3*(s$age == "35 à 49 ans") + 4.6*(s$age == "50 à 64 ans") + 7*(s$age == "65 ans ou plus")
   s$taille_agglo <<- as.item(as.numeric(s$taille_agglo), labels = structure(1:5, names = c("rural", "-20k", "20-100k", "+100k", "Paris")), annotation=Label(s$taille_agglo))  
 
+  s$Diplome <<- (s$diplome == "Brevet des collèges") + 2*(s$diplome=="CAP ou BEP") + 3*(s$diplome=="Baccalauréat") + 4*(s$diplome=="Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)") + 5*(s$diplome=="Bac +3 (licence...)") + 6*(s$diplome=="Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)") - (s$diplome=="NSP (Ne se prononce pas)")
+  s$diplome4 <<- as.item(pmin(pmax(s$Diplome, 1), 4), labels = structure(1:4, names = c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur")), annotation=Label(s$diplome))  
+  # s$diplome4 <<- as.character(s$diplome)
+  # s$diplome4[s$Diplome<2] <<- "Aucun diplôme ou brevet" # TODO: as.item
+  # s$diplome4[s$Diplome>3] <<- "Supérieur"
+  
   # s$compris_depenses <<- as.item(as.character(s$compris_depenses),
   s$compris_depenses <<- as.item(as.character(s$compris_depenses),
                 labels = structure(c("","Oui","Non","Bug: le graphique ne s'est pas affiché correctement."), names = c("NA","Oui","Non","Bug")), annotation=attr(s$compris_depenses, "label"))
@@ -1001,10 +1007,6 @@ convert_s <- function() {
   s$niveau_vie <<- s$revdisp / s$uc
 
   # s$age <<- as.factor(as.character(s$age))
-  s$Diplome <<- (s$diplome == "Brevet des collèges") + 2*(s$diplome=="CAP ou BEP") + 3*(s$diplome=="Baccalauréat") + 4*(s$diplome=="Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)") + 5*(s$diplome=="Bac +3 (licence...)") + 6*(s$diplome=="Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)") - (s$diplome=="NSP (Ne se prononce pas)")
-  s$diplome4 <<- as.character(s$diplome)
-  s$diplome4[s$Diplome<2] <<- "Aucun diplôme ou brevet"
-  s$diplome4[s$Diplome>3] <<- "Supérieur"
   # s$Region <<- as.factor(as.character(s$region)) 
   # s$taille_agglo <<- as.factor(gsub("[[:alpha:] ]", "", s$taille_agglo))
   # s <<- s[s$taille_agglo!="%1%",] 
@@ -1273,7 +1275,7 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   relabel_and_rename_s()
   
   print(paste(length(which(s$exclu=="QuotaMet")), "QuotaMet"))
-  s$fini[s$exclu=="QuotaMet" | is.na(s$revenu)] <<- "False" # To check the number of QuotaMet that shouldn't have incremented the quota: decrit(ss$each_strate[ss$exclu=="QuotaMet" & ss$csp=="Employé" & !grepl("2019-03-04 07", ss$date)])
+  s$fini[s$exclu=="QuotaMet" | is.na(s$revenu)] <<- "False" # To check the number of QuotaMet that shouldn't have incremented the quota, comment this line and: decrit(s$each_strate[s$exclu=="QuotaMet" & s$csp=="Employé" & !grepl("2019-03-04 07", s$date)])
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
   if (exclude_speeder) { s <<- s[as.numeric(as.vector(s$duree)) > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
