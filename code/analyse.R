@@ -727,5 +727,10 @@ oui_non(margin_l=430, variables_problemes[1:(length(variables_problemes)-2)], "b
 barres_benefices <- barres(file="benefices", title="<b>Bénéfices d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_benefices, ncol=length(values_benefices)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_benefices, hover=labels_benefices, legend="empty")
 barres_problemes <- barres(file="problemes", title="<b>Problèmes d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_problemes, ncol=length(values_problemes)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_problemes, hover=labels_problemes, legend="empty")
 barres_benefices
+dev.print(png, '../images/benefice.png')
+dev.copy(png, filename="../images/benefice.png")
+dev.off()
 barres_problemes
-orca(barres_problemes, "../images/problemes.png")
+dev.print(png, '../images/probleme.png')
+# orca(barres_problemes, "../images/problemes.png")
+# orca(barres_benefices, "../images/benefices.png")

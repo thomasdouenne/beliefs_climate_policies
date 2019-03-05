@@ -1194,8 +1194,8 @@ convert_s <- function() {
 
   for (v in c("autonomie", "priorite", "etats", "global", "trop")) {
     s[[paste("aide_non", v, sep="_")]] <<- NA
-    s[[paste("aide_non", v, sep="_")]][s$transferts_inter_info==T & s$aide_2p==T] <<- s[[paste("aide_non", v, "i", sep="_")]]
-    s[[paste("aide_non", v, sep="_")]][s$transferts_inter_info==FALSE & s$aide_2p==T] <<- s[[paste("aide_non", v, "ni", sep="_")]]
+    s[[paste("aide_non", v, sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==T & s$aide_2p==T] <<- s[[paste("aide_non", v, "i", sep="_")]]
+    s[[paste("aide_non", v, sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==FALSE & s$aide_2p==T] <<- s[[paste("aide_non", v, "ni", sep="_")]]
     label(s[[paste("aide_non", v, sep="_")]]) <<- Label(s[[paste("aide_non", v, "i", sep="_")]])
   }
     
