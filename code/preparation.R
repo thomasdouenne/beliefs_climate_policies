@@ -918,7 +918,7 @@ convert_s <- function() {
  # TODO: as.item region_CC, gain_taxe_fuel, gain_taxe_chauffage, gain_taxe, gain_taxe_feedback, gain_taxe_progressif, gain_taxe_cible, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
 
   for (j in names(s)) {
-    if (grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p|ecologiste|conservateur|liberal|patriote|humaniste|apolitique', j)) {
+    if (j!="peages_urbains" & grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p|ecologiste|conservateur|liberal|patriote|humaniste|apolitique', j)) {
       s[[j]][s[[j]]!=""] <<- TRUE
       s[[j]][is.na(s[[j]])] <<- FALSE
     }
@@ -1272,7 +1272,8 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   
   relabel_and_rename_s()
   
-  s$fini[s$exclu=="QuotaMet"] <<- "False" # To check the number of QuotaMet that shouldn't have incremented the quota: decrit(ss$each_strate[ss$exclu=="QuotaMet" & ss$csp=="Employé" & !grepl("2019-03-04 07", ss$date)])
+  print(paste(length(which(s$exclu=="QuotaMet")), "QuotaMet"))
+  s$fini[s$exclu=="QuotaMet" | is.na(s$revenu)] <<- "False" # To check the number of QuotaMet that shouldn't have incremented the quota: decrit(ss$each_strate[ss$exclu=="QuotaMet" & ss$csp=="Employé" & !grepl("2019-03-04 07", ss$date)])
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
   if (exclude_speeder) { s <<- s[as.numeric(as.vector(s$duree)) > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
@@ -1304,4 +1305,4 @@ sa <- s
 
 prepare_s()
 
-# write.csv(s, "survey_prepared.csv")
+write.csv(s, "survey_prepared.csv")
