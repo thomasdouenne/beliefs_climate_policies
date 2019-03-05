@@ -3,57 +3,8 @@
 #setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 
-# options(download.file.method = "wget"); # For Ubuntu 14.04
-package <- function(p) { 
-  if (!is.element(p, installed.packages()[,1])) {
-    install.packages(p); 
-  }
-  library(p, character.only = TRUE)
-} # loads packages with automatical install if needed
+source("packages_functions.R")
 
-package('tidyverse')
-package('pwr')
-package("foreign")
-package("memisc")
-package("DT")
-package("pastecs")
-package("lsr")
-package("ggplot2")
-package("stringr")
-package("survey")
-package("plotly")
-package('gdata')
-package("Hmisc")
-package("readstata13")
-
-# Fs <- function(QID) { s[QID][[1]] }
-# Vs <- function(QID) { as.vector(Fs(QID))  } 
-n <- function(var) { as.numeric(as.vector(var)) }
-NSPs <- function(QID) { length(V(QID)[V(QID) == "NSP (Je ne veux pas répondre)"])/length(V(QID)) }
-nsps <- function(id) { length(v(id)[v(id) == "NSP (Je ne veux pas répondre)"])/length(v(id)) }
-Label <- function(var) {
-  if (length(annotation(var))==1) { annotation(var)[1] }
-  else { label(var)  }
-}
-decrit <- function(variable, miss = FALSE, weights = NULL, numbers=FALSE) { 
-  if (length(annotation(variable))>0 & !numbers) {
-    if (!miss) {
-      # if (is.element("Oui", levels(as.factor(variable))) | grepl("(char)", annotation(variable)) | is.element("quotient", levels(as.factor(variable)))  | is.element("Pour", levels(as.factor(variable))) | is.element("Plutôt", levels(as.factor(variable))) ) { describe(as.factor(variable[variable!="" & !is.na(variable)]), weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
-      # else { describe(variable[variable!="" & !is.na(variable)], weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
-      if (length(which(is.numeric(levels(as.factor(variable)))))==0) { describe(as.factor(variable[variable!="" & !is.na(variable)]), weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
-      else { describe(as.numeric(as.vector(variable[variable!="" & !is.na(variable)])), weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
-    }
-    else describe(as.factor(include.missings(variable[variable!="" & !is.na(variable)])), weights = weights[variable!="" & !is.na(variable)], descript=Label(variable)) }
-  else {  
-    if (length(annotation(variable))>0) {
-      if (miss) describe(variable[variable!=""], weights = weights[variable!=""], descript=Label(variable))
-      else describe(variable[variable!="" & !is.missing(variable)], weights = weights[variable!="" & !is.missing(variable)], descript=paste(length(which(is.missing(variable))), "missing obs.", Label(variable)))
-    } else describe(variable[variable!=""], weights = weights[variable!=""])  }
-}
-CImedian <- function(vec) { # 95% confidence interval
-  res <- tryCatch(unlist(ci.median(vec[!is.na(vec) & vec!=-1])), error=function(e) {print('NA')})
-  return(paste(res[paste('ci.lower')], res[paste('ci.median')], res[paste('ci.upper')], length(which(!is.na(vec) & vec!=-1)))) 
-}
 clean_number <- function(vec, high_numbers='') { 
    numeric_vec <- as.numeric(gsub(",", ".", gsub("[[:alpha:]  !#$%&')?/(@:;€_-]","",vec)))
    if (high_numbers=='remove') { is.na(numeric_vec) <- numeric_vec>10000 }
@@ -981,8 +932,8 @@ convert_s <- function() {
                 labels = structure(c("","Chauffage individuel","Chauffage collectif", "NSP"), names = c("NA","individuel","collectif","NSP")), missing.values='NSP', annotation=Label(s$mode_chauffage))
   s$chauffage <<- as.item(s$chauffage,
                 labels = structure(c("Gaz de ville", "Butane, propane, gaz en citerne", "Fioul, mazout, pétrole", "Électricité", "Bois, solaire, géothermie, aérothermie (pompe à chaleur)", "Autre","NSP"), names = c("Gaz réseau", "Gaz bouteille", "Fioul", "Électricité", "Bois, solaire...", "Autre", "NSP")), missing.values='NSP', annotation=Label(s$chauffage))
-  s$schiste_CC <<- as.item(s$schiste_CC,
-                labels = structure(c("","Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir","Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"), names = c("NA","malvenue","valable","NSP")), missing.values='NSP', annotation=Label(s$schiste_CC))
+  s$schiste_CC <<- as.item(as.character(s$schiste_CC),
+                labels = structure(c("Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir","Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"), names = c("malvenue","valable","NSP")), missing.values='NSP', annotation=Label(s$schiste_CC))
   s$cause_CC <<- as.item(s$cause_CC,
                 labels = structure(c("n'est pas une réalité","est principalement dû à la variabilité naturelle du climat", "est principalement dû à l'activité humaine", "NSP"), names = c("n'existe pas","naturel","anthropique","NSP")), missing.values='NSP', annotation=Label(s$cause_CC))
   
