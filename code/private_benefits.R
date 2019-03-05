@@ -82,7 +82,7 @@ summary(tsls2)
 
 # Test effet des seuils sur les ménages jamais éligibles pour écarter l'effet gagnant/perdant de l'acceptation #
 s_70_plus <- subset(s, categorie_cible == '70_' & traite_transfert != 1 & traite_transfert_conjoint != 1) # To do : mieux définir ce sample, ce critère revenu n'est pas suffisant du fait du revenu du conjoint
-ols_approuve_seuils <- lm(dummy_approbation_cible ~ (cible==20) + (cible==30) + (cible==40), data=s_70_plus, weights = s$weight)
+ols_approuve_seuils <- lm(dummy_approbation_cible ~ (cible==20) + (cible==30) + (cible==40), data=s_70_plus, weights = s_70_plus$weight)
 summary(ols_approuve_seuils)
 # On ne détecte aucun effet significatif du seuil pour les non-éligibles affectés aléatoirement à l'un d'entre eux.
 # A noter toutefois le nombre très faible d'observations
@@ -149,3 +149,21 @@ summary(model_2_variables_40)
 model_2_variables_50 = mrd_est(dummy_approbation_cible ~ revenu + revenu_conjoint | approbation_avant, cutpoint = c(1670, 1670), method = "center", subset = cible==50 & (categorie_cible == '40_50'  | categorie_cible == '50_70'), t.design = c("leq", "geq"))
 summary(model_2_variables_50)
 # De même, rien de significatif, et rien qui n'ait vraiment de sens
+
+
+##### 6. 2SLS avec RDD paramétrique pour le feedback
+sf <- subset(s, !is.na(s$gagnant))
+sf$dummy_approbation_feedback <- 1 * (sf$taxe_feedback_approbation=='Oui')
+
+sf$hausse_depenses_2 <- sf$hausse_depenses^2
+
+sf$dummy_declare_gain_taxe_feedback <- 1 * (sf$gain_taxe_feedback == 'Gagnant')
+sf$gagnant <- as.numeric(sf$gagnant)
+
+cor(sf$dummy_declare_gain_taxe_feedback, sf$gagnant)
+
+tsls_rdd_feedback_1 <- lm(dummy_declare_gain_taxe_feedback ~ gagnant + hausse_depenses + hausse_depenses_2, data=sf, weights = sf$weight)
+
+d_rdd_feedback.hat <- fitted.values(tsls_rdd_feedback_1)
+tsls_rdd_feedback_2 <- lm(dummy_approbation_feedback ~ d_rdd_feedback.hat + taxe_approbation + hausse_depenses + hausse_depenses_2, data=sf, weights = sf$weight)
+summary(tsls_rdd_feedback_2)
