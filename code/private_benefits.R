@@ -4,6 +4,7 @@
 # 2) l'IV : on instrumente en utilisant l'allocation aléatoire des ménages à des mécanismes auxquels ils sont éligibles ou non
 # La meilleure méthode consiste à combiner ces deux approches : 2SLS avec RDD paramétriques pour l'équation de first stage.
 # On obtient que ceteris paribus, se savoir gagnant augmente la proabilité d'approbation d'environ 50 p.p.
+# Ce résultat est confirmé lorsqu'on effectue la même procédure (2SLS avec RDD paramétrique en 1st stage) appliqué au feedback.
 
 ##### 1. Spécification principale : 2SLS avec RDD paramétrique à multiples seuils en first stage #####
 s$dummy_approbation_cible <- 1*(s$taxe_cible_approbation=='Oui')
@@ -154,16 +155,25 @@ summary(model_2_variables_50)
 ##### 6. 2SLS avec RDD paramétrique pour le feedback
 sf <- subset(s, !is.na(s$gagnant))
 sf$dummy_approbation_feedback <- 1 * (sf$taxe_feedback_approbation=='Oui')
-
-sf$hausse_depenses_2 <- sf$hausse_depenses^2
-
 sf$dummy_declare_gain_taxe_feedback <- 1 * (sf$gain_taxe_feedback == 'Gagnant')
 sf$gagnant <- as.numeric(sf$gagnant)
+sf$gains_nets_estimes <- sf$hausse_depenses - 110 * sf$nb_adultes - 16.1
+sf$gains_nets_estimes_2 <- sf$gains_nets_estimes^2
 
+# OLS simple
+ols_feedback <- lm(dummy_approbation_feedback ~ dummy_declare_gain_taxe_feedback, data=sf, weights = sf$weight)
+summary(ols_feedback)
+
+# RDD simple - effet d'être gagnant
+rdd_feedback <- lm(dummy_approbation_feedback ~ gagnant + gains_nets_estimes + gains_nets_estimes_2 + taxe_approbation, data=sf, weights = sf$weight)
+summary(rdd_feedback)
+
+# 2SLS avec 1st stage RDD - effet de se considérer gagnant
 cor(sf$dummy_declare_gain_taxe_feedback, sf$gagnant)
-
-tsls_rdd_feedback_1 <- lm(dummy_declare_gain_taxe_feedback ~ gagnant + hausse_depenses + hausse_depenses_2, data=sf, weights = sf$weight)
-
+tsls_rdd_feedback_1 <- lm(dummy_declare_gain_taxe_feedback ~ gagnant + taxe_approbation + gains_nets_estimes + gains_nets_estimes_2, data=sf, weights = sf$weight)
 d_rdd_feedback.hat <- fitted.values(tsls_rdd_feedback_1)
-tsls_rdd_feedback_2 <- lm(dummy_approbation_feedback ~ d_rdd_feedback.hat + taxe_approbation + hausse_depenses + hausse_depenses_2, data=sf, weights = sf$weight)
+tsls_rdd_feedback_2 <- lm(dummy_approbation_feedback ~ d_rdd_feedback.hat + taxe_approbation + gains_nets_estimes + gains_nets_estimes_2, data=sf, weights = sf$weight)
 summary(tsls_rdd_feedback_2)
+# Les résultats sont sensiblement les mêmes que dans le cas des seuils :
+# 1) Etre gagnant augmente la probabilité d'approuver de 10p.p., 2) se considérer gagnant augmente la probabilité d'approuver de 50p.p.
+# L'effet estimé est ici local, et concerne les personnes qui sont à la limite de gagner/perdre.
