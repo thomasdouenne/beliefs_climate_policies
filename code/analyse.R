@@ -498,8 +498,8 @@ labels_perdant[6] <- "Les ruraux"
 
 # TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
 
-barres_gagnants <- barres(file="gagnants", title="<b>Selon vous, quels seraient les gagnants avec une telle mesure ?</b><br>(choix multiples)", margin_l = 200, data=matrix(values_gagnant, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
-barres_perdants <- barres(file="perdants", title="<b>Selon vous, quels seraient les perdants avec une telle mesure ?</b><br>(choix multiples)", margin_l = 200, data=matrix(values_perdant, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
+barres_gagnants <- barres(file="gagnants", title="<b>Selon vous, quels seraient les gagnants avec une taxe carbone compensée ?</b><br>(choix multiples)", margin_l = 200, data=matrix(values_gagnant, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
+barres_perdants <- barres(file="perdants", title="<b>Selon vous, quels seraient les perdants avec une taxe carbone compensée ?</b><br>(choix multiples)", margin_l = 200, data=matrix(values_perdant, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
 barres_gagnants
 barres_perdants
 
@@ -568,10 +568,10 @@ for (v in variables_taxe_perdant) {
 
 # TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
 
-barres_gagnants_GJ_approuve <- barres(file="gagnants_GJ_approuve", title="Selon vous, quels seraient <b>les gagnants</b> avec une telle mesure ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", margin_l = 200, data=matrix(values_gagnant_GJ_approuve, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
-barres_gagnants_GJ_oppose <- barres(file="gagnants_GJ_oppose", title="Selon vous, quels seraient <b>les gagnants</b> avec une telle mesure ?<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", margin_l = 200, data=matrix(values_gagnant_GJ_oppose, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
-barres_perdants_GJ_approuve <- barres(file="perdants_GJ_approuve", title="Selon vous, quels seraient <b>les perdants</b> avec une telle mesure ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", margin_l = 200, data=matrix(values_perdant_GJ_approuve, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
-barres_perdants_GJ_oppose <- barres(file="perdants_GJ_oppose", title="Selon vous, quels seraient <b>les perdants</b> avec une telle mesure ?<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", margin_l = 200, data=matrix(values_perdant_GJ_oppose, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
+barres_gagnants_GJ_approuve <- barres(file="gagnants_GJ_approuve", title="Selon vous, quels seraient <b>les gagnants</b> avec une taxe carbone compensée ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", margin_l = 200, data=matrix(values_gagnant_GJ_approuve, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
+barres_gagnants_GJ_oppose <- barres(file="gagnants_GJ_oppose", title="Selon vous, quels seraient <b>les gagnants</b> avec une taxe carbone compensée ?<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", margin_l = 200, data=matrix(values_gagnant_GJ_oppose, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
+barres_perdants_GJ_approuve <- barres(file="perdants_GJ_approuve", title="Selon vous, quels seraient <b>les perdants</b> avec une taxe carbone compensée ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", margin_l = 200, data=matrix(values_perdant_GJ_approuve, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
+barres_perdants_GJ_oppose <- barres(file="perdants_GJ_oppose", title="Selon vous, quels seraient <b>les perdants</b> avec une taxe carbone compensée ?<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", margin_l = 200, data=matrix(values_perdant_GJ_oppose, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
 barres_gagnants_GJ_approuve
 barres_gagnants_GJ_oppose
 barres_perdants_GJ_approuve

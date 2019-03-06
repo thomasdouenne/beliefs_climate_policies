@@ -993,7 +993,7 @@ convert_s <- function() {
   s$perte_partielle[s$variante_partielle=='c'] <<- s$perte_chauffage[s$variante_partielle=='c']
   s$perte_partielle[s$variante_partielle=='f'] <<- s$perte_fuel[s$variante_partielle=='f']
   label(s$perte_partielle) <<- "perte_partielle: Une hausse des taxes sur variante_partielle (chauffage ou fuel) ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155, 162"
-  # naming: perte -> gain_relatif / gain_taxe -> gain_categorie / gain -> gain ou gain_valeur
+  # TODO: naming: perte -> gain_relatif / gain_taxe -> gagnant_categorie / gain -> gain ou gain_valeur et gain_intervalle / gagnant -> simule_gagnant / gain_taxe_feedback -> gagnant_feedback_categorie
   # s$gain_fuel <- NA
   s$gain_fuel[s$gain_taxe_fuel=='Non affecté' & s$variante_partielle=='f'] <<- 0
   s$gain_fuel[s$gain_taxe_fuel=='Gagnant' & s$variante_partielle=='f'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_hausse[s$gain_taxe_fuel=='Gagnant' & s$variante_partielle=='f']))))/25
