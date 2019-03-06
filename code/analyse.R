@@ -40,13 +40,13 @@ decrit(s$nb_vehicules, weights = s$weight)
 
 
 ##### Gain questions générales (TVA, transports, logement) #####
-decrit(s$perte_tva, weights = s$weight)
-decrit(s$perte_fuel, weights = s$weight)
-decrit(s$perte_chauffage, weights = s$weight) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
-temp1 <- temp2 <- s[,c("perte_tva", "perte_fuel", "perte_chauffage", "perte_partielle", "variante_partielle", "weight")]
-temp1$perte <- temp1$perte_tva
+decrit(s$gain_relatif_tva, weights = s$weight)
+decrit(s$gain_relatif_fuel, weights = s$weight)
+decrit(s$gain_relatif_chauffage, weights = s$weight) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
+temp1 <- temp2 <- s[,c("gain_relatif_tva", "gain_relatif_fuel", "gain_relatif_chauffage", "gain_relatif_partielle", "variante_partielle", "weight")]
+temp1$perte <- temp1$gain_relatif_tva
 temp1$variante_perte <- "tva"
-temp2$perte <- temp2$perte_partielle
+temp2$perte <- temp2$gain_relatif_partielle
 temp2$variante_perte <- temp2$variante_partielle
 s_perte <- merge(temp1, temp2, all=T)
 # s_perte$variante_perte <- relevel(as.factor(s_perte$variante_perte), "tva")
@@ -57,13 +57,13 @@ summary(lm(perte ~ variante_perte, data = s_perte, weights = s_perte$weight)) # 
 ##### Gain (dividende - hausse dépenses énergétiques) #####
 decrit(110 * s$nb_adultes - s$hausse_depenses, weights = s$weight) # Ok !
 decrit(s$gain, weights = s$weight) 
-decrit(s$gain_taxe, weights = s$weight)
-decrit(s$gain_taxe_feedback, weights = s$weight)
-decrit(s$gain_taxe_feedback[s$hausse_depenses < 110 * s$nb_adultes], weights = s$weight[s$hausse_depenses < 110 * s$nb_adultes]) 
+decrit(s$gagnant_categorie, weights = s$weight)
+decrit(s$gagnant_feedback_categorie, weights = s$weight)
+decrit(s$gagnant_feedback_categorie[s$hausse_depenses < 110 * s$nb_adultes], weights = s$weight[s$hausse_depenses < 110 * s$nb_adultes]) 
 # On ne les convainc pas !!!
-length(which(s$gain_taxe_feedback=='Gagnant' & s$hausse_depenses < 110 * s$nb_adultes))/length(which(!is.na(s$gain_taxe_feedback) & s$hausse_depenses < 110 * s$nb_adultes))
-length(which(s$gain_taxe_feedback=='Gagnant' & s$gain_taxe != 'Gagnant' & s$hausse_depenses < 110 * s$nb_adultes))/length(which(!is.na(s$gain_taxe_feedback) & s$hausse_depenses < 110 * s$nb_adultes & s$gain_taxe != 'Gagnant'))
-decrit(s$gain_taxe_progressif, weights = s$weight)
+length(which(s$gagnant_feedback_categorie=='Gagnant' & s$hausse_depenses < 110 * s$nb_adultes))/length(which(!is.na(s$gagnant_feedback_categorie) & s$hausse_depenses < 110 * s$nb_adultes))
+length(which(s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie != 'Gagnant' & s$hausse_depenses < 110 * s$nb_adultes))/length(which(!is.na(s$gagnant_feedback_categorie) & s$hausse_depenses < 110 * s$nb_adultes & s$gagnant_categorie != 'Gagnant'))
+decrit(s$gagnant_progressif_categorie, weights = s$weight)
 
 ## Plot CDF
 cdf_gain <- wtd.Ecdf(s$gain, weights = s$weight)
@@ -77,10 +77,10 @@ decrit(s$taxe_approbation[s$gilets_jaunes_oppose==TRUE])
 decrit(s$taxe_feedback_approbation) # 17%
 decrit(s$taxe_efficace) # 18%
 decrit(s$taxe_progressif_approbation) # 19%
-summary(lm((taxe_feedback_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s, weights = s$weight))
-summary(lm((taxe_progressif_approbation=='Oui') ~ (gain_taxe!='Perdant'), data=s, weights = s$weight))
-summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gain_taxe!='Perdant'), data=s, weights = s$weight))
-summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (gain_taxe!='Perdant'), data=s, weights = s$weight))
+summary(lm((taxe_feedback_approbation=='Oui') ~ (gagnant_categorie!='Perdant'), data=s, weights = s$weight))
+summary(lm((taxe_progressif_approbation=='Oui') ~ (gagnant_categorie!='Perdant'), data=s, weights = s$weight))
+summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gagnant_categorie!='Perdant'), data=s, weights = s$weight))
+summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (gagnant_categorie!='Perdant'), data=s, weights = s$weight))
 
 
 ##### Approbation: Model Selection #####
@@ -112,14 +112,14 @@ variables_aleatoires <- c("info_CC", "info_PM", "variante_monetaire", "apres_mod
                           "info_progressivite") # TODO: missing values variante_progressivite variante_monetaire
 variables_demo <- c("sexe", "age", "statut_emploi", "csp", "region", "diplome", "taille_menage", "revenu", "rev_tot", "nb_14_et_plus", "nb_adultes", 
                     "fume", "actualite", "taille_agglo", "uc", "niveau_vie") # weight, TODO: each age
-variables_energie <- c("surface", "mode_chauffage", "chauffage", "km", "conso", "diesel", "essence", "nb_vehicules", "gaz", "fioul", "gagnant", # hausse_carburants 
-                       "hausse_chauffage", "hausse_diesel", "hausse_essence", "hausse_depenses") # TODO: missing values gagnant, conso, chauffage, mode_chauffage, 
+variables_energie <- c("surface", "mode_chauffage", "chauffage", "km", "conso", "diesel", "essence", "nb_vehicules", "gaz", "fioul", "simule_gagnant", # hausse_carburants 
+                       "hausse_chauffage", "hausse_diesel", "hausse_essence", "hausse_depenses") # TODO: missing values simule_gagnant, conso, chauffage, mode_chauffage, 
 variables_transport <- c("transports_distance", "transports_frequence", "transports_avis", "transports_travail", "transports_courses", "transports_loisirs", 
                          "transports_travail_commun", "transports_travail_actif") # TODO: missing values distance, travail
 variables_politiques <- c("interet_politique", "conservateur", "liberal", "humaniste", "patriote", "apolitique", "ecologiste", "Gauche_droite")
 variables_gilets_jaunes <- c("gilets_jaunes_dedans", "gilets_jaunes_soutien", "gilets_jaunes_compris", "gilets_jaunes_oppose", "gilets_jaunes_NSP")
-variables_gains_subjectifs <- c("perte_tva", "perte_partielle", "gain_taxe_partielle", "gain_partielle", "gain_taxe", "gain", "gain_taxe_feedback", 
-                                "gain_taxe_progressif", "gain_cible") # TODO: group feedback/progressif
+variables_gains_subjectifs <- c("gain_relatif_tva", "gain_relatif_partielle", "gagnant_categorie_partielle", "gain_partielle", "gagnant_categorie", "gain", "gagnant_feedback_categorie", 
+                                "gagnant_progressif_categorie", "gain_cible") # TODO: group feedback/progressif
 variables_Elasticite <- c("Elasticite_fuel", "Elasticite_fuel_perso", "Elasticite_chauffage", "Elasticite_chauffage_perso")
 variables_elasticite <- c("elasticite_fuel", "elasticite_fuel_perso", "elasticite_chauffage", "elasticite_chauffage_perso") # TODO: group fuel/chauffage
 variables_taxe_croyances <- c("taxe_efficace", variables_taxe_gagnant, variables_taxe_perdant, "progressivite_feedback_avec_info", 
@@ -185,7 +185,7 @@ summary(glm(as.formula(paste("(taxe_approbation!='Non') ~", paste(selected_varia
 
 
 significatifs_lasso_dev_oui <- as.formula((taxe_approbation=='Oui') ~ age + fume + niveau_vie + hausse_diesel + (transports_loisirs=="La voiture") + gilets_jaunes_oppose 
-                               + perte_partielle + taxe_perdant_pauvres + taxe_benefices_CC + taxe_benefices_aucun + taxe_problemes_aucun
+                               + gain_relatif_partielle + taxe_perdant_pauvres + taxe_benefices_CC + taxe_benefices_aucun + taxe_problemes_aucun
                                + si_compensee + peages_urbains + ges_O2 + ges_avion + changer_si_tous)
 summary(glm(significatifs_lasso, binomial, data=s, weights=s$weight))
 
