@@ -25,10 +25,11 @@ package("rcompanion")
 package("DescTools")
 package("VCA")
 package("glmnet")
-package("installr")
+# package("installr") # not for linux
 package("plotly")
 package("processx")
 package("readstata13")
+package("permute")
 # package("doMC") # for parallel computing, does not work on Windows
 
 # Fs <- function(QID) { s[QID][[1]] }

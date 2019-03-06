@@ -83,46 +83,6 @@ summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gain_taxe!='Per
 summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (gain_taxe!='Perdant'), data=s, weights = s$weight))
 
 
-##### OLS Approbation ####
-summary(lm((taxe_approbation=='Oui') ~ revenu + rev_tot + hausse_carburants + hausse_chauffage + score_climate_call + score_ges
-              + Gauche_droite + emission_cible + effets_CC + ecologiste + conservateur + liberal + humaniste + patriote + apolitique
-              + sexe + age + diplome4 + statut_emploi + csp + region, 
-            data=s))
-
-
-
-###### Approbation: ANOVA #####
-# ANalysis Of VAriance partitions sequentially the error terms of a regression where regressors are categorical variables. 
-#   This gives the Sum of squares (SS) of each variable, which depends on the rank of the variable in the list (I think that variables 
-#   have higher sum of squares when they are treated first). (SS are rank-independent when the sample is balanced, i.e. when there are the same number of observations in each category)
-#   This generalizes from OLS to logit (and other) using deviance; to continuous regressors (TODO: how? if we don't know, we could still make them categorical)
-# Is there a canonical way to decompose the variance for unbalanced samples? Like averaging SS from random draws on the ordering of the variables?
-#   I haven't found. en.wikipedia.org/wiki/Repeated_measures is something else. The more I dig, the more I realize ANOVA is fit for another
-#   purpose: when we can decompose the sample into several groups (as if there were only one categorical variable, or different but with all interaction terms)
-variables_big_regression <- c("revenu", "rev_tot", "hausse_carburants", "hausse_chauffage", "score_climate_call", "score_ges", "Gauche_droite", 
-                              "emission_cible", "effets_CC", "ecologiste", "conservateur", "liberal", "humaniste", "patriote", "apolitique", 
-                              "sexe", "age", "diplome4", "statut_emploi", "csp", "region") # TODO: complete the list
-ols <- summary(lm(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), data=s))
-ols
-sum(ols$residuals^2)
-anova <- summary(aov(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), data=s))
-anova
-sum_sq <- anova[[1]]$'Sum Sq'
-explained_variance <- sum(sum_sq[-length(sum_sq)])
-print(paste("Share of explained variance: ", round(explained_variance/sum(sum_sq), 2), ". Among which, share of explained variance explained by each variable:", sep=""))
-for (i in 1:length(variables_big_regression)) print(paste(variables_big_regression[order(sum_sq[-length(sum_sq)], decreasing = T)][i], round(sort(sum_sq[-length(sum_sq)], decreasing = T)[i]/explained_variance,3)))
-summary(lm((taxe_approbation=='Oui') ~ ecologiste + conservateur, data=s))
-
-anovaVCA(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), Data=s)
-st <- s[,c("revenu", "Gauche_droite", "humaniste")]
-st$revenu <- n(st$revenu)
-st$humaniste <- factor(st$humaniste)
-anovaMM(revenu ~ Gauche_droite + humaniste, Data=st)
-data(dataEP05A2_2)
-dt <- dataEP05A2_2[-1,]
-st <- cbind(st[1:79,], dt)
-anovaMM(revenu ~ day, st)
-
 ##### Approbation: Model Selection #####
 # Other method of model selection exists (like forward/backward stepwise selection), but seem less reliable as they do not
 #   explore exhaustively all possible models nor do they minimize anything. Best-subset selection is exhaustive, but I am
@@ -143,42 +103,157 @@ anovaMM(revenu ~ day, st)
 #   (introduced by Zhao, Rocha &  Yu (2009) who only coded it in matlab; R package quadrupen provides a related method cran.r-project.org/web/packages/quadrupen/quadrupen.pdf)
 # Multinomial regression is an alternative to logit, as we have 3 categories in our dependant variable (Oui/Non/NSP)
 #   This is family="multinomial". type.multinomial="grouped" forces that the same variables be taken for our categories (Oui/Non/NSP)
+variables_taxe_gagnant <- c("taxe_gagnant_personne", "taxe_gagnant_pauvres", "taxe_gagnant_moyennes", "taxe_gagnant_riches", "taxe_gagnant_tous", "taxe_gagnant_citadins", "taxe_gagnant_certains", "taxe_gagnant_NSP")
+variables_taxe_perdant <- c("taxe_perdant_personne", "taxe_perdant_pauvres", "taxe_perdant_moyennes", "taxe_perdant_riches", "taxe_perdant_tous", "taxe_perdant_ruraux", "taxe_perdant_certains", "taxe_perdant_NSP")
 
-for (v in variables_big_regression) { # display and remove variables with missing values
-  na_v <- length(which(is.na(s[[v]])))
-  # if ("labelled" %in% class(s[[v]])) na_v <- length(which(is.na(s[[v]]))) #
-  # else na_v <- length(which(is.missing(s[[v]]))) 
+variables_approbation <- c("taxe_approbation", "taxe_feedback_approbation", "taxe_progressif_approbation", "taxe_cible_approbation") # TODO: group feedback/progressif
+variables_qualite <- c("duree", "duree_info", "duree_champ_libre") # champ_libre != "", exclu, "test_qualite"
+variables_aleatoires <- c("info_CC", "info_PM", "variante_monetaire", "apres_modifs", "variante_taxe_info", "variante_progressivite", # cible categorie_cible
+                          "info_progressivite") # TODO: missing values variante_progressivite variante_monetaire
+variables_demo <- c("sexe", "age", "statut_emploi", "csp", "region", "diplome", "taille_menage", "revenu", "rev_tot", "nb_14_et_plus", "nb_adultes", 
+                    "fume", "actualite", "taille_agglo", "uc", "niveau_vie") # weight, TODO: each age
+variables_energie <- c("surface", "mode_chauffage", "chauffage", "km", "conso", "diesel", "essence", "nb_vehicules", "gaz", "fioul", "gagnant", # hausse_carburants 
+                       "hausse_chauffage", "hausse_diesel", "hausse_essence", "hausse_depenses") # TODO: missing values gagnant, conso, chauffage, mode_chauffage, 
+variables_transport <- c("transports_distance", "transports_frequence", "transports_avis", "transports_travail", "transports_courses", "transports_loisirs", 
+                         "transports_travail_commun", "transports_travail_actif") # TODO: missing values distance, travail
+variables_politiques <- c("interet_politique", "conservateur", "liberal", "humaniste", "patriote", "apolitique", "ecologiste", "Gauche_droite")
+variables_gilets_jaunes <- c("gilets_jaunes_dedans", "gilets_jaunes_soutien", "gilets_jaunes_compris", "gilets_jaunes_oppose", "gilets_jaunes_NSP")
+variables_gains_subjectifs <- c("perte_tva", "perte_partielle", "gain_taxe_partielle", "gain_partielle", "gain_taxe", "gain", "gain_taxe_feedback", 
+                                "gain_taxe_progressif", "gain_cible") # TODO: group feedback/progressif
+variables_Elasticite <- c("Elasticite_fuel", "Elasticite_fuel_perso", "Elasticite_chauffage", "Elasticite_chauffage_perso")
+variables_elasticite <- c("elasticite_fuel", "elasticite_fuel_perso", "elasticite_chauffage", "elasticite_chauffage_perso") # TODO: group fuel/chauffage
+variables_taxe_croyances <- c("taxe_efficace", variables_taxe_gagnant, variables_taxe_perdant, "progressivite_feedback_avec_info", 
+                              "progressivite_feedback_sans_info", "progressivite_progressif") # TODO: group avec/sans info
+variables_benefices <- names(s)[which(grepl("benefice", names(s)))[which(grepl("benefice", names(s)))>300]]
+variables_problemes <- names(s)[which(grepl("problemes", names(s)))[which(grepl("problemes", names(s)))>300]]
+variables_taxe_condition <- c("si_pauvres", "si_compensee", "si_contraints", "si_baisse_cotsoc", "si_baisse_tva", "si_baisse_deficit", "si_renovation", "si_renouvelables", "si_transports")
+variables_politiques <- c("taxe_kerosene", "taxe_viande", "normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants", 
+                          "peages_urbains", "fonds_mondial") # "rattrapage_diesel"
+variables_connaissances_CC <- c("cause_CC", "ges_CO2", "ges_CH4", "ges_O2", "ges_pm", "ges_boeuf", "ges_nucleaire", "ges_avion", "region_CC", 
+                                "emission_cible", "score_ges", "score_climate_call")
+variables_avis_CC <- c("parle_CC", "effets_CC", "generation_CC_1960", "generation_CC_1990", "generation_CC_2020", "generation_CC_2050", "generation_CC_aucune",
+                       "responsable_CC_chacun", "responsable_CC_riches", "responsable_CC_govts", "responsable_CC_etranger", "responsable_CC_passe", 
+                       "responsable_CC_nature", "enfant_CC") # TODO: generation_min generation_max , "enfant_CC_pour_lui", "enfant_CC_pour_CC"
+variables_comportement_CC <- c("mode_vie_ecolo", "changer_si_politiques", "changer_si_moyens", "changer_si_tous", "changer_non_riches", "changer_non_interet", "changer_non_negation", "changer_deja_fait", "changer_essaie")
+variables_schiste <- c("schiste_approbation", "schiste_avantage", "schiste_CC", "schiste_traite")
+variables_transferts_inter <- c("transferts_inter", "aide_2p", "transferts_inter_info", "aide_non_autonomie", "aide_non_priorite", "aide_non_etats", 
+                                "aide_non_global", "aide_non_trop", "aide_non_autonomie")
+variables_depenses_publiques <- c("depenses_confiant", "compris_depenses", "duree_depenses", "nombre_clics_depenses", "depense_totale", # budget_eq, regle_or, variations, dep_i_en_position
+                                  "depense_sante", "depense_retraites", "depense_protection", "depense_education", "depense_recherche", "depense_loisirs", "depense_infrastructures", "depense_justice", "depense_armee", "depense_securite", "depense_aide", "recette_totale", 
+                                  "en_position_0", "en_position_1", "en_position_2", "en_position_3", "en_position_4", "en_position_5", "en_position_6", "en_position_7", "en_position_8", "en_position_9", "en_position_10")
+variables_toutes <- c(variables_approbation, variables_qualite, variables_aleatoires, variables_demo, variables_energie, variables_transport, variables_politiques, 
+                      variables_gilets_jaunes, variables_gains_subjectifs, variables_Elasticite, variables_elasticite, variables_taxe_croyances, variables_benefices, 
+                      variables_problemes, variables_taxe_condition, variables_politiques, "rattrapage_diesel", variables_connaissances_CC, variables_avis_CC, 
+                      variables_comportement_CC, variables_schiste, variables_depenses_publiques)
+
+variables_wo_missing <- variables_toutes
+for (v in variables_toutes) { # display and remove variables with missing values
+  # na_v <- length(which(is.na(s[[v]]) | is.nan(s[[v]]) | is.infinite(s[[v]])))
+  if ("labelled" %in% class(s[[v]])) na_v <- length(which(is.na(s[[v]]))) #
+  else na_v <- length(which(is.missing(s[[v]])))
   if (na_v>0) {
     print(paste(v, na_v))
-    variables_big_regression <- variables_big_regression[variables_big_regression!=v] }
+    variables_wo_missing <- variables_wo_missing[variables_wo_missing!=v] }
 }
-  
-x <- model.matrix(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))),  data=s)
-y <- ifelse(s$taxe_approbation=="Oui", 1, 0)
-#perform grid search to find optimal value of lambda
-#family= binomial => logistic regression, alpha=1 => lasso 
-# check docs to explore other type.measure options
-fit <- glmnet(x, y, alpha=1, family="binomial", weights = s$weight, type.multinomial = "grouped")
-cv.out <- cv.glmnet(x, y, alpha=1, family="binomial", weights = s$weight, type.multinomial = "grouped") # TODO: how to choose alpha?; run parallel computing: parallel = T
-plot(cv.out)
-coefs_lasso <- coef(cv.out, s="lambda.1se") # lambda.min lambda.1se
-coefs_lasso <- coef(cv.out, s="lambda.min") # TODO: group variables
-data.frame(name = coefs_lasso@Dimnames[[1]][coefs_lasso@i + 1], coefficient = coefs_lasso@x) # doesn't work for multinomial
-selected_variables <- coefs_lasso@i - 1
-selected_variables <- selected_variables[selected_variables > 0 & selected_variables <= length(variables_big_regression)]
-selected_variables <- variables_big_regression[selected_variables]
-summary(glm(as.formula(paste("(taxe_approbation=='Oui') ~", paste(selected_variables, collapse=' + '))), binomial, data=s, weights=s$weight))
-# lasso <- glmnet(x, y, alpha=1, family="binomial")
 
-# find alpha
-foldid=sample(1:10,size=length(y),replace=TRUE)
-cv1=cv.glmnet(x,y,foldid=foldid,alpha=1)
-cv.5=cv.glmnet(x,y,foldid=foldid,alpha=.5)
-cv0=cv.glmnet(x,y,foldid=foldid,alpha=0)
+x <- model.matrix(as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_wo_missing, collapse=' + '))),  data=s)
+y <- ifelse(s$taxe_approbation=="Oui", 1, 0)
+# cexplore other type.measure options
+
+# fit <- glmnet(x, y, alpha=1, family="binomial", weights = s$weight)
+lasso_dev <- cv.glmnet(x, y, alpha=1, family="binomial", weights = s$weight) # run parallel computing: parallel = T;  residual deviance: 1705, AIC: 1834
+lasso_class <- cv.glmnet(x, y, alpha=1, type.measure = "class", family="binomial", weights = s$weight) # min missclassification error is 0.064 ! (very small) residual deviance: 1600, AIC: 1764
+lasso_mae <- cv.glmnet(x, y, alpha=1, type.measure = "mae", family="binomial", weights = s$weight) # residual deviance: 1390, AIC: 1626
+
+# smaller alpha yield more selected variables, a decrease of AIC and residual variance, but no decrease of minimum binomial variance
+foldid=sample(1:10, size=length(y), replace=TRUE) # TODO: difference residual variance (output glm) and binomial variance (output cross validation)?
+cv1 <- cv.glmnet(x, y, foldid=foldid, alpha=1, family="binomial", weights = s$weight) # lasso (residual deviance: 1695, AIC: 1836)
+cv.5 <- cv.glmnet(x, y, foldid=foldid, alpha=.5, family="binomial", weights = s$weight) # elastic net (residual deviance: 1646, AIC: 1791)
+cv0 <- cv.glmnet(x, y, foldid=foldid, alpha=0, family="binomial", weights = s$weight) # Ridge: all variables selected (residual deviance: 1152, AIC: 1509)
+cv0_mae <- cv.glmnet(x, y, alpha=0, type.measure = "mae", family="binomial", weights = s$weight) # all variables selected. residual deviance: 1152, AIC: 1509
+
+lasso <- lasso_dev
+plot(lasso)
+min(lasso$cvm) # min deviance. alpha = 1: 0.3399301 / 0.5: 0.3393227 / 0: 0.3456004 ; alpha = 1 and class: 0.064 / mae: 0.18
+coefs_lasso <- coef(lasso, s="lambda.1se") # lambda.1se contains less variables than lambda.min
+coefs_lasso <- coef(lasso, s="lambda.min")
+data.frame(name = coefs_lasso@Dimnames[[1]][coefs_lasso@i + 1], coefficient = coefs_lasso@x) # doesn't work for multinomial
+selected_variables <- coefs_lasso@i - 1 # TODO: why is norme_vehicules present twice?
+selected_variables <- selected_variables[selected_variables > 0 & selected_variables <= length(variables_wo_missing)]
+selected_variables <- variables_wo_missing[selected_variables] # length(selected_variables) (.min) when alpha = 1: 58 / 0.5: 62 / 0: 142 (all) ; alpha = 1 and class: 67 / mae: 97
+summary(glm(as.formula(paste("(taxe_approbation!='Non') ~", paste(selected_variables, collapse=' + '))), binomial, data=s, weights=s$weight))
+
+
+significatifs_lasso_dev_oui <- as.formula((taxe_approbation=='Oui') ~ age + fume + niveau_vie + hausse_diesel + (transports_loisirs=="La voiture") + gilets_jaunes_oppose 
+                               + perte_partielle + taxe_perdant_pauvres + taxe_benefices_CC + taxe_benefices_aucun + taxe_problemes_aucun
+                               + si_compensee + peages_urbains + ges_O2 + ges_avion + changer_si_tous)
+summary(glm(significatifs_lasso, binomial, data=s, weights=s$weight))
+
+
+##### OLS Approbation ####
+summary(lm(as.formula(paste("(taxe_approbation!='Non') ~", paste(selected_variables, collapse=' + '))), data=s, weights=s$weight))
+summary(lm(significatifs_lasso, data=s, weights=s$weight))
+summary(lm(as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_big_regression, collapse=' + '))), data=s))
+
+
+###### Approbation: ANOVA #####
+# ANalysis Of VAriance partitions sequentially the error terms of a regression where regressors are categorical variables. 
+#   This gives the Sum of squares (SS) of each variable, which depends on the rank of the variable in the list (I think that variables 
+#   have higher sum of squares when they are treated first). (SS are rank-independent when the sample is balanced, i.e. when there are the same number of observations in each category)
+#   This generalizes from OLS to logit (and other) using deviance; to continuous regressors (TODO: how? if we don't know, we could still make them categorical)
+# Is there a canonical way to decompose the variance for unbalanced samples? Like averaging SS from random draws on the ordering of the variables?
+#   I haven't found. en.wikipedia.org/wiki/Repeated_measures is something else. The more I dig, the more I realize ANOVA is fit for another
+#   purpose: when we can decompose the sample into several groups (as if there were only one categorical variable, or different but with all interaction terms)
+
+variables_big_regression <- c("revenu", "rev_tot", "hausse_carburants", "hausse_chauffage", "score_climate_call", "score_ges", "Gauche_droite",
+                              "emission_cible", "effets_CC", "ecologiste", "conservateur", "liberal", "humaniste", "patriote", "apolitique",
+                              "sexe", "age", "diplome4", "statut_emploi", "csp", "region", "fume")
+# 
+# ols <- summary(lm(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), data=s))
+# ols
+# sum(ols$residuals^2)
+# anova <- summary(aov(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), data=s))
+# anova
+# sum_sq <- anova[[1]]$'Sum Sq'
+# explained_variance <- sum(sum_sq[-length(sum_sq)])
+# print(paste("Share of explained variance: ", round(explained_variance/sum(sum_sq), 2), ". Among which, share of explained variance explained by each variable:", sep=""))
+# for (i in 1:length(variables_big_regression)) print(paste(variables_big_regression[order(sum_sq[-length(sum_sq)], decreasing = T)][i], round(sort(sum_sq[-length(sum_sq)], decreasing = T)[i]/explained_variance,3)))
+# summary(lm((taxe_approbation=='Oui') ~ ecologiste + conservateur, data=s))
+# 
+# anovaVCA(as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_big_regression, collapse=' + '))), Data=s)
+# st <- s[,c("revenu", "Gauche_droite", "humaniste")]
+# st$revenu <- n(st$revenu)
+# st$humaniste <- factor(st$humaniste)
+# anovaMM(revenu ~ Gauche_droite + humaniste, Data=st)
+# data(dataEP05A2_2)
+# dt <- dataEP05A2_2[-1,]
+# st <- cbind(st[1:79,], dt)
+# anovaMM(revenu ~ day, st)
+
+# TODO: non linear ANOVA
+variables_big_regression <- selected_variables[!duplicated(selected_variables) & selected_variables!="ges_pm"] # TODO: why is there a bug with ges_pm?
+nb_draws <- 100
+sum_sq_all <- matrix(nrow = length(variables_big_regression), ncol = nb_draws, dimnames = list(variables_big_regression))
+for (i in 1:nb_draws) {
+  variables_i <- variables_big_regression[shuffle(length(variables_big_regression))]
+  anova_i <- summary(aov(as.formula(paste("(taxe_approbation!='Non') ~ ", paste(variables_i, collapse=' + '))), data=s, weights = s$weight))
+  sum_sq_i <- anova_i[[1]]$'Sum Sq'
+  explained_error <- sum(sum_sq_i[-length(sum_sq_i)]) # independent of i
+  for (v in variables_big_regression) sum_sq_all[v,i] <- sum_sq_i[which(variables_i==v)]/explained_error
+}
+sum_sq_average <- rowMeans(sum_sq_all)
+sum_sq_sd <- apply(sum_sq_all, 1, sd)
+explained_error/(var(s$taxe_approbation!='Non')*nrow(s)) # share of explained variance (0.08 with arbitrary pick, 0.31 with lasso)
+sort(sum_sq_average, decreasing = T) # average share of explained variance explained by each variable
+sum_sq_sd[order(sum_sq_average, decreasing = T)] # standard deviation of the share of explained variance explained by each variable
+sort(sum_sq_average, decreasing = T)/sum_sq_sd[order(sum_sq_average, decreasing = T)] # "T-stats"
+sum(sum_sq_average) # should = 1 (if it's not, probably because one variable is missing in anova_i; to find which one, run next line (I found ges_pm))
+# for (v in variables_big_regression) if (!(v %in% broom::tidy(aov(as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_i, collapse=' + '))), data=s, weights = s$weight))$term )) print(v) 
+
 
 ##### Logit Approbation #####
 # All variables we can think of (TODO: complete the list)
-logit_all <- glm((taxe_approbation=='Oui') ~ revenu + rev_tot + hausse_carburants + hausse_chauffage + score_climate_call + score_ges
+logit_all <- glm((taxe_approbation!='Non') ~ revenu + rev_tot + hausse_carburants + hausse_chauffage + score_climate_call + score_ges
               + Gauche_droite + emission_cible + effets_CC + ecologiste + conservateur + liberal + humaniste + patriote + apolitique
               + sexe + age + diplome4 + statut_emploi + csp + region, 
             family = "binomial", data=s)
@@ -186,22 +261,22 @@ summary(logit_all)
 PseudoR2(logit_all)
 
 # Only significant variables
-summary(glm((taxe_approbation=='Oui') ~ hausse_chauffage + score_climate_call + ecologiste + conservateur + humaniste + sexe , 
+summary(glm((taxe_approbation!='Non') ~ hausse_chauffage + score_climate_call + ecologiste + conservateur + humaniste + sexe , 
             binomial, data=s))
 
 # Only demographics
-summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + age + region, 
+summary(glm((taxe_approbation!='Non') ~ revenu + rev_tot + sexe + age + region, 
             family = "binomial", data=s)) # *: -age, +revenu, -rev_tot, +Homme, qq regions
-summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region, 
+summary(glm((taxe_approbation!='Non') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region, 
             family = "binomial", data=s)) # *: +revenu, -rev_tot, +Homme, qq regions
-summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + Age + Diplome + region, 
+summary(glm((taxe_approbation!='Non') ~ revenu + rev_tot + sexe + Age + Diplome + region, 
             family = "binomial", data=s)) # *: +revenu, -rev_tot, +Homme, qq regions
 
 # Demographics + politics
-summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region
+summary(glm((taxe_approbation!='Non') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region
             + Gauche_droite + ecologiste + conservateur + liberal + humaniste + patriote + apolitique, 
             family = "binomial", data=s)) # *: apolitique, ecologiste, conservateur, +revenu, -rev_tot, +Homme, qq regions
-summary(glm((taxe_approbation=='Oui') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region
+summary(glm((taxe_approbation!='Non') ~ revenu + rev_tot + sexe + age + diplome4 + statut_emploi + csp + region
             + Gauche_droite + ecologiste + conservateur + liberal + humaniste + patriote + apolitique, 
             family = "binomial", data=s)) # *: apolitique, ecologiste, conservateur, +revenu, -rev_tot, +Homme, qq regions
 
@@ -390,6 +465,7 @@ for (v in variables_problemes[1:(length(variables_problemes)-2)]) {
   labels_problemes <- c(labels_problemes, gsub(" - .*", "", gsub(".*: ", "", Label(s[[v]]))))
   values_problemes <- c(values_problemes, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
 
+# TODO: perdants/gagnants + variante_monetaire
 # oui_non(margin_l=430, variables_benefices[1:(length(variables_benefices)-2)], "barres_benefices", labels_benefices)
 # oui_non(margin_l=430, variables_problemes[1:(length(variables_problemes)-2)], "barres_problemes", labels_problemes)
 

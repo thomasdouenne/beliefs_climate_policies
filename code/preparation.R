@@ -993,7 +993,7 @@ convert_s <- function() {
   s$perte_partielle[s$variante_partielle=='c'] <<- s$perte_chauffage[s$variante_partielle=='c']
   s$perte_partielle[s$variante_partielle=='f'] <<- s$perte_fuel[s$variante_partielle=='f']
   label(s$perte_partielle) <<- "perte_partielle: Une hausse des taxes sur variante_partielle (chauffage ou fuel) ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155, 162"
-  
+  # naming: perte -> gain_relatif / gain_taxe -> gain_categorie / gain -> gain ou gain_valeur
   # s$gain_fuel <- NA
   s$gain_fuel[s$gain_taxe_fuel=='Non affecté' & s$variante_partielle=='f'] <<- 0
   s$gain_fuel[s$gain_taxe_fuel=='Gagnant' & s$variante_partielle=='f'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_hausse[s$gain_taxe_fuel=='Gagnant' & s$variante_partielle=='f']))))/25
@@ -1005,6 +1005,13 @@ convert_s <- function() {
   s$gain_chauffage[s$gain_taxe_chauffage=='Perdant' & s$variante_partielle=='c'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_chauffage_baisse[s$gain_taxe_chauffage=='Perdant' & s$variante_partielle=='c']))))/25
   label(s$gain_chauffage) <<- "gain_fuel: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe chauffage compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
 
+  s$gain_taxe_partielle[s$variante_partielle=='c'] <<- s$gain_taxe_chauffage[s$variante_partielle=='c'] 
+  s$gain_taxe_partielle[s$variante_partielle=='f'] <<- s$gain_taxe_fuel[s$variante_partielle=='f']
+  label(s$gain_taxe_partielle) <<- "gain_taxe_partielle: Ménage Gagnant/Non affecté/Perdant par hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gain_taxe_fuel/chauffage)"
+  s$gain_partielle[s$variante_partielle=='c'] <<- s$gain_chauffage[s$variante_partielle=='c'] 
+  s$gain_partielle[s$variante_partielle=='f'] <<- s$gain_fuel[s$variante_partielle=='f']
+  label(s$gain_partielle) <<- "gain_partielle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gain_fuel/chauffage)"
+  
   s$gain[s$gain_taxe=='Non affecté' & s$variante_partielle!='NA'] <<- 0
   s$gain[s$gain_taxe=='Gagnant' & s$variante_partielle!='NA'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_hausse[s$gain_taxe=='Gagnant' & s$variante_partielle!='NA']))))/50
   s$gain[s$gain_taxe=='Perdant' & s$variante_partielle!='NA'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_baisse[s$gain_taxe=='Perdant' & s$variante_partielle!='NA']))))/50
@@ -1145,6 +1152,12 @@ convert_s <- function() {
   s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) + 1*(s$ges_nucleaire == FALSE)
   label(s$score_climate_call) <<- "score_climate_call: Somme des bonnes réponses au questionnaire Climate Call (avion-train / boeuf-pates / nucleaire-eolien) ges_avion/boeuf/nucleaire"  
 
+  s$duree_info[s$info_CC==1 & s$info_PM==1] <<- s$duree_info_CC_PM[s$info_CC==1 & s$info_PM==1]
+  s$duree_info[s$info_CC==0 & s$info_PM==1] <<- s$duree_info_PM[s$info_CC==0 & s$info_PM==1]
+  s$duree_info[s$info_CC==1 & s$info_PM==0] <<- s$duree_info_CC[s$info_CC==1 & s$info_PM==0]
+  s$duree_info[s$info_CC==0 & s$info_PM==0] <<- s$duree_no_info[s$info_CC==0 & s$info_PM==0]
+  label(s$duree_info) <<- "duree_info: Temps de soumission - Ancrage (information procurée ou non au début sur changement climatique ou particules fines) (duree_info_CC/PM/CC_PM/no_info)"
+  
   for (v in c("autonomie", "priorite", "etats", "global", "trop")) {
     s[[paste("aide_non", v, sep="_")]] <<- NA
     s[[paste("aide_non", v, sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==T & s$aide_2p==T] <<- s[[paste("aide_non", v, "i", sep="_")]]
