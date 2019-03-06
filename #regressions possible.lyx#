@@ -130,13 +130,13 @@ Variables
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $A^{I}$
+\begin_inset Formula $A^{i}$
 \end_inset
 
  taxe_approbation: Oui/Non/NSP approbation hausse taxe compensée avant info
  (
 \emph on
-I
+i
 \emph default
  pour initial ou ignorant)
 \end_layout
@@ -155,26 +155,6 @@ I
 
  simule_gagnant: ménage simulé gagnant avec 5 chances sur 6 suite à hausse
  taxe compensée 
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $G^{P}$
-\end_inset
-
-/
-\begin_inset Formula $G^{F}$
-\end_inset
-
-: gagnant_[progressif/feedback]_categorie: G/N/P suite à hausse taxe compensée
- et à affichage de l'info sur la progressivité 
-\begin_inset Formula $I^{P}$
-\end_inset
-
- / simule_gagnant 
-\begin_inset Formula $\Gamma$
-\end_inset
-
-
 \end_layout
 
 \begin_layout Itemize
@@ -202,21 +182,7 @@ I
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $T$
-\end_inset
 
- (resp.
- 
-\begin_inset Formula $T_{2}$
-\end_inset
-
-) transfert: indicatrice que le répondant (resp.
- son conjoint) reçoit un versement dans la taxe avec compensation ciblée
- (
-\begin_inset Formula $T=\left(R<c\right)$
-\end_inset
-
-)
 \end_layout
 
 \begin_layout Itemize
@@ -232,48 +198,6 @@ I
 
  taxe_cible_approbation: Oui/Non/NSP approbation hausse taxe avec compensation
  ciblée
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $R$
-\end_inset
-
- (resp.
- 
-\begin_inset Formula $R_{2}$
-\end_inset
-
-): revenu (resp.
- revenu du conjoint)
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $\mathbf{C}$
-\end_inset
-
-: vecteur de contrôles
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $\Delta A^{v}=A^{v}-A^{I}$
-\end_inset
-
- pour 
-\begin_inset Formula $v\in\left\{ C;F;P\right\} $
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $\Delta G^{v}=G^{v}-G$
-\end_inset
-
- pour 
-\begin_inset Formula $v\in\left\{ C;F\right\} $
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -373,40 +297,8 @@ Intérêt personnel
 Discontinuité instrumentée
 \end_layout
 
-\begin_layout Standard
-\begin_inset Formula 
-\begin{align*}
-G_{i}^{C} & =\gamma_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
-A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
-\end{align*}
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 Simulation comme instrument
-\end_layout
-
-\begin_layout Standard
-introduire 
-\begin_inset Formula $A^{I}$
-\end_inset
-
- produit un effet
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{align*}
-G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
-A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
-\end{align*}
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -414,33 +306,7 @@ Persistance des croyances
 \end_layout
 
 \begin_layout Subsection
-Persistance après la simulation
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\Delta G_{i}^{F}=\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
 Simulation comme instrument
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\Delta A_{i}^{F}=\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
-\]
-
-\end_inset
-
-
 \end_layout
 
 \end_body

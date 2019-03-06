@@ -71,7 +71,7 @@ plot(cdf_gain$x, cdf_gain$ecdf, type='s', lwd=2, col='orange', xlab="Category of
 
 
 ##### Approbation #####
-decrit(s$taxe_approbation) # 11% Dur !!!
+decrit(s$taxe_approbation, miss=T, weights=s$weight) # 10% Dur !!!
 decrit(s$taxe_approbation[s$gilets_jaunes_soutien==TRUE])
 decrit(s$taxe_approbation[s$gilets_jaunes_oppose==TRUE])
 decrit(s$taxe_feedback_approbation) # 17%
@@ -81,6 +81,12 @@ summary(lm((taxe_feedback_approbation=='Oui') ~ (gagnant_categorie!='Perdant'), 
 summary(lm((taxe_progressif_approbation=='Oui') ~ (gagnant_categorie!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ (taxe_efficace!='Non') + (gagnant_categorie!='Perdant'), data=s, weights = s$weight))
 summary(lm((taxe_approbation=='Oui') ~ score_climate_call + score_polluants + (gagnant_categorie!='Perdant'), data=s, weights = s$weight))
+
+decrit(s$taxe_approbation[s$gagnant_categorie=='Gagnant'], miss=T) # 32% de ceux qui s'estiment gagnant approuvent
+decrit(s$taxe_feedback_approbation[s$gagnant_categorie=='Gagnant'], miss=T) # 32% de ceux qui s'estiment gagnant approuvent après info
+decrit(s$taxe_feedback_approbation[s$gagnant_feedback_categorie=='Gagnant'], miss=T) # 52% de ceux qui s'estiment gagnant après info approuvent après info
+decrit(s$taxe_feedback_approbation[s$gagnant_categorie!='Gagnant' & s$gagnant_feedback_categorie=='Gagnant'], miss=T) 
+# 48% de ceux qu'on fait changer d'avis approuvent
 
 
 ##### Approbation: Model Selection #####

@@ -82,10 +82,364 @@ Régressions possibles
 \end_layout
 
 \begin_layout Section
+Termes
+\end_layout
+
+\begin_layout Subsection
 Variables
 \end_layout
 
+\begin_layout Itemize
+\begin_inset Formula $L^{\mathring{T}}$
+\end_inset
+
+/
+\begin_inset Formula $L^{\mathring{L}}$
+\end_inset
+
+ perte_relative_partielle: 
+\begin_inset Formula $\left[-2;+2\right]$
+\end_inset
+
+ suite à hausse taxe partielle
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $G^{p}$
+\end_inset
+
+ gagnant_categorie_partielle: G/N/P suite à hausse taxe partielle compensée
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $G$
+\end_inset
+
+ gagnant_categorie: G/N/P suite à hausse taxe compensée
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\tilde{G}$
+\end_inset
+
+ gain: 
+\begin_inset Formula $\left[-6;+5\right]$
+\end_inset
+
+ suite à hausse taxe compensée
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $A^{I}$
+\end_inset
+
+ taxe_approbation: Oui/Non/NSP approbation hausse taxe compensée avant info
+ (
+\emph on
+I
+\emph default
+ pour initial ou ignorant)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $P$
+\end_inset
+
+ progressivite: Oui/Non/NSP hausse taxe compensée avantagerait les plus
+ modestes (seulement pour apres_modifs)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ simule_gagnant: ménage simulé gagnant avec 5 chances sur 6 suite à hausse
+ taxe compensée 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $G^{P}$
+\end_inset
+
+/
+\begin_inset Formula $G^{F}$
+\end_inset
+
+: gagnant_[progressif/feedback]_categorie: G/N/P suite à hausse taxe compensée
+ et à affichage de l'info sur la progressivité 
+\begin_inset Formula $I^{P}$
+\end_inset
+
+ / simule_gagnant 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $A^{P}$
+\end_inset
+
+/
+\begin_inset Formula $A^{F}$
+\end_inset
+
+ taxe_[progressif/feedback]_approbation: Oui/Non/NSP approbation hausse
+ taxe compensée après info progressivité et/ou simule_gagnant (
+\begin_inset Formula $A^{r}$
+\end_inset
+
+ pour renseigné)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\pi$
+\end_inset
+
+ categorie_cible: /20/30/40/50/70/ catégorie de revenus du répondant et
+ de son ménage
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $T$
+\end_inset
+
+ (resp.
+ 
+\begin_inset Formula $T_{2}$
+\end_inset
+
+) transfert: indicatrice que le répondant (resp.
+ son conjoint) reçoit un versement dans la taxe avec compensation ciblée
+ (
+\begin_inset Formula $T=\left(R<c\right)$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $G^{C}$
+\end_inset
+
+ gain_cible: G/N/P suite à hausse taxe avec compensation ciblée
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $A^{C}$
+\end_inset
+
+ taxe_cible_approbation: Oui/Non/NSP approbation hausse taxe avec compensation
+ ciblée
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $R$
+\end_inset
+
+ (resp.
+ 
+\begin_inset Formula $R_{2}$
+\end_inset
+
+): revenu (resp.
+ revenu du conjoint)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+: vecteur de contrôles
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\Delta A^{v}=A^{v}-A^{I}$
+\end_inset
+
+ pour 
+\begin_inset Formula $v\in\left\{ C;F;P\right\} $
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\Delta G^{v}=G^{v}-G$
+\end_inset
+
+ pour 
+\begin_inset Formula $v\in\left\{ C;F\right\} $
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Réformes
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $V$
+\end_inset
+
+ hausse TVA
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathring{p}:\mathring{T},\mathring{L}$
+\end_inset
+
+ hausse taxe partielle
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $p:T,L$
+\end_inset
+
+ hausse taxe partielle compensée
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\textrm{Ø}$
+\end_inset
+
+ hausse taxe compensée
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $C$
+\end_inset
+
+ hausse taxe avec compensation ciblée (20/30/40/50 percentiles)
+\end_layout
+
+\begin_layout Subsection
+Traitements
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $p:T,L$
+\end_inset
+
+ variante_partielle: fuel ou chauffage 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $S$
+\end_inset
+
+ apres_modifs: 2è moitié: rajout de questions et d'information sur la progressiv
+ité
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $r:F,P$
+\end_inset
+
+ variante_feedback: f/p: feedback (2/3) / progressivité (1/3)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $I^{P}$
+\end_inset
+
+ info_progressivite: info sur la progressivité ((variante: progressivité)
+ ou (apres_modifs et variante: feedback et variante_progressivite: fb_info))
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $c$
+\end_inset
+
+ cible 
+\begin_inset Formula $\lessgtr$
+\end_inset
+
+ 
+\begin_inset Formula $\pi$
+\end_inset
+
+ categorie_cible: cible attribuée aléatoirement comme max ou min de categorie_ci
+ble (sauf pour categorie_cible=>70)
+\end_layout
+
+\begin_layout Section
+Intérêt personnel
+\end_layout
+
+\begin_layout Subsection
+Discontinuité instrumentée
+\end_layout
+
 \begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+G_{i}^{C} & =\gamma_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Simulation comme instrument
+\end_layout
+
+\begin_layout Standard
+introduire 
+\begin_inset Formula $A^{I}$
+\end_inset
+
+ produit un effet
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Persistance des croyances
+\end_layout
+
+\begin_layout Subsection
+Persistance après la simulation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta G_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Simulation comme instrument
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta A_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\]
+
+\end_inset
+
 
 \end_layout
 
