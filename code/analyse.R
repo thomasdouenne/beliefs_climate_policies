@@ -442,7 +442,7 @@ labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red
 labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
 labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
 barres(file="politiques_environnementales", title="<b>Seriez-vous favorable aux politiques environnementales suivantes ?</b>", 
-       data=data5(names(s)[141:148], miss=FALSE), nsp=FALSE, sort=T, color=color5, legend = c(oui_non5), labels=labels_politiques_env)
+       data=data5(names(s)[141:148], miss=FALSE), nsp=FALSE, sort=T, color=(color5), legend = c(oui_non5), labels=labels_politiques_env)
 barres(file="environmental_policies", title="<b>Would you agree with the following environnemental policies?</b>", 
        data=data5(names(s)[141:148], miss=FALSE), nsp=FALSE, sort=T, color=color5, legend = c(yes_no5), labels=labels_environmental_policies)
 barres(file="taxe_condition", title="Dans quels cas seriez-vous favorable à l'augmentation de la taxe carbone ?<br><b>Je serais favorable si les recettes de la taxe étaient utilisées pour financer ...</b>", 
@@ -481,3 +481,99 @@ barres_problemes
 dev.print(png, '../images/probleme.png')
 # orca(barres_problemes, "../images/problemes.png")
 # orca(barres_benefices, "../images/benefices.png")
+
+
+##### Perdants/Gagnants #####
+labels_gagnant_perdant <- c()
+values_gagnant <- c()
+for (v in variables_taxe_gagnant) {
+  labels_gagnant_perdant <- c(labels_gagnant_perdant, gsub(" - .*", "", gsub(".*: ", "", Label(s[[v]]))))
+  values_gagnant <- c(values_gagnant, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
+values_perdant <- c()
+for (v in variables_taxe_perdant) {
+  values_perdant <- c(values_perdant, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
+labels_gagnant_perdant[7] <- "Certains Français, mais <br>pas une catégorie de revenus particulière"
+labels_gagnant <- labels_perdant <- labels_gagnant_perdant
+labels_perdant[6] <- "Les ruraux"
+
+# TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
+
+barres_gagnants <- barres(file="gagnants", title="<b>Selon vous, quels seraient les gagnants avec une telle mesure ?</b><br>(choix multiples)", margin_l = 200, data=matrix(values_gagnant, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
+barres_perdants <- barres(file="perdants", title="<b>Selon vous, quels seraient les perdants avec une telle mesure ?</b><br>(choix multiples)", margin_l = 200, data=matrix(values_perdant, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
+barres_gagnants
+barres_perdants
+
+for (v in c(variables_taxe_gagnant, variables_taxe_perdant)) {
+  reg_v <- summary(glm(as.formula(paste(v, "==T ~ variante_monetaire")), data=s, weights=s$weight))
+  if (reg_v$coefficients[2,4]<0.05) print(paste(v, ": coef: ", reg_v$coefficients[2], "; p-value: ", reg_v$coefficients[2,4]))
+}
+test <- glm(as.formula(paste(variables_taxe_gagnant[1], "==T ~ variante_monetaire")), data=s, weights=s$weight)
+test <- summary(glm(as.formula(paste(variables_taxe_gagnant[1], "==T ~ variante_monetaire")), data=s, weights=s$weight))
+length(c(variables_taxe_gagnant, variables_taxe_perdant))
+
+
+##### Gilets jaunes #####
+decrit(s$gilets_jaunes_dedans, weights = s$weight)
+decrit(s$gilets_jaunes_soutien, weights = s$weight)
+decrit(s$gilets_jaunes_compris, weights = s$weight)
+decrit(s$gilets_jaunes_oppose, weights = s$weight)
+decrit(s$gilets_jaunes_NSP, weights = s$weight)
+decrit((s$gilets_jaunes_oppose==T & (s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T)))
+
+values_benefices_GJ_approuve <- c()
+values_benefices_GJ_oppose <- c()
+for (v in variables_benefices[1:(length(variables_benefices)-2)]) {
+  values_benefices_GJ_approuve <- c(values_benefices_GJ_approuve, sum(s$weight[which(s[[v]]==T & (s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T))])/sum(s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T]))
+  values_benefices_GJ_oppose <- c(values_benefices_GJ_oppose, sum(s$weight[which(s[[v]]==T & s$gilets_jaunes_oppose==T)])/sum(s$weight[s$gilets_jaunes_oppose==T])) }
+values_problemes_GJ_approuve <- c()
+values_problemes_GJ_oppose <- c()
+for (v in variables_problemes[1:(length(variables_problemes)-2)]) {
+  values_problemes_GJ_approuve <- c(values_problemes_GJ_approuve, sum(s$weight[which(s[[v]]==T & (s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T))])/sum(s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T]))
+  values_problemes_GJ_oppose <- c(values_problemes_GJ_oppose, sum(s$weight[which(s[[v]]==T & s$gilets_jaunes_oppose==T)])/sum(s$weight[s$gilets_jaunes_oppose==T])) }
+# TODO: perdants/gagnants + variante_monetaire
+# oui_non(margin_l=430, variables_benefices[1:(length(variables_benefices)-2)], "barres_benefices", labels_benefices)
+# oui_non(margin_l=430, variables_problemes[1:(length(variables_problemes)-2)], "barres_problemes", labels_problemes)
+
+# TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
+decrit((s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T), weights = s$weight)
+decrit((s$gilets_jaunes_oppose==T), weights = s$weight)
+barres(file="politiques_environnementales_GJ_approuve", title="Seriez-vous favorable aux politiques environnementales suivantes ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", 
+       data=data5(names(s)[141:148], miss=FALSE, data=s[s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T,]), nsp=FALSE, sort=T, color=(color5), legend = c(oui_non5), labels=labels_politiques_env)
+barres(file="politiques_environnementales_GJ_oppose", title="Seriez-vous favorable aux politiques environnementales suivantes ?<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", 
+       data=data5(names(s)[141:148], miss=FALSE, data=s[s$gilets_jaunes_oppose==T,]), nsp=FALSE, sort=T, color=(color5), legend = c(oui_non5), labels=labels_politiques_env)
+barres(file="taxe_condition_GJ_approuve", title="Je serais favorable à la hausse de la taxe carbone si les recettes étaient utilisées pour financer ...<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", 
+       data=data5(names(s)[131:139], miss=FALSE, data=s[s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T,]), nsp=FALSE, margin_l = 270, sort=T, color=color5, legend = c(oui_non5), labels=labels_taxe_condition)
+barres(file="taxe_condition_GJ_oppose", title="Je serais favorable à la hausse de la taxe carbone si les recettes étaient utilisées pour financer ...<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", 
+       data=data5(names(s)[131:139], miss=FALSE, data=s[s$gilets_jaunes_oppose==T,]), nsp=FALSE, margin_l = 270, sort=T, color=color5, legend = c(oui_non5), labels=labels_taxe_condition)
+
+barres_benefices_GJ_approuve <- barres(file="benefices_GJ_approuve", title="<b>Bénéfices d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_benefices_GJ_approuve, ncol=length(values_benefices)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_benefices, hover=labels_benefices, legend="empty")
+barres_problemes_GJ_approuve <- barres(file="problemes_GJ_approuve", title="<b>Problèmes d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_problemes_GJ_approuve, ncol=length(values_problemes)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_problemes, hover=labels_problemes, legend="empty")
+barres_benefices_GJ_oppose <- barres(file="benefices_GJ_oppose", title="<b>Bénéfices d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_benefices_GJ_oppose, ncol=length(values_benefices)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_benefices, hover=labels_benefices, legend="empty")
+barres_problemes_GJ_oppose <- barres(file="problemes_GJ_oppose", title="<b>Problèmes d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_problemes_GJ_oppose, ncol=length(values_problemes)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_problemes, hover=labels_problemes, legend="empty")
+barres_benefices_GJ_approuve
+barres_problemes_GJ_approuve
+barres_benefices_GJ_oppose
+barres_problemes_GJ_oppose
+
+values_gagnant_GJ_approuve <- c()
+values_gagnant_GJ_oppose <- c()
+for (v in variables_taxe_gagnant) {
+  values_gagnant_GJ_approuve <- c(values_gagnant_GJ_approuve, sum(s$weight[which(s[[v]]==T & (s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T))])/sum(s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T]))
+  values_gagnant_GJ_oppose <- c(values_gagnant_GJ_oppose, sum(s$weight[which(s[[v]]==T & s$gilets_jaunes_oppose==T)])/sum(s$weight[s$gilets_jaunes_oppose==T])) }
+values_perdant_GJ_approuve <- c()
+values_perdant_GJ_oppose <- c()
+for (v in variables_taxe_perdant) {
+  values_perdant_GJ_approuve <- c(values_perdant_GJ_approuve, sum(s$weight[which(s[[v]]==T & (s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T))])/sum(s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T])) 
+  values_perdant_GJ_oppose <- c(values_perdant_GJ_oppose, sum(s$weight[which(s[[v]]==T & s$gilets_jaunes_oppose==T)])/sum(s$weight[s$gilets_jaunes_oppose==T])) }
+
+# TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
+
+barres_gagnants_GJ_approuve <- barres(file="gagnants_GJ_approuve", title="Selon vous, quels seraient <b>les gagnants</b> avec une telle mesure ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", margin_l = 200, data=matrix(values_gagnant_GJ_approuve, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
+barres_gagnants_GJ_oppose <- barres(file="gagnants_GJ_oppose", title="Selon vous, quels seraient <b>les gagnants</b> avec une telle mesure ?<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", margin_l = 200, data=matrix(values_gagnant_GJ_oppose, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
+barres_perdants_GJ_approuve <- barres(file="perdants_GJ_approuve", title="Selon vous, quels seraient <b>les perdants</b> avec une telle mesure ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", margin_l = 200, data=matrix(values_perdant_GJ_approuve, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
+barres_perdants_GJ_oppose <- barres(file="perdants_GJ_oppose", title="Selon vous, quels seraient <b>les perdants</b> avec une telle mesure ?<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", margin_l = 200, data=matrix(values_perdant_GJ_oppose, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
+barres_gagnants_GJ_approuve
+barres_gagnants_GJ_oppose
+barres_perdants_GJ_approuve
+barres_perdants_GJ_oppose
+# TODO: combiner les deux graphes opposants/soutiens, pourcentages
