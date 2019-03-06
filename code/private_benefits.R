@@ -24,16 +24,18 @@ s$transfert_seuil_gagnant <- 1 * (s$gain_taxe__20=='Gagnant') + 1 * (s$gain_taxe
 
 s_0_70 <- subset(s, categorie_cible != '70_')
 
-y_dummy_approbation_cible <- s_0_70$dummy_approbation_cible
-x_transfert_seuil_gagnant <- s_0_70$transfert_seuil_gagnant
-z1_traite_transfert <- s_0_70$traite_transfert
-z2_traite_transfert_conjoint <- s_0_70$traite_transfert_conjoint
-c1_taxe_approbation <- s_0_70$taxe_approbation # Peut-être ajouter d'autres variables de contrôle
+# Simple OLS #
+ols_approve_winner <- lm(y_dummy_approbation_cible ~ x_transfert_seuil_gagnant + c1_taxe_approbation, data=s_0_70, weights = s_0_70$weight)
+summary(ols_approve_winner)
+# Une OLS standard nous donne qu'une personne se percevant gagnante a une probabilité d'approbation supérieure de 48 p.p.
 
-tsls_rdd_1 <- lm(transfert_seuil_gagnant ~ taxe_approbation + traite_transfert + traite_transfert_conjoint + revenu + revenu_conjoint + revenu_2 + revenu_conjoint_2, data=s_0_70, weights = s_0_70$weight)
+cor(s$transfert_seuil_gagnant, s$traite_transfert)
+cor(s$transfert_seuil_gagnant, s$traite_transfert_conjoint)
+
+tsls_rdd_1 <- lm(transfert_seuil_gagnant ~ taxe_approbation + hausse_depenses + traite_transfert + traite_transfert_conjoint + revenu + revenu_conjoint + revenu_2 + revenu_conjoint_2, data=s_0_70, weights = s_0_70$weight)
 
 d_rdd.hat <- fitted.values(tsls_rdd_1)
-tsls_rdd_2 <- lm(dummy_approbation_cible ~ d_rdd.hat + taxe_approbation + revenu + revenu_conjoint, data=s_0_70, weights = s_0_70$weight)
+tsls_rdd_2 <- lm(dummy_approbation_cible ~ d_rdd.hat + taxe_approbation + hausse_depenses + revenu + revenu_conjoint, data=s_0_70, weights = s_0_70$weight)
 summary(tsls_rdd_2)
 # On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
 # Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
@@ -61,11 +63,6 @@ x_transfert_seuil_gagnant <- s_20_50$transfert_seuil_gagnant
 z1_traite_transfert <- s_20_50$traite_transfert
 z2_traite_transfert_conjoint <- s_20_50$traite_transfert_conjoint
 c1_taxe_approbation <- s_20_50$taxe_approbation # Peut-être ajouter d'autres variables de contrôle
-
-# Simple OLS #
-ols_approve_winner <- lm(y_dummy_approbation_cible ~ x_transfert_seuil_gagnant + c1_taxe_approbation, data=s_20_50, weights = s_20_50$weight)
-summary(ols_approve_winner)
-# Une OLS standard nous donne qu'une personne se percevant gagnante a une probabilité d'approbation supérieure de 51 p.p.
 
 # 2SLS #
 cor(z1_traite_transfert,x_transfert_seuil_gagnant)
@@ -161,7 +158,7 @@ sf$gains_nets_estimes <- sf$hausse_depenses - 110 * sf$nb_adultes - 16.1
 sf$gains_nets_estimes_2 <- sf$gains_nets_estimes^2
 
 # OLS simple
-ols_feedback <- lm(dummy_approbation_feedback ~ dummy_declare_gain_taxe_feedback, data=sf, weights = sf$weight)
+ols_feedback <- lm(dummy_approbation_feedback ~ dummy_declare_gain_taxe_feedback + taxe_approbation, data=sf, weights = sf$weight)
 summary(ols_feedback)
 
 # RDD simple - effet d'être gagnant
@@ -177,3 +174,10 @@ summary(tsls_rdd_feedback_2)
 # Les résultats sont sensiblement les mêmes que dans le cas des seuils :
 # 1) Etre gagnant augmente la probabilité d'approuver de 10p.p., 2) se considérer gagnant augmente la probabilité d'approuver de 50p.p.
 # L'effet estimé est ici local, et concerne les personnes qui sont à la limite de gagner/perdre.
+
+
+##### 7. Biprobit - WIP...
+biprobit_feedback <- biprobit(dummy_approbation_feedback~1+dummy_declare_gain_taxe_feedback, rho=~1+dummy_declare_gain_taxe_feedback,data=sf)
+summary(biprobit_feedback)
+margins(biprobit_feedback)
+summary(margins(biprobit_feedback, variables = "dummy_declare_gain_taxe_feedback"))

@@ -76,3 +76,21 @@ summary(lm(s$effets_CC_NSP ~ s$info_CC + s$info_PM + (s$info_CC * s$info_PM), da
 logit_taxe_approbation <- glm(dummy_approbation ~ dummy_taxe_efficace + revenu + fioul + gaz + taille_menage + surface, data=s, family=binomial(link="logit"))
 summary(logit_taxe_approbation) # To do : ajouter les variables de contrôle pertinentes pour avoir une bonne spécification
 margins(logit_taxe_approbation)
+
+
+##### 2SLS avec nouvel instrument #####
+s$info_efficacite <- 1 * (s$apres_modifs == TRUE)
+decrit(s$taxe_efficace)
+
+# OLS
+ols_approuve_efficace <- lm((s$taxe_approbation == 'Oui') ~ (s$taxe_efficace == 'Oui'), data=s, weights = s$weight)
+summary(ols_approuve_efficace) # Effet assez fort : +0.39, si l'on ne contrôle pour rien
+
+# Pertinence de l'instrument
+cor(s$info_efficacite, (s$taxe_efficace == 'Oui'))
+summary(lm((s$taxe_efficace == 'Oui') ~ s$info_efficacite, data=s, weights = s$weight))
+
+tsls_efficacite_1 <- lm((taxe_efficace == 'Oui') ~ info_efficacite, data=s, weights = s$weight)
+d_efficacite.hat <- fitted.values(tsls_efficacite_1)
+tsls_efficacite_2 <- lm((taxe_approbation == 'Oui') ~ d_efficacite.hat, data=s, weights = s$weight)
+summary(tsls_efficacite_2)
