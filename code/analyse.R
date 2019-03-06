@@ -40,13 +40,13 @@ decrit(s$nb_vehicules, weights = s$weight)
 
 
 ##### Gain questions générales (TVA, transports, logement) #####
-decrit(s$gain_relatif_tva, weights = s$weight)
-decrit(s$gain_relatif_fuel, weights = s$weight)
-decrit(s$gain_relatif_chauffage, weights = s$weight) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
-temp1 <- temp2 <- s[,c("gain_relatif_tva", "gain_relatif_fuel", "gain_relatif_chauffage", "gain_relatif_partielle", "variante_partielle", "weight")]
-temp1$perte <- temp1$gain_relatif_tva
+decrit(s$perte_relative_tva, weights = s$weight)
+decrit(s$perte_relative_fuel, weights = s$weight)
+decrit(s$perte_relative_chauffage, weights = s$weight) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
+temp1 <- temp2 <- s[,c("perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage", "perte_relative_partielle", "variante_partielle", "weight")]
+temp1$perte <- temp1$perte_relative_tva
 temp1$variante_perte <- "tva"
-temp2$perte <- temp2$gain_relatif_partielle
+temp2$perte <- temp2$perte_relative_partielle
 temp2$variante_perte <- temp2$variante_partielle
 s_perte <- merge(temp1, temp2, all=T)
 # s_perte$variante_perte <- relevel(as.factor(s_perte$variante_perte), "tva")
@@ -118,7 +118,7 @@ variables_transport <- c("transports_distance", "transports_frequence", "transpo
                          "transports_travail_commun", "transports_travail_actif") # TODO: missing values distance, travail
 variables_politiques <- c("interet_politique", "conservateur", "liberal", "humaniste", "patriote", "apolitique", "ecologiste", "Gauche_droite")
 variables_gilets_jaunes <- c("gilets_jaunes_dedans", "gilets_jaunes_soutien", "gilets_jaunes_compris", "gilets_jaunes_oppose", "gilets_jaunes_NSP")
-variables_gains_subjectifs <- c("gain_relatif_tva", "gain_relatif_partielle", "gagnant_categorie_partielle", "gain_partielle", "gagnant_categorie", "gain", "gagnant_feedback_categorie", 
+variables_gains_subjectifs <- c("perte_relative_tva", "perte_relative_partielle", "gagnant_categorie_partielle", "gain_partielle", "gagnant_categorie", "gain", "gagnant_feedback_categorie", 
                                 "gagnant_progressif_categorie", "gain_cible") # TODO: group feedback/progressif
 variables_Elasticite <- c("Elasticite_fuel", "Elasticite_fuel_perso", "Elasticite_chauffage", "Elasticite_chauffage_perso")
 variables_elasticite <- c("elasticite_fuel", "elasticite_fuel_perso", "elasticite_chauffage", "elasticite_chauffage_perso") # TODO: group fuel/chauffage
@@ -185,7 +185,7 @@ summary(glm(as.formula(paste("(taxe_approbation!='Non') ~", paste(selected_varia
 
 
 significatifs_lasso_dev_oui <- as.formula((taxe_approbation=='Oui') ~ age + fume + niveau_vie + hausse_diesel + (transports_loisirs=="La voiture") + gilets_jaunes_oppose 
-                               + gain_relatif_partielle + taxe_perdant_pauvres + taxe_benefices_CC + taxe_benefices_aucun + taxe_problemes_aucun
+                               + perte_relative_partielle + taxe_perdant_pauvres + taxe_benefices_CC + taxe_benefices_aucun + taxe_problemes_aucun
                                + si_compensee + peages_urbains + ges_O2 + ges_avion + changer_si_tous)
 summary(glm(significatifs_lasso, binomial, data=s, weights=s$weight))
 

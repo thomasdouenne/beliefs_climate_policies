@@ -264,10 +264,10 @@ relabel_and_rename_s <- function() {
   label(s[[55]]) <<- "conso_2: (nb_vehicules=2) Consommation moyenne des véhicules du ménage (en litres aux 100 km) - Q176"
   names(s)[56] <<- "km_2"
   label(s[[56]]) <<- "km_2: (nb_vehicules=2) Nombre de kilomètres parcourus par l'ensemble des véhicules lors des 12 derniers mois - Q141"
-  names(s)[57] <<- "gain_relatif_tva"
-  label(s[[57]]) <<- "gain_relatif_tva: Une hausse de la TVA ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q150"
-  names(s)[58] <<- "gain_relatif_fuel"
-  label(s[[58]]) <<- "gain_relatif_fuel: ~ Une hausse des taxes sur les carburants ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q151"
+  names(s)[57] <<- "perte_relative_tva"
+  label(s[[57]]) <<- "perte_relative_tva: Une hausse de la TVA ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q150"
+  names(s)[58] <<- "perte_relative_fuel"
+  label(s[[58]]) <<- "perte_relative_fuel: ~ Une hausse des taxes sur les carburants ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q151"
   names(s)[59] <<- "gagnant_categorie_fuel"
   label(s[[59]]) <<- "gagnant_categorie_fuel: ~ Ménage Gagnant/Non affecté/Perdant par hausse taxe carburants redistribuée à tous (+0.11/13 €/L diesel/essence, +60€/an /adulte) - Q152"
   names(s)[60] <<- "gain_taxe_fuel_hausse"
@@ -278,8 +278,8 @@ relabel_and_rename_s <- function() {
   label(s[[62]]) <<- "elasticite_fuel_perso: ~ Réduction de la conso de carburants du ménage suite à augmentation du prix de 0.5€/L (0% - Je n'en consomme déjà presque pas/0% - Je suis contraint sur tous mes déplacements/de 0% à 10%/de 10% à 20%/de 20% à 30%/+ de 30% - Je changerais largement mes habitudes de déplacement) - Q159"
   names(s)[63] <<- "elasticite_fuel"
   label(s[[63]]) <<- "elasticite_fuel: ~ Réduction moyenne de la conso de carburants des Français suite à augmentation du prix de 0.5€/L (de 0% à 3%/de 3% à 10%/de 10% à 20%/de 20% à 30%/+ de 30%) - Q162"
-  names(s)[64] <<- "gain_relatif_chauffage"
-  label(s[[64]]) <<- "gain_relatif_chauffage: ~ Une hausse des taxes sur le fioul et le gaz ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155"
+  names(s)[64] <<- "perte_relative_chauffage"
+  label(s[[64]]) <<- "perte_relative_chauffage: ~ Une hausse des taxes sur le fioul et le gaz ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155"
   names(s)[65] <<- "gagnant_categorie_chauffage"
   label(s[[65]]) <<- "gagnant_categorie_chauffage: ~ Ménage Gagnant/Non affecté/Perdant par hausse taxe fioul et gaz redistribuée à tous (+13/15% gaz/fioul, +50€/an /adulte) - Q156"
   names(s)[66] <<- "gain_taxe_chauffage_hausse"
@@ -860,7 +860,7 @@ convert_s <- function() {
   
   for (j in c("mode_chauffage", "chauffage", "parle_CC", "cause_CC", "effets_CC", "transports_frequence", 
               "schiste_CC", "transports_avis", "transports_travail_actif", "transports_travail_commun", "interet_politique",
-              "gain_relatif_tva", "gain_relatif_fuel", "gain_relatif_chauffage"
+              "perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage"
               )) {
     s[j][[1]] <<- as.item(as.character(s[j][[1]]),
                 labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))), 
@@ -875,7 +875,7 @@ convert_s <- function() {
     }
   }
 
-  for (k in c("gain_relatif_tva", "gain_relatif_fuel", "gain_relatif_chauffage")) {
+  for (k in c("perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage")) {
     temp <-  2 * (s[[k]]=="Oui, beaucoup plus") + (s[[k]]=="Oui, un peu plus") - (s[[k]]=="Non, un peu moins") - 2 * (s[[k]]=="Non, beaucoup moins")
     s[[k]] <<- as.item(temp, labels = structure(c(-2:2),
                           names = c("Beaucoup moins","Un peu moins","= Moyenne","Un peu plus","Beaucoup plus")),
@@ -990,9 +990,9 @@ convert_s <- function() {
   s$variante_partielle[!is.na(s$gagnant_categorie_chauffage)] <<- 'c'
   s$variante_partielle[!is.na(s$gagnant_categorie_fuel)] <<- 'f'
   label(s$variante_partielle) <<- "variante_partielle: Variante aléatoire (c/f) de la taxe partielle sur le chauffage ou les carburants (=fuel)"
-  s$gain_relatif_partielle[s$variante_partielle=='c'] <<- s$gain_relatif_chauffage[s$variante_partielle=='c']
-  s$gain_relatif_partielle[s$variante_partielle=='f'] <<- s$gain_relatif_fuel[s$variante_partielle=='f']
-  label(s$gain_relatif_partielle) <<- "gain_relatif_partielle: Une hausse des taxes sur variante_partielle (chauffage ou fuel) ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155, 162"
+  s$perte_relative_partielle[s$variante_partielle=='c'] <<- s$perte_relative_chauffage[s$variante_partielle=='c']
+  s$perte_relative_partielle[s$variante_partielle=='f'] <<- s$perte_relative_fuel[s$variante_partielle=='f']
+  label(s$perte_relative_partielle) <<- "perte_relative_partielle: Une hausse des taxes sur variante_partielle (chauffage ou fuel) ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155, 162"
 
     # s$gain_fuel <- NA
   s$gain_fuel[s$gagnant_categorie_fuel=='Non affecté' & s$variante_partielle=='f'] <<- 0
@@ -1174,7 +1174,7 @@ convert_s <- function() {
   }
   
   # TODO: remove useless colonnes, such as _f/_p
-  # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, gain_relatif_tva/fuel, si_/non_, gaz-fioul -> T/F, transferts_inter/variante, enfant
+  # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_relative_tva/fuel, si_/non_, gaz-fioul -> T/F, transferts_inter/variante, enfant
 }
 # convert_s()
 # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
