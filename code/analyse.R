@@ -124,8 +124,8 @@ variables_transport <- c("transports_distance", "transports_frequence", "transpo
                          "transports_travail_commun", "transports_travail_actif") # TODO: missing values distance, travail
 variables_politiques <- c("interet_politique", "conservateur", "liberal", "humaniste", "patriote", "apolitique", "ecologiste", "Gauche_droite")
 variables_gilets_jaunes <- c("gilets_jaunes_dedans", "gilets_jaunes_soutien", "gilets_jaunes_compris", "gilets_jaunes_oppose", "gilets_jaunes_NSP")
-variables_gains_subjectifs <- c("perte_relative_tva", "perte_relative_partielle", "gagnant_categorie_partielle", "gain_partielle", "gagnant_categorie", "gain", "gagnant_feedback_categorie", 
-                                "gagnant_progressif_categorie", "gain_cible") # TODO: group feedback/progressif
+variables_gains_subjectifs <- c("perte_relative_tva", "perte_relative_partielle", "gagnant_partielle_categorie", "gain_partielle", "gagnant_categorie", "gain", "gagnant_feedback_categorie", 
+                                "gagnant_progressif_categorie", "gagnant_cible_categorie") # TODO: group feedback/progressif
 variables_Elasticite <- c("Elasticite_fuel", "Elasticite_fuel_perso", "Elasticite_chauffage", "Elasticite_chauffage_perso")
 variables_elasticite <- c("elasticite_fuel", "elasticite_fuel_perso", "elasticite_chauffage", "elasticite_chauffage_perso") # TODO: group fuel/chauffage
 variables_taxe_croyances <- c("taxe_efficace", variables_taxe_gagnant, variables_taxe_perdant, "progressivite_feedback_avec_info", 
@@ -583,3 +583,94 @@ barres_gagnants_GJ_oppose
 barres_perdants_GJ_approuve
 barres_perdants_GJ_oppose
 # TODO: combiner les deux graphes opposants/soutiens, pourcentages
+
+
+##### Régressions: OLS gagnant_cible_categorie ######
+# 52%*** less chance of approval when thinking to not win, among < 70_
+summary(lm((taxe_cible_approbation=='Oui') ~ (gagnant_cible_categorie=='Gagnant') + (taxe_approbation=='Oui'), data=s, subset=categorie_cible!='70_', weights = s$weight))
+# 45%*** more chance of acceptance when thinking to not loose
+summary(lm((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant') + (taxe_approbation!='Non'), data=s, weights = s$weight))
+cor(s$gagnant_cible_categorie!='Perdant', s$traite_cible==1) # 21%
+cor(s$gagnant_cible_categorie!='Perdant', s$traite_cible_conjoint==1) # 10%
+cor(s$gagnant_cible_categorie=='Gagnant', s$traite_cible==1) # 23%
+cor(s$gagnant_cible_categorie=='Gagnant', s$traite_cible_conjoint==1) # 10%
+
+
+##### Régressions: 2SLS gagnant_cible_categorie ######
+# traite_cible: 19%*** (conjoint 10%**) 
+tsls1 <- lm(gagnant_cible_categorie !='Perdant'~ traite_cible + traite_cible_conjoint + taxe_approbation, subset = is.element(categorie_cible, c('20_30', '30_40', '40_50')), data=s, weights = s$weight)
+summary(tsls1)
+# gagnant.hat: 69% MAIS manquent des contrôles
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + taxe_approbation, subset = is.element(categorie_cible, c('20_30', '30_40', '40_50')), data=s, weights = s$weight))
+# cf. commentaires de 3. dans private_benefits
+
+
+##### Régressions: traite_cible ######
+# 20%*** (conjoint 10%)
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint, subset = categorie_cible == '20_30', data=s, weights = s$weight))
+# 15%* (15%*)
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint, subset = categorie_cible == '30_40', data=s, weights = s$weight))
+# 12% (17%*)
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint, subset = categorie_cible == '40_50', data=s, weights = s$weight))
+# 13%*** (resp. 8%***) more chance of acceptance with traite_cible (resp. traite_cible_conjoint), with -7%. if both are treated
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint + cible + taxe_approbation + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, weights = s$weight))
+# Effect driven by cible=30 for respondent and cible=20 for conjoint
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint * cible + taxe_approbation + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, weights = s$weight))
+# TODO: versement_cible, simule_gain_cible
+
+
+###### Régressions: 2SLS Discontinuité cible #####
+# tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + taxe_approbation + hausse_depenses + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
+tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
+tsls_rdd_1 # TODO: exclure les >70 ou pas ?
+gagnant.hat <- fitted.values(tsls_rdd_1)
+# summary(lm(dummy_approbation_cible ~ gagnant.hat + taxe_approbation + hausse_depenses + revenu + revenu_conjoint, data=s, weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
+
+# On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
+# Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
+
+# Avec effet hétérogène par seuil
+# s$cible <- relevel(as.factor(s$cible), '50')
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat*cible + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
+# Les résultats ne sont pas significatifs pour les effets par seuil. L'effet d_rdd.hat varie pour cible=30, et perd en significativité (enfin on reste à 4e-5).
+
+
+##### Régressions: Feedback #####
+# OLS - s'estimer gagnant: +31%*** chance d'approuver / non perdant: +33%*** chance d'accepter
+summary(lm((taxe_feedback_approbation == 'Oui') ~ (gagnant_feedback_categorie == 'Gagnant') + taxe_approbation, data=s, weights = s$weight))
+summary(lm((taxe_feedback_approbation != 'Non') ~ (gagnant_feedback_categorie != 'Perdant') + taxe_approbation, data=s, weights = s$weight))
+
+# RDD simple - effet d'être (simulé) gagnant: +9%*** approbation / +15%*** acceptation
+summary(lm((taxe_feedback_approbation == 'Oui') ~ simule_gagnant + simule_gain + I(simule_gain^2) + taxe_approbation, data=s, weights = s$weight))
+summary(lm((taxe_feedback_approbation != 'Non') ~ simule_gagnant + simule_gain + I(simule_gain^2) + taxe_approbation, data=s, weights = s$weight))
+
+# 2SLS avec 1st stage RDD - effet de se considérer gagnant
+cor(s$gagnant_feedback_categorie == 'Gagnant', s$simule_gagnant==1, use = "complete.obs") # 0.24
+cor(s$gagnant_feedback_categorie != 'Perdant', s$simule_gagnant==1, use = "complete.obs") # 0.33
+
+sf <- subset(s, s$variante_taxe_info=='f') # TODO: autre méthode, package?
+# 19%***
+tsls_rdd_feedback_1 <- lm(gagnant_feedback_categorie == 'Gagnant' ~ simule_gagnant + taxe_approbation + simule_gain + I(simule_gain^2), data=sf, weights = sf$weight)
+summary(tsls_rdd_feedback_1)
+gagnant_f.hat <- fitted.values(tsls_rdd_feedback_1) 
+# +49%***
+summary(lm((taxe_feedback_approbation == 'Oui') ~ gagnant_f.hat + taxe_approbation + simule_gain + I(simule_gain^2),  data=sf, weights = sf$weight))
+
+# +32%***
+tsls_rdd_feedback_2 <- lm(gagnant_feedback_categorie != 'Perdant' ~ simule_gagnant + taxe_approbation + simule_gain + I(simule_gain^2), data=sf, weights = sf$weight)
+summary(tsls_rdd_feedback_2)
+gagnant_f.hat <- fitted.values(tsls_rdd_feedback_2)
+# +47%***
+summary(lm((taxe_feedback_approbation != 'Non') ~ gagnant_f.hat + taxe_approbation + simule_gain + I(simule_gain^2), data=sf, weights = sf$weight))
+
+
+##### Régressions: persistance des croyances #####
+# apprendre qu'on est (simulé) gagnant augmente la croyance de ne pas perdre de 23%***
+croyances_1 <- lm(((gagnant_feedback_categorie!='Perdant') - (gagnant_categorie!='Perdant')) ~ simule_gagnant, data=sf, weights = sf$weight)
+summary(croyances_1)
+Dgagnant.hat <- fitted.values(croyances_1)
+# apprendre qu'on est (simulé) gagnant augmente l'acceptation de 9%***
+summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ simule_gagnant, data=s, weights = s$weight)) # TODO: rajouter contrôles
+# comprendre qu'on est non perdant augmente l'approbation de 41%*** = 9/0.23 (0.407540~0.09224/0.22634)
+summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ Dgagnant.hat, data=sf, weights = sf$weight))

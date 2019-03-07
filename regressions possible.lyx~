@@ -108,7 +108,7 @@ Variables
 \begin_inset Formula $G^{p}$
 \end_inset
 
- gagnant_categorie_partielle: G/N/P suite à hausse taxe partielle compensée
+ gagnant_partielle_categorie: G/N/P suite à hausse taxe partielle compensée
 \end_layout
 
 \begin_layout Itemize
@@ -154,7 +154,14 @@ I
 \end_inset
 
  simule_gagnant: ménage simulé gagnant avec 5 chances sur 6 suite à hausse
- taxe compensée 
+ taxe compensée
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\tilde{\Gamma}$
+\end_inset
+
+ simule_gain: gain simulé du ménage suite à hausse taxe compensée
 \end_layout
 
 \begin_layout Itemize
@@ -175,6 +182,13 @@ I
 \end_inset
 
 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\tilde{\Gamma}^{C}$
+\end_inset
+
+ simule_gain_cible: gain simulé du ménage suite à hausse taxe compensée
 \end_layout
 
 \begin_layout Itemize
@@ -210,7 +224,7 @@ I
 \begin_inset Formula $T_{2}$
 \end_inset
 
-) transfert: indicatrice que le répondant (resp.
+) traite_cible: indicatrice que le répondant (resp.
  son conjoint) reçoit un versement dans la taxe avec compensation ciblée
  (
 \begin_inset Formula $T=\left(R<c\right)$
@@ -223,7 +237,7 @@ I
 \begin_inset Formula $G^{C}$
 \end_inset
 
- gain_cible: G/N/P suite à hausse taxe avec compensation ciblée
+ gagnant_cible_categorie: G/N/P suite à hausse taxe avec compensation ciblée
 \end_layout
 
 \begin_layout Itemize
@@ -370,6 +384,36 @@ Intérêt personnel
 \end_layout
 
 \begin_layout Subsection
+Gain subjectif avec ciblage
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{i}^{C}=\delta_{0}+\beta_{G}G_{i}^{C}+\delta_{A}A_{i}^{I}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discontinuité
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{i}^{C}=\delta_{0}+\beta_{T}T_{i}+\beta_{2}T_{2,i}+\delta_{R}R_{i}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Discontinuité instrumentée
 \end_layout
 
@@ -377,7 +421,7 @@ Discontinuité instrumentée
 \begin_inset Formula 
 \begin{align*}
 G_{i}^{C} & =\gamma_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
-A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mathbf{1}_{c_{i}=c}+\beta_{G\cdot c}\widehat{G_{i}^{C}}\mathbf{1}_{c_{i}=c}\right)+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
 \end{align*}
 
 \end_inset
@@ -420,7 +464,7 @@ Persistance après la simulation
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Delta G_{i}^{F}=\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta G_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
 \]
 
 \end_inset
@@ -435,7 +479,7 @@ Simulation comme instrument
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Delta A_{i}^{F}=\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta A_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
 \]
 
 \end_inset

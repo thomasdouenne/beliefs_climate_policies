@@ -15,12 +15,12 @@ s$traite_transfert_conjoint <- (s$nb_adultes > 1) * (1 * (s$cible==20) * (s$reve
 s$revenu_2 <- s$revenu^2
 s$revenu_conjoint_2 <- s$revenu_conjoint^2
 
-s$gain_taxe__20[is.na(s$gain_taxe__20)] <- 0
-s$gain_taxe_20_30[is.na(s$gain_taxe_20_30)] <- 0
-s$gain_taxe_30_40[is.na(s$gain_taxe_30_40)] <- 0
-s$gain_taxe_40_50[is.na(s$gain_taxe_40_50)] <- 0
-s$transfert_seuil_gagnant <- 1 * (s$gain_taxe__20=='Gagnant') + 1 * (s$gain_taxe_20_30=='Gagnant') + 1 * (s$gain_taxe_30_40=='Gagnant') + 1 * (s$gain_taxe_40_50=='Gagnant')
-#  COMM: définitions variable dans preparation, encodage, transfert_seuil_gagnant c'est gain_cible, package pour IV?
+s$gagnant_categorie__20[is.na(s$gagnant_categorie__20)] <- 0
+s$gagnant_categorie_20_30[is.na(s$gagnant_categorie_20_30)] <- 0
+s$gagnant_categorie_30_40[is.na(s$gagnant_categorie_30_40)] <- 0
+s$gagnant_categorie_40_50[is.na(s$gagnant_categorie_40_50)] <- 0
+s$transfert_seuil_gagnant <- 1 * (s$gagnant_categorie__20=='Gagnant') + 1 * (s$gagnant_categorie_20_30=='Gagnant') + 1 * (s$gagnant_categorie_30_40=='Gagnant') + 1 * (s$gagnant_categorie_40_50=='Gagnant')
+#  COMM: définitions variable dans preparation, encodage, transfert_seuil_gagnant c'est gagnant_cible_categorie, package pour IV?
 
 s_0_70 <- subset(s, categorie_cible != '70_')
 
@@ -150,24 +150,24 @@ summary(model_2_variables_50)
 
 
 ##### 6. 2SLS avec RDD paramétrique pour le feedback
-sf <- subset(s, !is.na(s$gagnant))
+sf <- subset(s, !is.na(s$simule_gagnant))
 sf$dummy_approbation_feedback <- 1 * (sf$taxe_feedback_approbation=='Oui')
-sf$dummy_declare_gain_taxe_feedback <- 1 * (sf$gain_taxe_feedback == 'Gagnant')
-sf$gagnant <- as.numeric(sf$gagnant)
+sf$dummy_declare_gagnant_feedback_categorie <- 1 * (sf$gagnant_feedback_categorie == 'Gagnant')
+sf$simule_gagnant <- as.numeric(sf$simule_gagnant)
 sf$gains_nets_estimes <- sf$hausse_depenses - 110 * sf$nb_adultes - 16.1
 sf$gains_nets_estimes_2 <- sf$gains_nets_estimes^2
 
 # OLS simple
-ols_feedback <- lm(dummy_approbation_feedback ~ dummy_declare_gain_taxe_feedback + taxe_approbation, data=sf, weights = sf$weight)
+ols_feedback <- lm(dummy_approbation_feedback ~ dummy_declare_gagnant_feedback_categorie + taxe_approbation, data=sf, weights = sf$weight)
 summary(ols_feedback)
 
 # RDD simple - effet d'être gagnant
-rdd_feedback <- lm(dummy_approbation_feedback ~ gagnant + gains_nets_estimes + gains_nets_estimes_2 + taxe_approbation, data=sf, weights = sf$weight)
+rdd_feedback <- lm(dummy_approbation_feedback ~ simule_gagnant + gains_nets_estimes + gains_nets_estimes_2 + taxe_approbation, data=sf, weights = sf$weight)
 summary(rdd_feedback)
 
 # 2SLS avec 1st stage RDD - effet de se considérer gagnant
-cor(sf$dummy_declare_gain_taxe_feedback, sf$gagnant)
-tsls_rdd_feedback_1 <- lm(dummy_declare_gain_taxe_feedback ~ gagnant + taxe_approbation + gains_nets_estimes + gains_nets_estimes_2, data=sf, weights = sf$weight)
+cor(sf$dummy_declare_gagnant_feedback_categorie, sf$gagnant)
+tsls_rdd_feedback_1 <- lm(dummy_declare_gagnant_feedback_categorie ~ simule_gagnant + taxe_approbation + gains_nets_estimes + gains_nets_estimes_2, data=sf, weights = sf$weight)
 d_rdd_feedback.hat <- fitted.values(tsls_rdd_feedback_1)
 tsls_rdd_feedback_2 <- lm(dummy_approbation_feedback ~ d_rdd_feedback.hat + taxe_approbation + gains_nets_estimes + gains_nets_estimes_2, data=sf, weights = sf$weight)
 summary(tsls_rdd_feedback_2)
@@ -177,7 +177,7 @@ summary(tsls_rdd_feedback_2)
 
 
 ##### 7. Biprobit - WIP...
-biprobit_feedback <- biprobit(dummy_approbation_feedback~1+dummy_declare_gain_taxe_feedback, rho=~1+dummy_declare_gain_taxe_feedback,data=sf)
+biprobit_feedback <- biprobit(dummy_approbation_feedback~1+dummy_declare_gagnant_feedback_categorie, rho=~1+dummy_declare_gagnant_feedback_categorie,data=sf)
 summary(biprobit_feedback)
 margins(biprobit_feedback)
-summary(margins(biprobit_feedback, variables = "dummy_declare_gain_taxe_feedback"))
+summary(margins(biprobit_feedback, variables = "dummy_declare_gagnant_feedback_categorie"))

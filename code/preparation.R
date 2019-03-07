@@ -425,23 +425,23 @@ relabel_and_rename_s <- function() {
   names(s)[136] <<- "taxe__20_approbation"
   label(s[[136]]) <<- "taxe__20_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q115"
   names(s)[137] <<- "gagnant_categorie_20_30"
-  label(s[[137]]) <<- "gagnant_categorie__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€ /an/adulte concerné) - Q120"
+  label(s[[137]]) <<- "gagnant_categorie_20_30: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€ /an/adulte concerné) - Q120"
   names(s)[138] <<- "taxe_20_30_approbation"
   label(s[[138]]) <<- "taxe_20_30_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€/an/adulte concerné) - Q121"
   names(s)[139] <<- "gagnant_categorie_30_40"
-  label(s[[139]]) <<- "gagnant_categorie__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€ /an/adulte concerné) - Q169"
+  label(s[[139]]) <<- "gagnant_categorie_30_40: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€ /an/adulte concerné) - Q169"
   names(s)[140] <<- "taxe_30_40_approbation"
   label(s[[140]]) <<- "taxe_30_40_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€/an/adulte concerné) - Q124"
   names(s)[141] <<- "gagnant_categorie_40_50"
-  label(s[[141]]) <<- "gagnant_categorie__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€ /an/adulte concerné) - Q170"
+  label(s[[141]]) <<- "gagnant_categorie_40_50: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€ /an/adulte concerné) - Q170"
   names(s)[142] <<- "taxe_40_50_approbation"
   label(s[[142]]) <<- "taxe_40_50_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€/an/adulte concerné) - Q127"
   names(s)[143] <<- "gagnant_categorie_50_70"
-  label(s[[143]]) <<- "gagnant_categorie__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 50% des plus modestes (+220€ /an/adulte concerné) - Q171"
+  label(s[[143]]) <<- "gagnant_categorie_50_70: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 50% des plus modestes (+220€ /an/adulte concerné) - Q171"
   names(s)[144] <<- "taxe_50_70_approbation"
   label(s[[144]]) <<- "taxe_50_70_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 50% des plus modestes (+220€/an/adulte concerné) - Q130"
   names(s)[145] <<- "gagnant_categorie_70_"
-  label(s[[145]]) <<- "gagnant_categorie__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q172"
+  label(s[[145]]) <<- "gagnant_categorie_70_: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q172"
   names(s)[146] <<- "taxe_70__approbation"
   label(s[[146]]) <<- "taxe_70__approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q133"
   names(s)[147] <<- "si_pauvres"
@@ -866,7 +866,7 @@ convert_s <- function() {
                 labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))), 
                 missing.values = c("","NSP"), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb
   }  
- # TODO: as.item region_CC, gagnant_categorie_fuel, gagnant_categorie_chauffage, gagnant_categorie, gagnant_feedback_categorie, gagnant_progressif_categorie, gagnant_categorie_cible, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
+ # TODO: as.item region_CC, gagnant_categorie_fuel, gagnant_categorie_chauffage, gagnant_categorie, gagnant_feedback_categorie, gagnant_progressif_categorie, gagnant_cible_categorie, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
 
   for (j in names(s)) {
     if (j!="peages_urbains" & grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p|ecologiste|conservateur|liberal|patriote|humaniste|apolitique', j)) {
@@ -1005,9 +1005,9 @@ convert_s <- function() {
   s$gain_chauffage[s$gagnant_categorie_chauffage=='Perdant' & s$variante_partielle=='c'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_chauffage_baisse[s$gagnant_categorie_chauffage=='Perdant' & s$variante_partielle=='c']))))/25
   label(s$gain_chauffage) <<- "gain_fuel: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe chauffage compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
 
-  s$gagnant_categorie_partielle[s$variante_partielle=='c'] <<- s$gagnant_categorie_chauffage[s$variante_partielle=='c'] 
-  s$gagnant_categorie_partielle[s$variante_partielle=='f'] <<- s$gagnant_categorie_fuel[s$variante_partielle=='f']
-  label(s$gagnant_categorie_partielle) <<- "gagnant_categorie_partielle: Ménage Gagnant/Non affecté/Perdant par hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gagnant_categorie_fuel/chauffage)"
+  s$gagnant_partielle_categorie[s$variante_partielle=='c'] <<- s$gagnant_categorie_chauffage[s$variante_partielle=='c'] 
+  s$gagnant_partielle_categorie[s$variante_partielle=='f'] <<- s$gagnant_categorie_fuel[s$variante_partielle=='f']
+  label(s$gagnant_partielle_categorie) <<- "gagnant_partielle_categorie: Ménage Gagnant/Non affecté/Perdant par hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gagnant_categorie_fuel/chauffage)"
   s$gain_partielle[s$variante_partielle=='c'] <<- s$gain_chauffage[s$variante_partielle=='c'] 
   s$gain_partielle[s$variante_partielle=='f'] <<- s$gain_fuel[s$variante_partielle=='f']
   label(s$gain_partielle) <<- "gain_partielle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gain_fuel/chauffage)"
@@ -1061,10 +1061,11 @@ convert_s <- function() {
     label(s[[paste('taxe_problemes_', v, sep="")]]) <<- sub("_f: \\* ", ": ", label(s[paste('taxe_problemes_', v, '_f', sep="")][[1]]))
   }
   
-  s$cible[s$cible20==1] <<- 20
-  s$cible[s$cible30==1] <<- 30
-  s$cible[s$cible40==1] <<- 40
-  s$cible[s$cible50==1] <<- 50
+  s$cible[s$cible20==1] <<- '20'
+  s$cible[s$cible30==1] <<- '30'
+  s$cible[s$cible40==1] <<- '40'
+  s$cible[s$cible50==1] <<- '50'
+  s$cible <<- relevel(as.factor(s$cible), '50')
   label(s$cible) <<- "cible: Ciblage du recyclage de la hausse de la taxe carbone, attribué en fonction du revenu du répondant et de son ménage (20/30/40/50% les plus modestes)" 
 
   # TODO: manage to use tidyverse without erasing observations
@@ -1080,13 +1081,13 @@ convert_s <- function() {
   # s <<- merge(s, s %>% gather(key = temp, value = conso, c(conso_1, conso_2)) %>% filter(conso != "") %>% select(-temp), sort=FALSE)
   # label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
 
-  s$gain_cible[!is.na(s$gagnant_categorie__20)] <<- s$gagnant_categorie__20[!is.na(s$gagnant_categorie__20)]
-  s$gain_cible[!is.na(s$gagnant_categorie_20_30)] <<- s$gagnant_categorie_20_30[!is.na(s$gagnant_categorie_20_30)]
-  s$gain_cible[!is.na(s$gagnant_categorie_30_40)] <<- s$gagnant_categorie_30_40[!is.na(s$gagnant_categorie_30_40)]
-  s$gain_cible[!is.na(s$gagnant_categorie_40_50)] <<- s$gagnant_categorie_40_50[!is.na(s$gagnant_categorie_40_50)]
-  s$gain_cible[!is.na(s$gagnant_categorie_50_70)] <<- s$gagnant_categorie_50_70[!is.na(s$gagnant_categorie_50_70)]
-  s$gain_cible[!is.na(s$gagnant_categorie_70_)] <<- s$gagnant_categorie_70_[!is.na(s$gagnant_categorie_70_)]
-  label(s$gain_cible) <<- "gain_cible: Ménage Gagnant/Non affecté/Perdant avec hausse taxe carbone à recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
+  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie__20)] <<- s$gagnant_categorie__20[!is.na(s$gagnant_categorie__20)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_20_30)] <<- s$gagnant_categorie_20_30[!is.na(s$gagnant_categorie_20_30)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_30_40)] <<- s$gagnant_categorie_30_40[!is.na(s$gagnant_categorie_30_40)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_40_50)] <<- s$gagnant_categorie_40_50[!is.na(s$gagnant_categorie_40_50)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_50_70)] <<- s$gagnant_categorie_50_70[!is.na(s$gagnant_categorie_50_70)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_70_)] <<- s$gagnant_categorie_70_[!is.na(s$gagnant_categorie_70_)]
+  label(s$gagnant_cible_categorie) <<- "gagnant_cible_categorie: Ménage Gagnant/Non affecté/Perdant avec hausse taxe carbone à recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
   s$taxe_cible_approbation[!is.na(s$taxe__20_approbation)] <<- s$taxe__20_approbation[!is.na(s$taxe__20_approbation)]
   s$taxe_cible_approbation[!is.na(s$taxe_20_30_approbation)] <<- s$taxe_20_30_approbation[!is.na(s$taxe_20_30_approbation)]
   s$taxe_cible_approbation[!is.na(s$taxe_30_40_approbation)] <<- s$taxe_30_40_approbation[!is.na(s$taxe_30_40_approbation)]
@@ -1102,6 +1103,15 @@ convert_s <- function() {
   s$categorie_cible[!is.na(s$taxe_50_70_approbation)] <<- '50_70'
   s$categorie_cible[!is.na(s$taxe_70__approbation)] <<- '70_'
   label(s$categorie_cible) <<- "categorie_cible: Catégorie de revenu du répondant (et de son ménage) taxe à recyclage ciblé - Catégories: percentile <20/20-30/30-40/40-50/50-70/>70, sachant que revenu_conjoint détermine la catégorie quand percentile de revenu > 70 (780/1140/1430/1670/2220)"
+
+  s$traite_cible <<- (s$cible==20)*(s$revenu<780) + (s$cible==30)*(s$revenu<1140) + (s$cible==40)*(s$revenu<1430) + (s$cible==50)*(s$revenu<1670)
+  s$traite_cible_conjoint <<- (s$nb_adultes > 1)* ((s$cible==20)*(s$revenu_conjoint<780) + (s$cible==30)*(s$revenu_conjoint<1140) + (s$cible==40)*(s$revenu_conjoint<1430) + (s$cible==50)*(s$revenu_conjoint<1670))
+  label(s$traite_cible) <<- "traite_cible: Indicatrice de transfert reçu par le répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/adulte pour cible à 20/30/40/50"
+  label(s$traite_cible_conjoint) <<- "traite_cible_conjoint: Indicatrice de transfert reçu par le conjoint du répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/adulte pour cible à 20/30/40/50"
+  s$versement_cible <<- (s$traite_cible + s$traite_cible_conjoint) * ((s$cible==20)*550 + (s$cible==30)*360 + (s$cible==40)*270 + (s$cible==50)*220)
+  s$versement_cible_sans_conjoint <<- (s$traite_cible) * ((s$cible==20)*550 + (s$cible==30)*360 + (s$cible==40)*270 + (s$cible==50)*220)
+  label(s$versement_cible) <<- "versement_cible: Versement annuel reçu par le ménage du répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/adulte pour cible à 20/30/40/50"
+  label(s$versement_cible_sans_conjoint) <<- "versement_cible_sans_conjoint: Versement annuel reçu par le répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/adulte pour cible à 20/30/40/50"
 
   s$km[!is.na(s$km_0)] <<- s$km_0[!is.na(s$km_0)]
   s$km[!is.na(s$km_1)] <<- s$km_1[!is.na(s$km_1)]
@@ -1128,6 +1138,15 @@ convert_s <- function() {
   s$essence <<- (!is.na(s$fuel_1) & (s$fuel_1=='Essence')) | (!is.na(s$fuel_2_2) & ((s$fuel_2_1=='Essence') | (s$fuel_2_2=='Essence')))
   label(s$diesel) <<- "diesel: Indicatrice de la possession d'un véhicule diesel par le ménage (fuel_1 ou fuel_2_1 ou fuel_2_2 = 'Diesel')"
   label(s$essence) <<- "essence: Indicatrice de la possession d'un véhicule à essence par le ménage (fuel_1 ou fuel_2_1 ou fuel_2_2 = 'Essence')"
+
+  s$simule_gain <<- 16.1 + s$nb_adultes * 110 - s$hausse_depenses
+  s$simule_gain_repondant <<- 16.1 + 110 - s$hausse_depenses
+  label(s$simule_gain) <<- "simule_gain: Gain net annuel simulé pour le ménage du répondant suite à une hausse de taxe carbone compensée: 16.1 + nb_adultes * 110 - hausse_depenses"
+  label(s$simule_gain_repondant) <<- "simule_gain_repondant: Gain net annuel simulé pour le répondant (sans tenir compte du potentiel versement reçu par les autres adultes du ménage) suite à une hausse de taxe carbone compensée: 116.1 - hausse_depenses"
+  s$simule_gain_cible <<- s$versement_cible - s$hausse_depenses
+  s$simule_gain_cible_sans_conjoint <<- s$versement_cible - s$hausse_depenses
+  label(s$simule_gain_cible) <<- "simule_gain_cible: Gain net simulé pour le ménage du répondant suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
+  label(s$simule_gain_cible_sans_conjoint) <<- "simule_gain_cible_sans_conjoint: Gain net simulé pour le répondant (sans tenir compte du potentiel versement reçu par son conjoint) suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
   
   s$progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- s$progressivite_feedback_sans_info[!is.na(s$progressivite_feedback_sans_info)]
   s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
