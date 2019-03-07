@@ -690,16 +690,55 @@ plot(s$hausse_carburants, jitter(s$perte_relative_fuel), xlim=c(0, 500))
 plot(s$hausse_chauffage, jitter(s$perte_relative_chauffage), xlim=c(0, 500))
 length(which(s$gain <= 0 & s$km < 1000 & s$gaz==FALSE & s$fioul==FALSE))
 
+s$update_necessaire <- (s$simule_gagnant==1 & s$gagnant_categorie=='Perdant') | (s$simule_gagnant==0 & s$gagnant_categorie=='Gagnant')
+label(s$update_necessaire) <- "update_necessaire: Indicatrice de se croire gagnant/perdant en étant simulé perdant/gagnant"
+s$update_necessaire_large <- (s$simule_gagnant==1 & s$gagnant_categorie!='Gagnant') | (s$simule_gagnant==0 & s$gagnant_categorie!='Perdant')
+label(s$update_necessaire_large) <- "update_necessaire: Indicatrice de se croire non perdant/non gagnant en étant simulé perdant/gagnant"
+decrit(s$update_necessaire) # 45%
+decrit(s$update_necessaire_large) # 70%
 s$update_correct <- ((s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') 
                     + (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')
                     - (s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')
                     - (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant'))
+label(s$update_correct) <- "update_correct: Différence entre l'indicatrice de ne pas se penser gagnant/perdant et le penser après feedback infirmant, moins la même après feedback confirmant"
 s$update_correct_large <- ((s$simule_gagnant==1 & ((s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') | (s$gagnant_feedback_categorie!='Perdant' & s$gagnant_categorie=='Perdant'))) 
   + (s$simule_gagnant==0 & ((s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant') | (s$gagnant_feedback_categorie!='Gagnant' & s$gagnant_categorie=='Gagnant')))
   - (s$simule_gagnant==1 & ((s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant') | (s$gagnant_feedback_categorie!='Gagnant' & s$gagnant_categorie=='Gagnant')))
   - (s$simule_gagnant==0 & ((s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') | (s$gagnant_feedback_categorie!='Perdant' & s$gagnant_categorie=='Perdant'))))
+label(s$update_correct_large) <- "update_correct_large: Différence entre faire un update dans la bonne direction quand le feedback y conduit et faire un update dans la mauvaise direction"
 decrit(s$update_correct)
 decrit(s$update_correct_large)
 # Les gens pensant perdre légèrement updatent plus correctement que la moyenne et plus ils se trompent, plus ils updatent correctement.
 # Les autres catégories ne sont pas significatives: notamment le fait de se tromper davantage n'est pas associé à updater plus correctement que la moyenne, même si le signe est +.
 summary(lm(update_correct_large ~ I(simule_gain - gain)*as.factor(gain), data=s, weights = s$weight))
+
+# Biais à la perte : (Tout est significatif) Ceux qui gagnent (simulé) updatent moins correctement, ceux qui croient perdrent aussi. 
+summary(lm(update_correct_large ~ simule_gagnant*gagnant_categorie, data=s, weights = s$weight))
+
+s$feedback_confirme <- (s$gagnant_categorie=='Gagnant' & s$simule_gagnant==1) | (s$gagnant_categorie=='Perdant' & s$simule_gagnant==0)
+s$feedback_infirme <- (s$gagnant_categorie=='Perdant' & s$simule_gagnant==1) | (s$gagnant_categorie=='Gagnant' & s$simule_gagnant==0)
+s$feedback_confirme_large <- s$feedback_confirme | (s$gagnant_categorie!='Perdant' & s$simule_gagnant==1) | (s$gagnant_categorie!='Gagnant' & s$simule_gagnant==0)
+s$feedback_infirme_large <- s$feedback_infirme | (s$gagnant_categorie!='Perdant' & s$simule_gagnant==0) | (s$gagnant_categorie!='Gagnant' & s$simule_gagnant==1)
+label(s$feedback_confirme) <- "feedback_confirme: Indicatrice de se penser et être simulé gagnant/perdant (gagnant_categorie, simule_gagnant)"
+label(s$feedback_infirme) <- "feedback_infirme: Indicatrice de se penser gagnant et être simulé perdant, ou l'inverse (gagnant_categorie, simule_gagnant)"
+label(s$feedback_confirme_large) <- "feedback_confirme_large: Indicatrice de se penser non perdant et être simulé gagnant, ou de se penser non gagnant et être simulé perdant (gagnant_categorie, simule_gagnant)"
+label(s$feedback_infirme_large) <- "feedback_infirme_large: Indicatrice de se penser non gagnant et être simulé gagnant, ou de se penser non perdant et être simulé perdant (gagnant_categorie, simule_gagnant)"
+# summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ I(feedback_confirme - feedback_infirme)*(s$gagnant_categorie=='Perdant'), data=s, weights=s$weight))
+# summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ simule_gagnant*(gagnant_categorie=='Gagnant'), data=s, weights=s$weight))
+
+# Les gens qui se croient gagnants updatent plus correctement que les autres lorsqu'ils doivent le faire
+summary(lm(update_correct_large ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight))
+summary(lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme==T, data=s, weights = s$weight)) # Non affectés exclus par feedback_infirme
+# Biais à la perte: des gens pensent perdre après feedback confirmant qu'ils gagnent 5 fois sur 6. 
+# (Sont-ce des gens qui ont répondu au pif perdre après un feedback confirmant leur gain ? Non, cf. les deux lignes d'après)
+summary(lm(update_correct_large ~ gagnant_categorie=='Gagnant', data=s, weights = s$weight)) 
+decrit(s$update_correct[s$gagnant_categorie=='Gagnant' & s$simule_gagnant==1])
+decrit(s$update_correct[s$gagnant_categorie=='Perdant' & s$simule_gagnant==0])
+
+# Signe > 0 indique biais de confirmation: ~ 0.03 dans les deux 
+summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ gagnant_categorie=='Gagnant', subset = simule_gagnant==1, data=s, weights=s$weight))
+summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ gagnant_categorie!='Perdant', subset = simule_gagnant==0, data=s, weights=s$weight))
+decrit(s$feedback_confirme)
+
+# Indication de non-biais vers la perte: parmi les non affectés, approbation augmente de 6%* (resp. 0%) quand on leur dit qu'ils gagnent (resp. perdent)
+summary(lm(I((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ 0 + simule_gagnant, subset=gain=='0', data=s, weights=s$weight))
