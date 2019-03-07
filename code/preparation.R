@@ -1017,6 +1017,13 @@ convert_s <- function() {
   s$gain[s$gagnant_categorie=='Perdant' & s$variante_partielle!='NA'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_baisse[s$gagnant_categorie=='Perdant' & s$variante_partielle!='NA']))))/50
   label(s$gain) <<- "gain: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carbone compensée, dans [-6;5] (seuils: -280/-190/-120/-70/-30/0/20/40/60/80)"
 
+  s$gain_echelle <<- s$gain
+  s$gain_fuel_echelle <<- s$gain_fuel
+  s$gain_chauffage_echelle <<- s$gain_chauffage
+  label(s$gain) <<- "gain: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carbone compensée, dans [-6;5] (seuils: -280/-190/-120/-70/-30/0/20/40/60/80)"
+  label(s$gain_chauffage_echelle) <<- "gain_chauffage_echelle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe chauffage compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
+  label(s$gain_fuel_echelle) <<- "gain_fuel_echelle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carburants compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
+  
   # cf. consistency_belief_losses.py pour les imputations
   temp <- -405.55*(s$gain==-6) - 224.25*(s$gain==-5) - 147.91*(s$gain==-4) - 92.83*(s$gain==-3) - 48.28*(s$gain==-2) - 13.72*(s$gain==-1) + 10.39*(s$gain==1) + 30.36*(s$gain==2) + 49.96*(s$gain==3) + 69.72*(s$gain==4) + 106.89*(s$gain==5) #  - 1.66*(s$gain==0)
   s$gain <<- as.item(temp, labels = structure(c(-405.55, -224.25, -147.91, -92.83, -48.28, -13.72, 0, 10.39, 30.36, 49.96, 69.72, 106.89), names = c("<-280", "-280_-190", "-190_-120", "-120_-70", "-70_-30", "-30_0", "0", "0_20", "20_40", "40_60", "60_80", ">80")), annotation=Label(s$gain))
@@ -1110,9 +1117,11 @@ convert_s <- function() {
   label(s$traite_cible_conjoint) <<- "traite_cible_conjoint: Indicatrice de transfert reçu par le conjoint du répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/adulte pour cible à 20/30/40/50"
   s$versement_cible <<- (s$traite_cible + s$traite_cible_conjoint) * ((s$cible==20)*550 + (s$cible==30)*360 + (s$cible==40)*270 + (s$cible==50)*220)
   s$versement_cible_sans_conjoint <<- (s$traite_cible) * ((s$cible==20)*550 + (s$cible==30)*360 + (s$cible==40)*270 + (s$cible==50)*220)
-  label(s$versement_cible) <<- "versement_cible: Versement annuel reçu par le ménage du répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/adulte pour cible à 20/30/40/50"
+  label(s$versement_cible) <<- "versement_cible: Versement annuel reçu par le ménage du répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/parent pour cible à 20/30/40/50"
   label(s$versement_cible_sans_conjoint) <<- "versement_cible_sans_conjoint: Versement annuel reçu par le répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/adulte pour cible à 20/30/40/50"
-
+  s$versement <<- 110 * s$nb_adultes
+  label(s$versement) <<- "versement: Versement annuel reçu par le ménage suite à une hausse de la taxe carbone compensée (110 * nb_adultes)"
+  
   s$km[!is.na(s$km_0)] <<- s$km_0[!is.na(s$km_0)]
   s$km[!is.na(s$km_1)] <<- s$km_1[!is.na(s$km_1)]
   s$km[!is.na(s$km_2)] <<- s$km_2[!is.na(s$km_2)]

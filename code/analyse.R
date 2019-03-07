@@ -674,3 +674,28 @@ Dgagnant.hat <- fitted.values(croyances_1)
 summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ simule_gagnant, data=s, weights = s$weight)) # TODO: rajouter contrôles
 # comprendre qu'on est non perdant augmente l'approbation de 41%*** = 9/0.23 (0.407540~0.09224/0.22634)
 summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ Dgagnant.hat, data=sf, weights = sf$weight))
+
+
+##### Adaptation Bayesienne biaisée des croyances (aka. "on se fait Bayeser") #####
+summary(lm((gain*uc) ~ versement + hausse_depenses, subset = s$hausse_depenses<200, data=s, weights = s$weight)) # TODO: renomme gain -> gain_subjectif
+summary(lm((gain - versement/uc) ~ 1, data=s, weights = s$weight)) 
+summary(lm(gain ~ I(versement/uc) + I(hausse_depenses/uc) + I(hausse_depenses^2/uc) + taille_menage + diplome + age + csp + region + revenu + rev_tot + I(revenu^2) + I(rev_tot^2), data=s, weights = s$weight))
+
+cor(s$hausse_depenses, s$gain*s$uc)
+cor(s$hausse_depenses[s$nb_adultes==1], (s$gain*s$uc)[s$nb_adultes==1])
+cor(s$perte_relative_partielle, s$gain)
+cor(s$perte_relative_chauffage, s$hausse_chauffage, use="complete.obs")
+cor(s$perte_relative_fuel, s$hausse_carburants, use="complete.obs")
+plot(s$hausse_carburants, jitter(s$perte_relative_fuel), xlim=c(0, 500))
+plot(s$hausse_chauffage, jitter(s$perte_relative_chauffage), xlim=c(0, 500))
+length(which(s$gain <= 0 & s$km < 1000 & s$gaz==FALSE & s$fioul==FALSE))
+
+s$update_correct <- (s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') 
+                    + (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')
+                    - (s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')
+                    - (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant')
+s$update_correct <- (s$simule_gagnant==1 & ((s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') | (s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant'))) 
+  + (s$simule_gagnant==0 & ((s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant') | (s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')))
+  - (s$simule_gagnant==1 & ((s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant') | (s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')))
+  - (s$simule_gagnant==0 & ((s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') | (s$gagnant_feedback_categorie!='Perdant' & s$gagnant_categorie=='Perdant')))
+summary(lm((simule_gagnant==gagnant_categorie) ~ I(simule_gain - gain)*as.factor(gain), data=s, weights = s$weight))

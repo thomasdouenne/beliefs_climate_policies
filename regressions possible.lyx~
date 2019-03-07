@@ -420,8 +420,8 @@ Discontinuité instrumentée
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-G_{i}^{C} & =\gamma_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
-A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mathbf{1}_{c_{i}=c}+\beta_{G\cdot c}\widehat{G_{i}^{C}}\mathbf{1}_{c_{i}=c}\right)+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+G_{i}^{C} & =\gamma_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}\left(+\gamma_{R}R_{i}\right)+\eta_{i}\\
+A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mathbf{1}_{c_{i}=c}+\beta_{G\cdot c}\widehat{G_{i}^{C}}\mathbf{1}_{c_{i}=c}\right)+\delta_{A}A_{i}^{I}\left(+\delta_{R}R_{i}\right)+\epsilon_{i}
 \end{align*}
 
 \end_inset
