@@ -30,7 +30,7 @@ df_bdf = variables_names_bdf_to_ptc(df_bdf)
 df_bdf['weight'] = 1
 
 df_ptc['weight'] = 1
-df_ptc['gain_taxe_carbone'] = df_ptc['gain']
+df_ptc['gain_taxe_carbone_echelle'] = df_ptc['gain_echelle']
 
 
 """ Define sub-samples to study """ # Put None to variable, value or sign to get full sample
@@ -46,8 +46,8 @@ except:
 
 
 """ Choose which function to perform """ # True to compute and display results, False otherwise
-plot_step_distribution = False
-plot_kde = True
+plot_step_distribution = True
+plot_kde = False
 test_imputationn_methods = True # The two methods provide quite similar results
 regress = False
 
@@ -70,8 +70,8 @@ if test_imputationn_methods == True:
     print "Sample means:", df_ptc['gain_net_numeric_uc_{}'.format(energy)].mean(), \
         df_ptc['gain_net_numeric_barycentre_uc_{}'.format(energy)].mean()
     for i in range(-6,6):
-        print i, "Average BdF: ", df_ptc.query('gain_{0} == {1}'.format(energy, i))['gain_net_numeric_uc_{}'.format(energy)].mean(), \
-            "/ Barycentre method:", df_ptc.query('gain_{0} == {1}'.format(energy, i))['gain_net_numeric_barycentre_uc_{}'.format(energy)].mean()
+        print i, "Average BdF: ", df_ptc.query('gain_{0}_echelle == {1}'.format(energy, i))['gain_net_numeric_uc_{}'.format(energy)].mean(), \
+            "/ Barycentre method:", df_ptc.query('gain_{0}_echelle == {1}'.format(energy, i))['gain_net_numeric_barycentre_uc_{}'.format(energy)].mean()
 
 
 """ Regress expected net gain on various households characteristics """
@@ -87,3 +87,6 @@ if regress == True:
         data = data).fit() # To do : add more variables
     print ols_net_gain.summary() 
     # Results are barely sensitive to choice of imputation method for numeric net gain
+
+
+#print df_ptc['gain_fuel_echelle']
