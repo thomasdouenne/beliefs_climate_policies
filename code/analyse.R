@@ -114,32 +114,32 @@ variables_taxe_perdant <- c("taxe_perdant_personne", "taxe_perdant_pauvres", "ta
 
 variables_approbation <- c("taxe_approbation", "taxe_feedback_approbation", "taxe_progressif_approbation", "taxe_cible_approbation") # TODO: group feedback/progressif
 variables_qualite <- c("duree", "duree_info", "duree_champ_libre") # champ_libre != "", exclu, "test_qualite"
-variables_aleatoires <- c("info_CC", "info_PM", "variante_monetaire", "apres_modifs", "variante_taxe_info", "variante_progressivite", # cible categorie_cible
-                          "info_progressivite") # TODO: missing values variante_progressivite variante_monetaire
+variables_aleatoires <- c("info_CC", "info_PM", "variante_monetaire", "apres_modifs", "variante_taxe_info", "variante_progressivite",
+                          "info_progressivite", "cible", "categorie_cible")
 variables_demo <- c("sexe", "age", "statut_emploi", "csp", "region", "diplome", "taille_menage", "revenu", "rev_tot", "nb_14_et_plus", "nb_adultes", 
-                    "fume", "actualite", "taille_agglo", "uc", "niveau_vie") # weight, TODO: each age
+                    "fume", "actualite", "taille_agglo", "uc", "niveau_vie", "age_18_24", "age_25_34", "age_35_49", "age_50_64", "age_65_plus") # weight
 variables_energie <- c("surface", "mode_chauffage", "chauffage", "km", "conso", "diesel", "essence", "nb_vehicules", "gaz", "fioul", "simule_gagnant", # hausse_carburants 
-                       "hausse_chauffage", "hausse_diesel", "hausse_essence", "hausse_depenses") # TODO: missing values simule_gagnant, conso, chauffage, mode_chauffage, 
+                       "hausse_chauffage", "hausse_diesel", "hausse_essence", "hausse_depenses") # TODO: missing values chauffage, mode_chauffage, 
 variables_transport <- c("transports_distance", "transports_frequence", "transports_avis", "transports_travail", "transports_courses", "transports_loisirs", 
-                         "transports_travail_commun", "transports_travail_actif") # TODO: missing values distance, travail
+                         "transports_travail_commun", "transports_travail_actif") # TODO: missing values distance
 variables_politiques <- c("interet_politique", "conservateur", "liberal", "humaniste", "patriote", "apolitique", "ecologiste", "Gauche_droite")
 variables_gilets_jaunes <- c("gilets_jaunes_dedans", "gilets_jaunes_soutien", "gilets_jaunes_compris", "gilets_jaunes_oppose", "gilets_jaunes_NSP")
 variables_gains_subjectifs <- c("perte_relative_tva", "perte_relative_partielle", "gagnant_partielle_categorie", "gain_partielle", "gagnant_categorie", "gain", "gagnant_feedback_categorie", 
-                                "gagnant_progressif_categorie", "gagnant_cible_categorie") # TODO: group feedback/progressif
-variables_Elasticite <- c("Elasticite_fuel", "Elasticite_fuel_perso", "Elasticite_chauffage", "Elasticite_chauffage_perso")
-variables_elasticite <- c("elasticite_fuel", "elasticite_fuel_perso", "elasticite_chauffage", "elasticite_chauffage_perso") # TODO: group fuel/chauffage
+                                "gagnant_progressif_categorie", "gagnant_info_categorie", "gagnant_cible_categorie")
+variables_Elasticite <- c("Elasticite_fuel", "Elasticite_fuel_perso", "Elasticite_chauffage", "Elasticite_chauffage_perso", "Elasticite_partielle", "Elasticite_partielle_perso")
+variables_elasticite <- c("elasticite_fuel", "elasticite_fuel_perso", "elasticite_chauffage", "elasticite_chauffage_perso", "elasticite_partielle", "elasticite_partielle_perso")
 variables_taxe_croyances <- c("taxe_efficace", variables_taxe_gagnant, variables_taxe_perdant, "progressivite_feedback_avec_info", 
                               "progressivite_feedback_sans_info", "progressivite_progressif") # TODO: group avec/sans info
 variables_benefices <- names(s)[which(grepl("benefice", names(s)))[which(grepl("benefice", names(s)))>300]]
 variables_problemes <- names(s)[which(grepl("problemes", names(s)))[which(grepl("problemes", names(s)))>300]]
 variables_taxe_condition <- c("si_pauvres", "si_compensee", "si_contraints", "si_baisse_cotsoc", "si_baisse_tva", "si_baisse_deficit", "si_renovation", "si_renouvelables", "si_transports")
-variables_politiques <- c("taxe_kerosene", "taxe_viande", "normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants", 
+variables_politiques_environnementales <- c("taxe_kerosene", "taxe_viande", "normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants", 
                           "peages_urbains", "fonds_mondial") # "rattrapage_diesel"
 variables_connaissances_CC <- c("cause_CC", "ges_CO2", "ges_CH4", "ges_O2", "ges_pm", "ges_boeuf", "ges_nucleaire", "ges_avion", "region_CC", 
                                 "emission_cible", "score_ges", "score_climate_call")
 variables_avis_CC <- c("parle_CC", "effets_CC", "generation_CC_1960", "generation_CC_1990", "generation_CC_2020", "generation_CC_2050", "generation_CC_aucune",
                        "responsable_CC_chacun", "responsable_CC_riches", "responsable_CC_govts", "responsable_CC_etranger", "responsable_CC_passe", 
-                       "responsable_CC_nature", "enfant_CC") # TODO: generation_min generation_max , "enfant_CC_pour_lui", "enfant_CC_pour_CC"
+                       "responsable_CC_nature", "enfant_CC", "enfant_CC_pour_lui", "enfant_CC_pour_CC") # TODO: generation_min generation_max 
 variables_comportement_CC <- c("mode_vie_ecolo", "changer_si_politiques", "changer_si_moyens", "changer_si_tous", "changer_non_riches", "changer_non_interet", "changer_non_negation", "changer_deja_fait", "changer_essaie")
 variables_schiste <- c("schiste_approbation", "schiste_avantage", "schiste_CC", "schiste_traite")
 variables_transferts_inter <- c("transferts_inter", "aide_2p", "transferts_inter_info", "aide_non_autonomie", "aide_non_priorite", "aide_non_etats", 
@@ -149,9 +149,9 @@ variables_depenses_publiques <- c("depenses_confiant", "compris_depenses", "dure
                                   "en_position_0", "en_position_1", "en_position_2", "en_position_3", "en_position_4", "en_position_5", "en_position_6", "en_position_7", "en_position_8", "en_position_9", "en_position_10")
 variables_toutes <- c(variables_approbation, variables_qualite, variables_aleatoires, variables_demo, variables_energie, variables_transport, variables_politiques, 
                       variables_gilets_jaunes, variables_gains_subjectifs, variables_Elasticite, variables_elasticite, variables_taxe_croyances, variables_benefices, 
-                      variables_problemes, variables_taxe_condition, variables_politiques, "rattrapage_diesel", variables_connaissances_CC, variables_avis_CC, 
+                      variables_problemes, variables_taxe_condition, variables_politiques_environnementales, "rattrapage_diesel", variables_connaissances_CC, variables_avis_CC, 
                       variables_comportement_CC, variables_schiste, variables_depenses_publiques)
-
+# TODO: rajouter nouvelles variables
 variables_wo_missing <- variables_toutes
 for (v in variables_toutes) { # display and remove variables with missing values
   # na_v <- length(which(is.na(s[[v]]) | is.nan(s[[v]]) | is.infinite(s[[v]])))
@@ -184,14 +184,15 @@ min(lasso$cvm) # min deviance. alpha = 1: 0.3399301 / 0.5: 0.3393227 / 0: 0.3456
 coefs_lasso <- coef(lasso, s="lambda.1se") # lambda.1se contains less variables than lambda.min
 coefs_lasso <- coef(lasso, s="lambda.min")
 data.frame(name = coefs_lasso@Dimnames[[1]][coefs_lasso@i + 1], coefficient = coefs_lasso@x) # doesn't work for multinomial
-selected_variables <- coefs_lasso@i - 1 # TODO: why is norme_vehicules present twice?
+selected_variables <- coefs_lasso@i - 1 
 selected_variables <- selected_variables[selected_variables > 0 & selected_variables <= length(variables_wo_missing)]
 selected_variables <- variables_wo_missing[selected_variables] # length(selected_variables) (.min) when alpha = 1: 58 / 0.5: 62 / 0: 142 (all) ; alpha = 1 and class: 67 / mae: 97
+selected_variables[duplicated(selected_variables)]
 summary(glm(as.formula(paste("(taxe_approbation!='Non') ~", paste(selected_variables, collapse=' + '))), binomial, data=s, weights=s$weight))
 
 
 significatifs_lasso_dev_oui <- as.formula((taxe_approbation=='Oui') ~ age + fume + niveau_vie + hausse_diesel + (transports_loisirs=="La voiture") + gilets_jaunes_oppose 
-                               + perte_relative_partielle + taxe_perdant_pauvres + taxe_benefices_CC + taxe_benefices_aucun + taxe_problemes_aucun
+                               + perte_relative_partielle + taxe_perdant_pauvres + benefices_CC + benefices_aucun + problemes_aucun
                                + si_compensee + peages_urbains + ges_O2 + ges_avion + changer_si_tous)
 summary(glm(significatifs_lasso, binomial, data=s, weights=s$weight))
 
@@ -237,7 +238,7 @@ variables_big_regression <- c("revenu", "rev_tot", "hausse_carburants", "hausse_
 # anovaMM(revenu ~ day, st)
 
 # TODO: non linear ANOVA
-variables_big_regression <- selected_variables[!duplicated(selected_variables) & selected_variables!="ges_pm"] # TODO: why is there a bug with ges_pm?
+variables_big_regression <- selected_variables 
 nb_draws <- 100
 sum_sq_all <- matrix(nrow = length(variables_big_regression), ncol = nb_draws, dimnames = list(variables_big_regression))
 for (i in 1:nb_draws) {
@@ -363,7 +364,7 @@ decrit(s$cause_CC, miss=T, weights = s$weight)
 
 ##### Orientation politiques #####
 decrit(s$gauche_droite, weights = s$weight, miss=T)
-decrit(s$gauche_droite, miss=T) # TODO: pb (should not be number, and missing should be here)
+decrit(s$gauche_droite)
 decrit(s$apolitique, weights = s$weight) # 21%
 decrit(s$ecologiste, weights = s$weight) # 15%
 decrit(s$humaniste, weights = s$weight) # 11%
@@ -398,6 +399,12 @@ summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data 
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = t, subset = transferts_inter!='NSP', weights = t$weight)) # 0
 
 # use m_global (in enquete/codes) to redo graph with new data for transferts_inter
+decrit(s$aide_non_etats)
+decrit(s$aide_non_priorite)
+decrit(s$aide_non_global)
+decrit(s$aide_non_trop)
+decrit(s$aide_non_autonomie)
+
 
 ##### Dépenses publiques #####
 categories_depenses <- c("sante", "education", "retraites", "securite", "recherche", "justice", "armee", "protection", "infrastructures", "loisirs", "aide")
@@ -437,11 +444,11 @@ for (j in names(s)) if (grepl('gilets_jaunes', j)) print(decrit(s[[j]], weights=
 
 ##### Approbation politiques environnementales #####
 for (j in names(s)) if (grepl('si_', j)) print(decrit(s[[j]], weights=s$weight))
-for (j in 141:148) print(decrit(s[[j]], weights=s$weight))
+for (j in 102:109) print(decrit(s[[j]], weights=s$weight))
 labels_politiques_env <- c()
-for (j in 141:148) labels_politiques_env <- c(labels_politiques_env, gsub(" - Q74", "", gsub(".*) à ", "", Label(s[[j]]))))  
+for (j in 109:109) labels_politiques_env <- c(labels_politiques_env, gsub(" - Q74", "", gsub(".*) à ", "", Label(s[[j]]))))  
 labels_taxe_condition <- c()
-for (j in 131:139) labels_taxe_condition <- c(labels_taxe_condition, gsub(" - .*", "", gsub(".*: ", "", Label(s[[j]])))) 
+for (j in 92:100) labels_taxe_condition <- c(labels_taxe_condition, gsub(" - .*", "", gsub(".*: ", "", Label(s[[j]])))) 
 labels_taxe_condition[1] <- "un versement pour les 50% de Français les plus modestes<br> (ceux gagnant moins de 1670€/mois)"
 labels_taxe_condition[3] <- "une compensation pour les ménages contraints<br> dans leur consommation de produits pétroliers"
 labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", "stricter standards on pollution from new vehicles", "stricter standards on pollution during roadworthiness tests", "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
@@ -471,7 +478,6 @@ for (v in variables_problemes[1:(length(variables_problemes)-2)]) {
   labels_problemes <- c(labels_problemes, gsub(" - .*", "", gsub(".*: ", "", Label(s[[v]]))))
   values_problemes <- c(values_problemes, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
 
-# TODO: perdants/gagnants + variante_monetaire
 # oui_non(margin_l=430, variables_benefices[1:(length(variables_benefices)-2)], "barres_benefices", labels_benefices)
 # oui_non(margin_l=430, variables_problemes[1:(length(variables_problemes)-2)], "barres_problemes", labels_problemes)
 
@@ -501,8 +507,6 @@ for (v in variables_taxe_perdant) {
 labels_gagnant_perdant[7] <- "Certains Français, mais <br>pas une catégorie de revenus particulière"
 labels_gagnant <- labels_perdant <- labels_gagnant_perdant
 labels_perdant[6] <- "Les ruraux"
-
-# TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
 
 barres_gagnants <- barres(file="gagnants", title="<b>Selon vous, quels seraient les gagnants avec une taxe carbone compensée ?</b><br>(choix multiples)", margin_l = 200, data=matrix(values_gagnant, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
 barres_perdants <- barres(file="perdants", title="<b>Selon vous, quels seraient les perdants avec une taxe carbone compensée ?</b><br>(choix multiples)", margin_l = 200, data=matrix(values_perdant, ncol=length(values_perdant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_perdant, hover=labels_perdant, legend="empty")
@@ -536,11 +540,7 @@ values_problemes_GJ_oppose <- c()
 for (v in variables_problemes[1:(length(variables_problemes)-2)]) {
   values_problemes_GJ_approuve <- c(values_problemes_GJ_approuve, sum(s$weight[which(s[[v]]==T & (s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T))])/sum(s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T]))
   values_problemes_GJ_oppose <- c(values_problemes_GJ_oppose, sum(s$weight[which(s[[v]]==T & s$gilets_jaunes_oppose==T)])/sum(s$weight[s$gilets_jaunes_oppose==T])) }
-# TODO: perdants/gagnants + variante_monetaire
-# oui_non(margin_l=430, variables_benefices[1:(length(variables_benefices)-2)], "barres_benefices", labels_benefices)
-# oui_non(margin_l=430, variables_problemes[1:(length(variables_problemes)-2)], "barres_problemes", labels_problemes)
 
-# TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
 decrit((s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T), weights = s$weight)
 decrit((s$gilets_jaunes_oppose==T), weights = s$weight)
 barres(file="politiques_environnementales_GJ_approuve", title="Seriez-vous favorable aux politiques environnementales suivantes ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", 
@@ -571,8 +571,6 @@ values_perdant_GJ_oppose <- c()
 for (v in variables_taxe_perdant) {
   values_perdant_GJ_approuve <- c(values_perdant_GJ_approuve, sum(s$weight[which(s[[v]]==T & (s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T))])/sum(s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_compris==T])) 
   values_perdant_GJ_oppose <- c(values_perdant_GJ_oppose, sum(s$weight[which(s[[v]]==T & s$gilets_jaunes_oppose==T)])/sum(s$weight[s$gilets_jaunes_oppose==T])) }
-
-# TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
 
 barres_gagnants_GJ_approuve <- barres(file="gagnants_GJ_approuve", title="Selon vous, quels seraient <b>les gagnants</b> avec une taxe carbone compensée ?<br><b>Réponses parmi les 36% de soutiens aux gilets jaunes</b>", margin_l = 200, data=matrix(values_gagnant_GJ_approuve, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
 barres_gagnants_GJ_oppose <- barres(file="gagnants_GJ_oppose", title="Selon vous, quels seraient <b>les gagnants</b> avec une taxe carbone compensée ?<br><b>Réponses parmi les 25% d'opposants aux gilets jaunes</b>", margin_l = 200, data=matrix(values_gagnant_GJ_oppose, ncol=length(values_gagnant)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_gagnant, hover=labels_gagnant, legend="empty")
@@ -690,12 +688,6 @@ plot(s$hausse_carburants, jitter(s$perte_relative_fuel), xlim=c(0, 500))
 plot(s$hausse_chauffage, jitter(s$perte_relative_chauffage), xlim=c(0, 500))
 length(which(s$gain <= 0 & s$km < 1000 & s$gaz==FALSE & s$fioul==FALSE))
 
-s$update_necessaire <- (s$simule_gagnant==1 & s$gagnant_categorie=='Perdant') | (s$simule_gagnant==0 & s$gagnant_categorie=='Gagnant')
-label(s$update_necessaire) <- "update_necessaire: Indicatrice de se croire gagnant/perdant en étant simulé perdant/gagnant"
-s$update_necessaire_large <- (s$simule_gagnant==1 & s$gagnant_categorie!='Gagnant') | (s$simule_gagnant==0 & s$gagnant_categorie!='Perdant')
-label(s$update_necessaire_large) <- "update_necessaire: Indicatrice de se croire non perdant/non gagnant en étant simulé perdant/gagnant"
-decrit(s$update_necessaire) # 45%
-decrit(s$update_necessaire_large) # 70%
 s$update_correct <- ((s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') 
                     + (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')
                     - (s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')
@@ -725,7 +717,8 @@ label(s$feedback_confirme_large) <- "feedback_confirme_large: Indicatrice de se 
 label(s$feedback_infirme_large) <- "feedback_infirme_large: Indicatrice de se penser non gagnant et être simulé gagnant, ou de se penser non perdant et être simulé perdant (gagnant_categorie, simule_gagnant)"
 # summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ I(feedback_confirme - feedback_infirme)*(s$gagnant_categorie=='Perdant'), data=s, weights=s$weight))
 # summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ simule_gagnant*(gagnant_categorie=='Gagnant'), data=s, weights=s$weight))
-
+decrit(s$feedback_infirme) # 45%
+decrit(s$feedback_infirme_large) # 70%
 # Les gens qui se croient gagnants updatent plus correctement que les autres lorsqu'ils doivent le faire
 summary(lm(update_correct_large ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight))
 summary(lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme==T, data=s, weights = s$weight)) # Non affectés exclus par feedback_infirme

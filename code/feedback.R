@@ -59,27 +59,13 @@ decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categor
 # TODO: que faire avec non affectés ? les exclure ? les mettre avec gagnants ?
 proba_gagner <- 0.70
 proba_perdre <- 0.30
-proba_simule_gagnant <- sum(s$weight[s$simule_gagnant==1 & s$variante_taxe_info=='f'])/sum(s$weight[s$variante_taxe_info=='f']) # 0.77
-proba_simule_perdant <- sum(s$weight[s$simule_gagnant==0 & s$variante_taxe_info=='f'])/sum(s$weight[s$variante_taxe_info=='f']) # 0.23
-proba_simule_gagnant_quand_cru_gagnant <- (sum(s$weight[s$simule_gagnant==1 & s$gagnant_categorie=='Gagnant' & s$variante_taxe_info=='f']) # 0.88
-                                           /sum(s$weight[s$gagnant_categorie=='Gagnant' & s$variante_taxe_info=='f']))
-proba_simule_non_gagnant_quand_cru_non_gagnant <- (sum(s$weight[s$simule_gagnant==0 & s$gagnant_categorie!='Gagnant' & s$variante_taxe_info=='f']) # 0.25
-                                           /sum(s$weight[s$gagnant_categorie!='Gagnant' & s$variante_taxe_info=='f']))
-proba_simule_perdant_quand_cru_perdant <- (sum(s$weight[s$simule_gagnant==0 & s$gagnant_categorie=='Perdant' & s$variante_taxe_info=='f']) # 0.28
-                                           /sum(s$weight[s$gagnant_categorie=='Perdant' & s$variante_taxe_info=='f']))
-proba_simule_non_perdant_quand_cru_non_perdant <- (sum(s$weight[s$simule_gagnant==1 & s$gagnant_categorie!='Perdant' & s$variante_taxe_info=='f']) # 0.85
-                                           /sum(s$weight[s$gagnant_categorie!='Perdant' & s$variante_taxe_info=='f']))
-proba_cru_gagnant_quand_simule_gagnant <- (sum(s$weight[s$simule_gagnant==1 & s$gagnant_categorie=='Gagnant' & s$variante_taxe_info=='f']) # 0.15
-                                           /sum(s$weight[s$simule_gagnant==1 & s$variante_taxe_info=='f']))
-proba_cru_perdant_quand_simule_perdant <- (sum(s$weight[s$simule_gagnant==0 & s$gagnant_categorie=='Perdant' & s$variante_taxe_info=='f']) # 0.78
-                                           /sum(s$weight[s$simule_gagnant==0 & s$variante_taxe_info=='f']))
-proba_cru_gagnant <- sum(s$weight[s$gagnant_categorie=='Gagnant' & s$variante_taxe_info=='f'])/sum(s$weight[s$variante_taxe_info=='f']) # 0.13
-proba_cru_perdant <- sum(s$weight[s$gagnant_categorie=='Perdant' & s$variante_taxe_info=='f'])/sum(s$weight[s$variante_taxe_info=='f']) # 0.65
 
 probas <- c()
 for (cru in c('Perdant', 'Gagnant')) {
   probas[paste('cru', tolower(cru), sep='_')] <- length(which(s$gagnant_categorie==cru & s$variante_taxe_info=='f'))/length(which(s$variante_taxe_info=='f'))
   probas[paste('cru_non', tolower(cru), sep='_')] <- length(which(s$gagnant_categorie!=cru & s$variante_taxe_info=='f'))/length(which(s$variante_taxe_info=='f'))
+  probas[paste('feedback_cru', tolower(cru), sep='_')] <- length(which(s$gagnant_feedback_categorie==cru & s$variante_taxe_info=='f'))/length(which(s$variante_taxe_info=='f'))
+  probas[paste('feedback_cru_non', tolower(cru), sep='_')] <- length(which(s$gagnant_feedback_categorie!=cru & s$variante_taxe_info=='f'))/length(which(s$variante_taxe_info=='f'))
   for (sim in c(0, 1)) {
     sim_nom <- 'perdant'
     if (sim==1) sim_nom <- 'gagnant'
@@ -92,6 +78,9 @@ for (cru in c('Perdant', 'Gagnant')) {
             length(which(s$variante_taxe_info=='f' & (i=='non' | s$gagnant_categorie==cru) & (i=='' | s$gagnant_categorie!=cru))))
         probas[gsub('__', '_', paste('cru', i, tolower(cru), 'quand_simule', j, sim_nom, sep='_'))] <- (length(which(s$variante_taxe_info=='f' & 
           (i=='non' | s$gagnant_categorie==cru) & (j=='non' | s$simule_gagnant==sim) & (i=='' | s$gagnant_categorie!=cru) & (j=='' | s$simule_gagnant!=sim)))/
+            length(which(s$variante_taxe_info=='f' & (j=='non' | s$simule_gagnant==sim) & (j=='' | s$simule_gagnant!=sim))))
+        probas[gsub('__', '_', paste('feedback_cru', i, tolower(cru), 'quand_simule', j, sim_nom, sep='_'))] <- (length(which(s$variante_taxe_info=='f' & 
+          (i=='non' | s$gagnant_feedback_categorie==cru) & (j=='non' | s$simule_gagnant==sim) & (i=='' | s$gagnant_feedback_categorie!=cru) & (j=='' | s$simule_gagnant!=sim)))/
             length(which(s$variante_taxe_info=='f' & (j=='non' | s$simule_gagnant==sim) & (j=='' | s$simule_gagnant!=sim))))
       }
     }
@@ -107,12 +96,16 @@ probas['cru_gagnant_quand_simule_gagnant']
 # les uns sont simulés gagnants et les autres simulés perdants
 
 
-proba_non_gagnant_coherente_Bayes <- (5/6)*probas['simule_non_gagnant']/probas['simule_non_gagnant_quand_cru_non_gagnant'] # 0.77
-proba_perdant_coherente_Bayes <- (5/6)*probas['simule_perdant']/probas['simule_perdant_quand_cru_perdant'] # 0.70
-proba_non_perdant_coherente_Bayes <- (5/6)*probas['simule_non_perdant']/probas['simule_non_perdant_quand_cru_non_perdant'] # 0.76
-
-proba_cru_perdant_quand_simule_perdant = 5/6 = proba_cru_gagnant_quand_simule_gagnant
-
 probas
-probas_gagnant_coherente_Bayes <- (5/6)*probas['simule_gagnant']/probas['simule_gagnant_quand_cru_gagnant'] # 0.73
-proba_non_gagnant_coherente_Bayes <- (5/6)*probas['simule_perdant']/probas['simule_non_gagnant_quand_cru_non_gagnant'] # 0.77
+probas['cru_gagnant']
+probas['feedback_cru_gagnant']
+probas['feedback_cru_gagnant_quand_simule_gagnant'] 
+probas_gagnant_coherente_Bayes <- as.numeric((5/6)*probas['simule_gagnant']/probas['simule_gagnant_quand_cru_gagnant']) # 0.73
+probas_gagnant_coherente_Bayes
+probas['cru_perdant']
+probas['feedback_cru_perdant']
+probas['feedback_cru_perdant_quand_simule_gagnant']
+proba_perdant_coherente_Bayes <- as.numeric((5/6)*probas['simule_perdant']/probas['simule_perdant_quand_cru_perdant']) # 0.70
+proba_perdant_coherente_Bayes
+proba_non_gagnant_coherente_Bayes <- (5/6)*probas['simule_non_gagnant']/probas['simule_non_gagnant_quand_cru_non_gagnant'] # 0.77
+proba_non_perdant_coherente_Bayes <- (5/6)*probas['simule_non_perdant']/probas['simule_non_perdant_quand_cru_non_perdant'] # 0.76

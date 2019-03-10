@@ -15,11 +15,11 @@ s$traite_transfert_conjoint <- (s$nb_adultes > 1) * (1 * (s$cible==20) * (s$reve
 s$revenu_2 <- s$revenu^2
 s$revenu_conjoint_2 <- s$revenu_conjoint^2
 
-s$gagnant_categorie__20[is.na(s$gagnant_categorie__20)] <- 0
-s$gagnant_categorie_20_30[is.na(s$gagnant_categorie_20_30)] <- 0
-s$gagnant_categorie_30_40[is.na(s$gagnant_categorie_30_40)] <- 0
-s$gagnant_categorie_40_50[is.na(s$gagnant_categorie_40_50)] <- 0
-s$transfert_seuil_gagnant <- 1 * (s$gagnant_categorie__20=='Gagnant') + 1 * (s$gagnant_categorie_20_30=='Gagnant') + 1 * (s$gagnant_categorie_30_40=='Gagnant') + 1 * (s$gagnant_categorie_40_50=='Gagnant')
+s$gagnant__20_categorie[is.na(s$gagnant__20_categorie)] <- 0
+s$gagnant_20_30_categorie[is.na(s$gagnant_20_30_categorie)] <- 0
+s$gagnant_30_40_categorie[is.na(s$gagnant_30_40_categorie)] <- 0
+s$gagnant_40_50_categorie[is.na(s$gagnant_40_50_categorie)] <- 0
+s$transfert_seuil_gagnant <- 1 * (s$gagnant__20_categorie=='Gagnant') + 1 * (s$gagnant_20_30_categorie=='Gagnant') + 1 * (s$gagnant_30_40_categorie=='Gagnant') + 1 * (s$gagnant_40_50_categorie=='Gagnant')
 #  COMM: définitions variable dans preparation, encodage, transfert_seuil_gagnant c'est gagnant_cible_categorie, package pour IV?
 
 s_0_70 <- subset(s, categorie_cible != '70_')

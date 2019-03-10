@@ -268,24 +268,24 @@ relabel_and_rename_s <- function() {
   label(s[[57]]) <<- "perte_relative_tva: Une hausse de la TVA ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q150"
   names(s)[58] <<- "perte_relative_fuel"
   label(s[[58]]) <<- "perte_relative_fuel: ~ Une hausse des taxes sur les carburants ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q151"
-  names(s)[59] <<- "gagnant_categorie_fuel"
-  label(s[[59]]) <<- "gagnant_categorie_fuel: ~ Ménage Gagnant/Non affecté/Perdant par hausse taxe carburants redistribuée à tous (+0.11/13 €/L diesel/essence, +60€/an /adulte) - Q152"
+  names(s)[59] <<- "gagnant_fuel_categorie"
+  label(s[[59]]) <<- "gagnant_fuel_categorie: ~ Ménage Gagnant/Non affecté/Perdant par hausse taxe carburants redistribuée à tous (+0.11/13 €/L diesel/essence, +60€/an /adulte) - Q152"
   names(s)[60] <<- "gain_taxe_fuel_hausse"
-  label(s[[60]]) <<- "gain_taxe_fuel_hausse: ~ (gagnant_categorie_fuel=Gagnant) Hausse de pouvoir d'achat du ménage suite à hausse taxe carburants redistribuée à tous (seuils à 10/20/30/40 €/an /UC) - Q153"
+  label(s[[60]]) <<- "gain_taxe_fuel_hausse: ~ (gagnant_fuel_categorie=Gagnant) Hausse de pouvoir d'achat du ménage suite à hausse taxe carburants redistribuée à tous (seuils à 10/20/30/40 €/an /UC) - Q153"
   names(s)[61] <<- "gain_taxe_fuel_baisse"
-  label(s[[61]]) <<- "gain_taxe_fuel_baisse: ~ (gagnant_categorie_fuel=Perdant) Baisse de pouvoir d'achat du ménage suite à hausse taxe carburants redistribuée à tous (seuils à 15/40/70/110/160 €/an /UC) - Q154"
+  label(s[[61]]) <<- "gain_taxe_fuel_baisse: ~ (gagnant_fuel_categorie=Perdant) Baisse de pouvoir d'achat du ménage suite à hausse taxe carburants redistribuée à tous (seuils à 15/40/70/110/160 €/an /UC) - Q154"
   names(s)[62] <<- "elasticite_fuel_perso"
   label(s[[62]]) <<- "elasticite_fuel_perso: ~ Réduction de la conso de carburants du ménage suite à augmentation du prix de 0.5€/L (0% - Je n'en consomme déjà presque pas/0% - Je suis contraint sur tous mes déplacements/de 0% à 10%/de 10% à 20%/de 20% à 30%/+ de 30% - Je changerais largement mes habitudes de déplacement) - Q159"
   names(s)[63] <<- "elasticite_fuel"
   label(s[[63]]) <<- "elasticite_fuel: ~ Réduction moyenne de la conso de carburants des Français suite à augmentation du prix de 0.5€/L (de 0% à 3%/de 3% à 10%/de 10% à 20%/de 20% à 30%/+ de 30%) - Q162"
   names(s)[64] <<- "perte_relative_chauffage"
   label(s[[64]]) <<- "perte_relative_chauffage: ~ Une hausse des taxes sur le fioul et le gaz ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155"
-  names(s)[65] <<- "gagnant_categorie_chauffage"
-  label(s[[65]]) <<- "gagnant_categorie_chauffage: ~ Ménage Gagnant/Non affecté/Perdant par hausse taxe fioul et gaz redistribuée à tous (+13/15% gaz/fioul, +50€/an /adulte) - Q156"
+  names(s)[65] <<- "gagnant_chauffage_categorie"
+  label(s[[65]]) <<- "gagnant_chauffage_categorie: ~ Ménage Gagnant/Non affecté/Perdant par hausse taxe fioul et gaz redistribuée à tous (+13/15% gaz/fioul, +50€/an /adulte) - Q156"
   names(s)[66] <<- "gain_taxe_chauffage_hausse"
-  label(s[[66]]) <<- "gain_taxe_chauffage_hausse: ~ (gagnant_categorie_chauffage=Gagnant) Hausse de pouvoir d'achat du ménage suite à hausse taxe fioul et gaz redistribuée à tous (seuils à 10/20/30/40 €/an /UC) - Q157"
+  label(s[[66]]) <<- "gain_taxe_chauffage_hausse: ~ (gagnant_chauffage_categorie=Gagnant) Hausse de pouvoir d'achat du ménage suite à hausse taxe fioul et gaz redistribuée à tous (seuils à 10/20/30/40 €/an /UC) - Q157"
   names(s)[67] <<- "gain_taxe_chauffage_baisse"
-  label(s[[67]]) <<- "gain_taxe_chauffage_baisse: ~ (gagnant_categorie_chauffage=Perdant) Baisse de pouvoir d'achat du ménage suite à hausse taxe fioul et gaz redistribuée à tous (seuils à 15/40/70/110/160 €/an /UC) - Q158"
+  label(s[[67]]) <<- "gain_taxe_chauffage_baisse: ~ (gagnant_chauffage_categorie=Perdant) Baisse de pouvoir d'achat du ménage suite à hausse taxe fioul et gaz redistribuée à tous (seuils à 15/40/70/110/160 €/an /UC) - Q158"
   names(s)[68] <<- "elasticite_chauffage_perso"
   label(s[[68]]) <<- "elasticite_chauffage_perso: ~ Réduction de la conso de fioul et gaz du ménage suite à augmentation du prix de 30% (0% - Je n'en consomme déjà presque pas/0% - Je suis contraint sur tous mes déplacements/de 0% à 10%/de 10% à 20%/de 20% à 30%/+ de 30% - Je changerais largement mes habitudes de déplacement) - Q160"
   names(s)[69] <<- "elasticite_chauffage"
@@ -336,112 +336,112 @@ relabel_and_rename_s <- function() {
   label(s[[91]]) <<- "gagnant_feedback_categorie: ~ info si le ménage est gagnant/perdant - Ménage Gagnant/Non affecté/Perdant par hausse taxe carbone redistribuée à tous (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence) - Q63"
   names(s)[92] <<- "taxe_feedback_approbation"
   label(s[[92]]) <<- "taxe_feedback_approbation: ~ info si le ménage est gagnant/perdant - Approbation d'une hausse de la taxe carbone compensée (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence) - Q64"
-  names(s)[93] <<- "taxe_benefices_CC_f"
-  label(s[[93]]) <<- "taxe_benefices_CC_f: * Participe à la lutte contre le changement climatique - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[94] <<- "taxe_benefices_sante_f"
-  label(s[[94]]) <<- "taxe_benefices_sante_f: * Réduit les effets néfastes de la pollution sur la santé - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[95] <<- "taxe_benefices_circulation_f"
-  label(s[[95]]) <<- "taxe_benefices_circulation_f: * Réduit les embouteillages - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[96] <<- "taxe_benefices_revenu_f"
-  label(s[[96]]) <<- "taxe_benefices_revenu_f: * Augmente mon pouvoir d'achat - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[97] <<- "taxe_benefices_pauvres_f"
-  label(s[[97]]) <<- "taxe_benefices_pauvres_f: * Augmente le pouvoir d'achat des plus modestes - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[98] <<- "taxe_benefices_independance_f"
-  label(s[[98]]) <<- "taxe_benefices_independance_f: * Favorise l'indépendance de la France aux importations d'énergie fossile - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[99] <<- "taxe_benefices_enjeu_f"
-  label(s[[99]]) <<- "taxe_benefices_enjeux_f: * Prépare l'économie aux enjeux de demain - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[100] <<- "taxe_benefices_aucun_f"
-  label(s[[100]]) <<- "taxe_benefices_aucun_f: * Pour aucune de ces raisons - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[101] <<- "taxe_benefices_autre_choix_f"
-  label(s[[101]]) <<- "taxe_benefices_autre_choix_f: * Autre (préciser) - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[102] <<- "taxe_benefices_autre_f"
-  label(s[[102]]) <<- "taxe_benefices_autre_f: * Champ libre - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
-  names(s)[103] <<- "taxe_problemes_inefficace_f"
-  label(s[[103]]) <<- "taxe_problemes_inefficace_f: * Est inefficace pour réduire la pollution - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[104] <<- "taxe_problemes_alternatives_f"
-  label(s[[104]]) <<- "taxe_problemes_alternatives_f: * Les alternatives sont insuffisantes ou trop chères - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[105] <<- "taxe_problemes_ruraux_f"
-  label(s[[105]]) <<- "taxe_problemes_ruraux_f: * Pénalise les milieux ruraux - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[106] <<- "taxe_problemes_revenu_f"
-  label(s[[106]]) <<- "taxe_problemes_revenu_f: * Diminue mon pouvoir d'achat - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[107] <<- "taxe_problemes_pauvres_f"
-  label(s[[107]]) <<- "taxe_problemes_pauvres_f: * Diminue le pouvoir d'achat de certains ménages modestes - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[108] <<- "taxe_problemes_economie_f"
-  label(s[[108]]) <<- "taxe_problemes_economie_f: * Nuit à l'économie et à l'emploi - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[109] <<- "taxe_problemes_pretexte_f" # TODO: vérifier recodage marche bien, cf. survey_old
-  label(s[[109]]) <<- "taxe_problemes_pretexte_f: * Est un prétexte pour augmenter les impôts - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[110] <<- "taxe_problemes_aucun_f"
-  label(s[[110]]) <<- "taxe_problemes_aucun_f: * Pour aucune de ces raisons - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[111] <<- "taxe_problemes_autre_choix_f"
-  label(s[[111]]) <<- "taxe_problemes_autre_choix_f: * Autre (préciser) - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
-  names(s)[112] <<- "taxe_problemes_autre_f"
-  label(s[[112]]) <<- "taxe_problemes_autre_f: * Champ libre - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[93] <<- "benefices_CC_f"
+  label(s[[93]]) <<- "benefices_CC_f: * Participe à la lutte contre le changement climatique - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[94] <<- "benefices_sante_f"
+  label(s[[94]]) <<- "benefices_sante_f: * Réduit les effets néfastes de la pollution sur la santé - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[95] <<- "benefices_circulation_f"
+  label(s[[95]]) <<- "benefices_circulation_f: * Réduit les embouteillages - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[96] <<- "benefices_revenu_f"
+  label(s[[96]]) <<- "benefices_revenu_f: * Augmente mon pouvoir d'achat - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[97] <<- "benefices_pauvres_f"
+  label(s[[97]]) <<- "benefices_pauvres_f: * Augmente le pouvoir d'achat des plus modestes - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[98] <<- "benefices_independance_f"
+  label(s[[98]]) <<- "benefices_independance_f: * Favorise l'indépendance de la France aux importations d'énergie fossile - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[99] <<- "benefices_enjeu_f"
+  label(s[[99]]) <<- "benefices_enjeux_f: * Prépare l'économie aux enjeux de demain - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[100] <<- "benefices_aucun_f"
+  label(s[[100]]) <<- "benefices_aucun_f: * Pour aucune de ces raisons - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[101] <<- "benefices_autre_choix_f"
+  label(s[[101]]) <<- "benefices_autre_choix_f: * Autre (préciser) - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[102] <<- "benefices_autre_f"
+  label(s[[102]]) <<- "benefices_autre_f: * Champ libre - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q66"
+  names(s)[103] <<- "problemes_inefficace_f"
+  label(s[[103]]) <<- "problemes_inefficace_f: * Est inefficace pour réduire la pollution - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[104] <<- "problemes_alternatives_f"
+  label(s[[104]]) <<- "problemes_alternatives_f: * Les alternatives sont insuffisantes ou trop chères - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[105] <<- "problemes_ruraux_f"
+  label(s[[105]]) <<- "problemes_ruraux_f: * Pénalise les milieux ruraux - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[106] <<- "problemes_revenu_f"
+  label(s[[106]]) <<- "problemes_revenu_f: * Diminue mon pouvoir d'achat - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[107] <<- "problemes_pauvres_f"
+  label(s[[107]]) <<- "problemes_pauvres_f: * Diminue le pouvoir d'achat de certains ménages modestes - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[108] <<- "problemes_economie_f"
+  label(s[[108]]) <<- "problemes_economie_f: * Nuit à l'économie et à l'emploi - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[109] <<- "problemes_pretexte_f" # TODO: vérifier recodage marche bien, cf. survey_old
+  label(s[[109]]) <<- "problemes_pretexte_f: * Est un prétexte pour augmenter les impôts - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[110] <<- "problemes_aucun_f"
+  label(s[[110]]) <<- "problemes_aucun_f: * Pour aucune de ces raisons - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[111] <<- "problemes_autre_choix_f"
+  label(s[[111]]) <<- "problemes_autre_choix_f: * Autre (préciser) - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
+  names(s)[112] <<- "problemes_autre_f"
+  label(s[[112]]) <<- "problemes_autre_f: * Champ libre - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q67"
   names(s)[113] <<- "gagnant_progressif_categorie"
   label(s[[113]]) <<- "gagnant_progressif_categorie: ~ info que taxe est progressive - Ménage Gagnant/Non affecté/Perdant par hausse taxe carbone redistribuée à tous (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence) - Q185"
   names(s)[114] <<- "taxe_progressif_approbation"
   label(s[[114]]) <<- "taxe_progressif_approbation: ~ info que taxe est progressive - Approbation d'une hausse de la taxe carbone compensée (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence) - Q186"
-  names(s)[115] <<- "taxe_benefices_CC_p"
-  label(s[[115]]) <<- "taxe_benefices_CC_p: * Participe à la lutte contre le changement climatique - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[116] <<- "taxe_benefices_sante_p"
-  label(s[[116]]) <<- "taxe_benefices_sante_p: * Réduit les effets néfastes de la pollution sur la santé - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[117] <<- "taxe_benefices_circulation_p"
-  label(s[[117]]) <<- "taxe_benefices_circulation_p: * Réduit les embouteillages - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[118] <<- "taxe_benefices_revenu_p"
-  label(s[[118]]) <<- "taxe_benefices_revenu_p: * Augmente mon pouvoir d'achat - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[119] <<- "taxe_benefices_pauvres_p"
-  label(s[[119]]) <<- "taxe_benefices_pauvres_p: * Augmente le pouvoir d'achat des plus modestes - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[120] <<- "taxe_benefices_independance_p"
-  label(s[[120]]) <<- "taxe_benefices_independance_p: * Favorise l'indépendance de la France aux importations d'énergie fossile - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[121] <<- "taxe_benefices_enjeu_p"
-  label(s[[121]]) <<- "taxe_benefices_enjeux_p: * Prépare l'économie aux enjeux de demain - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[122] <<- "taxe_benefices_aucun_p"
-  label(s[[122]]) <<- "taxe_benefices_aucun_p: * Pour aucune de ces raisons - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[123] <<- "taxe_benefices_autre_choix_p"
-  label(s[[123]]) <<- "taxe_benefices_autre_choix_p: * Autre (préciser) - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[124] <<- "taxe_benefices_autre_p"
-  label(s[[124]]) <<- "taxe_benefices_autre_p: * Champ libre - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
-  names(s)[125] <<- "taxe_problemes_inefficace_p"
-  label(s[[125]]) <<- "taxe_problemes_inefficace_p: * Est inefficace pour réduire la pollution - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[126] <<- "taxe_problemes_alternatives_p"
-  label(s[[126]]) <<- "taxe_problemes_alternatives_p: * Les alternatives sont insuffisantes ou trop chères - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[127] <<- "taxe_problemes_ruraux_p"
-  label(s[[127]]) <<- "taxe_problemes_ruraux_p: * Pénalise les milieux ruraux - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[128] <<- "taxe_problemes_revenu_p"
-  label(s[[128]]) <<- "taxe_problemes_revenu_p: * Diminue mon pouvoir d'achat - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[129] <<- "taxe_problemes_pauvres_p"
-  label(s[[129]]) <<- "taxe_problemes_pauvres_p: * Diminue le pouvoir d'achat de certains ménages modestes - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[130] <<- "taxe_problemes_economie_p"
-  label(s[[130]]) <<- "taxe_problemes_economie_p: * Nuit à l'économie et à l'emploi - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[131] <<- "taxe_problemes_pretexte_p"
-  label(s[[131]]) <<- "taxe_problemes_pretexte_p: * Est un prétexte pour augmenter les impôts - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[132] <<- "taxe_problemes_aucun_p"
-  label(s[[132]]) <<- "taxe_problemes_aucun_p: * Pour aucune de ces raisons - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[133] <<- "taxe_problemes_autre_choix_p"
-  label(s[[133]]) <<- "taxe_problemes_autre_choix_p: * Autre (préciser) - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[134] <<- "taxe_problemes_autre_p" # TODO: enlever 'taxe_' de 73 à 134
-  label(s[[134]]) <<- "taxe_problemes_autre_p: * Champ libre - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
-  names(s)[135] <<- "gagnant_categorie__20"
-  label(s[[135]]) <<- "gagnant_categorie__20: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q117"
+  names(s)[115] <<- "benefices_CC_p"
+  label(s[[115]]) <<- "benefices_CC_p: * Participe à la lutte contre le changement climatique - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[116] <<- "benefices_sante_p"
+  label(s[[116]]) <<- "benefices_sante_p: * Réduit les effets néfastes de la pollution sur la santé - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[117] <<- "benefices_circulation_p"
+  label(s[[117]]) <<- "benefices_circulation_p: * Réduit les embouteillages - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[118] <<- "benefices_revenu_p"
+  label(s[[118]]) <<- "benefices_revenu_p: * Augmente mon pouvoir d'achat - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[119] <<- "benefices_pauvres_p"
+  label(s[[119]]) <<- "benefices_pauvres_p: * Augmente le pouvoir d'achat des plus modestes - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[120] <<- "benefices_independance_p"
+  label(s[[120]]) <<- "benefices_independance_p: * Favorise l'indépendance de la France aux importations d'énergie fossile - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[121] <<- "benefices_enjeu_p"
+  label(s[[121]]) <<- "benefices_enjeux_p: * Prépare l'économie aux enjeux de demain - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[122] <<- "benefices_aucun_p"
+  label(s[[122]]) <<- "benefices_aucun_p: * Pour aucune de ces raisons - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[123] <<- "benefices_autre_choix_p"
+  label(s[[123]]) <<- "benefices_autre_choix_p: * Autre (préciser) - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[124] <<- "benefices_autre_p"
+  label(s[[124]]) <<- "benefices_autre_p: * Champ libre - Bénéfices d'une taxe carbone compensée (maximum trois réponses) - Q187"
+  names(s)[125] <<- "problemes_inefficace_p"
+  label(s[[125]]) <<- "problemes_inefficace_p: * Est inefficace pour réduire la pollution - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[126] <<- "problemes_alternatives_p"
+  label(s[[126]]) <<- "problemes_alternatives_p: * Les alternatives sont insuffisantes ou trop chères - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[127] <<- "problemes_ruraux_p"
+  label(s[[127]]) <<- "problemes_ruraux_p: * Pénalise les milieux ruraux - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[128] <<- "problemes_revenu_p"
+  label(s[[128]]) <<- "problemes_revenu_p: * Diminue mon pouvoir d'achat - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[129] <<- "problemes_pauvres_p"
+  label(s[[129]]) <<- "problemes_pauvres_p: * Diminue le pouvoir d'achat de certains ménages modestes - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[130] <<- "problemes_economie_p"
+  label(s[[130]]) <<- "problemes_economie_p: * Nuit à l'économie et à l'emploi - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[131] <<- "problemes_pretexte_p"
+  label(s[[131]]) <<- "problemes_pretexte_p: * Est un prétexte pour augmenter les impôts - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[132] <<- "problemes_aucun_p"
+  label(s[[132]]) <<- "problemes_aucun_p: * Pour aucune de ces raisons - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[133] <<- "problemes_autre_choix_p"
+  label(s[[133]]) <<- "problemes_autre_choix_p: * Autre (préciser) - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[134] <<- "problemes_autre_p"
+  label(s[[134]]) <<- "problemes_autre_p: * Champ libre - Indésirabilités d'une taxe carbone compensée (maximum trois réponses) - Q188"
+  names(s)[135] <<- "gagnant__20_categorie"
+  label(s[[135]]) <<- "gagnant__20_categorie: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q117"
   names(s)[136] <<- "taxe__20_approbation"
   label(s[[136]]) <<- "taxe__20_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% des plus modestes (+550€/an/adulte concerné) - Q115"
-  names(s)[137] <<- "gagnant_categorie_20_30"
-  label(s[[137]]) <<- "gagnant_categorie_20_30: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€ /an/adulte concerné) - Q120"
+  names(s)[137] <<- "gagnant_20_30_categorie"
+  label(s[[137]]) <<- "gagnant_20_30_categorie: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€ /an/adulte concerné) - Q120"
   names(s)[138] <<- "taxe_20_30_approbation"
   label(s[[138]]) <<- "taxe_20_30_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% des plus modestes (+550€ ou +360€/an/adulte concerné) - Q121"
-  names(s)[139] <<- "gagnant_categorie_30_40"
-  label(s[[139]]) <<- "gagnant_categorie_30_40: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€ /an/adulte concerné) - Q169"
+  names(s)[139] <<- "gagnant_30_40_categorie"
+  label(s[[139]]) <<- "gagnant_30_40_categorie: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€ /an/adulte concerné) - Q169"
   names(s)[140] <<- "taxe_30_40_approbation"
   label(s[[140]]) <<- "taxe_30_40_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 30% ou 40% des plus modestes (+360€ ou +270€/an/adulte concerné) - Q124"
-  names(s)[141] <<- "gagnant_categorie_40_50"
-  label(s[[141]]) <<- "gagnant_categorie_40_50: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€ /an/adulte concerné) - Q170"
+  names(s)[141] <<- "gagnant_40_50_categorie"
+  label(s[[141]]) <<- "gagnant_40_50_categorie: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€ /an/adulte concerné) - Q170"
   names(s)[142] <<- "taxe_40_50_approbation"
   label(s[[142]]) <<- "taxe_40_50_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 40% ou 50% des plus modestes (+270€ ou +220€/an/adulte concerné) - Q127"
-  names(s)[143] <<- "gagnant_categorie_50_70"
-  label(s[[143]]) <<- "gagnant_categorie_50_70: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 50% des plus modestes (+220€ /an/adulte concerné) - Q171"
+  names(s)[143] <<- "gagnant_50_70_categorie"
+  label(s[[143]]) <<- "gagnant_50_70_categorie: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 50% des plus modestes (+220€ /an/adulte concerné) - Q171"
   names(s)[144] <<- "taxe_50_70_approbation"
   label(s[[144]]) <<- "taxe_50_70_approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 50% des plus modestes (+220€/an/adulte concerné) - Q130"
-  names(s)[145] <<- "gagnant_categorie_70_"
-  label(s[[145]]) <<- "gagnant_categorie_70_: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q172"
+  names(s)[145] <<- "gagnant_70__categorie"
+  label(s[[145]]) <<- "gagnant_70__categorie: Le répondant estime que son ménage serait gagnant/non affecté/perdant par hausse taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q172"
   names(s)[146] <<- "taxe_70__approbation"
   label(s[[146]]) <<- "taxe_70__approbation: Le répondant approuverait une hausse de la taxe carbone redistribuée aux 20% ou 30% ou 40% ou 50% des plus modestes (+550€ ou 360€ ou 270€ ou 220€ /an/adulte concerné) - Q133"
   names(s)[147] <<- "si_pauvres"
@@ -864,12 +864,12 @@ convert_s <- function() {
               )) {
     s[j][[1]] <<- as.item(as.character(s[j][[1]]),
                 labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))), 
-                missing.values = c("","NSP"), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb
+                missing.values = c("","NSP"), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
   }  
- # TODO: as.item region_CC, gagnant_categorie_fuel, gagnant_categorie_chauffage, gagnant_categorie, gagnant_feedback_categorie, gagnant_progressif_categorie, gagnant_cible_categorie, interet politique, gilets jaunes, transports_travail_commun, transports_travail_actif?  
+ # TODO: as.item region_CC, gagnant_fuel_categorie, gagnant_chauffage_categorie, gagnant_categorie, gagnant_feedback_categorie, gagnant_progressif_categorie, gagnant_cible_categorie?  
 
   for (j in names(s)) {
-    if (j!="peages_urbains" & grepl('_perdant_|_gagnant_|_benefices_|_problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p|ecologiste|conservateur|liberal|patriote|humaniste|apolitique', j)) {
+    if (j!="peages_urbains" & grepl('_perdant_|_gagnant_|benefices_|problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p|ecologiste|conservateur|liberal|patriote|humaniste|apolitique', j)) {
       s[[j]][s[[j]]!=""] <<- TRUE
       s[[j]][is.na(s[[j]])] <<- FALSE
     }
@@ -883,7 +883,7 @@ convert_s <- function() {
                         annotation=Label(s[[k]]))
   }
 
-  for (k in c(131:139,141:148)) {
+  for (k in c(132:140,142:149)) {
     temp <-  2 * (s[k][[1]]=="Oui, tout à fait") + (s[k][[1]]=="Oui, plutôt") - (s[k][[1]]=="Non, pas vraiment") - 2 * (s[k][[1]]=="Non, pas du tout")
     s[k][[1]] <<- as.item(temp, labels = structure(c(-2:2),
                           names = c("Pas du tout","Pas vraiment","Indifférent/NSP","Plutôt","Tout à fait")),
@@ -913,7 +913,10 @@ convert_s <- function() {
                           names = c("NSP","Insuffisante","Limitée","Convenable","Satisfaisante")),
                           # names = c("NSP","Insuffisante","Limitée, mais suffisante","Convenable, mais devrait être accrue","Satisfaisante")),
                         missing.values = -1, annotation=Label(s$transports_avis))
-  # TODO: decrit(s$age) not numbers (as with miss=T)
+  
+  labels(s$transports_travail_commun) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
+  labels(s$transports_travail_actif) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
+  
   temp <- 20.90*(s$age == "18 à 24 ans") + 29.61*(s$age == "25 à 34 ans") + 42.14*(s$age == "35 à 49 ans") + 56.84*(s$age == "50 à 64 ans") + 75.43*(s$age == "65 ans ou plus")
   s$age <<- as.item(temp, labels = structure(c(20.90, 29.61, 42.14, 56.84, 75.43), names = c("18-24", "25-34", "35-49", "50-64", "65+")), annotation=Label(s$age))
   # s$Age <<- (s$age == "18 à 24 ans") + 2*(s$age == "25 à 34 ans") + 3.3*(s$age == "35 à 49 ans") + 4.6*(s$age == "50 à 64 ans") + 7*(s$age == "65 ans ou plus")
@@ -922,7 +925,7 @@ convert_s <- function() {
   s$Diplome <<- (s$diplome == "Brevet des collèges") + 2*(s$diplome=="CAP ou BEP") + 3*(s$diplome=="Baccalauréat") + 4*(s$diplome=="Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)") + 5*(s$diplome=="Bac +3 (licence...)") + 6*(s$diplome=="Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)") - (s$diplome=="NSP (Ne se prononce pas)")
   s$diplome4 <<- as.item(pmin(pmax(s$Diplome, 1), 4), labels = structure(1:4, names = c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur")), annotation=Label(s$diplome))  
   # s$diplome4 <<- as.character(s$diplome)
-  # s$diplome4[s$Diplome<2] <<- "Aucun diplôme ou brevet" # TODO: as.item
+  # s$diplome4[s$Diplome<2] <<- "Aucun diplôme ou brevet"
   # s$diplome4[s$Diplome>3] <<- "Supérieur"
   
   # s$compris_depenses <<- as.item(as.character(s$compris_depenses),
@@ -937,14 +940,34 @@ convert_s <- function() {
   s$cause_CC <<- as.item(s$cause_CC,
                 labels = structure(c("n'est pas une réalité","est principalement dû à la variabilité naturelle du climat", "est principalement dû à l'activité humaine", "NSP"), names = c("n'existe pas","naturel","anthropique","NSP")), missing.values='NSP', annotation=Label(s$cause_CC))
   
+  s$enfant_CC_pour_CC[s$enfant_CC=='Non'] <<- 'Non concerné'
+  s$enfant_CC_pour_CC <<- as.item(as.character(s$enfant_CC_pour_CC), labels = structure(c(T, FALSE, 'Non concerné'), names=c('TRUE', 'FALSE', 'Non concerné')),
+                                 missing.values='Non concerné', annotation=Label(s$enfant_CC_pour_CC))
+  s$enfant_CC_pour_lui[s$enfant_CC=='Non'] <<- 'Non concerné'
+  s$enfant_CC_pour_lui <<- as.item(as.character(s$enfant_CC_pour_lui), labels = structure(c(T, FALSE, 'Non concerné'), names=c('TRUE', 'FALSE', 'Non concerné')),
+                                 missing.values='Non concerné', annotation=Label(s$enfant_CC_pour_lui))  
+  
   s$gauche_droite <<- pmax(-2,pmin(2,-2 * grepl("extrême gauche", s$extr_gauche) - grepl("De gauche", s$gauche) + grepl("De droite", s$droite) + 2 * grepl("extrême droite", s$extr_droite)))
   is.na(s$gauche_droite) <<- (s$gauche_droite == 0) & !grepl("centre", s$centre)
   s$Gauche_droite <<- as.factor(s$gauche_droite)
   s$gauche_droite <<- as.item(as.numeric(as.vector(s$gauche_droite)), labels = structure(c(-2:2),
-                          names = c("Extrême gauche","Gauche","Centre","Droite","Extrême droite")), annotation=attr(s$gauche_droite, "label"))
+                          names = c("Extrême gauche","Gauche","Centre","Droite","Extrême droite")), annotation="gauche_droite:échelle de -2 (extr_gauche) à +2 (extr_droite) - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Patriote/Apolitique/Écologiste/Conservateur (champ libre)/NSP)") 
   levels(s$Gauche_droite) <<- c("Extreme-left", "Left", "Center", "Right", "Extreme-right", "Indeterminate")
   s$Gauche_droite[is.na(s$Gauche_droite)] <<- "Indeterminate"
+  
+  temp <- Label(s$interet_politique)
+  s$interet_politique <<- 1*(s$interet_politique=='Un peu') + 2*(s$interet_politique=='Beaucoup')
+  s$interet_politique <<- as.item(s$interet_politique, labels=structure(c(0:2), names=c('Presque pas', 'Un peu', 'Beaucoup')), annotation=temp)
 
+  # s$gilets_jaunes[s$gilets_jaunes_NSP==T] <<- -99
+  s$gilets_jaunes[s$gilets_jaunes_compris==T] <<- 0 # total à 115%
+  s$gilets_jaunes[s$gilets_jaunes_oppose==T] <<- -1 # 2 oppose et soutien en même temps
+  s$gilets_jaunes[s$gilets_jaunes_soutien==T] <<- 1
+  s$gilets_jaunes[s$gilets_jaunes_dedans==T] <<- 2
+  label(s$gilets_jaunes) <<- "gilets_jaunes: -1: s'oppose / 0: comprend sans soutenir ni s'opposer / 1: soutient / 2: fait partie des gilets jaunes (gilets_jaunes_compris/oppose/soutien/dedans/NSP)" 
+  s$gilets_jaunes <<- as.item(n(s$gilets_jaunes), labels = structure(c(-1:2), names=c('oppose', 'comprend', 'soutient', 'est_dedans')), 
+                             annotation=attr(s$gilets_jaunes, "label"))
+  
   # temp <- label(s$diplome)
   # s$diplome <<- factor(s$diplome, c("","Aucun diplôme","Brevet des collèges","CAP ou BEP","Baccalauréat","Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)","Bac +3 (licence...)","Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)","NSP (Ne se prononce pas)") )
   # label(s$diplome) <<- temp
@@ -987,27 +1010,27 @@ convert_s <- function() {
   s$nb_vehicules <<- (s$nb_vehicules_texte=='Un') + 2*(s$nb_vehicules_texte=='Deux ou plus')
 
   s$variante_partielle <<- 'NA'
-  s$variante_partielle[!is.na(s$gagnant_categorie_chauffage)] <<- 'c'
-  s$variante_partielle[!is.na(s$gagnant_categorie_fuel)] <<- 'f'
+  s$variante_partielle[!is.na(s$gagnant_chauffage_categorie)] <<- 'c'
+  s$variante_partielle[!is.na(s$gagnant_fuel_categorie)] <<- 'f'
   label(s$variante_partielle) <<- "variante_partielle: Variante aléatoire (c/f) de la taxe partielle sur le chauffage ou les carburants (=fuel)"
   s$perte_relative_partielle[s$variante_partielle=='c'] <<- s$perte_relative_chauffage[s$variante_partielle=='c']
   s$perte_relative_partielle[s$variante_partielle=='f'] <<- s$perte_relative_fuel[s$variante_partielle=='f']
   label(s$perte_relative_partielle) <<- "perte_relative_partielle: Une hausse des taxes sur variante_partielle (chauffage ou fuel) ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155, 162"
 
     # s$gain_fuel <- NA
-  s$gain_fuel[s$gagnant_categorie_fuel=='Non affecté' & s$variante_partielle=='f'] <<- 0
-  s$gain_fuel[s$gagnant_categorie_fuel=='Gagnant' & s$variante_partielle=='f'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_hausse[s$gagnant_categorie_fuel=='Gagnant' & s$variante_partielle=='f']))))/25
-  s$gain_fuel[s$gagnant_categorie_fuel=='Perdant' & s$variante_partielle=='f'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_baisse[s$gagnant_categorie_fuel=='Perdant' & s$variante_partielle=='f']))))/25
+  s$gain_fuel[s$gagnant_fuel_categorie=='Non affecté' & s$variante_partielle=='f'] <<- 0
+  s$gain_fuel[s$gagnant_fuel_categorie=='Gagnant' & s$variante_partielle=='f'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_hausse[s$gagnant_fuel_categorie=='Gagnant' & s$variante_partielle=='f']))))/25
+  s$gain_fuel[s$gagnant_fuel_categorie=='Perdant' & s$variante_partielle=='f'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_baisse[s$gagnant_fuel_categorie=='Perdant' & s$variante_partielle=='f']))))/25
   label(s$gain_fuel) <<- "gain_fuel: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carburants compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
   
-  s$gain_chauffage[s$gagnant_categorie_chauffage=='Non affecté' & s$variante_partielle=='c'] <<- 0
-  s$gain_chauffage[s$gagnant_categorie_chauffage=='Gagnant' & s$variante_partielle=='c'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_chauffage_hausse[s$gagnant_categorie_chauffage=='Gagnant' & s$variante_partielle=='c']))))/25
-  s$gain_chauffage[s$gagnant_categorie_chauffage=='Perdant' & s$variante_partielle=='c'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_chauffage_baisse[s$gagnant_categorie_chauffage=='Perdant' & s$variante_partielle=='c']))))/25
+  s$gain_chauffage[s$gagnant_chauffage_categorie=='Non affecté' & s$variante_partielle=='c'] <<- 0
+  s$gain_chauffage[s$gagnant_chauffage_categorie=='Gagnant' & s$variante_partielle=='c'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_chauffage_hausse[s$gagnant_chauffage_categorie=='Gagnant' & s$variante_partielle=='c']))))/25
+  s$gain_chauffage[s$gagnant_chauffage_categorie=='Perdant' & s$variante_partielle=='c'] <<- - 1 - as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_chauffage_baisse[s$gagnant_chauffage_categorie=='Perdant' & s$variante_partielle=='c']))))/25
   label(s$gain_chauffage) <<- "gain_fuel: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe chauffage compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
 
-  s$gagnant_partielle_categorie[s$variante_partielle=='c'] <<- s$gagnant_categorie_chauffage[s$variante_partielle=='c'] 
-  s$gagnant_partielle_categorie[s$variante_partielle=='f'] <<- s$gagnant_categorie_fuel[s$variante_partielle=='f']
-  label(s$gagnant_partielle_categorie) <<- "gagnant_partielle_categorie: Ménage Gagnant/Non affecté/Perdant par hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gagnant_categorie_fuel/chauffage)"
+  s$gagnant_partielle_categorie[s$variante_partielle=='c'] <<- s$gagnant_chauffage_categorie[s$variante_partielle=='c'] 
+  s$gagnant_partielle_categorie[s$variante_partielle=='f'] <<- s$gagnant_fuel_categorie[s$variante_partielle=='f']
+  label(s$gagnant_partielle_categorie) <<- "gagnant_partielle_categorie: Ménage Gagnant/Non affecté/Perdant par hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gagnant_fuel_categorie/chauffage)"
   s$gain_partielle[s$variante_partielle=='c'] <<- s$gain_chauffage[s$variante_partielle=='c'] 
   s$gain_partielle[s$variante_partielle=='f'] <<- s$gain_fuel[s$variante_partielle=='f']
   label(s$gain_partielle) <<- "gain_partielle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gain_fuel/chauffage)"
@@ -1054,19 +1077,38 @@ convert_s <- function() {
   s$Elasticite_fuel_perso <<- - round(s$Elasticite_fuel_perso / 30, 2) # converts into elasticity
   label(s$Elasticite_fuel_perso) <<- "Elasticite_fuel_perso: Élasticité-prix des dépenses de carburants du ménage, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 0.5€/L)"
   
+  s$elasticite_partielle <<- s$elasticite_chauffage
+  s$elasticite_partielle[!is.na(s$elasticite_fuel)] <<- s$elasticite_fuel[!is.na(s$elasticite_fuel)]
+  label(s$elasticite_partielle) <<- "elasticite_partielle: Réduction de la conso de fioul et gaz OU de carburants des Français suite à augmentation du prix de 30% (0% - Je n'en consomme déjà presque pas/0% - Je suis contraint sur tous mes déplacements/de 0% à 10%/de 10% à 20%/de 20% à 30%/+ de 30% - Je changerais largement mes habitudes de déplacement)"
+
+  s$Elasticite_partielle <<- s$Elasticite_chauffage
+  s$Elasticite_partielle[!is.na(s$Elasticite_fuel)] <<- s$Elasticite_fuel[!is.na(s$Elasticite_fuel)]
+  label(s$Elasticite_partielle) <<- "Elasticite_partielle: Élasticité-prix des dépenses de fioul et gaz OU de carburants des Français, calculée en prenant la valeur moyenne des intervalles proposées"
+
+  s$elasticite_partielle_perso <<- s$elasticite_chauffage_perso
+  s$elasticite_partielle_perso[!is.na(s$elasticite_fuel_perso)] <<- s$elasticite_fuel_perso[!is.na(s$elasticite_fuel_perso)]
+  label(s$elasticite_partielle_perso) <<- "elasticite_partielle_perso: Réduction de la conso de fioul et gaz OU de carburants du ménage suite à augmentation du prix de 30% (0% - Je n'en consomme déjà presque pas/0% - Je suis contraint sur tous mes déplacements/de 0% à 10%/de 10% à 20%/de 20% à 30%/+ de 30% - Je changerais largement mes habitudes de déplacement)"
+
+  s$Elasticite_partielle_perso <<- s$Elasticite_chauffage_perso
+  s$Elasticite_partielle_perso[!is.na(s$Elasticite_fuel_perso)] <<- s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)]
+  label(s$Elasticite_partielle_perso) <<- "Elasticite_partielle_perso: Élasticité-prix des dépenses de fioul et gaz OU de carburants du ménage, calculée en prenant la valeur moyenne des intervalles proposées"
+  
   s$variante_taxe_info <<- "p"
   s$variante_taxe_info[s$gagnant_feedback_categorie!=""] <<- "f"
   label(s$variante_taxe_info) <<- "variante_taxe_info: (f/p) Variante aléatoire entre f: feedback (=simulation, 2/3) et p: progressivité (1/3), dans l'information donnée sur la taxe compensée avant de demander à nouveau le gain et l'approbation, ainsi que les bénéfices et problèmes"
   for (v in c('CC', 'sante', 'circulation', 'revenu', 'pauvres', 'independance', 'enjeu', 'aucun', 'autre_choix', 'autre')) {
-    s[[paste('taxe_benefices_', v, sep="")]] <<- s[paste('taxe_benefices_', v, '_p', sep="")][[1]]
-    s[[paste('taxe_benefices_', v, sep="")]][s$variante_taxe_info=='f'] <<- s[paste('taxe_benefices_', v, '_f', sep="")][[1]][s$variante_taxe_info=='f']
-    label(s[[paste('taxe_benefices_', v, sep="")]]) <<- sub("_f: \\* ", ": ", label(s[paste('taxe_benefices_', v, '_f', sep="")][[1]]))
+    s[[paste('benefices_', v, sep="")]] <<- s[paste('benefices_', v, '_p', sep="")][[1]]
+    s[[paste('benefices_', v, sep="")]][s$variante_taxe_info=='f'] <<- s[paste('benefices_', v, '_f', sep="")][[1]][s$variante_taxe_info=='f']
+    label(s[[paste('benefices_', v, sep="")]]) <<- sub("_f: \\* ", ": ", label(s[paste('benefices_', v, '_f', sep="")][[1]]))
   }
   for (v in c('inefficace', 'alternatives', 'ruraux', 'revenu', 'pauvres', 'economie', 'pretexte', 'aucun', 'autre_choix', 'autre')) {
-    s[[paste('taxe_problemes_', v, sep="")]] <<- s[paste('taxe_problemes_', v, '_p', sep="")][[1]]
-    s[[paste('taxe_problemes_', v, sep="")]][s$variante_taxe_info=='f'] <<- s[paste('taxe_problemes_', v, '_f', sep="")][[1]][s$variante_taxe_info=='f']
-    label(s[[paste('taxe_problemes_', v, sep="")]]) <<- sub("_f: \\* ", ": ", label(s[paste('taxe_problemes_', v, '_f', sep="")][[1]]))
+    s[[paste('problemes_', v, sep="")]] <<- s[paste('problemes_', v, '_p', sep="")][[1]]
+    s[[paste('problemes_', v, sep="")]][s$variante_taxe_info=='f'] <<- s[paste('problemes_', v, '_f', sep="")][[1]][s$variante_taxe_info=='f']
+    label(s[[paste('problemes_', v, sep="")]]) <<- sub("_f: \\* ", ": ", label(s[paste('problemes_', v, '_f', sep="")][[1]]))
   }
+  s$gagnant_info_categorie <<- s$gagnant_feedback_categorie
+  s$gagnant_info_categorie[!is.na(s$gagnant_progressif_categorie)] <<- s$gagnant_progressif_categorie[!is.na(s$gagnant_progressif_categorie)]
+  label(s$gagnant_info_categorie) <<- "gagnant_info_categorie: après info simule_gagnant et/ou progressivité: Ménage Gagnant/Non affecté/Perdant par hausse taxe carbone redistribuée à tous (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence)"
   
   s$cible[s$cible20==1] <<- '20'
   s$cible[s$cible30==1] <<- '30'
@@ -1076,7 +1118,7 @@ convert_s <- function() {
   label(s$cible) <<- "cible: Ciblage du recyclage de la hausse de la taxe carbone, attribué en fonction du revenu du répondant et de son ménage (20/30/40/50% les plus modestes)" 
 
   # TODO: manage to use tidyverse without erasing observations
-  # s <<- merge(s, s %>% gather(key = temp, value = gain_cible, c(gagnant_categorie__20, gagnant_categorie_20_30, gagnant_categorie_30_40, gagnant_categorie_40_50, gagnant_categorie_50_70, gagnant_categorie_70_)) %>% filter(gain_cible != "") %>% select(-temp), sort=FALSE) # Warning: attributes are not identical across measure variables; they will be dropped
+  # s <<- merge(s, s %>% gather(key = temp, value = gain_cible, c(gagnant__20_categorie, gagnant_20_30_categorie, gagnant_30_40_categorie, gagnant_40_50_categorie, gagnant_50_70_categorie, gagnant_70__categorie)) %>% filter(gain_cible != "") %>% select(-temp), sort=FALSE) # Warning: attributes are not identical across measure variables; they will be dropped
   # label(s$gain_cible) <<- "gain_cible: Ménage Gagnant/Non affecté/Perdant avec hausse taxe carbone à recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
   # s <<- merge(s, s %>% gather(key = temp, value = taxe_cible_approbation, c(taxe__20_approbation, taxe_20_30_approbation, taxe_30_40_approbation, taxe_40_50_approbation, taxe_50_70_approbation, taxe_70__approbation)) %>% filter(taxe_cible_approbation != "") %>% select(-temp), sort=FALSE)
   # label(s$taxe_cible_approbation) <<- "taxe_cible_approbation: Approbation d'une hausse de la taxe carbone compensée par recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
@@ -1088,12 +1130,12 @@ convert_s <- function() {
   # s <<- merge(s, s %>% gather(key = temp, value = conso, c(conso_1, conso_2)) %>% filter(conso != "") %>% select(-temp), sort=FALSE)
   # label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
 
-  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie__20)] <<- s$gagnant_categorie__20[!is.na(s$gagnant_categorie__20)]
-  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_20_30)] <<- s$gagnant_categorie_20_30[!is.na(s$gagnant_categorie_20_30)]
-  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_30_40)] <<- s$gagnant_categorie_30_40[!is.na(s$gagnant_categorie_30_40)]
-  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_40_50)] <<- s$gagnant_categorie_40_50[!is.na(s$gagnant_categorie_40_50)]
-  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_50_70)] <<- s$gagnant_categorie_50_70[!is.na(s$gagnant_categorie_50_70)]
-  s$gagnant_cible_categorie[!is.na(s$gagnant_categorie_70_)] <<- s$gagnant_categorie_70_[!is.na(s$gagnant_categorie_70_)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant__20_categorie)] <<- s$gagnant__20_categorie[!is.na(s$gagnant__20_categorie)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_20_30_categorie)] <<- s$gagnant_20_30_categorie[!is.na(s$gagnant_20_30_categorie)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_30_40_categorie)] <<- s$gagnant_30_40_categorie[!is.na(s$gagnant_30_40_categorie)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_40_50_categorie)] <<- s$gagnant_40_50_categorie[!is.na(s$gagnant_40_50_categorie)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_50_70_categorie)] <<- s$gagnant_50_70_categorie[!is.na(s$gagnant_50_70_categorie)]
+  s$gagnant_cible_categorie[!is.na(s$gagnant_70__categorie)] <<- s$gagnant_70__categorie[!is.na(s$gagnant_70__categorie)]
   label(s$gagnant_cible_categorie) <<- "gagnant_cible_categorie: Ménage Gagnant/Non affecté/Perdant avec hausse taxe carbone à recyclage ciblé (cible: 20/30/40/50% les plus modestes)"
   s$taxe_cible_approbation[!is.na(s$taxe__20_approbation)] <<- s$taxe__20_approbation[!is.na(s$taxe__20_approbation)]
   s$taxe_cible_approbation[!is.na(s$taxe_20_30_approbation)] <<- s$taxe_20_30_approbation[!is.na(s$taxe_20_30_approbation)]
@@ -1129,6 +1171,7 @@ convert_s <- function() {
  
   s$conso[!is.na(s$conso_1)] <<- s$conso_1[!is.na(s$conso_1)]
   s$conso[!is.na(s$conso_2)] <<- s$conso_2[!is.na(s$conso_2)]
+  s$conso[is.na(s$conso)] <<- (6.39 + 7.31) / 2
   label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
 
   s$gaz <<- grepl('gaz', s$chauffage, ignore.case = T)
@@ -1156,6 +1199,7 @@ convert_s <- function() {
   s$simule_gain_cible_sans_conjoint <<- s$versement_cible - s$hausse_depenses
   label(s$simule_gain_cible) <<- "simule_gain_cible: Gain net simulé pour le ménage du répondant suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
   label(s$simule_gain_cible_sans_conjoint) <<- "simule_gain_cible_sans_conjoint: Gain net simulé pour le répondant (sans tenir compte du potentiel versement reçu par son conjoint) suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
+  s$simule_gagnant[is.na(s$simule_gagnant)] <<- 1*(s$simule_gain[is.na(s$simule_gagnant)] > 0)
   
   s$progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- s$progressivite_feedback_sans_info[!is.na(s$progressivite_feedback_sans_info)]
   s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
@@ -1163,12 +1207,15 @@ convert_s <- function() {
   label(s$progressivite) <<- "progressivite: ~ Une hausse de la taxe carbone compensée avantagerait les plus modestes (réunion des trois variante_progressivite: prog/fb_info/fb_no_info où seule fb_no_info est sans information préalable sur la progressivité) - Q206-208"
   s$variante_progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- "fb_no_info"
   s$variante_progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- "fb_info"
-  s$variante_progressivite[!is.na(s$progressivite_progressif)] <<- "prog"
-  label(s$variante_progressivite) <<- "variante_progressivite: prog/fb_info/fb_no_info Variante aléatoire du bloc de questions où figure 'progressivite', seulement pour apres_modifs=T. prog: info sur la progressivité / fb: feedback sur le statut gagnant/perdant simulé, info/no_info: avec/sans info sur la progressivité de la mesure"
+  s$variante_progressivite[s$variante_taxe_info=='p'] <<- "prog" # !is.na(s$progressivite_progressif) | 
+  s$variante_progressivite[s$variante_taxe_info=='f' & s$apres_modifs==FALSE] <<- 'fb_no_info' 
+  label(s$variante_progressivite) <<- "variante_progressivite: prog/fb_info/fb_no_info Variante aléatoire du bloc de questions où figure 'progressivite'. prog: info sur la progressivité / fb: feedback sur le statut gagnant/perdant simulé, info/no_info: avec/sans info sur la progressivité de la mesure" # , seulement pour apres_modifs=T
   s$info_progressivite <<- FALSE
   s$info_progressivite[s$variante_taxe_info=='p' | s$variante_progressivite=='fb_info'] <<- T
   label(s$info_progressivite) <<- "info_progressivite: Indicatrice qu'a été montrée l'information que la hausse de la taxe carbone compensée avantagerait les plus modestes"
 
+  s$variante_monetaire[is.na(s$variante_monetaire)] <<- 0 # concerne seulement une observation. Évite des complications inutiles.
+  
   s$age_18_24 <<- 1*(s$age == '18 à 24 ans')
   s$age_25_34 <<- 1*(s$age == '25 à 34 ans')
   s$age_35_49 <<- 1*(s$age == '35 à 49 ans')
@@ -1188,26 +1235,30 @@ convert_s <- function() {
   
   for (v in c("autonomie", "priorite", "etats", "global", "trop")) {
     s[[paste("aide_non", v, sep="_")]] <<- NA
-    s[[paste("aide_non", v, sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==T & s$aide_2p==T] <<- s[[paste("aide_non", v, "i", sep="_")]]
-    s[[paste("aide_non", v, sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==FALSE & s$aide_2p==T] <<- s[[paste("aide_non", v, "ni", sep="_")]]
+    s[[paste("aide_non", v, sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==T & s$aide_2p==T] <<- s[[paste("aide_non", v, "i", sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==T & s$aide_2p==T]
+    s[[paste("aide_non", v, sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==FALSE & s$aide_2p==T] <<- s[[paste("aide_non", v, "ni", sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==FALSE & s$aide_2p==T]
     label(s[[paste("aide_non", v, sep="_")]]) <<- Label(s[[paste("aide_non", v, "i", sep="_")]])
   }
-    
-  for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
+  
+  categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
+  # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
   for (i in 0:10) {
-    for (o in 1:nrow(s)) {
-      j <- s[[paste('en_position', i, sep='_')]][o]
-      if (!is.na(j)) s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
-    }
+    s[[paste('dep', i, 'en_position', sep='_')]] <<- (s$en_position_1==i) + 2*(s$en_position_2==i)  + 3*(s$en_position_3==i)  + 4*(s$en_position_4==i)  + 5*(s$en_position_5==i)  + 6*(s$en_position_6==i)  + 7*(s$en_position_7==i)  + 8*(s$en_position_8==i)  + 9*(s$en_position_9==i)  + 10*(s$en_position_10==i) 
+    label(s[[paste('dep', i, 'en_position', sep='_')]]) <<- paste(paste('dep', i, 'en_position', sep='_'), ": Position à laquelle est affichée la catégorie de dépense ", i, "(", categories_depenses[i], ") (cf. en_position_i)", sep="")
+    # for (o in 1:nrow(s)) {
+    #   j <- s[[paste('en_position', i, sep='_')]][o]
+    #   if (!is.na(j)) s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
+    #   s[[paste('dep', j, 'en_position', sep='_')]][!is.na(s$en_position_0)] <- 
+    # }
   }
   
-  # TODO: remove useless colonnes, such as _f/_p
-  # TODO: qualité, connaissances CC, opinions CC, gilets jaunes, duree_info, perte_relative_tva/fuel, si_/non_, gaz-fioul -> T/F, transferts_inter/variante, enfant
+  s <<- s[, -c(78:97, 100:119, 294:303)]
+  # TODO: qualité, connaissances CC, opinions CC
 }
 # convert_s()
 # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
 # sa <- s
-# prepare_s()
+prepare_s()
 
 weighting_s <- function(data, printWeights = T) { # cf. google sheet
   d <- data
@@ -1236,7 +1287,7 @@ weighting_s <- function(data, printWeights = T) { # cf. google sheet
   diplome4 <- data.frame(diplome4 = c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur"),  # http://webcache.googleusercontent.com/search?q=cache:rUvf6u0uCnEJ:www.insee.fr/fr/themes/tableau.asp%3Freg_id%3D0%26ref_id%3Dnattef07232+&cd=1&hl=fr&ct=clnk&gl=fr&lr=lang_en%7Clang_es%7Clang_fr
                         Freq=nrow(d)*c(0.301, 0.246, 0.168, 0.285))
 
-  if (length(which(d$taille_agglo==""))>0) raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~region,~csp,~age),
+  if (length(which(is.na(d$taille_agglo)))>0) raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~region,~csp,~age),
                 population.margins = list(sexe,diplome4,region,csp,age))    
   else raked <- rake(design= unweigthed, sample.margins = list(~sexe,~diplome4,~taille_agglo,~region,~csp,~age),
                 population.margins = list(sexe,diplome4,taille_agglo,region,csp,age)) 
@@ -1248,7 +1299,7 @@ weighting_s <- function(data, printWeights = T) { # cf. google sheet
   return(weights(trimWeights(raked, lower=0.25, upper=4, strict=TRUE)))
 }
 
-prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished=TRUE) { # , exclude_quotas_full=TRUE
+prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished=TRUE, only_known_agglo=T) { # , exclude_quotas_full=TRUE
   # setwd("/home/adrien/Google Drive/Economie/Travail/enquete/codes")
   # setwd("C:/Users/a.fabre/Google Drive/Economie/Travail/enquete/codes")
   # pes <<- read.csv("fin.csv", sep=";")
@@ -1274,10 +1325,15 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
   if (only_finished) { s <<- s[s$fini=="True",] }
   
+  agglos <- read.xls('agglos.xls')
+  names(agglos) <- c("id", "taille_agglo2")
+  s <<- merge(s, agglos, by="id", all.x=T)
+  s$taille_agglo[is.na(s$taille_agglo)] <<- s$taille_agglo2[is.na(s$taille_agglo)]
+  s <<- s[, which(names(s)!="taille_agglo2")]
   print(paste(length(which(is.na(s$taille_agglo))), "tailles d'agglo sont manquantes"))
-  s <<- s[!is.na(s$taille_agglo),]
+  if (only_known_agglo) s <<- s[!is.na(s$taille_agglo),]
   
-  convert_s() # TODO: check the Warnings
+  convert_s() 
   
   s$sample <<- "a"
   s$sample[s$fini=="True"] <<- "e"

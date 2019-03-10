@@ -158,7 +158,7 @@ I
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\tilde{\Gamma}$
+\begin_inset Formula $\widetilde{\Gamma}$
 \end_inset
 
  simule_gain: gain simulé du ménage suite à hausse taxe compensée
@@ -442,7 +442,11 @@ A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mat
 \end_layout
 
 \begin_layout Subsection
-Simulation comme instrument
+Simulation comme instrument (à travers 
+\begin_inset Formula $G^{F}$
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Standard
@@ -465,8 +469,36 @@ A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_
 
 \end_layout
 
+\begin_layout Subsection
+Simulation comme instrument (à travers 
+\begin_inset Formula $\Delta G^{F}$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+introduire 
+\begin_inset Formula $A^{I}$
+\end_inset
+
+ produit un effet
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\Delta G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
-Persistance des croyances
+Persistance et biais des croyances
 \end_layout
 
 \begin_layout Subsection
@@ -492,6 +524,49 @@ Simulation comme instrument
 \begin_inset Formula 
 \[
 \Delta A_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Biais de confirmation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta A_{i}^{F}=\delta_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\Gamma_{i}=j
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Biais à la perte
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $U$
+\end_inset
+
+: update_correct vaut +1 si le répondant adopte le feedback qui infirme
+ sa croyance initiale, 
+\begin_inset Formula $-$
+\end_inset
+
+1 s'il update contre le feedback qui pourtant le confirme, 0 s'il n'update
+ pas
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+U_{i}=\delta_{0}+\beta_{G}G_{i}^{F}\,|\,\Gamma_{i}\neq G_{i}
 \]
 
 \end_inset
