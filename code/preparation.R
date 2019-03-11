@@ -1,7 +1,8 @@
 # setwd("/var/www/beliefs_climate_policies/code")
 # setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
-#setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
+# setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
+# setwd("C:/Users/a.fabre/Documents/beliefs_climate_policies/code")
 
 source("packages_functions.R")
 
@@ -859,12 +860,13 @@ convert_s <- function() {
   }
   
   for (j in c("mode_chauffage", "chauffage", "parle_CC", "cause_CC", "effets_CC", "transports_frequence", 
-              "schiste_CC", "transports_avis", "transports_travail_actif", "transports_travail_commun", "interet_politique",
-              "perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage"
+              "schiste_CC", "transports_avis", "transports_travail_actif", "transports_travail_commun"
+              # "perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage", "interet_politique",
               )) {
+    if (j %in% c("mode_chauffage", "chauffage", "schiste_CC", "cause_CC")) s[capitalize(j)] <<- s[j][[1]]
     s[j][[1]] <<- as.item(as.character(s[j][[1]]),
                 labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))), 
-                missing.values = c("","NSP"), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
+                missing.values = c("NSP", ""), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
   }  
  # TODO: as.item region_CC, gagnant_fuel_categorie, gagnant_chauffage_categorie, gagnant_categorie, gagnant_feedback_categorie, gagnant_progressif_categorie, gagnant_cible_categorie?  
 
@@ -916,7 +918,16 @@ convert_s <- function() {
   
   labels(s$transports_travail_commun) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
   labels(s$transports_travail_actif) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
-  
+  s$Transports_travail_commun <<- s$transports_travail_commun
+  s$Transports_travail_actif <<- s$transports_travail_actif
+  s$Transports_travail_commun[is.na(s$Transports_travail_commun)] <<- "Non concerné"
+  s$Transports_travail_actif[is.na(s$Transports_travail_actif)] <<- "Non concerné"
+  s$Transports_travail_actif <<- as.item(as.character(s$Transports_travail_actif), missing.values=c('NSP', "Non concerné"), annotation="Transports_travail_actif: (transports_travail_actif sans NA) Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture d'effectuer ses trajets domicile-travail en marchant ou en vélo (Non/Oui mais ça l'embêterait/Oui ça ne lui poserait pas de grande difficulté/NSP)")
+  s$Transports_travail_commun <<- as.item(as.character(s$Transports_travail_commun), missing.values=c('NSP', "Non concerné"), annotation="Transports_travail_commun: (transports_travail_commun sans NA) Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture de prendre les transports en commun pour ses trajets domicile-travail (Non/Oui mais ça l'embêterait/Oui ça ne lui poserait pas de grande difficulté/NSP)")
+  s$Transports_distance <<- s$transports_distance
+  s$Transports_distance[is.na(s$Transports_distance)] <<- mean(s$transports_distance, na.rm=T)
+  s$Transports_distance <<- as.item(n(s$Transports_distance), missing.values = mean(s$transports_distance, na.rm=T), annotation="Transports_distance: (transports_distance sans NA) L'arrêt de transport en commun le plus proche de chez le répondant est à X minutes de marche")
+
   temp <- 20.90*(s$age == "18 à 24 ans") + 29.61*(s$age == "25 à 34 ans") + 42.14*(s$age == "35 à 49 ans") + 56.84*(s$age == "50 à 64 ans") + 75.43*(s$age == "65 ans ou plus")
   s$age <<- as.item(temp, labels = structure(c(20.90, 29.61, 42.14, 56.84, 75.43), names = c("18-24", "25-34", "35-49", "50-64", "65+")), annotation=Label(s$age))
   # s$Age <<- (s$age == "18 à 24 ans") + 2*(s$age == "25 à 34 ans") + 3.3*(s$age == "35 à 49 ans") + 4.6*(s$age == "50 à 64 ans") + 7*(s$age == "65 ans ou plus")
@@ -927,19 +938,17 @@ convert_s <- function() {
   # s$diplome4 <<- as.character(s$diplome)
   # s$diplome4[s$Diplome<2] <<- "Aucun diplôme ou brevet"
   # s$diplome4[s$Diplome>3] <<- "Supérieur"
-  
-  # s$compris_depenses <<- as.item(as.character(s$compris_depenses),
+ 
+  labels(s$mode_chauffage) <<- c("individuel"="Chauffage individuel", "collectif"="Chauffage collectif", "NSP"="NSP")
+  labels(s$chauffage) <<- c("Gaz réseau"="Gaz de ville", "Gaz bouteille"="Butane, propane, gaz en citerne", "Fioul"="Fioul, mazout, pétrole", "Électricité"="Électricité", "Bois, solaire..."="Bois, solaire, géothermie, aérothermie (pompe à chaleur)", "Autre"="Autre", "NSP"="NSP")
+  labels(s$schiste_CC) <<- c("malvenue"="Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir", "valable"="Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"="NSP")
+  labels(s$cause_CC) <<- c("n'existe pas"="n'est pas une réalité", "naturel"="est principalement dû à la variabilité naturelle du climat", "anthropique"="est principalement dû à l'activité humaine", "NSP"="NSP")
+  s$Compris_depenses <<- as.character(s$compris_depenses)
+  s$Compris_depenses[is.na(s$Compris_depenses)] <<- "NA"
   s$compris_depenses <<- as.item(as.character(s$compris_depenses),
-                labels = structure(c("","Oui","Non","Bug: le graphique ne s'est pas affiché correctement."), names = c("NA","Oui","Non","Bug")), annotation=attr(s$compris_depenses, "label"))
-  s$mode_chauffage <<- as.item(s$mode_chauffage,
-                labels = structure(c("","Chauffage individuel","Chauffage collectif", "NSP"), names = c("NA","individuel","collectif","NSP")), missing.values='NSP', annotation=Label(s$mode_chauffage))
-  s$chauffage <<- as.item(s$chauffage,
-                labels = structure(c("Gaz de ville", "Butane, propane, gaz en citerne", "Fioul, mazout, pétrole", "Électricité", "Bois, solaire, géothermie, aérothermie (pompe à chaleur)", "Autre","NSP"), names = c("Gaz réseau", "Gaz bouteille", "Fioul", "Électricité", "Bois, solaire...", "Autre", "NSP")), missing.values='NSP', annotation=Label(s$chauffage))
-  s$schiste_CC <<- as.item(as.character(s$schiste_CC),
-                labels = structure(c("Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir","Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"), names = c("malvenue","valable","NSP")), missing.values='NSP', annotation=Label(s$schiste_CC))
-  s$cause_CC <<- as.item(s$cause_CC,
-                labels = structure(c("n'est pas une réalité","est principalement dû à la variabilité naturelle du climat", "est principalement dû à l'activité humaine", "NSP"), names = c("n'existe pas","naturel","anthropique","NSP")), missing.values='NSP', annotation=Label(s$cause_CC))
-  
+                                 labels = structure(c("", "Oui","Non","Bug: le graphique ne s'est pas affiché correctement."), names = c("NA", "Oui","Non","Bug")), annotation=attr(s$compris_depenses, "label"))
+
+  s$enfant_CC[is.na(s$enfant_CC)] <<- "NSP"
   s$enfant_CC_pour_CC[s$enfant_CC=='Non'] <<- 'Non concerné'
   s$enfant_CC_pour_CC <<- as.item(as.character(s$enfant_CC_pour_CC), labels = structure(c(T, FALSE, 'Non concerné'), names=c('TRUE', 'FALSE', 'Non concerné')),
                                  missing.values='Non concerné', annotation=Label(s$enfant_CC_pour_CC))
@@ -1006,7 +1015,7 @@ convert_s <- function() {
   for (i in 1:95) region_dep[i] <- region_code(i)
   s$region <<- "autre"
   s$region[as.numeric(substr(s$code_postal, 1, 2)) %in% 1:95] <<- region_dep[as.numeric(substr(s$code_postal, 1, 2))]
-  
+  # TODO: missing schiste_traite? dep_traites <- c(01, 02, 04, 06, 07, 08, 10, 11, 12, 13, 24, 25, 26, 30, 31, 32, 33, 34, 38, 39, 40, 45, 46, 48, 51, 54, 55, 57, 59, 60, 62, 64, 65, 67, 68, 69, 71, 73, 74, 77, 78, 82, 83, 84, 89, 90, 91, 93, 94, 95)
   s$nb_vehicules <<- (s$nb_vehicules_texte=='Un') + 2*(s$nb_vehicules_texte=='Deux ou plus')
 
   s$variante_partielle <<- 'NA'
@@ -1043,9 +1052,12 @@ convert_s <- function() {
   s$gain_echelle <<- s$gain
   s$gain_fuel_echelle <<- s$gain_fuel
   s$gain_chauffage_echelle <<- s$gain_chauffage
+  s$gain_partielle_echelle <<- s$gain_fuel
+  s$gain_partielle_echelle[!is.na(s$gain_chauffage_echelle)] <<- s$gain_chauffage_echelle[!is.na(s$gain_chauffage_echelle)]
   label(s$gain) <<- "gain: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carbone compensée, dans [-6;5] (seuils: -280/-190/-120/-70/-30/0/20/40/60/80)"
   label(s$gain_chauffage_echelle) <<- "gain_chauffage_echelle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe chauffage compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
   label(s$gain_fuel_echelle) <<- "gain_fuel_echelle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carburants compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
+  label(s$gain_partielle_echelle) <<- "gain_partielle_echelle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (carburants ou chauffage) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
   
   # cf. consistency_belief_losses.py pour les imputations
   temp <- -405.55*(s$gain==-6) - 224.25*(s$gain==-5) - 147.91*(s$gain==-4) - 92.83*(s$gain==-3) - 48.28*(s$gain==-2) - 13.72*(s$gain==-1) + 10.39*(s$gain==1) + 30.36*(s$gain==2) + 49.96*(s$gain==3) + 69.72*(s$gain==4) + 106.89*(s$gain==5) #  - 1.66*(s$gain==0)
@@ -1109,6 +1121,10 @@ convert_s <- function() {
   s$gagnant_info_categorie <<- s$gagnant_feedback_categorie
   s$gagnant_info_categorie[!is.na(s$gagnant_progressif_categorie)] <<- s$gagnant_progressif_categorie[!is.na(s$gagnant_progressif_categorie)]
   label(s$gagnant_info_categorie) <<- "gagnant_info_categorie: après info simule_gagnant et/ou progressivité: Ménage Gagnant/Non affecté/Perdant par hausse taxe carbone redistribuée à tous (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence)"
+  
+  s$taxe_info_approbation <<- s$taxe_feedback_approbation
+  s$taxe_info_approbation[!is.na(s$taxe_progressif_approbation)] <<- s$taxe_progressif_approbation[!is.na(s$taxe_progressif_approbation)]
+  annotation(s$taxe_info_approbation) <<- "taxe_info_approbation: après info simule_gagnant et/ou progressivité - Approbation d'une hausse de la taxe carbone compensée (+110€/an /adulte, +13/15% gaz/fioul, +0.11/13 €/L diesel/essence)"
   
   s$cible[s$cible20==1] <<- '20'
   s$cible[s$cible30==1] <<- '30'
@@ -1258,7 +1274,7 @@ convert_s <- function() {
 # convert_s()
 # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
 # sa <- s
-prepare_s()
+# prepare_s()
 
 weighting_s <- function(data, printWeights = T) { # cf. google sheet
   d <- data
@@ -1325,12 +1341,14 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
   if (only_finished) { s <<- s[s$fini=="True",] }
   
-  agglos <- read.xls('agglos.xls')
+  agglos <- read.csv2('agglos.csv')
   names(agglos) <- c("id", "taille_agglo2")
   s <<- merge(s, agglos, by="id", all.x=T)
   s$taille_agglo[is.na(s$taille_agglo)] <<- s$taille_agglo2[is.na(s$taille_agglo)]
   s <<- s[, which(names(s)!="taille_agglo2")]
   print(paste(length(which(is.na(s$taille_agglo))), "tailles d'agglo sont manquantes"))
+  id_agglo_manquante <- s$id[is.na(s$taille_agglo)]
+  write.csv(id_agglo_manquante, "ID_agglo_manquante.csv")
   if (only_known_agglo) s <<- s[!is.na(s$taille_agglo),]
   
   convert_s() 
