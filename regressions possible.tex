@@ -1,4 +1,4 @@
-%% LyX 2.3.2 created this file.  For more info, see http://www.lyx.org/.
+%% LyX 2.3.0 created this file.  For more info, see http://www.lyx.org/.
 %% Do not edit unless you really know what you are doing.
 \documentclass[french]{article}
 \usepackage[T1]{fontenc}
@@ -14,6 +14,7 @@
 
 \makeatother
 \begin{document}
+
 \title{Régressions possibles}
 \maketitle
 
@@ -26,19 +27,19 @@ $\left[-2;+2\right]$ suite à hausse taxe partielle
 \item $G^{p}$ gagnant\_partielle\_categorie: G/N/P suite à hausse taxe
 partielle compensée
 \item $G$ gagnant\_categorie: G/N/P suite à hausse taxe compensée
-\item $\tilde{G}$ gain: $\left[-6;+5\right]$ suite à hausse taxe compensée
+\item $g$ gain: $\left[-6;+5\right]$ suite à hausse taxe compensée
 \item $A^{I}$ taxe\_approbation: Oui/Non/NSP approbation hausse taxe compensée
 avant info (\emph{I} pour initial ou ignorant)
 \item $P$ progressivite: Oui/Non/NSP hausse taxe compensée avantagerait
 les plus modestes (seulement pour apres\_modifs)
-\item $\Gamma$ simule\_gagnant: ménage simulé gagnant avec 5 chances sur
-6 suite à hausse taxe compensée
-\item $\widehat{\Gamma}$ simule\_gain: gain simulé du ménage suite à hausse
+\item $\widehat{\Gamma}$ simule\_gagnant: ménage simulé gagnant avec 5
+chances sur 6 suite à hausse taxe compensée
+\item $\widehat{\gamma}$ simule\_gain: gain simulé du ménage suite à hausse
 taxe compensée
 \item $G^{P}$/$G^{F}$: gagnant\_{[}progressif/feedback{]}\_categorie:
 G/N/P suite à hausse taxe compensée et à affichage de l'info sur la
-progressivité $I^{P}$ / simule\_gagnant $\Gamma$
-\item $\widehat{\Gamma}^{C}$ simule\_gain\_cible: gain simulé du ménage
+progressivité $I^{P}$ / simule\_gagnant $\widehat{\Gamma}$
+\item $\widehat{\Gamma^{C}}$ simule\_gain\_cible: gain simulé du ménage
 suite à hausse taxe compensée
 \item $A^{P}$/$A^{F}$ taxe\_{[}progressif/feedback{]}\_approbation: Oui/Non/NSP
 approbation hausse taxe compensée après info progressivité et/ou simule\_gagnant
@@ -101,7 +102,7 @@ A_{i}^{C}=\delta_{0}+\beta_{T}T_{i}+\beta_{2}T_{2,i}+\delta_{R}R_{i}+\epsilon_{i
 \subsection{Discontinuité instrumentée}
 
 \begin{align*}
-G_{i}^{C} & =\gamma_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}\left(+\gamma_{R}R_{i}\right)+\eta_{i}\\
+G_{i}^{C} & =\alpha_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}\left(+\gamma_{R}R_{i}\right)+\eta_{i}\\
 A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mathbf{1}_{c_{i}=c}+\beta_{G\cdot c}\widehat{G_{i}^{C}}\mathbf{1}_{c_{i}=c}\right)+\delta_{A}A_{i}^{I}\left(+\delta_{R}R_{i}\right)+\epsilon_{i}
 \end{align*}
 
@@ -111,7 +112,7 @@ A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mat
 introduire $A^{I}$ produit un effet
 
 \begin{align*}
-G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+G_{i}^{F} & =\alpha_{0}+\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
 A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
 \end{align*}
 
@@ -121,7 +122,7 @@ A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_
 introduire $A^{I}$ produit un effet
 
 \begin{align*}
-\Delta G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+\Delta G_{i}^{F} & =\alpha_{0}+\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
 A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
 \end{align*}
 
@@ -131,21 +132,21 @@ A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+
 \subsection{Persistance après la simulation}
 
 \[
-\Delta G_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta G_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
 \]
 
 
 \subsection{Simulation comme instrument}
 
 \[
-\Delta A_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta A_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
 \]
 
 
 \subsection{Biais de confirmation}
 
 \[
-\Delta A_{i}^{F}=\delta_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\Gamma_{i}=j
+\Delta A_{i}^{F}=\alpha_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=j
 \]
 
 
@@ -156,7 +157,7 @@ infirme sa croyance initiale, $-$1 s'il update contre le feedback
 qui pourtant le confirme, 0 s'il n'update pas
 
 \[
-U_{i}=\delta_{0}+\beta_{G}G_{i}^{F}\,|\,\Gamma_{i}\neq G_{i}
+U_{i}=\alpha_{0}+\beta_{G}G_{i}^{F}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
 \]
 
 
@@ -164,72 +165,76 @@ U_{i}=\delta_{0}+\beta_{G}G_{i}^{F}\,|\,\Gamma_{i}\neq G_{i}
 
 On fait l'hypothèse que 
 \[
-\mathbb{P}_{i,t}\left(G_{i}>0\right)=f\left(\underset{+}{\tilde{G}_{i}}\right)
+\mathbb{P}_{i,t}\left(G_{i}>0\right)=f\left(\underset{+}{g_{i}}\right)
 \]
-et on estime \emph{f}. On a le gain subjectif $\tilde{G}_{i}=\tilde{\Gamma}_{i}-b+\epsilon_{i}$
-où l'erreur de l'individu \emph{i} par rapport au gain objectif $\tilde{\Gamma}_{i}$
+et on estime \emph{f}. On a le gain subjectif $g_{i}=\gamma_{i}-b+\epsilon_{i}$
+où l'erreur de l'individu \emph{i} par rapport au gain objectif $\gamma_{i}$
 est $-b+\epsilon_{i}$, avec $\mathbb{E}\left[\epsilon_{i}\right]=0$
-(et en espérant que $\mathbb{E}\left[\epsilon_{i}\,|\,\Delta\hat{E}_{i}\right]=0$).
+(et en espérant que $\mathbb{E}\left[\epsilon_{i}\,|\,\Delta\widehat{E_{i}}\right]=0$).
 (On pourrait faire dépendre \emph{b }de caractéristiques observables
 dans une extension). On peut estimer le biais \emph{b }directement.
 
 \begin{align*}
-\tilde{G}_{i} & =\underset{\tilde{\Gamma}_{i}}{\underbrace{110-\Delta E_{i}}}-b+\epsilon_{i}\\
- & =\underset{\hat{\tilde{\Gamma}_{i}}}{\underbrace{110-\Delta\hat{E}_{i}}}+\iota_{i}-b+\epsilon_{i}
+g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b+\epsilon_{i}\\
+ & =\underset{\widehat{\gamma_{i}}}{\underbrace{110-\Delta\widehat{E_{i}}}}+\iota_{i}-b+\epsilon_{i}
 \end{align*}
 
-On suppose que le répondant connaît notre estimation $\hat{\tilde{\Gamma}_{i}}$
-du gain objectif, qui est biaisée avec un biais noté $\iota_{i}$
-(qu'on peut estimer dans une extension pour estimer \emph{b} plus
-précisément). Le répondant sait qu'il est biaisé. Il sait que l'écart
-$\tilde{G}_{i}-\hat{\tilde{\Gamma}_{i}}$ entre son estimation et
-la nôtre est en moyenne de $\iota_{i}-b$, mais ne sait pas quel part
-de cet écart est dû à son biais, et quelle part est due à notre biais
-(l'estimation qu'il croit être la nôtre est $\hat{\tilde{\Gamma}_{i}}+\iota_{i}$).
-Il sait aussi qu'outre le biais, il y a un bruit $\epsilon_{i}$ dans
-son estimation de ses dépenses $\Delta E_{i}+b-\epsilon_{i}$, ce
-qui l'empêche de connaître parfaitement notre biais $\iota_{i}$,
-sur lequel il a néanmoins une information partielle (liée à ses caractéristiques
-inobservées par nous).
+Le répondant sait qu'il commet une erreur $b-\epsilon_{i}$, qu'il
+croit d'espérance nulle (il pense que $b=0$ \emph{a priori}). Il
+croit que nous estimons ses hausses de dépenses à $\widehat{\gamma_{i}}-\epsilon_{i}=\gamma_{i}-\iota_{i}-\epsilon_{i}$,
+et que nous commettons une erreur d'espérance $b-\iota_{i}$ \emph{a
+priori }non nulle, où $\iota_{i}-b$ est son information partielle
+(liée à ses caractéristiques inobservées par nous). On peut décomposer
+$b-\iota_{i}$ entre son biais $b$ et le nôtre $\iota_{i}$ (qu'on
+peut estimer dans une extension pour estimer \emph{b} plus précisément).
+Le répondant sait qu'il peut être biaisé. Il sait que l'écart $g_{i}-\widehat{\gamma_{i}}$
+entre son estimation et la nôtre est de $\iota_{i}-b+\epsilon_{i}$,
+mais ne sait pas quel part de cet écart est dû à son information partielle
+$\iota_{i}-b$, et quelle part est due à son incertitude $\epsilon_{i}$.
+L'incertitude du répondant $\epsilon_{i}$ est une variable aléatoire
+centrée qui l'empêche de distinguer son biais \emph{b} du nôtre $\iota_{i}$.
 
-Après le feedback, il va réviser son gain subjectif en
+Le feedback lui donne une information sur $\widehat{\gamma_{i}}$,
+donc indirectement sur $\epsilon_{i}$. Après le feedback, il va réviser
+son gain subjectif en
 
 \[
-\tilde{G}_{i}^{F}=\hat{\tilde{\Gamma}_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b+\epsilon_{i}
+g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b+\epsilon_{i}
 \]
 
 $\alpha\in\left[0;1\right]$ ssi le répondant update dans le bon sens.
 (On pourrait rendre le nouveau bruit $\eta_{i}b$ indépendant de \emph{b},
 à voir\emph{ }en fonction des données).
 
-$\tilde{G}_{i}^{F}$ n'est pas observée, mais on peut l'estimer à
-partir de l'estimation de \emph{f} (et en regroupant des individus
-similaires): 
+$g_{i}^{F}$ n'est pas observée, mais on peut l'estimer à partir de
+l'estimation de \emph{f} (et en regroupant des individus similaires):
 \[
-\hat{\tilde{G}_{i}^{F}}=\hat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
+\widehat{g_{i}^{F}}=\hat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
 \]
 
 Le paramètre qui nous intéresse est $\alpha$, car il représente l'ampleur
 de la révision effectuée par le répondant. On l'estime en utilisant
-$\tilde{G}_{i}-\tilde{G}_{i}^{F}=b\left(\alpha+\eta_{i}-1\right)$:
+$g_{i}-g_{i}^{F}=b\left(\alpha+\eta_{i}-1\right)$:
 
 \begin{align*}
-\hat{\alpha} & =1+\frac{\tilde{G}_{i}-\hat{\tilde{G}_{i}^{F}}}{b}
+\widehat{\alpha} & =1+\frac{g_{i}-\widehat{g_{i}^{F}}}{b}
 \end{align*}
 
 TODO: mettre ça dans un cadre bayésien (le 5/6 n'intervient pas par
-exemple!). Pistes : $\tilde{\mathbb{P}}\left(\Gamma>0\right)\overset{\text{hyp.}}{=}\tilde{\mathbb{P}}\left(\hat{\Gamma}>0\right)\implies\tilde{\mathbb{P}}\left(\hat{\Gamma}>0\,|\,\Gamma>0\right)=\tilde{\mathbb{P}}\left(\Gamma>0\,|\,\hat{\Gamma}>0\right)=\frac{5}{6}$;
-$\tilde{\mathbb{P}}\left(\Gamma>0\right)$ peut être estimé/encadré
-à partir de \emph{G }et $L^{\mathring{p}}$; $\tilde{\mathbb{P}}\left(\tilde{G}_{i}^{F}>0\,|\,\hat{\Gamma}>0\right)=\tilde{\mathbb{P}}\left(\hat{\tilde{\Gamma}_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b>-\epsilon_{i}\,|\,\hat{\tilde{\Gamma}_{i}}>0\right)$...;
+exemple!). Pistes : $\widetilde{\mathbb{P}}\left(\Gamma>0\right)\overset{\text{hyp.}}{=}\widetilde{\mathbb{P}}\left(\widehat{\Gamma}>0\right)\implies\widetilde{\mathbb{P}}\left(\widehat{\Gamma}>0\,|\,\Gamma>0\right)=\widetilde{\mathbb{P}}\left(\Gamma>0\,|\,\widehat{\Gamma}>0\right)=\frac{5}{6}$;
+$\widetilde{\mathbb{P}}\left(\Gamma>0\right)$ peut être estimé/encadré
+à partir de \emph{G }et $L^{\mathring{p}}$; $\widetilde{\mathbb{P}}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma}>0\right)=\widetilde{\mathbb{P}}\left(\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b>-\epsilon_{i}\,|\,\widehat{\gamma_{i}}>0\right)$...;
 le répondant est certain quand il croit que $\text{Var}\left(\epsilon_{i}\right)$
 est faible, mais alors après un feedback infirmant, il devrait soit
 réviser son estimation fortement (car il se rend compte qu'un $\left|\epsilon_{i}\right|$
 élevé est improbable): réviser \emph{b}, soit ça signifie qu'il croit
-que notre estimation est fortement biaisée ($\hat{\tilde{\Gamma}_{i}}+\iota_{i}$,
+que notre estimation est fortement biaisée ($\widehat{\gamma_{i}}+\iota_{i}$,
 avec $\left|\iota_{i}\right|$ élevé): réviser $\iota_{i}$ (cela
 dénote une irrationalité ou un manque de confiance en nous, car la
 révision devrait être vers $\iota_{i}=0$); on faisait l'hypothèse
-que le répondant connaissait $\hat{\tilde{\Gamma}_{i}}$ mais on devrait
+que le répondant connaissait $\widehat{\gamma_{i}}$ mais on devrait
 peut-être rajouter une erreur sur ce terme (ou interpréter $\iota_{i}$
 ainsi).
+
+
 \end{document}

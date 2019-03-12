@@ -5,6 +5,10 @@
 \save_transient_properties true
 \origin unavailable
 \textclass article
+\begin_preamble
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+\end_preamble
 \use_default_options true
 \maintain_unincluded_children false
 \language french
@@ -119,7 +123,7 @@ Variables
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\tilde{G}$
+\begin_inset Formula $g$
 \end_inset
 
  gain: 
@@ -150,7 +154,7 @@ I
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\Gamma$
+\begin_inset Formula $\widehat{\Gamma}$
 \end_inset
 
  simule_gagnant: ménage simulé gagnant avec 5 chances sur 6 suite à hausse
@@ -158,7 +162,7 @@ I
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\widehat{\Gamma}$
+\begin_inset Formula $\widehat{\gamma}$
 \end_inset
 
  simule_gain: gain simulé du ménage suite à hausse taxe compensée
@@ -178,14 +182,14 @@ I
 \end_inset
 
  / simule_gagnant 
-\begin_inset Formula $\Gamma$
+\begin_inset Formula $\widehat{\Gamma}$
 \end_inset
 
 
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\widehat{\Gamma}^{C}$
+\begin_inset Formula $\widehat{\Gamma^{C}}$
 \end_inset
 
  simule_gain_cible: gain simulé du ménage suite à hausse taxe compensée
@@ -278,6 +282,43 @@ I
 \end_inset
 
 : vecteur de contrôles
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+: caractéristiques énergétiques
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $e$
+\end_inset
+
+ (resp.
+ 
+\begin_inset Formula $\overline{e}$
+\end_inset
+
+): élasticité perso (resp.
+ moyenne)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\Delta E$
+\end_inset
+
+ (resp.
+ 
+\begin_inset Formula $\widehat{\Delta E}$
+\end_inset
+
+): hausse des dépenses (resp.
+ estimées): 
+\begin_inset Formula $\Delta E=d\left(\mathbf{E}\right)\cdot\Delta\tau\cdot\left(1-e\right)$
+\end_inset
+
+
 \end_layout
 
 \begin_layout Itemize
@@ -432,7 +473,7 @@ Discontinuité instrumentée
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-G_{i}^{C} & =\gamma_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}\left(+\gamma_{R}R_{i}\right)+\eta_{i}\\
+G_{i}^{C} & =\alpha_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}\left(+\gamma_{R}R_{i}\right)+\eta_{i}\\
 A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mathbf{1}_{c_{i}=c}+\beta_{G\cdot c}\widehat{G_{i}^{C}}\mathbf{1}_{c_{i}=c}\right)+\delta_{A}A_{i}^{I}\left(+\delta_{R}R_{i}\right)+\epsilon_{i}
 \end{align*}
 
@@ -460,7 +501,7 @@ introduire
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+G_{i}^{F} & =\alpha_{0}+\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
 A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
 \end{align*}
 
@@ -488,7 +529,7 @@ introduire
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-\Delta G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+\Delta G_{i}^{F} & =\alpha_{0}+\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
 A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
 \end{align*}
 
@@ -508,7 +549,7 @@ Persistance après la simulation
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Delta G_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta G_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
 \]
 
 \end_inset
@@ -523,7 +564,7 @@ Simulation comme instrument
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Delta A_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta A_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
 \]
 
 \end_inset
@@ -538,7 +579,7 @@ Biais de confirmation
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Delta A_{i}^{F}=\delta_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\Gamma_{i}=j
+\Delta A_{i}^{F}=\alpha_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=j
 \]
 
 \end_inset
@@ -566,7 +607,7 @@ Biais à la perte
 \begin_layout Standard
 \begin_inset Formula 
 \[
-U_{i}=\delta_{0}+\beta_{G}G_{i}^{F}\,|\,\Gamma_{i}\neq G_{i}
+U_{i}=\alpha_{0}+\beta_{G}G_{i}^{F}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
 \]
 
 \end_inset
@@ -582,7 +623,7 @@ Modèle adaptatif bayésien
 On fait l'hypothèse que 
 \begin_inset Formula 
 \[
-\mathbb{P}_{i,t}\left(G_{i}>0\right)=f\left(\underset{+}{\tilde{G}_{i}}\right)
+\mathbb{P}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right)=f\left(\underset{+}{\mathbb{E}\left[g_{i}\,|\,\mathbf{E}_{i}\right]}\right)=f\left(\gamma_{i}-b\right)
 \]
 
 \end_inset
@@ -593,7 +634,7 @@ f
 \emph default
 .
  On a le gain subjectif 
-\begin_inset Formula $\tilde{G}_{i}=\tilde{\Gamma}_{i}-b+\epsilon_{i}$
+\begin_inset Formula $g_{i}=\gamma_{i}-b+\epsilon_{i}$
 \end_inset
 
  où l'erreur de l'individu 
@@ -601,7 +642,7 @@ f
 i
 \emph default
  par rapport au gain objectif 
-\begin_inset Formula $\tilde{\Gamma}_{i}$
+\begin_inset Formula $\gamma_{i}$
 \end_inset
 
  est 
@@ -613,7 +654,7 @@ i
 \end_inset
 
  (et en espérant que 
-\begin_inset Formula $\mathbb{E}\left[\epsilon_{i}\,|\,\Delta\hat{E}_{i}\right]=0$
+\begin_inset Formula $\mathbb{E}\left[\epsilon_{i}\,|\,\Delta\widehat{E_{i}}\right]=0$
 \end_inset
 
 ).
@@ -632,8 +673,8 @@ directement.
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-\tilde{G}_{i} & =\underset{\tilde{\Gamma}_{i}}{\underbrace{110-\Delta E_{i}}}-b+\epsilon_{i}\\
- & =\underset{\hat{\tilde{\Gamma}_{i}}}{\underbrace{110-\Delta\hat{E}_{i}}}+\iota_{i}-b+\epsilon_{i}
+g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b+\epsilon_{i}\\
+ & =\underset{\widehat{\gamma_{i}}}{\underbrace{110-\Delta\widehat{E_{i}}}}+\iota_{i}-b+\epsilon_{i}
 \end{align*}
 
 \end_inset
@@ -642,11 +683,50 @@ directement.
 \end_layout
 
 \begin_layout Standard
-On suppose que le répondant connaît notre estimation 
-\begin_inset Formula $\hat{\tilde{\Gamma}_{i}}$
+Le répondant sait qu'il commet une erreur 
+\begin_inset Formula $b-\epsilon_{i}$
 \end_inset
 
- du gain objectif, qui est biaisée avec un biais noté 
+, qu'il croit d'espérance nulle (il pense que 
+\begin_inset Formula $b=0$
+\end_inset
+
+ 
+\emph on
+a priori
+\emph default
+).
+ Il croit que nous estimons ses hausses de dépenses à 
+\begin_inset Formula $\widehat{\gamma_{i}}-\epsilon_{i}=\gamma_{i}-\iota_{i}-\epsilon_{i}$
+\end_inset
+
+, et que nous commettons une erreur d'espérance 
+\begin_inset Formula $b-\iota_{i}$
+\end_inset
+
+ 
+\emph on
+a priori 
+\emph default
+non nulle (
+\begin_inset Formula $\widehat{\gamma_{i}}-\epsilon_{i}\tilde{\sim}\mathcal{N}\left(b-\iota_{i},\sigma^{2}\right)$
+\end_inset
+
+), où 
+\begin_inset Formula $\iota_{i}-b$
+\end_inset
+
+ est son information partielle (liée à ses caractéristiques inobservées
+ par nous).
+ On peut décomposer 
+\begin_inset Formula $b-\iota_{i}$
+\end_inset
+
+ entre son biais 
+\begin_inset Formula $b$
+\end_inset
+
+ et le nôtre 
 \begin_inset Formula $\iota_{i}$
 \end_inset
 
@@ -655,46 +735,58 @@ On suppose que le répondant connaît notre estimation
 b
 \emph default
  plus précisément).
- Le répondant sait qu'il est biaisé.
+ Le répondant sait qu'il peut être biaisé.
  Il sait que l'écart 
-\begin_inset Formula $\tilde{G}_{i}-\hat{\tilde{\Gamma}_{i}}$
+\begin_inset Formula $g_{i}-\widehat{\gamma_{i}}$
 \end_inset
 
- entre son estimation et la nôtre est en moyenne de 
+ entre son estimation et la nôtre est de 
+\begin_inset Formula $\iota_{i}-b+\epsilon_{i}$
+\end_inset
+
+, mais ne sait pas quel part de cet écart est dû à son information partielle
+ 
 \begin_inset Formula $\iota_{i}-b$
 \end_inset
 
-, mais ne sait pas quel part de cet écart est dû à son biais, et quelle
- part est due à notre biais (l'estimation qu'il croit être la nôtre est
- 
-\begin_inset Formula $\hat{\tilde{\Gamma}_{i}}+\iota_{i}$
-\end_inset
-
-).
- Il sait aussi qu'outre le biais, il y a un bruit 
+, et quelle part est due à son incertitude 
 \begin_inset Formula $\epsilon_{i}$
 \end_inset
 
- dans son estimation de ses dépenses 
-\begin_inset Formula $\Delta E_{i}+b-\epsilon_{i}$
+.
+ L'incertitude du répondant 
+\begin_inset Formula $\epsilon_{i}$
 \end_inset
 
-, ce qui l'empêche de connaître parfaitement notre biais 
+ est une variable aléatoire centrée qui l'empêche de distinguer son biais
+ 
+\emph on
+b
+\emph default
+ du nôtre 
 \begin_inset Formula $\iota_{i}$
 \end_inset
 
-, sur lequel il a néanmoins une information partielle (liée à ses caractéristiqu
-es inobservées par nous).
+.
 \end_layout
 
 \begin_layout Standard
-Après le feedback, il va réviser son gain subjectif en
+Le feedback lui donne une information sur 
+\begin_inset Formula $\widehat{\gamma_{i}}$
+\end_inset
+
+, donc indirectement sur 
+\begin_inset Formula $\epsilon_{i}$
+\end_inset
+
+.
+ Après le feedback, il va réviser son gain subjectif en
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\tilde{G}_{i}^{F}=\hat{\tilde{\Gamma}_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b+\epsilon_{i}
+g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b+\epsilon_{i}
 \]
 
 \end_inset
@@ -723,7 +815,7 @@ en fonction des données).
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $\tilde{G}_{i}^{F}$
+\begin_inset Formula $g_{i}^{F}$
 \end_inset
 
  n'est pas observée, mais on peut l'estimer à partir de l'estimation de
@@ -734,7 +826,7 @@ f
  (et en regroupant des individus similaires): 
 \begin_inset Formula 
 \[
-\hat{\tilde{G}_{i}^{F}}=\hat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
+\widehat{g_{i}^{F}}=\widehat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
 \]
 
 \end_inset
@@ -749,7 +841,7 @@ Le paramètre qui nous intéresse est
 
 , car il représente l'ampleur de la révision effectuée par le répondant.
  On l'estime en utilisant 
-\begin_inset Formula $\tilde{G}_{i}-\tilde{G}_{i}^{F}=b\left(\alpha+\eta_{i}-1\right)$
+\begin_inset Formula $g_{i}-g_{i}^{F}=b\left(\alpha+\eta_{i}-1\right)$
 \end_inset
 
 :
@@ -758,7 +850,7 @@ Le paramètre qui nous intéresse est
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-\hat{\alpha} & =1+\frac{\tilde{G}_{i}-\hat{\tilde{G}_{i}^{F}}}{b}
+\widehat{\alpha} & =1+\frac{g_{i}-\widehat{g_{i}^{F}}}{b}
 \end{align*}
 
 \end_inset
@@ -767,13 +859,51 @@ Le paramètre qui nous intéresse est
 \end_layout
 
 \begin_layout Standard
+Tentative de cadre bayésien :
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0,\mathbf{E}_{i}\right) & =f^{F}\left(\mathbb{E}\left[g_{i}^{F}\,|\,\mathbf{E}_{i}\right]\right)\\
+ & =f^{F}\left(\gamma_{i}-\alpha b\right)\\
+\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0,\mathbf{E}_{i}\right) & =\frac{\mathbb{P}_{i,t}\left(G_{i}^{F}>0\,|\,\mathbf{E}_{i}\right)\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,G_{i}^{F}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\frac{f^{F}\left(\gamma_{i}-b\right)\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,G_{i}^{F}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\frac{f^{F}\left(\gamma_{i}-b\right)\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & \overset{\text{hyp.}}{=}\frac{f^{F}\left(\gamma_{i}-b\right)\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,G_{i}^{F}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\Gamma_{i}>0\,|\,\mathbf{E}_{i}\right)}\\
+\\
+\widetilde{\mathbb{P}}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right) & =f\left(g_{i}\right)\\
+\widetilde{\mathbb{P}}_{i,t+1}\left(\Gamma_{i}>0\,|\,\widehat{\Gamma_{i}}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\Gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\Gamma_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(g_{i}+b-\iota_{i}-\epsilon_{i}>0\,|\,g_{i}+b-\epsilon_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(g_{i}+b-\iota_{i}-\epsilon_{i}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & \overset{\text{si trust}}{=}\frac{5}{6}\frac{\widetilde{\mathbb{P}}_{i,t}\left(g_{i}>\iota_{i}+\epsilon_{i}-b\,|\,g_{i}>\epsilon_{i}-b,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}-b\,|\,\mathbf{E}_{i}\right)}\\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi\left(g_{i}-\iota_{i}\right)}\\
+ & \overset{\iota_{i}\independent\epsilon_{i}}{=}\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi\left(g_{i}-\iota_{i}\right)}\\
+\\
+\\
+ & \mathbb{P}_{i,t+1}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\widehat{\gamma_{i}}-\epsilon_{i}\tilde{\sim}\mathcal{N}\left(b-\iota_{i},\sigma^{2}\right)$
+\end_inset
+
+, 
+\begin_inset Formula $b-\epsilon_{i}\tilde{\sim}\mathcal{N}\left(0,\sigma^{2}\right)$
+\end_inset
+
 TODO: mettre ça dans un cadre bayésien (le 5/6 n'intervient pas par exemple!).
  Pistes : 
-\begin_inset Formula $\tilde{\mathbb{P}}\left(\Gamma>0\right)\overset{\text{hyp.}}{=}\tilde{\mathbb{P}}\left(\hat{\Gamma}>0\right)\implies\tilde{\mathbb{P}}\left(\hat{\Gamma}>0\,|\,\Gamma>0\right)=\tilde{\mathbb{P}}\left(\Gamma>0\,|\,\hat{\Gamma}>0\right)=\frac{5}{6}$
+\begin_inset Formula $\widetilde{\mathbb{P}}\left(\Gamma>0\right)\overset{\text{hyp.}}{=}\widetilde{\mathbb{P}}\left(\widehat{\Gamma}>0\right)\implies\widetilde{\mathbb{P}}\left(\widehat{\Gamma}>0\,|\,\Gamma>0\right)=\widetilde{\mathbb{P}}\left(\Gamma>0\,|\,\widehat{\Gamma}>0\right)=\frac{5}{6}$
 \end_inset
 
 ; 
-\begin_inset Formula $\tilde{\mathbb{P}}\left(\Gamma>0\right)$
+\begin_inset Formula $\widetilde{\mathbb{P}}\left(\Gamma>0\right)$
 \end_inset
 
  peut être estimé/encadré à partir de 
@@ -785,7 +915,7 @@ et
 \end_inset
 
 ; 
-\begin_inset Formula $\tilde{\mathbb{P}}\left(\tilde{G}_{i}^{F}>0\,|\,\hat{\Gamma}>0\right)=\tilde{\mathbb{P}}\left(\hat{\tilde{\Gamma}_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b>-\epsilon_{i}\,|\,\hat{\tilde{\Gamma}_{i}}>0\right)$
+\begin_inset Formula $\widetilde{\mathbb{P}}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma}>0\right)=\widetilde{\mathbb{P}}\left(\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b>-\epsilon_{i}\,|\,\widehat{\gamma_{i}}>0\right)$
 \end_inset
 
 ...; le répondant est certain quand il croit que 
@@ -803,7 +933,7 @@ b
 \emph default
 , soit ça signifie qu'il croit que notre estimation est fortement biaisée
  (
-\begin_inset Formula $\hat{\tilde{\Gamma}_{i}}+\iota_{i}$
+\begin_inset Formula $\widehat{\gamma_{i}}+\iota_{i}$
 \end_inset
 
 , avec 
@@ -814,8 +944,13 @@ b
 \begin_inset Formula $\iota_{i}$
 \end_inset
 
-; on faisait l'hypothèse que le répondant connaissait 
-\begin_inset Formula $\hat{\tilde{\Gamma}_{i}}$
+ (cela dénote une irrationalité ou un manque de confiance en nous, car la
+ révision devrait être vers 
+\begin_inset Formula $\iota_{i}=0$
+\end_inset
+
+); on faisait l'hypothèse que le répondant connaissait 
+\begin_inset Formula $\widehat{\gamma_{i}}$
 \end_inset
 
  mais on devrait peut-être rajouter une erreur sur ce terme (ou interpréter
@@ -824,6 +959,76 @@ b
 \end_inset
 
  ainsi).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+On suppose que le répondant connaît approximativement notre estimation 
+\begin_inset Formula $\widehat{\gamma_{i}}$
+\end_inset
+
+ du gain objectif, qui est biaisée avec un biais noté 
+\begin_inset Formula $\iota_{i}$
+\end_inset
+
+ (qu'on peut estimer dans une extension pour estimer 
+\emph on
+b
+\emph default
+ plus précisément): il croit que nous estimons son gain à 
+\begin_inset Formula $\widehat{\gamma_{i}}+\epsilon_{i}^{s}$
+\end_inset
+
+, et estime donc notre erreur à 
+\begin_inset Formula $\epsilon_{i}^{s}-\iota_{i}$
+\end_inset
+
+.
+ Le répondant sait qu'il est biaisé.
+ Il sait que l'écart 
+\begin_inset Formula $g_{i}-\widehat{\gamma_{i}}$
+\end_inset
+
+ entre son estimation et la nôtre est en moyenne de 
+\begin_inset Formula $\iota_{i}-b$
+\end_inset
+
+, mais ne sait pas quel part de cet écart est dû à son biais (son erreur
+ est 
+\begin_inset Formula $-b+\epsilon_{i}^{r}$
+\end_inset
+
+ qu'il croit d'espérance nulle), et quelle part est due à notre biais (
+\begin_inset Formula $\epsilon_{i}$
+\end_inset
+
+ est la somme de son incertitude sur notre et sur son estimation: 
+\begin_inset Formula $\epsilon_{i}^{s}+\epsilon_{i}^{r}=\epsilon_{i}$
+\end_inset
+
+).
+ Il sait aussi qu'outre le biais, il y a un bruit 
+\begin_inset Formula $\epsilon_{i}$
+\end_inset
+
+ dans son estimation de ses dépenses 
+\begin_inset Formula $\Delta E_{i}+b-\epsilon_{i}$
+\end_inset
+
+, ce qui l'empêche de connaître parfaitement notre biais 
+\begin_inset Formula $\iota_{i}$
+\end_inset
+
+, sur lequel il a néanmoins une information partielle (liée à ses caractéristiqu
+es inobservées par nous).
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body
