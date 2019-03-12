@@ -32,8 +32,8 @@ package("readstata13")
 package("permute")
 package("AER")
 package("ivmodel")
-package("ergm")
 package("rattle")
+package("ergm") # not for linux
 # package("doMC") # for parallel computing, does not work on Windows
 
 # Fs <- function(QID) { s[QID][[1]] }

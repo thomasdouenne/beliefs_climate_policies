@@ -1,10 +1,18 @@
-%% LyX 2.3.0 created this file.  For more info, see http://www.lyx.org/.
+%% LyX 2.3.2 created this file.  For more info, see http://www.lyx.org/.
 %% Do not edit unless you really know what you are doing.
 \documentclass[french]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
 \usepackage{amsmath}
 \usepackage{amssymb}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+\makeatother
+
 \usepackage{babel}
 \makeatletter
 \addto\extrasfrench{%
@@ -14,7 +22,6 @@
 
 \makeatother
 \begin{document}
-
 \title{Régressions possibles}
 \maketitle
 
@@ -57,6 +64,10 @@ compensation ciblée
 taxe avec compensation ciblée
 \item $R$ (resp. $R_{2}$): revenu (resp. revenu du conjoint)
 \item $\mathbf{C}$: vecteur de contrôles
+\item $\mathbf{E}$: caractéristiques énergétiques
+\item $e$ (resp. $\overline{e}$): élasticité perso (resp. moyenne)
+\item $\Delta E$ (resp. $\widehat{\Delta E}$): hausse des dépenses (resp.
+estimées): $\Delta E=d\left(\mathbf{E}\right)\cdot\Delta\tau\cdot\left(1-e\right)$
 \item $\Delta A^{v}=A^{v}-A^{I}$ pour $v\in\left\{ C;F;P\right\} $
 \item $\Delta G^{v}=G^{v}-G$ pour $v\in\left\{ C;F\right\} $
 \end{itemize}
@@ -165,63 +176,91 @@ U_{i}=\alpha_{0}+\beta_{G}G_{i}^{F}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
 
 On fait l'hypothèse que 
 \[
-\mathbb{P}_{i,t}\left(G_{i}>0\right)=f\left(\underset{+}{g_{i}}\right)
+\mathbb{P}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right)=f\left(\underset{+}{\mathbb{E}\left[g_{i}\,|\,\mathbf{E}_{i}\right]}\right)=f\left(\gamma_{i}-b_{i}\right)
 \]
-et on estime \emph{f}. On a le gain subjectif $g_{i}=\gamma_{i}-b+\epsilon_{i}$
+et on estime \emph{f}. On a le gain subjectif $g_{i}=\gamma_{i}-b_{i}+\epsilon_{i}$
 où l'erreur de l'individu \emph{i} par rapport au gain objectif $\gamma_{i}$
-est $-b+\epsilon_{i}$, avec $\mathbb{E}\left[\epsilon_{i}\right]=0$
+est $-b_{i}+\epsilon_{i}$, avec $\mathbb{E}\left[\epsilon_{i}\right]=0$
 (et en espérant que $\mathbb{E}\left[\epsilon_{i}\,|\,\Delta\widehat{E_{i}}\right]=0$).
-(On pourrait faire dépendre \emph{b }de caractéristiques observables
-dans une extension). On peut estimer le biais \emph{b }directement.
+(On pourrait faire dépendre \emph{$b_{i}$ }de caractéristiques observables
+dans une extension). On peut estimer le biais \emph{$b_{i}$ }directement.
 
 \begin{align*}
-g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b+\epsilon_{i}\\
- & =\underset{\widehat{\gamma_{i}}}{\underbrace{110-\Delta\widehat{E_{i}}}}+\iota_{i}-b+\epsilon_{i}
+g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b_{i}+\epsilon_{i}\\
+ & =\underset{\widehat{\gamma_{i}}}{\underbrace{110-\Delta\widehat{E_{i}}}}+\iota_{i}-b_{i}+\epsilon_{i}
 \end{align*}
 
-Le répondant sait qu'il commet une erreur $b-\epsilon_{i}$, qu'il
-croit d'espérance nulle (il pense que $b=0$ \emph{a priori}). Il
-croit que nous estimons ses hausses de dépenses à $\widehat{\gamma_{i}}-\epsilon_{i}=\gamma_{i}-\iota_{i}-\epsilon_{i}$,
-et que nous commettons une erreur d'espérance $b-\iota_{i}$ \emph{a
-priori }non nulle, où $\iota_{i}-b$ est son information partielle
-(liée à ses caractéristiques inobservées par nous). On peut décomposer
-$b-\iota_{i}$ entre son biais $b$ et le nôtre $\iota_{i}$ (qu'on
-peut estimer dans une extension pour estimer \emph{b} plus précisément).
-Le répondant sait qu'il peut être biaisé. Il sait que l'écart $g_{i}-\widehat{\gamma_{i}}$
-entre son estimation et la nôtre est de $\iota_{i}-b+\epsilon_{i}$,
+Le répondant sait qu'il commet une erreur $b_{i}-\epsilon_{i}$, qu'il
+croit d'espérance nulle (il pense que $b_{i}=0$ \emph{a priori}).
+Il croit que nous estimons ses hausses de dépenses à $\widehat{\gamma_{i}}-\epsilon_{i}=\gamma_{i}-\iota_{i}-\epsilon_{i}$,
+et que nous commettons une erreur d'espérance $b_{i}-\iota_{i}$ \emph{a
+priori }non nulle ($\widehat{\gamma_{i}}-\epsilon_{i}\tilde{\sim}\mathcal{N}\left(b-\iota_{i},\sigma^{2}\right)$),
+où $\iota_{i}-b_{i}$ est son information partielle (liée à ses caractéristiques
+inobservées par nous). On peut décomposer $b_{i}-\iota_{i}$ entre
+son biais $b_{i}$ et le nôtre $\iota_{i}$ (qu'on peut estimer dans
+une extension pour estimer \emph{b} plus précisément). Le répondant
+sait qu'il peut être biaisé. Il sait que l'écart $g_{i}-\widehat{\gamma_{i}}$
+entre son estimation et la nôtre est de $\iota_{i}-b_{i}+\epsilon_{i}$,
 mais ne sait pas quel part de cet écart est dû à son information partielle
-$\iota_{i}-b$, et quelle part est due à son incertitude $\epsilon_{i}$.
+$\iota_{i}-b_{i}$, et quelle part est due à son incertitude $\epsilon_{i}$.
 L'incertitude du répondant $\epsilon_{i}$ est une variable aléatoire
-centrée qui l'empêche de distinguer son biais \emph{b} du nôtre $\iota_{i}$.
+centrée qui l'empêche de distinguer son biais \emph{$b_{i}$} du nôtre
+$\iota_{i}$.
 
 Le feedback lui donne une information sur $\widehat{\gamma_{i}}$,
 donc indirectement sur $\epsilon_{i}$. Après le feedback, il va réviser
 son gain subjectif en
 
 \[
-g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b+\epsilon_{i}
+g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b_{i}+\epsilon_{i}
 \]
 
 $\alpha\in\left[0;1\right]$ ssi le répondant update dans le bon sens.
-(On pourrait rendre le nouveau bruit $\eta_{i}b$ indépendant de \emph{b},
-à voir\emph{ }en fonction des données).
+(On pourrait rendre le nouveau bruit $\eta_{i}b_{i}$ indépendant
+de $b_{i}$, à voir\emph{ }en fonction des données).
 
 $g_{i}^{F}$ n'est pas observée, mais on peut l'estimer à partir de
 l'estimation de \emph{f} (et en regroupant des individus similaires):
 \[
-\widehat{g_{i}^{F}}=\hat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
+\widehat{g_{i}^{F}}=\widehat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
 \]
 
 Le paramètre qui nous intéresse est $\alpha$, car il représente l'ampleur
 de la révision effectuée par le répondant. On l'estime en utilisant
-$g_{i}-g_{i}^{F}=b\left(\alpha+\eta_{i}-1\right)$:
+$g_{i}-g_{i}^{F}=b_{i}\left(\alpha+\eta_{i}-1\right)$:
 
 \begin{align*}
-\widehat{\alpha} & =1+\frac{g_{i}-\widehat{g_{i}^{F}}}{b}
+\widehat{\alpha} & =1+\frac{g_{i}-\widehat{g_{i}^{F}}}{b_{i}}
 \end{align*}
 
-TODO: mettre ça dans un cadre bayésien (le 5/6 n'intervient pas par
-exemple!). Pistes : $\widetilde{\mathbb{P}}\left(\Gamma>0\right)\overset{\text{hyp.}}{=}\widetilde{\mathbb{P}}\left(\widehat{\Gamma}>0\right)\implies\widetilde{\mathbb{P}}\left(\widehat{\Gamma}>0\,|\,\Gamma>0\right)=\widetilde{\mathbb{P}}\left(\Gamma>0\,|\,\widehat{\Gamma}>0\right)=\frac{5}{6}$;
+Tentative de cadre bayésien :
+
+\begin{align*}
+\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0,\mathbf{E}_{i}\right) & =f^{F}\left(\mathbb{E}\left[g_{i}^{F}\,|\,\mathbf{E}_{i}\right]\right)\\
+ & =f^{F}\left(\gamma_{i}-\alpha b\right)\\
+\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0,\mathbf{E}_{i}\right) & =\frac{\mathbb{P}_{i,t}\left(G_{i}^{F}>0\,|\,\mathbf{E}_{i}\right)\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,G_{i}^{F}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\frac{f^{F}\left(\gamma_{i}-b\right)\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,G_{i}^{F}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\frac{f^{F}\left(\gamma_{i}-b\right)\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & \overset{\text{hyp.}}{=}\frac{f^{F}\left(\gamma_{i}-b\right)\mathbb{P}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,G_{i}^{F}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\Gamma_{i}>0\,|\,\mathbf{E}_{i}\right)}\\
+\\
+\widetilde{\mathbb{P}}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right) & =f\left(g_{i}\right)\\
+\widetilde{\mathbb{P}}_{i,t+1}\left(\Gamma_{i}>0\,|\,\widehat{\Gamma_{i}}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\Gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\Gamma_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+\widetilde{\mathbb{P}}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
+\mathbb{P}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}-\epsilon_{i}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}-\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}-\epsilon_{i}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & \overset{\text{si trust}}{=}\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(\gamma_{i}-\iota_{i}-\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}>\epsilon_{i}\,|\,\mathbf{E}_{i}\right)}\\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi\left(g_{i}-\iota_{i}\right)}\\
+\\
+\\
+\\
+ & \mathbb{P}_{i,t+1}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0\right)
+\end{align*}
+
+$g_{i}-\gamma_{i}=\epsilon_{i}\tilde{\sim}\mathcal{N}\left(b,\sigma^{2}\right)$, 
+
+$\widehat{\gamma_{i}}-\epsilon_{i}\tilde{\sim}\mathcal{N}\left(b-\iota_{i},\sigma^{2}\right)$,
+$b-\epsilon_{i}\tilde{\sim}\mathcal{N}\left(0,\sigma^{2}\right)$TODO:
+mettre ça dans un cadre bayésien (le 5/6 n'intervient pas par exemple!).
+Pistes : $\widetilde{\mathbb{P}}\left(\Gamma>0\right)\overset{\text{hyp.}}{=}\widetilde{\mathbb{P}}\left(\widehat{\Gamma}>0\right)\implies\widetilde{\mathbb{P}}\left(\widehat{\Gamma}>0\,|\,\Gamma>0\right)=\widetilde{\mathbb{P}}\left(\Gamma>0\,|\,\widehat{\Gamma}>0\right)=\frac{5}{6}$;
 $\widetilde{\mathbb{P}}\left(\Gamma>0\right)$ peut être estimé/encadré
 à partir de \emph{G }et $L^{\mathring{p}}$; $\widetilde{\mathbb{P}}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma}>0\right)=\widetilde{\mathbb{P}}\left(\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b>-\epsilon_{i}\,|\,\widehat{\gamma_{i}}>0\right)$...;
 le répondant est certain quand il croit que $\text{Var}\left(\epsilon_{i}\right)$

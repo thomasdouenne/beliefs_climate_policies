@@ -740,7 +740,16 @@ summary(lm(I((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ 0
 
 
 ##### Adaptation Bayesienne: nouveau modèle #####
+plot(s$simule_gain, jitter(s$gain, 10), xlim=c(-400,300), type='p', col='blue', cex=0.1, xlab='Simulated gain', ylab='Subjective gain')
+abline(lm(gain ~ simule_gain, data=s), col='blue', lwd=2)
+lines(seq(-500, 500, by=10), seq(-500, 500, by=10), type='l', col='black') + grid()
+abline(h = 0, v=0)
+cor(s$gain, s$simule_gain) # 0.05
+summary(lm(gain ~ simule_gain, data=s))
+sum(s$weight[s$simule_gain < s$gain])/sum(s$weight) # 11% surestiment leurs gains
+
 b <- wtd.mean(s$simule_gain - s$gain, weights = s$weight) # 136
+# b <- median(s$simule_gain - s$gain) # 161
 
 loess_gains <- loess((gagnant_categorie!='Perdant') ~ simule_gain, data=s)
 # plot(s$simule_gain, (s$gagnant_categorie!='Perdant'), col = "red", xlim = c(-500, 300))
@@ -762,62 +771,44 @@ decrit(s$gain_echelle)
 G_F_by_gain_echelle <- c()
 gain_by_gain_echelle <- c()
 imax <- 1
-for (i in -6:imax) { 
+for (i in -6:imax) { # différent de confirmation_bias parce que repose sur les catégories de l'échelle, pas sur les quantiles
   G_F_by_gain_echelle <- c(G_F_by_gain_echelle, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_categorie!='Perdant' & pmin(s$gain_echelle, imax)==i])/sum(s$weight[s$variante_taxe_info=='f' & pmin(s$gain_echelle, imax)==i]))
   gain_by_gain_echelle <- c(gain_by_gain_echelle, wtd.mean(s$gain[s$variante_taxe_info=='f' & pmin(s$gain_echelle, imax)==i], weights = s$weight[s$variante_taxe_info=='f' & pmin(s$gain_echelle, imax)==i])) }
 plot(-6:(-7+length(G_F_by_gain_echelle)), G_F_by_gain_echelle, type='l', xlab='min(gain_echelle, 1)', ylab="Probability that G^F ≠ 'Perdant'") + grid()
 hat_g_F_by_gain_echelle <- f_inv(G_F_by_gain_echelle)
 hat_alpha_i_by_gain_echelle <- 1 + (gain_by_gain_echelle - hat_g_F_by_gain_echelle)/b
-decrit(hat_alpha_i_by_gain_echelle)
-
-nb_bins <- 8 # higher values yield non monotonic functions
-s$bin_simule_gain <- binning(s$simule_gain, bins=nb_bins, method="wtd.quantile", labels=1:nb_bins, ordered=FALSE, weights=s$weight)
-G_F_by_simule_gain <- c()
-gain_by_simule_gain <- c()
-for (i in 1:nb_bins) {
-  G_F_by_simule_gain <- c(G_F_by_simule_gain, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_categorie!='Perdant' & s$bin_simule_gain==i])/sum(s$weight[s$variante_taxe_info=='f' & s$bin_simule_gain==i]))
-  gain_by_simule_gain <- c(gain_by_simule_gain, wtd.mean(s$gain[s$variante_taxe_info=='f' & s$bin_simule_gain==i], weights = s$weight[s$variante_taxe_info=='f' & s$bin_simule_gain==i])) }
-plot(1:nb_bins, G_F_by_simule_gain, type='l', xlab='deciles of simule_gain', ylab="Probability that G^F ≠ 'Perdant'") + grid()
-hat_g_F_by_simule_gain <- f_inv(G_F_by_simule_gain)
-hat_alpha_i_by_simule_gain <- 1 + (gain_by_simule_gain - hat_g_F_by_simule_gain)/b
-decrit(hat_alpha_i_by_simule_gain)
-
-nb_bins <- 7 # higher values yield non monotonic functions
-nb_bins <- length(levels(binning(s$gain, bins=nb_bins, method="wtd.quantile", ordered=FALSE, weights=s$weight)))
-s$bin_gain <- binning(s$gain, bins=nb_bins, method="wtd.quantile", labels=c(1:nb_bins), ordered=FALSE, weights=s$weight)
-G_F_by_gain <- c()
-gain_by_gain <- c()
-for (i in 1:nb_bins) {
-  G_F_by_gain <- c(G_F_by_gain, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_categorie!='Perdant' & s$bin_gain==i])/sum(s$weight[s$variante_taxe_info=='f' & s$bin_gain==i]))
-  gain_by_gain <- c(gain_by_gain, wtd.mean(s$gain[s$variante_taxe_info=='f' & s$bin_gain==i], weights = s$weight[s$variante_taxe_info=='f' & s$bin_gain==i])) }
-plot(1:nb_bins, G_F_by_gain, type='l', xlab='bins of gain (lowest to highest)', ylab="Probability that G^F ≠ 'Perdant'") + grid()
-hat_g_F_by_gain <- f_inv(G_F_by_gain)
-hat_alpha_i_by_gain <- 1 + (gain_by_gain - hat_g_F_by_gain)/b
-decrit(hat_alpha_i_by_gain)
+decrit(hat_alpha_i_by_gain_echelle) 
 
 confirmation_bias <- function(by_variable = 'gain', nb_bins = 8, local_b = TRUE, return='all', method='median') { # return = c('all', '', 'alpha', 'hat_alpha_i', 'b_i')
   nb_bins <- length(levels(binning(s[[by_variable]], bins=nb_bins, method="wtd.quantile", ordered=FALSE, weights=s$weight)))
   bins <- binning(s[[by_variable]], bins=nb_bins, method="wtd.quantile", labels=c(1:nb_bins), ordered=FALSE, weights=s$weight)
-  gain_i <- G_F_i <- b_i <- G_i <- p_i <- c()
+  gain_i <- G_F_i <- b_i <- G_i <- p_i <- variable_i <- c()
   for (i in 1:nb_bins) {
     p_i <- c(p_i, sum(s$weight[s$variante_taxe_info=='f' & bins==i])/sum(s$weight[s$variante_taxe_info=='f']))
     G_i <- c(G_i, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_categorie!='Perdant' & bins==i])/sum(s$weight[s$variante_taxe_info=='f' & bins==i]))
     G_F_i <- c(G_F_i, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_categorie!='Perdant' & bins==i])/sum(s$weight[s$variante_taxe_info=='f' & bins==i]))
-    if (method=='median') {    
+    if (method=='median') {   
+    variable_i <- c(variable_i, wtd.median(s[[by_variable]][s$variante_taxe_info=='f' & bins==i], weight=s$weight[s$variante_taxe_info=='f' & bins==i])) 
       gain_i <- c(gain_i, wtd.median(s$gain[s$variante_taxe_info=='f' & bins==i], weight = s$weight[s$variante_taxe_info=='f' & bins==i]))
       b_i <- c(b_i, wtd.median((s$simule_gain - s$gain)[s$variante_taxe_info=='f' & bins==i], weight = s$weight[s$variante_taxe_info=='f' & bins==i])) 
     } else if (method=='mean') {    
+    variable_i <- c(variable_i, wtd.mean(s[[by_variable]][s$variante_taxe_info=='f' & bins==i], weights=s$weight[s$variante_taxe_info=='f' & bins==i]))
       gain_i <- c(gain_i, wtd.mean(s$gain[s$variante_taxe_info=='f' & bins==i], weights = s$weight[s$variante_taxe_info=='f' & bins==i]))
       b_i <- c(b_i, wtd.mean((s$simule_gain - s$gain)[s$variante_taxe_info=='f' & bins==i], weights = s$weight[s$variante_taxe_info=='f' & bins==i])) 
     }    }  
   plot(1:nb_bins, G_F_i, type='l', xlab=paste('bins of', by_variable, '(lowest to highest)'), ylab="Probability that G^F ≠ 'Perdant'") + grid()
   hat_g_F_i <- f_inv(G_F_i)
   hat_alpha_i <- 1 + (gain_i - hat_g_F_i)/(b_i*local_b + (!local_b)*wtd.mean(s$simule_gain - s$gain, weights = s$weight))
-  if (return=='all') return(list('alpha'=median(hat_alpha_i), 'p_i'=p_i, 'G_i'=G_i, 'gain_i'=gain_i, 'b_i'=b_i ,'G_F_i'=G_F_i, 'hat_g_F_i'=hat_g_F_i, 'hat_alpha_i'=hat_alpha_i))
+  if (return=='all') return(list('alpha'=median(hat_alpha_i), paste(by_variable, 'i', sep='_')=variable_i, 'G_i'=G_i, 'gain_i'=gain_i, 'b_i'=b_i ,'G_F_i'=G_F_i, 'hat_g_F_i'=hat_g_F_i, 'hat_alpha_i'=hat_alpha_i))
   else if (return=='alpha') return(median(hat_alpha_i))
   else if (return=='hat_alpha_i') return(hat_alpha_i)
   else if (return=='b_i') return(b_i)
   else return(list('alpha'=median(hat_alpha_i), 'hat_alpha_i'=hat_alpha_i, 'b_i'=b_i))
 }
 
-confirmation_bias('simule_gain', 7, FALSE, 'all', 'mean')
+# alpha n'est presque jamais entre 0 et 1 ! i.e. les répondants n'updatent pas correctement
+# me semble le plus pertinent car repose sur une variable objective 
+confirmation_bias('simule_gain', 8, TRUE, 'all', 'mean') # higher values yield non monotonic functions
+
+confirmation_bias('gain_echelle', 8, TRUE, 'all', 'mean') 
+confirmation_bias('gain', 7, TRUE, 'all', 'mean') # higher values yield non monotonic functions
