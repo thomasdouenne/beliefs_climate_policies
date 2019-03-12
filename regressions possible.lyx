@@ -158,7 +158,7 @@ I
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\widetilde{\Gamma}$
+\begin_inset Formula $\widehat{\Gamma}$
 \end_inset
 
  simule_gain: gain simulé du ménage suite à hausse taxe compensée
@@ -185,7 +185,7 @@ I
 \end_layout
 
 \begin_layout Itemize
-\begin_inset Formula $\tilde{\Gamma}^{C}$
+\begin_inset Formula $\widehat{\Gamma}^{C}$
 \end_inset
 
  simule_gain_cible: gain simulé du ménage suite à hausse taxe compensée
@@ -572,6 +572,263 @@ U_{i}=\delta_{0}+\beta_{G}G_{i}^{F}\,|\,\Gamma_{i}\neq G_{i}
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Modèle adaptatif bayésien
+\end_layout
+
+\begin_layout Standard
+On fait l'hypothèse que 
+\begin_inset Formula 
+\[
+\mathbb{P}_{i,t}\left(G_{i}>0\right)=f\left(\underset{+}{\tilde{G}_{i}}\right)
+\]
+
+\end_inset
+
+et on estime 
+\emph on
+f
+\emph default
+.
+ On a le gain subjectif 
+\begin_inset Formula $\tilde{G}_{i}=\tilde{\Gamma}_{i}-b+\epsilon_{i}$
+\end_inset
+
+ où l'erreur de l'individu 
+\emph on
+i
+\emph default
+ par rapport au gain objectif 
+\begin_inset Formula $\tilde{\Gamma}_{i}$
+\end_inset
+
+ est 
+\begin_inset Formula $-b+\epsilon_{i}$
+\end_inset
+
+, avec 
+\begin_inset Formula $\mathbb{E}\left[\epsilon_{i}\right]=0$
+\end_inset
+
+ (et en espérant que 
+\begin_inset Formula $\mathbb{E}\left[\epsilon_{i}\,|\,\Delta\hat{E}_{i}\right]=0$
+\end_inset
+
+).
+ (On pourrait faire dépendre 
+\emph on
+b 
+\emph default
+de caractéristiques observables dans une extension).
+ On peut estimer le biais 
+\emph on
+b 
+\emph default
+directement.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\tilde{G}_{i} & =\underset{\tilde{\Gamma}_{i}}{\underbrace{110-\Delta E_{i}}}-b+\epsilon_{i}\\
+ & =\underset{\hat{\tilde{\Gamma}_{i}}}{\underbrace{110-\Delta\hat{E}_{i}}}+\iota_{i}-b+\epsilon_{i}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+On suppose que le répondant connaît notre estimation 
+\begin_inset Formula $\hat{\tilde{\Gamma}_{i}}$
+\end_inset
+
+ du gain objectif, qui est biaisée avec un biais noté 
+\begin_inset Formula $\iota_{i}$
+\end_inset
+
+ (qu'on peut estimer dans une extension pour estimer 
+\emph on
+b
+\emph default
+ plus précisément).
+ Le répondant sait qu'il est biaisé.
+ Il sait que l'écart 
+\begin_inset Formula $\tilde{G}_{i}-\hat{\tilde{\Gamma}_{i}}$
+\end_inset
+
+ entre son estimation et la nôtre est en moyenne de 
+\begin_inset Formula $\iota_{i}-b$
+\end_inset
+
+, mais ne sait pas quel part de cet écart est dû à son biais, et quelle
+ part est due à notre biais (l'estimation qu'il croit être la nôtre est
+ 
+\begin_inset Formula $\hat{\tilde{\Gamma}_{i}}+\iota_{i}$
+\end_inset
+
+).
+ Il sait aussi qu'outre le biais, il y a un bruit 
+\begin_inset Formula $\epsilon_{i}$
+\end_inset
+
+ dans son estimation de ses dépenses 
+\begin_inset Formula $\Delta E_{i}+b-\epsilon_{i}$
+\end_inset
+
+, ce qui l'empêche de connaître parfaitement notre biais 
+\begin_inset Formula $\iota_{i}$
+\end_inset
+
+, sur lequel il a néanmoins une information partielle (liée à ses caractéristiqu
+es inobservées par nous).
+\end_layout
+
+\begin_layout Standard
+Après le feedback, il va réviser son gain subjectif en
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{G}_{i}^{F}=\hat{\tilde{\Gamma}_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\alpha\in\left[0;1\right]$
+\end_inset
+
+ ssi le répondant update dans le bon sens.
+ (On pourrait rendre le nouveau bruit 
+\begin_inset Formula $\eta_{i}b$
+\end_inset
+
+ indépendant de 
+\emph on
+b
+\emph default
+, à voir
+\emph on
+ 
+\emph default
+en fonction des données).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\tilde{G}_{i}^{F}$
+\end_inset
+
+ n'est pas observée, mais on peut l'estimer à partir de l'estimation de
+ 
+\emph on
+f
+\emph default
+ (et en regroupant des individus similaires): 
+\begin_inset Formula 
+\[
+\hat{\tilde{G}_{i}^{F}}=\hat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Le paramètre qui nous intéresse est 
+\begin_inset Formula $\alpha$
+\end_inset
+
+, car il représente l'ampleur de la révision effectuée par le répondant.
+ On l'estime en utilisant 
+\begin_inset Formula $\tilde{G}_{i}-\tilde{G}_{i}^{F}=b\left(\alpha+\eta_{i}-1\right)$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\hat{\alpha} & =1+\frac{\tilde{G}_{i}-\hat{\tilde{G}_{i}^{F}}}{b}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TODO: mettre ça dans un cadre bayésien (le 5/6 n'intervient pas par exemple!).
+ Pistes : 
+\begin_inset Formula $\tilde{\mathbb{P}}\left(\Gamma>0\right)\overset{\text{hyp.}}{=}\tilde{\mathbb{P}}\left(\hat{\Gamma}>0\right)\implies\tilde{\mathbb{P}}\left(\hat{\Gamma}>0\,|\,\Gamma>0\right)=\tilde{\mathbb{P}}\left(\Gamma>0\,|\,\hat{\Gamma}>0\right)=\frac{5}{6}$
+\end_inset
+
+; 
+\begin_inset Formula $\tilde{\mathbb{P}}\left(\Gamma>0\right)$
+\end_inset
+
+ peut être estimé/encadré à partir de 
+\emph on
+G 
+\emph default
+et 
+\begin_inset Formula $L^{\mathring{p}}$
+\end_inset
+
+; 
+\begin_inset Formula $\tilde{\mathbb{P}}\left(\tilde{G}_{i}^{F}>0\,|\,\hat{\Gamma}>0\right)=\tilde{\mathbb{P}}\left(\hat{\tilde{\Gamma}_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b>-\epsilon_{i}\,|\,\hat{\tilde{\Gamma}_{i}}>0\right)$
+\end_inset
+
+...; le répondant est certain quand il croit que 
+\begin_inset Formula $\text{Var}\left(\epsilon_{i}\right)$
+\end_inset
+
+ est faible, mais alors après un feedback infirmant, il devrait soit réviser
+ son estimation fortement (car il se rend compte qu'un 
+\begin_inset Formula $\left|\epsilon_{i}\right|$
+\end_inset
+
+ élevé est improbable): réviser 
+\emph on
+b
+\emph default
+, soit ça signifie qu'il croit que notre estimation est fortement biaisée
+ (
+\begin_inset Formula $\hat{\tilde{\Gamma}_{i}}+\iota_{i}$
+\end_inset
+
+, avec 
+\begin_inset Formula $\left|\iota_{i}\right|$
+\end_inset
+
+ élevé): réviser 
+\begin_inset Formula $\iota_{i}$
+\end_inset
+
+ (cela dénote une irrationalité ou un manque de confiance en nous, car la
+ révision devrait être vers 
+\begin_inset Formula $\iota_{i}=0$
+\end_inset
+
+); on faisait l'hypothèse que le répondant connaissait 
+\begin_inset Formula $\hat{\tilde{\Gamma}_{i}}$
+\end_inset
+
+ mais on devrait peut-être rajouter une erreur sur ce terme (ou interpréter
+ 
+\begin_inset Formula $\iota_{i}$
+\end_inset
+
+ ainsi).
 \end_layout
 
 \end_body

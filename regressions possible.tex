@@ -1,0 +1,235 @@
+%% LyX 2.3.2 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[french]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{babel}
+\makeatletter
+\addto\extrasfrench{%
+   \providecommand{\og}{\leavevmode\flqq~}%
+   \providecommand{\fg}{\ifdim\lastskip>\z@\unskip\fi~\frqq}%
+}
+
+\makeatother
+\begin{document}
+\title{Régressions possibles}
+\maketitle
+
+\section{Termes}
+
+\subsection{Variables}
+\begin{itemize}
+\item $L^{\mathring{T}}$/$L^{\mathring{L}}$ perte\_relative\_partielle:
+$\left[-2;+2\right]$ suite à hausse taxe partielle
+\item $G^{p}$ gagnant\_partielle\_categorie: G/N/P suite à hausse taxe
+partielle compensée
+\item $G$ gagnant\_categorie: G/N/P suite à hausse taxe compensée
+\item $\tilde{G}$ gain: $\left[-6;+5\right]$ suite à hausse taxe compensée
+\item $A^{I}$ taxe\_approbation: Oui/Non/NSP approbation hausse taxe compensée
+avant info (\emph{I} pour initial ou ignorant)
+\item $P$ progressivite: Oui/Non/NSP hausse taxe compensée avantagerait
+les plus modestes (seulement pour apres\_modifs)
+\item $\Gamma$ simule\_gagnant: ménage simulé gagnant avec 5 chances sur
+6 suite à hausse taxe compensée
+\item $\widehat{\Gamma}$ simule\_gain: gain simulé du ménage suite à hausse
+taxe compensée
+\item $G^{P}$/$G^{F}$: gagnant\_{[}progressif/feedback{]}\_categorie:
+G/N/P suite à hausse taxe compensée et à affichage de l'info sur la
+progressivité $I^{P}$ / simule\_gagnant $\Gamma$
+\item $\widehat{\Gamma}^{C}$ simule\_gain\_cible: gain simulé du ménage
+suite à hausse taxe compensée
+\item $A^{P}$/$A^{F}$ taxe\_{[}progressif/feedback{]}\_approbation: Oui/Non/NSP
+approbation hausse taxe compensée après info progressivité et/ou simule\_gagnant
+($A^{r}$ pour renseigné)
+\item $\pi$ categorie\_cible: /20/30/40/50/70/ catégorie de revenus du
+répondant et de son ménage
+\item $T$ (resp. $T_{2}$) traite\_cible: indicatrice que le répondant
+(resp. son conjoint) reçoit un versement dans la taxe avec compensation
+ciblée ($T=\left(R<c\right)$)
+\item $\Theta$ (resp. $\Theta^{C}$) versement: versement reçu comme compensation
+de la taxe
+\item $G^{C}$ gagnant\_cible\_categorie: G/N/P suite à hausse taxe avec
+compensation ciblée
+\item $A^{C}$ taxe\_cible\_approbation: Oui/Non/NSP approbation hausse
+taxe avec compensation ciblée
+\item $R$ (resp. $R_{2}$): revenu (resp. revenu du conjoint)
+\item $\mathbf{C}$: vecteur de contrôles
+\item $\Delta A^{v}=A^{v}-A^{I}$ pour $v\in\left\{ C;F;P\right\} $
+\item $\Delta G^{v}=G^{v}-G$ pour $v\in\left\{ C;F\right\} $
+\end{itemize}
+
+\subsection{Réformes}
+\begin{itemize}
+\item $V$ hausse TVA
+\item $\mathring{p}:\mathring{T},\mathring{L}$ hausse taxe partielle
+\item $p:T,L$ hausse taxe partielle compensée
+\item $\textrm{Ø}$ hausse taxe compensée
+\item $C$ hausse taxe avec compensation ciblée (20/30/40/50 percentiles)
+\end{itemize}
+
+\subsection{Traitements}
+\begin{itemize}
+\item $p:T,L$ variante\_partielle: fuel ou chauffage 
+\item $S$ apres\_modifs: 2è moitié: rajout de questions et d'information
+sur la progressivité
+\item $r:F,P$ variante\_feedback: f/p: feedback (2/3) / progressivité (1/3)
+\item $I^{P}$ info\_progressivite: info sur la progressivité ((variante:
+progressivité) ou (apres\_modifs et variante: feedback et variante\_progressivite:
+fb\_info))
+\item $c$ cible $\lessgtr$ $\pi$ categorie\_cible: cible attribuée aléatoirement
+comme max ou min de categorie\_cible (sauf pour categorie\_cible=>70)
+\end{itemize}
+
+\section{Intérêt personnel}
+
+\subsection{Gain subjectif avec ciblage}
+
+\[
+A_{i}^{C}=\delta_{0}+\beta_{G}G_{i}^{C}+\delta_{A}A_{i}^{I}+\epsilon_{i}
+\]
+
+
+\subsection{Discontinuité}
+
+\[
+A_{i}^{C}=\delta_{0}+\beta_{T}T_{i}+\beta_{2}T_{2,i}+\delta_{R}R_{i}+\epsilon_{i}
+\]
+
+
+\subsection{Discontinuité instrumentée}
+
+\begin{align*}
+G_{i}^{C} & =\gamma_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}\left(+\gamma_{R}R_{i}\right)+\eta_{i}\\
+A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mathbf{1}_{c_{i}=c}+\beta_{G\cdot c}\widehat{G_{i}^{C}}\mathbf{1}_{c_{i}=c}\right)+\delta_{A}A_{i}^{I}\left(+\delta_{R}R_{i}\right)+\epsilon_{i}
+\end{align*}
+
+
+\subsection{Simulation comme instrument (à travers $G^{F}$)}
+
+introduire $A^{I}$ produit un effet
+
+\begin{align*}
+G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+
+\subsection{Simulation comme instrument (à travers $\Delta G^{F}$)}
+
+introduire $A^{I}$ produit un effet
+
+\begin{align*}
+\Delta G_{i}^{F} & =\gamma_{0}+\Gamma_{i}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+
+\section{Persistance et biais des croyances}
+
+\subsection{Persistance après la simulation}
+
+\[
+\Delta G_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\]
+
+
+\subsection{Simulation comme instrument}
+
+\[
+\Delta A_{i}^{F}=\delta_{0}+\beta_{\Gamma}\Gamma_{i}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\]
+
+
+\subsection{Biais de confirmation}
+
+\[
+\Delta A_{i}^{F}=\delta_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\Gamma_{i}=j
+\]
+
+
+\subsection{Biais à la perte}
+
+$U$: update\_correct vaut +1 si le répondant adopte le feedback qui
+infirme sa croyance initiale, $-$1 s'il update contre le feedback
+qui pourtant le confirme, 0 s'il n'update pas
+
+\[
+U_{i}=\delta_{0}+\beta_{G}G_{i}^{F}\,|\,\Gamma_{i}\neq G_{i}
+\]
+
+
+\section{Modèle adaptatif bayésien}
+
+On fait l'hypothèse que 
+\[
+\mathbb{P}_{i,t}\left(G_{i}>0\right)=f\left(\underset{+}{\tilde{G}_{i}}\right)
+\]
+et on estime \emph{f}. On a le gain subjectif $\tilde{G}_{i}=\tilde{\Gamma}_{i}-b+\epsilon_{i}$
+où l'erreur de l'individu \emph{i} par rapport au gain objectif $\tilde{\Gamma}_{i}$
+est $-b+\epsilon_{i}$, avec $\mathbb{E}\left[\epsilon_{i}\right]=0$
+(et en espérant que $\mathbb{E}\left[\epsilon_{i}\,|\,\Delta\hat{E}_{i}\right]=0$).
+(On pourrait faire dépendre \emph{b }de caractéristiques observables
+dans une extension). On peut estimer le biais \emph{b }directement.
+
+\begin{align*}
+\tilde{G}_{i} & =\underset{\tilde{\Gamma}_{i}}{\underbrace{110-\Delta E_{i}}}-b+\epsilon_{i}\\
+ & =\underset{\hat{\tilde{\Gamma}_{i}}}{\underbrace{110-\Delta\hat{E}_{i}}}+\iota_{i}-b+\epsilon_{i}
+\end{align*}
+
+On suppose que le répondant connaît notre estimation $\hat{\tilde{\Gamma}_{i}}$
+du gain objectif, qui est biaisée avec un biais noté $\iota_{i}$
+(qu'on peut estimer dans une extension pour estimer \emph{b} plus
+précisément). Le répondant sait qu'il est biaisé. Il sait que l'écart
+$\tilde{G}_{i}-\hat{\tilde{\Gamma}_{i}}$ entre son estimation et
+la nôtre est en moyenne de $\iota_{i}-b$, mais ne sait pas quel part
+de cet écart est dû à son biais, et quelle part est due à notre biais
+(l'estimation qu'il croit être la nôtre est $\hat{\tilde{\Gamma}_{i}}+\iota_{i}$).
+Il sait aussi qu'outre le biais, il y a un bruit $\epsilon_{i}$ dans
+son estimation de ses dépenses $\Delta E_{i}+b-\epsilon_{i}$, ce
+qui l'empêche de connaître parfaitement notre biais $\iota_{i}$,
+sur lequel il a néanmoins une information partielle (liée à ses caractéristiques
+inobservées par nous).
+
+Après le feedback, il va réviser son gain subjectif en
+
+\[
+\tilde{G}_{i}^{F}=\hat{\tilde{\Gamma}_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b+\epsilon_{i}
+\]
+
+$\alpha\in\left[0;1\right]$ ssi le répondant update dans le bon sens.
+(On pourrait rendre le nouveau bruit $\eta_{i}b$ indépendant de \emph{b},
+à voir\emph{ }en fonction des données).
+
+$\tilde{G}_{i}^{F}$ n'est pas observée, mais on peut l'estimer à
+partir de l'estimation de \emph{f} (et en regroupant des individus
+similaires): 
+\[
+\hat{\tilde{G}_{i}^{F}}=\hat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
+\]
+
+Le paramètre qui nous intéresse est $\alpha$, car il représente l'ampleur
+de la révision effectuée par le répondant. On l'estime en utilisant
+$\tilde{G}_{i}-\tilde{G}_{i}^{F}=b\left(\alpha+\eta_{i}-1\right)$:
+
+\begin{align*}
+\hat{\alpha} & =1+\frac{\tilde{G}_{i}-\hat{\tilde{G}_{i}^{F}}}{b}
+\end{align*}
+
+TODO: mettre ça dans un cadre bayésien (le 5/6 n'intervient pas par
+exemple!). Pistes : $\tilde{\mathbb{P}}\left(\Gamma>0\right)\overset{\text{hyp.}}{=}\tilde{\mathbb{P}}\left(\hat{\Gamma}>0\right)\implies\tilde{\mathbb{P}}\left(\hat{\Gamma}>0\,|\,\Gamma>0\right)=\tilde{\mathbb{P}}\left(\Gamma>0\,|\,\hat{\Gamma}>0\right)=\frac{5}{6}$;
+$\tilde{\mathbb{P}}\left(\Gamma>0\right)$ peut être estimé/encadré
+à partir de \emph{G }et $L^{\mathring{p}}$; $\tilde{\mathbb{P}}\left(\tilde{G}_{i}^{F}>0\,|\,\hat{\Gamma}>0\right)=\tilde{\mathbb{P}}\left(\hat{\tilde{\Gamma}_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b>-\epsilon_{i}\,|\,\hat{\tilde{\Gamma}_{i}}>0\right)$...;
+le répondant est certain quand il croit que $\text{Var}\left(\epsilon_{i}\right)$
+est faible, mais alors après un feedback infirmant, il devrait soit
+réviser son estimation fortement (car il se rend compte qu'un $\left|\epsilon_{i}\right|$
+élevé est improbable): réviser \emph{b}, soit ça signifie qu'il croit
+que notre estimation est fortement biaisée ($\hat{\tilde{\Gamma}_{i}}+\iota_{i}$,
+avec $\left|\iota_{i}\right|$ élevé): réviser $\iota_{i}$ (cela
+dénote une irrationalité ou un manque de confiance en nous, car la
+révision devrait être vers $\iota_{i}=0$); on faisait l'hypothèse
+que le répondant connaissait $\hat{\tilde{\Gamma}_{i}}$ mais on devrait
+peut-être rajouter une erreur sur ce terme (ou interpréter $\iota_{i}$
+ainsi).
+\end{document}

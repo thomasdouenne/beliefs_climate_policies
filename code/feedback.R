@@ -76,6 +76,9 @@ for (cru in c('Perdant', 'Gagnant')) {
         probas[gsub('__', '_', paste('simule', i, sim_nom, 'quand_cru', j, tolower(cru), sep='_'))] <- (length(which(s$variante_taxe_info=='f' & 
           (i=='non' | s$gagnant_categorie==cru) & (j=='non' | s$simule_gagnant==sim) & (i=='' | s$gagnant_categorie!=cru) & (j=='' | s$simule_gagnant!=sim)))/
             length(which(s$variante_taxe_info=='f' & (i=='non' | s$gagnant_categorie==cru) & (i=='' | s$gagnant_categorie!=cru))))
+        probas[gsub('__', '_', paste('simule', i, sim_nom, 'quand_feedback_cru', j, tolower(cru), sep='_'))] <- (length(which(s$variante_taxe_info=='f' & 
+          (i=='non' | s$gagnant_feedback_categorie==cru) & (j=='non' | s$simule_gagnant==sim) & (i=='' | s$gagnant_feedback_categorie!=cru) & (j=='' | s$simule_gagnant!=sim)))/
+            length(which(s$variante_taxe_info=='f' & (i=='non' | s$gagnant_feedback_categorie==cru) & (i=='' | s$gagnant_categorie!=cru))))
         probas[gsub('__', '_', paste('cru', i, tolower(cru), 'quand_simule', j, sim_nom, sep='_'))] <- (length(which(s$variante_taxe_info=='f' & 
           (i=='non' | s$gagnant_categorie==cru) & (j=='non' | s$simule_gagnant==sim) & (i=='' | s$gagnant_categorie!=cru) & (j=='' | s$simule_gagnant!=sim)))/
             length(which(s$variante_taxe_info=='f' & (j=='non' | s$simule_gagnant==sim) & (j=='' | s$simule_gagnant!=sim))))
@@ -97,15 +100,22 @@ probas['cru_gagnant_quand_simule_gagnant']
 
 
 probas
-probas['cru_gagnant']
-probas['feedback_cru_gagnant']
-probas['feedback_cru_gagnant_quand_simule_gagnant'] 
+probas['cru_gagnant'] # 0.14
+probas['feedback_cru_gagnant'] # 0.19
+probas['feedback_cru_gagnant_quand_simule_gagnant'] # 0.24
 probas_gagnant_coherente_Bayes <- as.numeric((5/6)*probas['simule_gagnant']/probas['simule_gagnant_quand_cru_gagnant']) # 0.73
-probas_gagnant_coherente_Bayes
-probas['cru_perdant']
-probas['feedback_cru_perdant']
-probas['feedback_cru_perdant_quand_simule_gagnant']
+probas_gagnant_coherente_Bayes # 0.73
+probas['feedback_cru_gagnant_quand_simule_gagnant']*probas['simule_gagnant']/probas['simule_gagnant_quand_feedback_cru_gagnant'] # 0.19
+probas['cru_gagnant_quand_simule_gagnant']*probas['simule_gagnant']/probas['simule_gagnant_quand_feedback_cru_gagnant'] # 0.21
+probas['feedback_cru_gagnant_quand_simule_gagnant']*probas['simule_gagnant']/probas['simule_gagnant_quand_cru_gagnant'] # 0.14
+probas['cru_gagnant_quand_simule_gagnant']*probas['simule_gagnant']/probas['simule_gagnant_quand_cru_gagnant'] # 0.19
+
+probas['cru_perdant'] # 0.66
+probas['feedback_cru_perdant'] # 0.57
+probas['feedback_cru_perdant_quand_simule_gagnant'] # 0.48
 proba_perdant_coherente_Bayes <- as.numeric((5/6)*probas['simule_perdant']/probas['simule_perdant_quand_cru_perdant']) # 0.70
-proba_perdant_coherente_Bayes
+proba_perdant_coherente_Bayes # 0.72
+probas['cru_perdant_quand_simule_perdant']*probas['simule_perdant']/probas['simule_perdant_quand_cru_perdant'] # 0.66
+
 proba_non_gagnant_coherente_Bayes <- (5/6)*probas['simule_non_gagnant']/probas['simule_non_gagnant_quand_cru_non_gagnant'] # 0.77
 proba_non_perdant_coherente_Bayes <- (5/6)*probas['simule_non_perdant']/probas['simule_non_perdant_quand_cru_non_perdant'] # 0.76
