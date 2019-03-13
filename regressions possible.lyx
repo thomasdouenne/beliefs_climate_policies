@@ -889,8 +889,8 @@ Tentative de cadre bayésien :
 \widetilde{\mathbb{P}}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
 \mathbb{P}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}-\epsilon_{i}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}-\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}-\epsilon_{i}>0\,|\,\mathbf{E}_{i}\right)}\\
  & \overset{\text{si trust}}{=}\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(\gamma_{i}-\iota_{i}-\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}>\epsilon_{i}\,|\,\mathbf{E}_{i}\right)}\\
- & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\right)}\\
-\\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}>\epsilon_{i}+\iota_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(g_{i}>\epsilon_{i}+\iota_{i}\right)}\\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi_{b_{i},\sigma_{\epsilon}^{2}+\sigma_{\iota}^{2}}\left(g_{i}\right)}\\
 \\
 \\
  & \mathbb{P}_{i,t+1}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0\right)
