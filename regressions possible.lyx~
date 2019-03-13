@@ -835,7 +835,11 @@ en fonction des données).
 \emph on
 f
 \emph default
- (et en regroupant des individus similaires): 
+ (et 
+\emph on
+en regroupant des individus similaires
+\emph default
+): 
 \begin_inset Formula 
 \[
 \widehat{g_{i}^{F}}=\widehat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
