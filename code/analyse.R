@@ -751,11 +751,11 @@ sum(s$weight[s$simule_gain < s$gain])/sum(s$weight) # 11% surestiment leurs gain
 b <- wtd.mean(s$simule_gain - s$gain, weights = s$weight) # 136
 # b <- median(s$simule_gain - s$gain) # 161
 
-loess_gains <- loess((gagnant_categorie!='Perdant') ~ simule_gain, data=s)
+loess_gains <- loess((gagnant_categorie!='Perdant') ~ I(simule_gain-b), data=s)
 # plot(s$simule_gain, (s$gagnant_categorie!='Perdant'), col = "red", xlim = c(-500, 300))
 plot(sort(s$simule_gain), predict(loess_gains)[order(s$simule_gain)], xlim = c(-500, 300), ylim=c(0,1), type='l', col = "blue", lwd=2)
 lines(seq(-500, 300, by=10), predict(loess_gains, newdata = seq(-500, 300, by=10)), type='l', col='red')
-grid()
+grid() # blue: y -> f(y-b) / red: y-b -> f(y-b) (the good one)
 
 f <- function(x, xmin=-500, xmax=300, by=10) approxfun(seq(xmin, xmax, by=by), predict(loess_gains, newdata = seq(xmin, xmax, by=by)), rule=2)(x)
 f_inv <- function(x, xmin=-500, xmax=300, by=10) approxfun(predict(loess_gains, newdata = seq(xmin, xmax, by=by)), seq(xmin, xmax, by=by), rule=2)(x) # imputes extremal values when outside bonds
@@ -779,36 +779,52 @@ hat_g_F_by_gain_echelle <- f_inv(G_F_by_gain_echelle)
 hat_alpha_i_by_gain_echelle <- 1 + (gain_by_gain_echelle - hat_g_F_by_gain_echelle)/b
 decrit(hat_alpha_i_by_gain_echelle) 
 
-confirmation_bias <- function(by_variable = 'gain', nb_bins = 8, local_b = TRUE, return='all', method='median') { # return = c('all', '', 'alpha', 'hat_alpha_i', 'b_i')
-  nb_bins <- length(levels(binning(s[[by_variable]], bins=nb_bins, method="wtd.quantile", ordered=FALSE, weights=s$weight)))
-  bins <- binning(s[[by_variable]], bins=nb_bins, method="wtd.quantile", labels=c(1:nb_bins), ordered=FALSE, weights=s$weight)
+confirmation_bias <- function(by_variable = 'gain', nb_bin = 8, local_b = TRUE, return='all', method='median') { # return = c('all', '', 'alpha', 'hat_alpha_i', 'b_i')
+  nb_bins <- length(levels(binning(s[[by_variable]], bins=nb_bin, method="wtd.quantile", ordered=FALSE, weights=s$weight)))
+  bins <- binning(s[[by_variable]], bins=nb_bin, method="wtd.quantile", labels=c(1:nb_bins), ordered=FALSE, weights=s$weight)
   gain_i <- G_F_i <- b_i <- G_i <- p_i <- variable_i <- c()
   for (i in 1:nb_bins) {
     p_i <- c(p_i, sum(s$weight[s$variante_taxe_info=='f' & bins==i])/sum(s$weight[s$variante_taxe_info=='f']))
     G_i <- c(G_i, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_categorie!='Perdant' & bins==i])/sum(s$weight[s$variante_taxe_info=='f' & bins==i]))
     G_F_i <- c(G_F_i, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_categorie!='Perdant' & bins==i])/sum(s$weight[s$variante_taxe_info=='f' & bins==i]))
-    if (method=='median') {   
-    variable_i <- c(variable_i, wtd.median(s[[by_variable]][s$variante_taxe_info=='f' & bins==i], weight=s$weight[s$variante_taxe_info=='f' & bins==i])) 
+    if (method=='median') {
+      variable_i <- c(variable_i, wtd.median(s[[by_variable]][s$variante_taxe_info=='f' & bins==i], weight=s$weight[s$variante_taxe_info=='f' & bins==i]))
       gain_i <- c(gain_i, wtd.median(s$gain[s$variante_taxe_info=='f' & bins==i], weight = s$weight[s$variante_taxe_info=='f' & bins==i]))
-      b_i <- c(b_i, wtd.median((s$simule_gain - s$gain)[s$variante_taxe_info=='f' & bins==i], weight = s$weight[s$variante_taxe_info=='f' & bins==i])) 
-    } else if (method=='mean') {    
-    variable_i <- c(variable_i, wtd.mean(s[[by_variable]][s$variante_taxe_info=='f' & bins==i], weights=s$weight[s$variante_taxe_info=='f' & bins==i]))
+      b_i <- c(b_i, wtd.median((s$simule_gain - s$gain)[s$variante_taxe_info=='f' & bins==i], weight = s$weight[s$variante_taxe_info=='f' & bins==i]))
+    } else if (method=='mean') {
+      variable_i <- c(variable_i, wtd.mean(s[[by_variable]][s$variante_taxe_info=='f' & bins==i], weights=s$weight[s$variante_taxe_info=='f' & bins==i]))
       gain_i <- c(gain_i, wtd.mean(s$gain[s$variante_taxe_info=='f' & bins==i], weights = s$weight[s$variante_taxe_info=='f' & bins==i]))
-      b_i <- c(b_i, wtd.mean((s$simule_gain - s$gain)[s$variante_taxe_info=='f' & bins==i], weights = s$weight[s$variante_taxe_info=='f' & bins==i])) 
-    }    }  
+      b_i <- c(b_i, wtd.mean((s$simule_gain - s$gain)[s$variante_taxe_info=='f' & bins==i], weights = s$weight[s$variante_taxe_info=='f' & bins==i]))
+    }
+    s$b_i[s$variante_taxe_info=='f' & bins==i] <<- b_i[i] }
   plot(1:nb_bins, G_F_i, type='l', xlab=paste('bins of', by_variable, '(lowest to highest)'), ylab="Probability that G^F ≠ 'Perdant'") + grid()
-  hat_g_F_i <- f_inv(G_F_i)
+
+  lowess_gains <- loess((gagnant_categorie!='Perdant') ~ I(simule_gain - b_i), data=s)
+  f__1 <- function(x, xmin=-500, xmax=300, by=10) approxfun(predict(lowess_gains, newdata = seq(xmin, xmax, by=by)), seq(xmin, xmax, by=by), rule=2)(x) # imputes extremal values when outside bonds
+  plot(seq(-500, 300, by=10), predict(lowess_gains, newdata = seq(-500, 300, by=10)), xlab=paste('simule_gain - biais_bin(i), où bin vient de', by_variable), ylab='Proba that G != Perdant', type='l', col='red') + grid()
+  
+  hat_g_F_i <- f__1(G_F_i)
   hat_alpha_i <- 1 + (gain_i - hat_g_F_i)/(b_i*local_b + (!local_b)*wtd.mean(s$simule_gain - s$gain, weights = s$weight))
-  if (return=='all') return(list('alpha'=median(hat_alpha_i), paste(by_variable, 'i', sep='_')=variable_i, 'G_i'=G_i, 'gain_i'=gain_i, 'b_i'=b_i ,'G_F_i'=G_F_i, 'hat_g_F_i'=hat_g_F_i, 'hat_alpha_i'=hat_alpha_i))
-  else if (return=='alpha') return(median(hat_alpha_i))
+  
+  name_by_var <- paste(by_variable, 'i', sep='_')
+  if (return=='alpha') return(median(hat_alpha_i))
+  else if (return=='all') return(list('alpha'=median(hat_alpha_i),  name_by_var=variable_i, 'G_i'=G_i, 'gain_i'=gain_i, 'b_i'=b_i ,'G_F_i'=G_F_i, 'hat_g_F_i'=hat_g_F_i, 'hat_alpha_i'=hat_alpha_i)) #
   else if (return=='hat_alpha_i') return(hat_alpha_i)
   else if (return=='b_i') return(b_i)
   else return(list('alpha'=median(hat_alpha_i), 'hat_alpha_i'=hat_alpha_i, 'b_i'=b_i))
 }
 
-# alpha n'est presque jamais entre 0 et 1 ! i.e. les répondants n'updatent pas correctement
-# me semble le plus pertinent car repose sur une variable objective 
-confirmation_bias('simule_gain', 8, TRUE, 'all', 'mean') # higher values yield non monotonic functions
+# preferred specification:
+confirmation_bias('simule_gain', 7, TRUE, 'all', 'median')
 
-confirmation_bias('gain_echelle', 8, TRUE, 'all', 'mean') 
+# me semble le plus pertinent a priori car repose sur une variable objective, mais donne des résultats aberrants
+confirmation_bias('simule_gain', 8, TRUE, 'all', 'mean') 
+# gain marche bien (pb: prendre gain rend les bin endogènes)
+confirmation_bias('gain', 7, TRUE, 'all', 'median') 
 confirmation_bias('gain', 7, TRUE, 'all', 'mean') # higher values yield non monotonic functions
+confirmation_bias('gain_echelle', 8, TRUE, 'all', 'mean') 
+
+confirmation_bias(nb_bin = 1, method='mean')
+
+# Bizarre: les gain = non affectés sont en moyenne perdants selon simule_gain ! (valable selon quand on pondère) => TODO: clean numbers simule_gain
+decrit(s$simule_gain[s$gain==0 & s$variante_taxe_info=='f'], weights= s$weight[s$gain==0 & s$variante_taxe_info=='f'])
