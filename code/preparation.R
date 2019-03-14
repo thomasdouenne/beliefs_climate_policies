@@ -928,6 +928,7 @@ convert_s <- function() {
   s$Transports_distance[is.na(s$Transports_distance)] <<- mean(s$transports_distance, na.rm=T)
   s$Transports_distance <<- as.item(n(s$Transports_distance), missing.values = mean(s$transports_distance, na.rm=T), annotation="Transports_distance: (transports_distance sans NA) L'arrêt de transport en commun le plus proche de chez le répondant est à X minutes de marche")
 
+  # TODO: récupérer le vrai âge à partir de ID_age_dep_device.csv 
   temp <- 20.90*(s$age == "18 à 24 ans") + 29.61*(s$age == "25 à 34 ans") + 42.14*(s$age == "35 à 49 ans") + 56.84*(s$age == "50 à 64 ans") + 75.43*(s$age == "65 ans ou plus")
   s$age <<- as.item(temp, labels = structure(c(20.90, 29.61, 42.14, 56.84, 75.43), names = c("18-24", "25-34", "35-49", "50-64", "65+")), annotation=Label(s$age))
   # s$Age <<- (s$age == "18 à 24 ans") + 2*(s$age == "25 à 34 ans") + 3.3*(s$age == "35 à 49 ans") + 4.6*(s$age == "50 à 64 ans") + 7*(s$age == "65 ans ou plus")
@@ -1322,7 +1323,7 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   # s <<- read.delim("politique.tsv", fileEncoding="UTF-16")
   # f_data <- read.delim("fin.tsv", fileEncoding="UTF-16")
   s <<- read_csv("survey.csv")
-  for (i in 1:length(s)) { label(s[[i]]) <<- toString(s[i][[1]][1]) } # Use the first line to create variable names labels then remove it - to run only once
+  for (i in 1:length(s)) { label(s[[i]]) <<- toString(s[i][[1]][1]) } # Use the first line to create variable names labels then remove it - to run only once # TODO: bug
   s <<- s[-c(1,2),c(1:91,94:115,117:235,241,247:310,313:319,92,93,116,311,312,236:240,242:246)]
 
   # if (exclude_screened) { s <<- s[s$Q_TerminateFlag=="",] } # remove Screened
@@ -1347,8 +1348,8 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   s$taille_agglo[is.na(s$taille_agglo)] <<- s$taille_agglo2[is.na(s$taille_agglo)]
   s <<- s[, which(names(s)!="taille_agglo2")]
   print(paste(length(which(is.na(s$taille_agglo))), "tailles d'agglo sont manquantes"))
-  id_agglo_manquante <- s$id[is.na(s$taille_agglo)]
-  write.csv(id_agglo_manquante, "ID_agglo_manquante.csv")
+  # id_agglo_manquante <- s$id[is.na(s$taille_agglo)]
+  # write.csv(id_agglo_manquante, "ID_agglo_manquante.csv")
   if (only_known_agglo) s <<- s[!is.na(s$taille_agglo),]
   
   convert_s() 
@@ -1374,3 +1375,12 @@ sa <- s
 prepare_s()
 
 write.csv(s, "survey_prepared.csv")
+
+# write.csv(s[,c("id", "taille_agglo", "sexe", "age", "diplome4", "region", "csp")], "IDs.csv")
+
+# ids <- read.csv("C:/Users/a.fabre/Downloads/IDs.csv", header=FALSE)
+# ids <- as.vector(ids$V1[-1])
+# sid <- s[s$id %in% ids,]
+# decrit(n(sid$duree)/60)
+# length(which(n(sid$duree) > 7*60))
+# decrit(sid$test_qualite)

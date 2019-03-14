@@ -7,6 +7,8 @@
 # Ce résultat est confirmé lorsqu'on effectue la même procédure (2SLS avec RDD paramétrique en 1st stage) appliqué au feedback.
 
 ##### 1. Spécification principale : 2SLS avec RDD paramétrique à multiples seuils en first stage #####
+
+# TODO: erase this
 s$dummy_approbation_cible <- 1*(s$taxe_cible_approbation=='Oui')
 
 s$traite_transfert <- 1 * (s$cible==20) * (s$revenu<780) + 1 * (s$cible==30) * (s$revenu<1140) + 1 * (s$cible==40) * (s$revenu<1430) + 1 * (s$cible==50) * (s$revenu<1670)
@@ -25,59 +27,66 @@ s$transfert_seuil_gagnant <- 1 * (s$gagnant__20_categorie=='Gagnant') + 1 * (s$g
 s_0_70 <- subset(s, categorie_cible != '70_')
 
 # Simple OLS #
-ols_approve_winner <- lm(y_dummy_approbation_cible ~ x_transfert_seuil_gagnant + c1_taxe_approbation, data=s_0_70, weights = s_0_70$weight)
-summary(ols_approve_winner)
+summary(lm((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant')*(taxe_approbation!='Non'), data=s, subset=categorie_cible!='70_', weights = s$weight))
 # Une OLS standard nous donne qu'une personne se percevant gagnante a une probabilité d'approbation supérieure de 48 p.p.
 
 cor(s$transfert_seuil_gagnant, s$traite_transfert)
 cor(s$transfert_seuil_gagnant, s$traite_transfert_conjoint)
 
-tsls_rdd_1 <- lm(transfert_seuil_gagnant ~ taxe_approbation + hausse_depenses + traite_transfert + traite_transfert_conjoint + revenu + revenu_conjoint + revenu_2 + revenu_conjoint_2, data=s_0_70, weights = s_0_70$weight)
-
-d_rdd.hat <- fitted.values(tsls_rdd_1)
-tsls_rdd_2 <- lm(dummy_approbation_cible ~ d_rdd.hat + taxe_approbation + hausse_depenses + revenu + revenu_conjoint, data=s_0_70, weights = s_0_70$weight)
-summary(tsls_rdd_2)
+# avant il y avait hausse_depenses au lieu de simule_gain_cible
+tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
+summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
+gagnant.hat <- fitted.values(tsls_rdd_1)
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
 # On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
 # Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
 
 # Avec effet hétérogène par seuil
-tsls_rdd_2_heterogeneous <- lm(dummy_approbation_cible ~ d_rdd.hat + (d_rdd.hat * (categorie_cible == '20_30')) + (d_rdd.hat * (categorie_cible == '30_40')) + (d_rdd.hat * (categorie_cible == '40_50')) + (d_rdd.hat * (categorie_cible == '50_70')) + taxe_approbation + revenu + revenu_conjoint, data=s_0_70, weights = s_0_70$weight)
-summary(tsls_rdd_2_heterogeneous)
+# s$cible <- relevel(as.factor(s$cible), '50')
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat*cible + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
 # Les résultats ne sont pas significatifs pour les effets par seuil. L'effet d_rdd.hat varie selon la catégorie omise, et perd en significativité.
 
 
 ##### 2. RDD paramétrique à multiples seuils (20-30-40-50) #####
-rdd_ms <- lm(dummy_approbation_cible ~ traite_transfert + traite_transfert_conjoint + (traite_transfert * traite_transfert_conjoint) + taxe_approbation + revenu + revenu_2 + revenu_conjoint + revenu_conjoint_2, data=s_0_70, weights = s_0_70$weight)
-summary(rdd_ms)
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint + cible + taxe_approbation + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, weights = s$weight))
 # On estime que lorsque le répondant est éligible au transfert, ceteris paribus la probabilité d'approbation augmente de 10 p.p.
 # On estime que lorsque son conjoint est éligible au transfert, ceteris paribus la probabilité d'approbation de 5 p.p.
 # On estime que l'effet marginal du cumul de la double égibilité est négatif, et réduit l'approbation de 3 p.p.
 # Les effets plus faibles qu'avec l'IV proviennet (a priori) du fait qu'être éligible n'est pas suffisant pour se considérer gagnant.
 
+# 20%*** (conjoint 10%) for 20_30
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint, subset = categorie_cible == '20_30', data=s, weights = s$weight))
+# 15%* (15%*) for 30_40
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint, subset = categorie_cible == '30_40', data=s, weights = s$weight))
+# 12% (17%*) for 40_50
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint, subset = categorie_cible == '40_50', data=s, weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible + traite_cible_conjoint, subset = categorie_cible == '20_30', data=s, weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible + traite_cible_conjoint, subset = categorie_cible == '30_40', data=s, weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible + traite_cible_conjoint, subset = categorie_cible == '40_50', data=s, weights = s$weight))
+# 13%*** (resp. 8%***) more chance of acceptance with traite_cible (resp. traite_cible_conjoint), with -7%. if both are treated
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint + cible + taxe_approbation + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint + cible + taxe_approbation + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), subset=is.element(categorie_cible, c('20_30', '30_40', '40_50')), data=s, weights = s$weight))
+# Effect driven by cible=30 for respondent and cible=20 for conjoint
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint * cible + taxe_approbation + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ traite_cible * traite_cible_conjoint * cible + taxe_approbation + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ versement_cible*cible + simule_gain_cible + taxe_approbation + revenu + revenu_conjoint, data=s, weights = s$weight))
+
 
 ##### 3. 2SLS standard #####
-s_20_50 <- subset(s, categorie_cible != '70_' & categorie_cible != '50_70' & categorie_cible != '0_20')
-
-y_dummy_approbation_cible <- s_20_50$dummy_approbation_cible
-x_transfert_seuil_gagnant <- s_20_50$transfert_seuil_gagnant
-z1_traite_transfert <- s_20_50$traite_transfert
-z2_traite_transfert_conjoint <- s_20_50$traite_transfert_conjoint
-c1_taxe_approbation <- s_20_50$taxe_approbation # Peut-être ajouter d'autres variables de contrôle
-
 # 2SLS #
-cor(z1_traite_transfert,x_transfert_seuil_gagnant)
-cor(z2_traite_transfert_conjoint,x_transfert_seuil_gagnant) # Les instrumments ne sont pas faibles
+cor(s$traite_cible, s$gagnant_cible_categorie !='Perdant') 
+cor(s$traite_cible_conjoint, s$gagnant_cible_categorie !='Perdant') # Les instrumments ne sont pas faibles
 
-tsls1 <- lm(x_transfert_seuil_gagnant ~ z1_traite_transfert + z2_traite_transfert_conjoint + c1_taxe_approbation)
+tsls1 <- lm(gagnant_cible_categorie !='Perdant'~ traite_cible + traite_cible_conjoint + (taxe_approbation!='Non'), subset=is.element(categorie_cible, c('20_30', '30_40', '40_50')), data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1)
-
-d.hat <- fitted.values(tsls1)
-tsls2 <- lm(y_dummy_approbation_cible ~ d.hat + c1_taxe_approbation)
-summary(tsls2)
+gagnant.hat <- fitted.values(tsls1)
+# gagnant.hat: 69% MAIS manquent des contrôles
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + (taxe_approbation!='Non'), data=s[is.element(s$categorie_cible, c('20_30', '30_40', '40_50')),], weights = s$weight[is.element(s$categorie_cible, c('20_30', '30_40', '40_50'))]))
 # L'effet sur l'approbation est plus élevé que dans la 2SLS avec RDD en first stage, et plus élevé qu'avec OLS (ce qui est surprenant) : 0.66 p.p. d'augmentation
 # Le problème de cette méthode est que l'on affecte les répondants aléatoirement aux différents mécanismes, mais on compare des mécanises différents
 # En moyenne, les mécanismes auxquels ils sont éligibles transferent moins à plus de gens
 
+# TODO: continue incorporating analyse.R into this file
 # Test effet des seuils sur les ménages jamais éligibles pour écarter l'effet gagnant/perdant de l'acceptation #
 s_70_plus <- subset(s, categorie_cible == '70_' & traite_transfert != 1 & traite_transfert_conjoint != 1) # To do : mieux définir ce sample, ce critère revenu n'est pas suffisant du fait du revenu du conjoint
 ols_approuve_seuils <- lm(dummy_approbation_cible ~ (cible==20) + (cible==30) + (cible==40), data=s_70_plus, weights = s_70_plus$weight)

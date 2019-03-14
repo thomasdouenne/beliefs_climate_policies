@@ -1,12 +1,18 @@
-%% LyX 2.3.2 created this file.  For more info, see http://www.lyx.org/.
+%% LyX 2.3.0 created this file.  For more info, see http://www.lyx.org/.
 %% Do not edit unless you really know what you are doing.
 \documentclass[french]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
+\usepackage{float}
 \usepackage{amsmath}
 \usepackage{amssymb}
 
 \makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
 \newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
 \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
@@ -22,12 +28,49 @@
 
 \makeatother
 \begin{document}
+
 \title{Régressions possibles}
 \maketitle
 
 \section{Termes}
 
 \subsection{Variables}
+
+\begin{tabular}{c|ccc}
+gain & subjective & truth & estimation\tabularnewline
+\hline 
+numeric & $g$ & $\gamma$ & $\widehat{\gamma}$\tabularnewline
+binary & $\dot{G}$ ($g>0$), $G$ ($g\geq0$) & $\Gamma$ & $\widehat{\Gamma}$\tabularnewline
+\end{tabular}
+
+\begin{tabular}{c|c|c|c|c|c|c|c}
+step & \multicolumn{3}{c|}{partial tax: \emph{p }(non compensated: $\mathring{p}$)} & \emph{ex ante} & \multicolumn{2}{c|}{after knowledge: \emph{K}} & after targeting\tabularnewline
+\hline 
+variants & transport & housing & VAT & $-$ & progressivity & feedback & $-$\tabularnewline
+\hline 
+exponent & \emph{T }($\mathring{T}$) & \emph{H }($\mathring{H}$) & \emph{V }($\mathring{V}$) & \emph{I} & \emph{P} & \emph{F} & \emph{C}\tabularnewline
+\end{tabular}
+\begin{itemize}
+\item $L$: $\left[-2;+2\right]$ loss following partial tax
+\item $g,G,\gamma,\Gamma,\widehat{\gamma},\widehat{\Gamma}$: gain from
+a reform
+\item $a/\dot{A}/A$: approval category (Yes/No/PNR) / approval (Yes) /
+acceptance (Yes or PNR) of a reform
+\item $\pi$: /20/30/40/50/70/ income category of the respondent and their
+household
+\item $R$ (resp. $R_{2}$): income of the respondent (resp. of their partner)
+\item $T$ (resp. $T_{2}$): dummy that the respondent (resp. their partner)
+receives a payment in the tax with targeting ($T=\left(R<c\right)$)
+\item $\Theta$: payment received as compensation from the tax
+\item $\mathbf{C}$: vector of controls
+\item $\mathbf{E}$: energetic characteristics 
+\item $e$ (resp. $\overline{e}$): subjective elasticity of the respondent
+(resp. of French people)
+\item $\Delta E$: increase in spending: $\Delta E=d\left(\mathbf{E}\right)\cdot\Delta\tau\cdot\left(1-\varepsilon\right)$
+\item $\Delta X^{v}=X^{v}-X$ for $X\in\left\{ A;G\right\} $ and $v\in\left\{ C;F;P\right\} $
+\item $U$: update in the appropriate direction
+\end{itemize}
+%
 \begin{itemize}
 \item $L^{\mathring{T}}$/$L^{\mathring{L}}$ perte\_relative\_partielle:
 $\left[-2;+2\right]$ suite à hausse taxe partielle
@@ -70,6 +113,9 @@ taxe avec compensation ciblée
 estimées): $\Delta E=d\left(\mathbf{E}\right)\cdot\Delta\tau\cdot\left(1-e\right)$
 \item $\Delta A^{v}=A^{v}-A^{I}$ pour $v\in\left\{ C;F;P\right\} $
 \item $\Delta G^{v}=G^{v}-G$ pour $v\in\left\{ C;F\right\} $
+\item \emph{U}: update\_correct vaut +1 si le répondant adopte le feedback
+qui infirme sa croyance initiale, $-$1 s'il update contre le feedback
+qui pourtant le confirme, 0 s'il n'update pas
 \end{itemize}
 
 \subsection{Réformes}
@@ -99,14 +145,84 @@ comme max ou min de categorie\_cible (sauf pour categorie\_cible=>70)
 \subsection{Gain subjectif avec ciblage}
 
 \[
-A_{i}^{C}=\delta_{0}+\beta_{G}G_{i}^{C}+\delta_{A}A_{i}^{I}+\epsilon_{i}
+A_{i}^{C}=\delta_{0}+\beta_{G}G_{i}^{C}+\delta_{A}A_{i}+\delta_{GA}G_{i}^{C}A_{i}^{I}+\epsilon_{i}
 \]
 
+\[
+A_{i}^{C}=.04+.45^{***}G_{i}^{C}+.38^{***}A_{i}+.01G_{i}^{C}A_{i}^{I}+\epsilon_{i}
+\]
 
-\subsection{Discontinuité}
+\begin{table}[H]
+\centering%
+\begin{tabular}{c|cc|c}
+$A^{C}$ & $G^{C}$ & $\neg G^{C}$ & total\tabularnewline
+\hline 
+$A^{I}$ & .89 & .43 & .67\tabularnewline
+$\neg A^{I}$ & .49 & .04 & .17\tabularnewline
+\hline 
+total & .66 & .12 & .32\tabularnewline
+\end{tabular}
+
+\caption{Acceptance rate for targeted reform in function of \emph{ex ante}
+acceptance and perceived personal benefit (non weighted)}
+
+\end{table}
+
+
+\subsection{Discontinuité du transfert ciblé}
 
 \[
-A_{i}^{C}=\delta_{0}+\beta_{T}T_{i}+\beta_{2}T_{2,i}+\delta_{R}R_{i}+\epsilon_{i}
+A_{i}^{C}=\delta_{0}+\beta_{T}T_{i}+\beta_{2}T_{2,i}+\beta_{T2}T_{i}\cdot T_{2,i}+\epsilon_{i}
+\]
+
+\[
+A_{i}^{C}=\left\{ \begin{array}{c}
+.31\\
+.23\\
+.20
+\end{array}\right.+\left\{ \begin{array}{c}
+.17^{**}\\
+.18^{**}\\
+.15^{*}
+\end{array}\right.T_{i}+\left\{ \begin{array}{c}
+.07\\
+.13^{.}\\
+.16^{*}
+\end{array}\right.T_{2,i}+\left\{ \begin{array}{c}
+-.01\\
+-.07\\
+-.11
+\end{array}\right.T_{i}\cdot T_{2,i}+\epsilon_{i}\text{ for }\left\{ \begin{array}{c}
+\pi_{i}=\left[20;30\right]\\
+\pi_{i}=\left[30;40\right]\\
+\pi_{i}=\left[40;50\right]
+\end{array}\right.
+\]
+
+\[
+A_{i}^{C}=\left\{ \begin{array}{c}
+.31\\
+.24\\
+.22
+\end{array}\right.+\left\{ \begin{array}{c}
+.17^{**}\\
+.15^{**}\\
+.10^{*}
+\end{array}\right.T_{i}+\left\{ \begin{array}{c}
+.07\\
+.09^{.}\\
+.10^{*}
+\end{array}\right.T_{2,i}+\epsilon_{i}\text{ for }\left\{ \begin{array}{c}
+\pi_{i}=\left[20;30\right]\\
+\pi_{i}=\left[30;40\right]\\
+\pi_{i}=\left[40;50\right]
+\end{array}\right.
+\]
+\[
+A_{i}^{C}=\delta_{0}+.14^{***}T_{i}+.06^{**}T_{2,i}+\beta_{T2}T_{i}\cdot T_{2,i}+\delta_{C}C_{i}+\delta_{a}^{***}a_{i}^{I}+\boldsymbol{\delta_{R}R_{i}}+\epsilon_{i}
+\]
+\[
+A_{i}^{C}=.31+.17^{**}T_{i}+.07\cdot T_{2,i}+\epsilon_{i}
 \]
 
 
@@ -117,14 +233,54 @@ G_{i}^{C} & =\alpha_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}\le
 A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mathbf{1}_{c_{i}=c}+\beta_{G\cdot c}\widehat{G_{i}^{C}}\mathbf{1}_{c_{i}=c}\right)+\delta_{A}A_{i}^{I}\left(+\delta_{R}R_{i}\right)+\epsilon_{i}
 \end{align*}
 
+\begin{align*}
+G_{i}^{C} & =.18+.21^{***}T_{i}+.13^{***}T_{2,i}+.25^{***}A_{i}^{I}+\eta_{i}\\
+A_{i}^{C} & =-.02+.65^{***}\widehat{G_{i}^{C}}+.34^{***}A_{i}^{I}+\epsilon_{i}
+\end{align*}
+
+
+\subsection{Discontinuité d'un feedback positif}
+
+\[
+A_{i}^{F}=\delta_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\delta_{a}a_{i}^{I}+\epsilon_{i}
+\]
+\[
+A_{i}^{F}=\delta_{0}+.08^{***}\widehat{\Gamma_{i}}+-6.10^{-5*}\widehat{\gamma_{i}}+-3.10^{-9*}\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\delta_{a}a_{i}^{I}+\epsilon_{i}
+\]
+
+Effet similaire sur la variation d'approbation:
+
+\[
+\Delta A_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\[
+\Delta A_{i}^{F}=\alpha_{0}+.11^{***}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+En instrumentant:
+
+\[
+G_{i}^{F}=\alpha_{0}+.21^{***}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\[
+A_{i}^{F}=\alpha_{0}+.40^{***}\widehat{G_{i}^{F}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
 
 \subsection{Simulation comme instrument (à travers $G^{F}$)}
 
 introduire $A^{I}$ produit un effet
 
 \begin{align*}
-G_{i}^{F} & =\alpha_{0}+\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+G_{i}^{F} & =\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
 A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+\begin{align*}
+G_{i}^{F} & =\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{F} & =\delta_{0}+.48^{***}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
 \end{align*}
 
 
@@ -137,38 +293,110 @@ introduire $A^{I}$ produit un effet
 A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
 \end{align*}
 
+\begin{align*}
+\Delta G_{i}^{F} & =\alpha_{0}+\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{F} & =\delta_{0}+.65^{***}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+TODO: quels contrôles?
 
 \section{Persistance et biais des croyances}
 
 \subsection{Persistance après la simulation}
 
 \[
-\Delta G_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta G_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\[
+\Delta G_{i}^{F}=-.08+.23^{***}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
 \]
 
 
 \subsection{Simulation comme instrument}
 
 \[
-\Delta A_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta G_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\[
+\Delta A_{i}^{F}=\alpha_{0}+.51^{***}\widehat{\Delta G_{i}^{F}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+
+\subsection{Biais d'update à la perte}
+
+\[
+U_{i}=\delta_{0}+\beta_{j}\bar{G}_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=G_{i}
+\]
+
+Among those who receive a feedback contradicting their subjective
+gain, those who felt winner have 59 p.p. more chances to update correctly
+their winning category (i.e. downards).
+
+\[
+U_{i}=\delta_{0}+.59^{***}\bar{G}_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
+\]
+
+
+\subsection{Biais à la perte}
+
+Among those who should have updated, those who revised their subjective
+gain upwards were disproportionately correct in doing so than those
+whose revised it downards, indicating a bias towards loss when updating.
+
+TODO: check how non affectés are managed; include those who shouldn't
+update in the analysis.
+
+\[
+U_{i}=\alpha_{0}+.92^{***}G_{i}^{F}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
+\]
+
+
+\subsection{Biais à la perte}
+
+Those who felt winners update incorrectly disproportionately as compared
+to those who felt losers, indicating a bias towards loss when updating.
+
+\[
+U_{i}=\alpha_{0}-.26^{***}G_{i}+\epsilon_{i}
+\]
+
+
+\subsection{Pas de biais à la perte}
+
+6\% of those who felt unaffected start approving the reform after
+the feedback, and learning to be a winner does not increase this figure
+significantly.
+
+TODO: rephrase \og start disapproving\fg{} because it can be \og stop
+disapproving\fg .
+
+\[
+\Delta A_{i}^{F}=.05+.02\widehat{\Gamma_{i}}+\epsilon_{i}
 \]
 
 
 \subsection{Biais de confirmation}
 
 \[
-\Delta A_{i}^{F}=\alpha_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=j
+\Delta A_{i}^{F}=\delta_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=j
 \]
 
-
-\subsection{Biais à la perte}
-
-$U$: update\_correct vaut +1 si le répondant adopte le feedback qui
-infirme sa croyance initiale, $-$1 s'il update contre le feedback
-qui pourtant le confirme, 0 s'il n'update pas
+Among winners, those who felt winner have 6 p.p. more chances to start
+approving the reform than the others; while among losers, those who
+already felt loser have 6 p.p. \emph{less }chances to start approving
+it. This looks like a confirmation bias, where hesitant winners (resp.
+losers) may gain confidence that they win (resp. loose) through the
+feedback, triggering them to approve (resp. to not approve) the reform
+more than those who learn that they gain (resp. loose) from the reform. 
 
 \[
-U_{i}=\alpha_{0}+\beta_{G}G_{i}^{F}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
+\Delta\bar{A}_{i}^{F}=\delta_{0}+.06^{**}\bar{G}_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=1
+\]
+
+\[
+\Delta\bar{A}_{i}^{F}=\delta_{0}+.06^{.}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=0
 \]
 
 
@@ -176,62 +404,68 @@ U_{i}=\alpha_{0}+\beta_{G}G_{i}^{F}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
 
 On fait l'hypothèse que 
 \[
-\mathbb{P}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right)=f\left(\underset{+}{\mathbb{E}\left[g_{i}\,|\,\mathbf{E}_{i}\right]}\right)=f\left(\gamma_{i}-b_{i}\right)
+\mathbb{P}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right)=f\left(\underset{+}{\mathbb{E}\left[g_{i}\,|\,\mathbf{E}_{i}\right]}\right)=f\left(\gamma_{i}-b_{B\left(i\right)}\right)
 \]
-et on estime \emph{f}. On a le gain subjectif $g_{i}=\gamma_{i}-b_{i}+\epsilon_{i}$
+où $B\left(i\right)$ est la catégorie du répondant \emph{i, }et on
+estime \emph{f}. On a le gain subjectif $g_{i}=\gamma_{i}-b_{B\left(i\right)}+\epsilon_{i}$
 où l'erreur de l'individu \emph{i} par rapport au gain objectif $\gamma_{i}$
-est $-b_{i}+\epsilon_{i}$, avec $\mathbb{E}\left[\epsilon_{i}\right]=0$
+est $-b_{B\left(i\right)}+\epsilon_{i}$, avec $\mathbb{E}\left[\epsilon_{i}\right]=0$
 (et en espérant que $\mathbb{E}\left[\epsilon_{i}\,|\,\Delta\widehat{E_{i}}\right]=0$).
-(On pourrait faire dépendre \emph{$b_{i}$ }de caractéristiques observables
-dans une extension). On peut estimer le biais \emph{$b_{i}$ }directement.
+(On pourrait faire dépendre \emph{$b_{B\left(i\right)}$ }de caractéristiques
+observables dans une extension). On peut estimer le biais \emph{$b_{B\left(i\right)}$
+}directement.
 
 \begin{align*}
-g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b_{i}+\epsilon_{i}\\
- & =\underset{\widehat{\gamma_{i}}}{\underbrace{110-\Delta\widehat{E_{i}}}}+\iota_{i}-b_{i}+\epsilon_{i}
+g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b_{B\left(i\right)}+\epsilon_{i}\\
+ & =\underset{\widehat{\gamma_{i}}}{\underbrace{110-\Delta\widehat{E_{i}}}}+\iota_{i}-b_{B\left(i\right)}+\epsilon_{i}
 \end{align*}
 
-Le répondant sait qu'il commet une erreur $b_{i}-\epsilon_{i}$, qu'il
-croit d'espérance nulle (il pense que $b_{i}=0$ \emph{a priori}).
-Il croit que nous estimons ses hausses de dépenses à $\widehat{\gamma_{i}}-\epsilon_{i}=\gamma_{i}-\iota_{i}-\epsilon_{i}$,
-et que nous commettons une erreur d'espérance $b_{i}-\iota_{i}$ \emph{a
-priori }non nulle ($\widehat{\gamma_{i}}-\epsilon_{i}\tilde{\sim}\mathcal{N}\left(b-\iota_{i},\sigma^{2}\right)$),
-où $\iota_{i}-b_{i}$ est son information partielle (liée à ses caractéristiques
-inobservées par nous). On peut décomposer $b_{i}-\iota_{i}$ entre
-son biais $b_{i}$ et le nôtre $\iota_{i}$ (qu'on peut estimer dans
-une extension pour estimer \emph{b} plus précisément). Le répondant
-sait qu'il peut être biaisé. Il sait que l'écart $g_{i}-\widehat{\gamma_{i}}$
-entre son estimation et la nôtre est de $\iota_{i}-b_{i}+\epsilon_{i}$,
-mais ne sait pas quel part de cet écart est dû à son information partielle
-$\iota_{i}-b_{i}$, et quelle part est due à son incertitude $\epsilon_{i}$.
-L'incertitude du répondant $\epsilon_{i}$ est une variable aléatoire
-centrée qui l'empêche de distinguer son biais \emph{$b_{i}$} du nôtre
-$\iota_{i}$.
+Le répondant sait qu'il commet une erreur $b_{B\left(i\right)}-\epsilon_{i}$,
+qu'il croit d'espérance nulle (il pense que $b_{B\left(i\right)}=0$
+\emph{a priori}). Il croit que nous estimons son gain à $\widehat{\gamma_{i}}+\epsilon_{i}=\gamma_{i}+\iota_{i}+\epsilon_{i}$,
+et que nous commettons une erreur d'espérance $b_{B\left(i\right)}-\iota_{i}$
+\emph{a priori }non nulle, où $\iota_{i}-b_{B\left(i\right)}$ est
+son information partielle (liée à ses caractéristiques inobservées
+par nous). On peut décomposer $b_{B\left(i\right)}-\iota_{i}$ entre
+son biais $b_{B\left(i\right)}$ et le nôtre $\iota_{i}$ (qu'on peut
+estimer dans une extension pour estimer \emph{b} plus précisément).
+Le répondant sait qu'il peut être biaisé. Il sait que l'écart $g_{i}-\widehat{\gamma_{i}}$
+entre son estimation et la nôtre est de $\iota_{i}-b_{B\left(i\right)}+\epsilon_{i}$,
+mais ne sait pas quelle part de cet écart est dû à son information
+partielle $\iota_{i}-b_{B\left(i\right)}$, et quelle part est due
+à son incertitude $\epsilon_{i}$. L'incertitude du répondant $\epsilon_{i}$
+est une variable aléatoire centrée qui l'empêche de distinguer son
+biais \emph{$b_{i}$} du nôtre $\iota_{i}$.
 
 Le feedback lui donne une information sur $\widehat{\gamma_{i}}$,
 donc indirectement sur $\epsilon_{i}$. Après le feedback, il va réviser
 son gain subjectif en
 
 \[
-g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b_{i}+\epsilon_{i}
+g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha_{B\left(i\right)}+\eta_{i}\right)b_{B\left(i\right)}+\epsilon_{i}
 \]
 
-$\alpha\in\left[0;1\right]$ ssi le répondant update dans le bon sens.
-(On pourrait rendre le nouveau bruit $\eta_{i}b_{i}$ indépendant
-de $b_{i}$, à voir\emph{ }en fonction des données).
+$\alpha_{B\left(i\right)}\in\left[0;1\right]$ ssi les répondant dans
+$B\left(i\right)$ révisent dans le bon sens. (On pourrait rendre
+le nouveau bruit $\eta_{i}b_{B\left(i\right)}$ indépendant de $b_{B\left(i\right)}$,
+à voir\emph{ }en fonction des données).
 
 $g_{i}^{F}$ n'est pas observée, mais on peut l'estimer à partir de
-l'estimation de \emph{f} (et en regroupant des individus similaires):
+l'estimation de \emph{f} (et \emph{en regroupant des individus similaires}):
 \[
-\widehat{g_{i}^{F}}=\widehat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
+\widehat{g_{B\left(i\right)}^{F}}=\widehat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
 \]
 
-Le paramètre qui nous intéresse est $\alpha$, car il représente l'ampleur
-de la révision effectuée par le répondant. On l'estime en utilisant
-$g_{i}-g_{i}^{F}=b_{i}\left(\alpha+\eta_{i}-1\right)$:
+Le paramètre qui nous intéresse est $\alpha_{B}$, car il représente
+l'ampleur de la révision effectuée par les répondants. On l'estime
+en utilisant $g_{i}-g_{i}^{F}=b_{B\left(i\right)}\left(\alpha_{B\left(i\right)}+\eta_{i}-1\right)$
+et en prenant la médiane de chaque terme:
 
 \begin{align*}
-\widehat{\alpha} & =1+\frac{g_{i}-\widehat{g_{i}^{F}}}{b_{i}}
+\widehat{\alpha_{B}} & =1+\frac{g_{B}-\widehat{g_{B\left(i\right)}^{F}}}{b_{B}}
 \end{align*}
+
+où $g_{B}$ est la médiane des répondants dans la catégorie \emph{B}.
 
 Tentative de cadre bayésien :
 
@@ -248,11 +482,25 @@ Tentative de cadre bayésien :
 \widetilde{\mathbb{P}}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
 \mathbb{P}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}-\epsilon_{i}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}-\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}-\epsilon_{i}>0\,|\,\mathbf{E}_{i}\right)}\\
  & \overset{\text{si trust}}{=}\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(\gamma_{i}-\iota_{i}-\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}>\epsilon_{i}\,|\,\mathbf{E}_{i}\right)}\\
- & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi\left(g_{i}-\iota_{i}\right)}\\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}>\epsilon_{i}+\iota_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(g_{i}>\epsilon_{i}+\iota_{i}\right)}\\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi_{b_{i},\sigma_{\epsilon}^{2}+\sigma_{\iota}^{2}}\left(g_{i}\right)}\\
+\\
+\\
+ & \mathbb{P}_{i,t+1}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0\right)\\
+\\
+\mathbb{P}\left(X+Y<a\,|\,X<a\right)\mathbb{P}\left(X<a\right) & =\int_{-\infty}^{a}\left(\int_{-\infty}^{+\infty}\varphi\left(y\right)\boldsymbol{1}_{x+y<a}dy\right)\varphi\left(x\right)dx\\
+ & =\frac{1}{2\pi\sqrt{\sigma_{X}^{2}\sigma_{Y}^{2}}}\int_{-\infty}^{a}\int_{-\infty}^{+\infty}e^{-\frac{x^{2}}{2\sigma_{X}^{2}}-\frac{y^{2}}{2\sigma_{Y}^{2}}}\boldsymbol{1}_{x+y<a}dydx\\
 \\
 \\
 \\
- & \mathbb{P}_{i,t+1}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0\right)
+\\
+ & =\int_{-\infty}^{a}\left(\int_{-\infty}^{a-x}\varphi\left(y\right)dy\right)\varphi\left(x\right)dx\\
+ & =\int_{-\infty}^{a}\Phi_{Y}\left(a-x\right)\varphi_{X}\left(x\right)dx\\
+ & =\frac{1}{2\sqrt{2\pi\sigma_{X}^{2}}}\int_{-\infty}^{a}\left(1+\text{erf}\left(\frac{a-x}{\sigma_{Y}\sqrt{2}}\right)\right)e^{-\frac{x^{2}}{2\sigma_{X}^{2}}}dx\\
+ & =\frac{1}{2\sqrt{2\pi\sigma_{X}^{2}}}\int_{-\infty}^{a}\left(1+\frac{2}{\sqrt{\pi}}\int_{0}^{\frac{a-x}{\sigma_{Y}\sqrt{2}}}e^{-t^{2}}dt\right)e^{-\frac{x^{2}}{2\sigma_{X}^{2}}}dx\\
+ & =\frac{\Phi_{X}\left(a\right)}{2\sqrt{2\pi\sigma_{X}^{2}}}+\frac{2}{\sqrt{\pi}}\int_{-\infty}^{a}e^{-\frac{x^{2}}{2\sigma_{X}^{2}}}\left(\int_{0}^{\frac{a-x}{\sigma_{Y}\sqrt{2}}}e^{-t^{2}}dt\right)dx\\
+\\
+\\
 \end{align*}
 
 $g_{i}-\gamma_{i}=\epsilon_{i}\tilde{\sim}\mathcal{N}\left(b,\sigma^{2}\right)$, 

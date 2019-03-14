@@ -93,6 +93,593 @@ Termes
 Variables
 \end_layout
 
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+gain
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+subjective
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+truth
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+estimation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+numeric
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $g$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\gamma$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\widehat{\gamma}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+binary
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\dot{G}$
+\end_inset
+
+ (
+\begin_inset Formula $g>0$
+\end_inset
+
+), 
+\begin_inset Formula $G$
+\end_inset
+
+ (
+\begin_inset Formula $g\geq0$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\Gamma$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\widehat{\Gamma}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="8">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+step
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+partial tax: 
+\emph on
+p 
+\emph default
+(non compensated: 
+\begin_inset Formula $\mathring{p}$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+ex ante
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+after knowledge: 
+\emph on
+K
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+after targeting
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+variants
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+transport
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+housing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+VAT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+progressivity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+feedback
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $-$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+exponent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+T 
+\emph default
+(
+\begin_inset Formula $\mathring{T}$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+H 
+\emph default
+(
+\begin_inset Formula $\mathring{H}$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+V 
+\emph default
+(
+\begin_inset Formula $\mathring{V}$
+\end_inset
+
+)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+I
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+P
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+F
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\emph on
+C
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $L$
+\end_inset
+
+: 
+\begin_inset Formula $\left[-2;+2\right]$
+\end_inset
+
+ loss following partial tax
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $g,G,\gamma,\Gamma,\widehat{\gamma},\widehat{\Gamma}$
+\end_inset
+
+: gain from a reform
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $a/\dot{A}/A$
+\end_inset
+
+: approval category (Yes/No/PNR) / approval (Yes) / acceptance (Yes or PNR)
+ of a reform
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\pi$
+\end_inset
+
+: /20/30/40/50/70/ income category of the respondent and their household
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $R$
+\end_inset
+
+ (resp.
+ 
+\begin_inset Formula $R_{2}$
+\end_inset
+
+): income of the respondent (resp.
+ of their partner)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $T$
+\end_inset
+
+ (resp.
+ 
+\begin_inset Formula $T_{2}$
+\end_inset
+
+): dummy that the respondent (resp.
+ their partner) receives a payment in the tax with targeting (
+\begin_inset Formula $T=\left(R<c\right)$
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\Theta$
+\end_inset
+
+: payment received as compensation from the tax
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathbf{C}$
+\end_inset
+
+: vector of controls
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathbf{E}$
+\end_inset
+
+: energetic characteristics 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $e$
+\end_inset
+
+ (resp.
+ 
+\begin_inset Formula $\overline{e}$
+\end_inset
+
+): subjective elasticity of the respondent (resp.
+ of French people)
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\Delta E$
+\end_inset
+
+: increase in spending: 
+\begin_inset Formula $\Delta E=d\left(\mathbf{E}\right)\cdot\Delta\tau\cdot\left(1-\varepsilon\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\Delta X^{v}=X^{v}-X$
+\end_inset
+
+ for 
+\begin_inset Formula $X\in\left\{ A;G\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $v\in\left\{ C;F;P\right\} $
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $U$
+\end_inset
+
+: update in the appropriate direction
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
 \begin_layout Itemize
 \begin_inset Formula $L^{\mathring{T}}$
 \end_inset
@@ -343,6 +930,20 @@ I
 
 \end_layout
 
+\begin_layout Itemize
+
+\emph on
+U
+\emph default
+: update_correct vaut +1 si le répondant adopte le feedback qui infirme
+ sa croyance initiale, 
+\begin_inset Formula $-$
+\end_inset
+
+1 s'il update contre le feedback qui pourtant le confirme, 0 s'il n'update
+ pas
+\end_layout
+
 \begin_layout Subsection
 Réformes
 \end_layout
@@ -443,7 +1044,7 @@ Gain subjectif avec ciblage
 \begin_layout Standard
 \begin_inset Formula 
 \[
-A_{i}^{C}=\delta_{0}+\beta_{G}G_{i}^{C}+\delta_{A}A_{i}^{I}+\epsilon_{i}
+A_{i}^{C}=\delta_{0}+\beta_{G}G_{i}^{C}+\delta_{A}A_{i}+\delta_{GA}G_{i}^{C}A_{i}^{I}+\epsilon_{i}
 \]
 
 \end_inset
@@ -451,14 +1052,326 @@ A_{i}^{C}=\delta_{0}+\beta_{G}G_{i}^{C}+\delta_{A}A_{i}^{I}+\epsilon_{i}
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{i}^{C}=.04+.45^{***}G_{i}^{C}+.38^{***}A_{i}+.01G_{i}^{C}A_{i}^{I}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $A^{C}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $G^{C}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\neg G^{C}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+total
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $A^{I}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.89
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.43
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.67
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\neg A^{I}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.49
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.04
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.17
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+total
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.66
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.12
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+.32
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Acceptance rate for targeted reform in function of 
+\emph on
+ex ante
+\emph default
+ acceptance and perceived personal benefit (non weighted)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
-Discontinuité
+Discontinuité du transfert ciblé
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \[
-A_{i}^{C}=\delta_{0}+\beta_{T}T_{i}+\beta_{2}T_{2,i}+\delta_{R}R_{i}+\epsilon_{i}
+A_{i}^{C}=\delta_{0}+\beta_{T}T_{i}+\beta_{2}T_{2,i}+\beta_{T2}T_{i}\cdot T_{2,i}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{i}^{C}=\left\{ \begin{array}{c}
+.31\\
+.23\\
+.20
+\end{array}\right.+\left\{ \begin{array}{c}
+.17^{**}\\
+.18^{**}\\
+.15^{*}
+\end{array}\right.T_{i}+\left\{ \begin{array}{c}
+.07\\
+.13^{.}\\
+.16^{*}
+\end{array}\right.T_{2,i}+\left\{ \begin{array}{c}
+-.01\\
+-.07\\
+-.11
+\end{array}\right.T_{i}\cdot T_{2,i}+\epsilon_{i}\text{ for }\left\{ \begin{array}{c}
+\pi_{i}=\left[20;30\right]\\
+\pi_{i}=\left[30;40\right]\\
+\pi_{i}=\left[40;50\right]
+\end{array}\right.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{i}^{C}=\left\{ \begin{array}{c}
+.31\\
+.24\\
+.22
+\end{array}\right.+\left\{ \begin{array}{c}
+.17^{**}\\
+.15^{**}\\
+.10^{*}
+\end{array}\right.T_{i}+\left\{ \begin{array}{c}
+.07\\
+.09^{.}\\
+.10^{*}
+\end{array}\right.T_{2,i}+\epsilon_{i}\text{ for }\left\{ \begin{array}{c}
+\pi_{i}=\left[20;30\right]\\
+\pi_{i}=\left[30;40\right]\\
+\pi_{i}=\left[40;50\right]
+\end{array}\right.
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A_{i}^{C}=\delta_{0}+.14^{***}T_{i}+.06^{**}T_{2,i}+\beta_{T2}T_{i}\cdot T_{2,i}+\delta_{C}C_{i}+\delta_{a}^{***}a_{i}^{I}+\boldsymbol{\delta_{R}R_{i}}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A_{i}^{C}=.31+.17^{**}T_{i}+.07\cdot T_{2,i}+\epsilon_{i}
 \]
 
 \end_inset
@@ -476,6 +1389,93 @@ Discontinuité instrumentée
 G_{i}^{C} & =\alpha_{0}+\alpha_{T}T_{i}+\alpha_{2}T_{2,i}+\gamma_{A}A_{i}^{I}\left(+\gamma_{R}R_{i}\right)+\eta_{i}\\
 A_{i}^{C} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{C}}\left(+\sum_{c}\beta_{c}\mathbf{1}_{c_{i}=c}+\beta_{G\cdot c}\widehat{G_{i}^{C}}\mathbf{1}_{c_{i}=c}\right)+\delta_{A}A_{i}^{I}\left(+\delta_{R}R_{i}\right)+\epsilon_{i}
 \end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+G_{i}^{C} & =.18+.21^{***}T_{i}+.13^{***}T_{2,i}+.25^{***}A_{i}^{I}+\eta_{i}\\
+A_{i}^{C} & =-.02+.65^{***}\widehat{G_{i}^{C}}+.34^{***}A_{i}^{I}+\epsilon_{i}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Discontinuité d'un feedback positif
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{i}^{F}=\delta_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\delta_{a}a_{i}^{I}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A_{i}^{F}=\delta_{0}+.08^{***}\widehat{\Gamma_{i}}+-6.10^{-5*}\widehat{\gamma_{i}}+-3.10^{-9*}\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\delta_{a}a_{i}^{I}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Effet similaire sur la variation d'approbation:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta A_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta A_{i}^{F}=\alpha_{0}+.11^{***}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+En instrumentant:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+G_{i}^{F}=\alpha_{0}+.21^{***}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{i}^{F}=\alpha_{0}+.40^{***}\widehat{G_{i}^{F}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
 
 \end_inset
 
@@ -501,8 +1501,20 @@ introduire
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-G_{i}^{F} & =\alpha_{0}+\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+G_{i}^{F} & =\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
 A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+G_{i}^{F} & =\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{F} & =\delta_{0}+.48^{***}\widehat{G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
 \end{align*}
 
 \end_inset
@@ -538,6 +1550,22 @@ A_{i}^{F} & =\delta_{0}+\beta_{G}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\Delta G_{i}^{F} & =\alpha_{0}+\widehat{\Gamma_{i}}+\gamma_{A}A_{i}^{I}+\gamma_{R}R_{i}+\eta_{i}\\
+A_{i}^{F} & =\delta_{0}+.65^{***}\widehat{\Delta G_{i}^{F}}+\delta_{A}A_{i}^{I}+\delta_{R}R_{i}+\epsilon_{i}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TODO: quels contrôles?
+\end_layout
+
 \begin_layout Section
 Persistance et biais des croyances
 \end_layout
@@ -549,7 +1577,18 @@ Persistance après la simulation
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Delta G_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta G_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta G_{i}^{F}=-.08+.23^{***}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
 \]
 
 \end_inset
@@ -564,7 +1603,137 @@ Simulation comme instrument
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Delta A_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\mathbf{\beta_{C}C}_{i}+\epsilon_{i}
+\Delta G_{i}^{F}=\alpha_{0}+\beta_{\Gamma}\widehat{\Gamma_{i}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta A_{i}^{F}=\alpha_{0}+.51^{***}\widehat{\Delta G_{i}^{F}}+\delta_{\gamma}\widehat{\gamma_{i}}+\delta_{\gamma^{2}}\widehat{\gamma_{i}}^{2}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Biais d'update à la perte
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+U_{i}=\delta_{0}+\beta_{j}\bar{G}_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=G_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Among those who receive a feedback contradicting their subjective gain,
+ those who felt winner have 59 p.p.
+ more chances to update correctly their winning category (i.e.
+ downards).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+U_{i}=\delta_{0}+.59^{***}\bar{G}_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Biais à la perte
+\end_layout
+
+\begin_layout Standard
+Among those who should have updated, those who revised their subjective
+ gain upwards were disproportionately correct in doing so than those whose
+ revised it downards, indicating a bias towards loss when updating.
+\end_layout
+
+\begin_layout Standard
+TODO: check how non affectés are managed; include those who shouldn't update
+ in the analysis.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+U_{i}=\alpha_{0}+.92^{***}G_{i}^{F}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Biais à la perte
+\end_layout
+
+\begin_layout Standard
+Those who felt winners update incorrectly disproportionately as compared
+ to those who felt losers, indicating a bias towards loss when updating.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+U_{i}=\alpha_{0}-.26^{***}G_{i}+\epsilon_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Pas de biais à la perte
+\end_layout
+
+\begin_layout Standard
+6% of those who felt unaffected start approving the reform after the feedback,
+ and learning to be a winner does not increase this figure significantly.
+\end_layout
+
+\begin_layout Standard
+TODO: rephrase 
+\begin_inset Quotes fld
+\end_inset
+
+start disapproving
+\begin_inset Quotes frd
+\end_inset
+
+ because it can be 
+\begin_inset Quotes fld
+\end_inset
+
+stop disapproving
+\begin_inset Quotes frd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta A_{i}^{F}=.05+.02\widehat{\Gamma_{i}}+\epsilon_{i}
 \]
 
 \end_inset
@@ -579,7 +1748,7 @@ Biais de confirmation
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\Delta A_{i}^{F}=\alpha_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=j
+\Delta A_{i}^{F}=\delta_{0}+\beta_{j}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=j
 \]
 
 \end_inset
@@ -587,27 +1756,38 @@ Biais de confirmation
 
 \end_layout
 
-\begin_layout Subsection
-Biais à la perte
-\end_layout
-
 \begin_layout Standard
-\begin_inset Formula $U$
-\end_inset
-
-: update_correct vaut +1 si le répondant adopte le feedback qui infirme
- sa croyance initiale, 
-\begin_inset Formula $-$
-\end_inset
-
-1 s'il update contre le feedback qui pourtant le confirme, 0 s'il n'update
- pas
+Among winners, those who felt winner have 6 p.p.
+ more chances to start approving the reform than the others; while among
+ losers, those who already felt loser have 6 p.p.
+ 
+\emph on
+less 
+\emph default
+chances to start approving it.
+ This looks like a confirmation bias, where hesitant winners (resp.
+ losers) may gain confidence that they win (resp.
+ loose) through the feedback, triggering them to approve (resp.
+ to not approve) the reform more than those who learn that they gain (resp.
+ loose) from the reform.
+ 
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \[
-U_{i}=\alpha_{0}+\beta_{G}G_{i}^{F}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
+\Delta\bar{A}_{i}^{F}=\delta_{0}+.06^{**}\bar{G}_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=1
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Delta\bar{A}_{i}^{F}=\delta_{0}+.06^{.}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=0
 \]
 
 \end_inset
@@ -623,18 +1803,26 @@ Modèle adaptatif bayésien
 On fait l'hypothèse que 
 \begin_inset Formula 
 \[
-\mathbb{P}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right)=f\left(\underset{+}{\mathbb{E}\left[g_{i}\,|\,\mathbf{E}_{i}\right]}\right)=f\left(\gamma_{i}-b_{i}\right)
+\mathbb{P}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right)=f\left(\underset{+}{\mathbb{E}\left[g_{i}\,|\,\mathbf{E}_{i}\right]}\right)=f\left(\gamma_{i}-b_{B\left(i\right)}\right)
 \]
 
 \end_inset
 
+où 
+\begin_inset Formula $B\left(i\right)$
+\end_inset
+
+ est la catégorie du répondant 
+\emph on
+i, 
+\emph default
 et on estime 
 \emph on
 f
 \emph default
 .
  On a le gain subjectif 
-\begin_inset Formula $g_{i}=\gamma_{i}-b_{i}+\epsilon_{i}$
+\begin_inset Formula $g_{i}=\gamma_{i}-b_{B\left(i\right)}+\epsilon_{i}$
 \end_inset
 
  où l'erreur de l'individu 
@@ -646,7 +1834,7 @@ i
 \end_inset
 
  est 
-\begin_inset Formula $-b_{i}+\epsilon_{i}$
+\begin_inset Formula $-b_{B\left(i\right)}+\epsilon_{i}$
 \end_inset
 
 , avec 
@@ -661,7 +1849,7 @@ i
  (On pourrait faire dépendre 
 \emph on
 
-\begin_inset Formula $b_{i}$
+\begin_inset Formula $b_{B\left(i\right)}$
 \end_inset
 
  
@@ -670,7 +1858,7 @@ de caractéristiques observables dans une extension).
  On peut estimer le biais 
 \emph on
 
-\begin_inset Formula $b_{i}$
+\begin_inset Formula $b_{B\left(i\right)}$
 \end_inset
 
  
@@ -681,8 +1869,8 @@ directement.
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b_{i}+\epsilon_{i}\\
- & =\underset{\widehat{\gamma_{i}}}{\underbrace{110-\Delta\widehat{E_{i}}}}+\iota_{i}-b_{i}+\epsilon_{i}
+g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b_{B\left(i\right)}+\epsilon_{i}\\
+ & =\underset{\widehat{\gamma_{i}}}{\underbrace{110-\Delta\widehat{E_{i}}}}+\iota_{i}-b_{B\left(i\right)}+\epsilon_{i}
 \end{align*}
 
 \end_inset
@@ -692,11 +1880,11 @@ g_{i} & =\underset{\gamma_{i}}{\underbrace{110-\Delta E_{i}}}-b_{i}+\epsilon_{i}
 
 \begin_layout Standard
 Le répondant sait qu'il commet une erreur 
-\begin_inset Formula $b_{i}-\epsilon_{i}$
+\begin_inset Formula $b_{B\left(i\right)}-\epsilon_{i}$
 \end_inset
 
 , qu'il croit d'espérance nulle (il pense que 
-\begin_inset Formula $b_{i}=0$
+\begin_inset Formula $b_{B\left(i\right)}=0$
 \end_inset
 
  
@@ -704,12 +1892,12 @@ Le répondant sait qu'il commet une erreur
 a priori
 \emph default
 ).
- Il croit que nous estimons ses hausses de dépenses à 
-\begin_inset Formula $\widehat{\gamma_{i}}-\epsilon_{i}=\gamma_{i}-\iota_{i}-\epsilon_{i}$
+ Il croit que nous estimons son gain à 
+\begin_inset Formula $\widehat{\gamma_{i}}+\epsilon_{i}=\gamma_{i}+\iota_{i}+\epsilon_{i}$
 \end_inset
 
 , et que nous commettons une erreur d'espérance 
-\begin_inset Formula $b_{i}-\iota_{i}$
+\begin_inset Formula $b_{B\left(i\right)}-\iota_{i}$
 \end_inset
 
  
@@ -717,17 +1905,17 @@ a priori
 a priori 
 \emph default
 non nulle, où 
-\begin_inset Formula $\iota_{i}-b_{i}$
+\begin_inset Formula $\iota_{i}-b_{B\left(i\right)}$
 \end_inset
 
  est son information partielle (liée à ses caractéristiques inobservées
  par nous).
  On peut décomposer 
-\begin_inset Formula $b_{i}-\iota_{i}$
+\begin_inset Formula $b_{B\left(i\right)}-\iota_{i}$
 \end_inset
 
  entre son biais 
-\begin_inset Formula $b_{i}$
+\begin_inset Formula $b_{B\left(i\right)}$
 \end_inset
 
  et le nôtre 
@@ -745,12 +1933,12 @@ b
 \end_inset
 
  entre son estimation et la nôtre est de 
-\begin_inset Formula $\iota_{i}-b_{i}+\epsilon_{i}$
+\begin_inset Formula $\iota_{i}-b_{B\left(i\right)}+\epsilon_{i}$
 \end_inset
 
-, mais ne sait pas quel part de cet écart est dû à son information partielle
+, mais ne sait pas quelle part de cet écart est dû à son information partielle
  
-\begin_inset Formula $\iota_{i}-b_{i}$
+\begin_inset Formula $\iota_{i}-b_{B\left(i\right)}$
 \end_inset
 
 , et quelle part est due à son incertitude 
@@ -794,7 +1982,7 @@ Le feedback lui donne une information sur
 \begin_layout Standard
 \begin_inset Formula 
 \[
-g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b_{i}+\epsilon_{i}
+g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha_{B\left(i\right)}+\eta_{i}\right)b_{B\left(i\right)}+\epsilon_{i}
 \]
 
 \end_inset
@@ -803,16 +1991,20 @@ g_{i}^{F}=\widehat{\gamma_{i}}+\iota_{i}-\left(\alpha+\eta_{i}\right)b_{i}+\epsi
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $\alpha\in\left[0;1\right]$
+\begin_inset Formula $\alpha_{B\left(i\right)}\in\left[0;1\right]$
 \end_inset
 
- ssi le répondant update dans le bon sens.
+ ssi les répondant dans 
+\begin_inset Formula $B\left(i\right)$
+\end_inset
+
+ révisent dans le bon sens.
  (On pourrait rendre le nouveau bruit 
-\begin_inset Formula $\eta_{i}b_{i}$
+\begin_inset Formula $\eta_{i}b_{B\left(i\right)}$
 \end_inset
 
  indépendant de 
-\begin_inset Formula $b_{i}$
+\begin_inset Formula $b_{B\left(i\right)}$
 \end_inset
 
 , à voir
@@ -838,7 +2030,7 @@ en regroupant des individus similaires
 ): 
 \begin_inset Formula 
 \[
-\widehat{g_{i}^{F}}=\widehat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
+\widehat{g_{B\left(i\right)}^{F}}=\widehat{f}^{-1}\left(\mathbb{P}_{i,t+1}\left(G_{i}^{F}>0\right)\right)
 \]
 
 \end_inset
@@ -848,26 +2040,38 @@ en regroupant des individus similaires
 
 \begin_layout Standard
 Le paramètre qui nous intéresse est 
-\begin_inset Formula $\alpha$
+\begin_inset Formula $\alpha_{B}$
 \end_inset
 
-, car il représente l'ampleur de la révision effectuée par le répondant.
+, car il représente l'ampleur de la révision effectuée par les répondants.
  On l'estime en utilisant 
-\begin_inset Formula $g_{i}-g_{i}^{F}=b_{i}\left(\alpha+\eta_{i}-1\right)$
+\begin_inset Formula $g_{i}-g_{i}^{F}=b_{B\left(i\right)}\left(\alpha_{B\left(i\right)}+\eta_{i}-1\right)$
 \end_inset
 
-:
+ et en prenant la médiane de chaque terme:
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-\widehat{\alpha} & =1+\frac{g_{i}-\widehat{g_{i}^{F}}}{b_{i}}
+\widehat{\alpha_{B}} & =1+\frac{g_{B}-\widehat{g_{B\left(i\right)}^{F}}}{b_{B}}
 \end{align*}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+où 
+\begin_inset Formula $g_{B}$
+\end_inset
+
+ est la médiane des répondants dans la catégorie 
+\emph on
+B
+\emph default
+.
 \end_layout
 
 \begin_layout Standard
@@ -893,7 +2097,21 @@ Tentative de cadre bayésien :
  & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi_{b_{i},\sigma_{\epsilon}^{2}+\sigma_{\iota}^{2}}\left(g_{i}\right)}\\
 \\
 \\
- & \mathbb{P}_{i,t+1}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0\right)
+ & \mathbb{P}_{i,t+1}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0\right)\\
+\\
+\mathbb{P}\left(X+Y<a\,|\,X<a\right)\mathbb{P}\left(X<a\right) & =\int_{-\infty}^{a}\left(\int_{-\infty}^{+\infty}\varphi\left(y\right)\boldsymbol{1}_{x+y<a}dy\right)\varphi\left(x\right)dx\\
+ & =\frac{1}{2\pi\sqrt{\sigma_{X}^{2}\sigma_{Y}^{2}}}\int_{-\infty}^{a}\int_{-\infty}^{+\infty}e^{-\frac{x^{2}}{2\sigma_{X}^{2}}-\frac{y^{2}}{2\sigma_{Y}^{2}}}\boldsymbol{1}_{x+y<a}dydx\\
+\\
+\\
+\\
+\\
+ & =\int_{-\infty}^{a}\left(\int_{-\infty}^{a-x}\varphi\left(y\right)dy\right)\varphi\left(x\right)dx\\
+ & =\int_{-\infty}^{a}\Phi_{Y}\left(a-x\right)\varphi_{X}\left(x\right)dx\\
+ & =\frac{1}{2\sqrt{2\pi\sigma_{X}^{2}}}\int_{-\infty}^{a}\left(1+\text{erf}\left(\frac{a-x}{\sigma_{Y}\sqrt{2}}\right)\right)e^{-\frac{x^{2}}{2\sigma_{X}^{2}}}dx\\
+ & =\frac{1}{2\sqrt{2\pi\sigma_{X}^{2}}}\int_{-\infty}^{a}\left(1+\frac{2}{\sqrt{\pi}}\int_{0}^{\frac{a-x}{\sigma_{Y}\sqrt{2}}}e^{-t^{2}}dt\right)e^{-\frac{x^{2}}{2\sigma_{X}^{2}}}dx\\
+ & =\frac{\Phi_{X}\left(a\right)}{2\sqrt{2\pi\sigma_{X}^{2}}}+\frac{2}{\sqrt{\pi}}\int_{-\infty}^{a}e^{-\frac{x^{2}}{2\sigma_{X}^{2}}}\left(\int_{0}^{\frac{a-x}{\sigma_{Y}\sqrt{2}}}e^{-t^{2}}dt\right)dx\\
+\\
+\\
 \end{align*}
 
 \end_inset
