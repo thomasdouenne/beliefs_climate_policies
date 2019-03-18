@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import scipy.stats as stats
 import random
+import matplotlib as plt
 
 from utils import graph_builder_bar_percent
 
@@ -215,9 +216,21 @@ def extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone
                 df_to_plot['subjective_gain_numeric_{}'.format(energy)][j] = vector_weights[index][0]
 
     # Cut extreme values for more readable figures
-    df_bdf_limited = df_bdf.query('gain_net_numeric_uc_{} > -300'.format(energy))
-    plot_2 = df_bdf_limited['gain_net_numeric_uc_{}'.format(energy)].plot.density(bw_method = bw_size)
-    df_to_plot_limited = df_to_plot.query('subjective_gain_numeric_{} > -300'.format(energy))
-    plot_1 = df_to_plot_limited['subjective_gain_numeric_{}'.format(energy)].plot.density(bw_method = bw_size)
+    df_bdf_limited = df_bdf.query('gain_net_numeric_uc_{} > -500'.format(energy))
+    plot_2 = df_bdf_limited['gain_net_numeric_uc_{}'.format(energy)].plot.density(bw_method = bw_size, legend = True)
+    df_to_plot_limited = df_to_plot.query('subjective_gain_numeric_{} > -500'.format(energy))
+    plot_1 = df_to_plot_limited['subjective_gain_numeric_{}'.format(energy)].plot.density(bw_method = bw_size, legend = True)
     
-    return plot_1, plot_2
+    return df_bdf, df_to_plot
+
+
+def save_dataframes_kernel_density(df_bdf, df_ptc):
+    df_objective, df_subjective_fuel = extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'fuel')
+    df_subjective_chauffage = extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'chauffage')[1]
+    df_subjective_taxe_carbone = extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone')[1]
+    
+    df_objective = df_objective[['gain_net_numeric_uc_fuel'] + ['gain_net_numeric_uc_chauffage'] + ['gain_net_numeric_uc_taxe_carbone']]
+    df_subjective = df_subjective_fuel.merge(df_subjective_chauffage).merge(df_subjective_taxe_carbone)
+    df_subjective = df_subjective[['subjective_gain_numeric_fuel'] + ['subjective_gain_numeric_chauffage'] + ['subjective_gain_numeric_taxe_carbone']]
+    
+    return df_objective.to_csv('df_objective_gains.csv', sep = ';'), df_subjective.to_csv('df_subjective_gains.csv', sep = ';')

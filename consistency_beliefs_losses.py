@@ -10,9 +10,10 @@ from model_reforms_data.prepare_dataset import prepare_dataset
 from model_reforms_data.gains_losses_data import compute_gains_losses
 from model_reforms_data.standardize_data_bdf_ptc import variables_names_bdf_to_ptc, \
     create_new_variables_bdf_ptc, compute_gain_net_uc, compare_objective_subjective_beliefs_gain, \
-    impute_barycentre_in_bins, impute_average_bdf_in_bins, extrapolate_distribution_bcp_from_bdf
+    impute_barycentre_in_bins, impute_average_bdf_in_bins, extrapolate_distribution_bcp_from_bdf, \
+    save_dataframes_kernel_density
 
-seaborn.set_palette(seaborn.color_palette("Set1", 2))
+seaborn.set_palette(seaborn.color_palette([u'blue', u'red']))
 
 
 """ Load samples - BdF/BCP """
@@ -46,27 +47,29 @@ except:
 
 
 """ Choose which function to perform """ # True to compute and display results, False otherwise
-plot_step_distribution = True
-plot_kde = False
-test_imputationn_methods = True # The two methods provide quite similar results
+plot_step_distribution = False
+plot_kde = True
+save_kde_data = False
+test_imputation_methods = False # The two methods provide quite similar results
 regress = False
 
 
 """ Compare distributions BdF/BCP """ # pdf and CDF net gains of both samples (step function or Kernel density estimation)
 
-energy = 'fuel' # chauffage, fuel ou taxe_carbone
+energy = 'taxe_carbone' # chauffage, fuel ou taxe_carbone
 
 if plot_step_distribution == True:
     df_to_plot = compare_objective_subjective_beliefs_gain(df_bdf, df_ptc, energy, True)    
 if plot_kde == True:
-    extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy, bw_size = None, vector = True)
-
+    extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy, bw_size = 0.3, vector = True)
+if save_kde_data == True:
+    save_dataframes_kernel_density(df_bdf, df_ptc)
 
 """ Imputate numerical values for net gain for BCP """ # Two different imputation methods: provide very similar results
 df_ptc = impute_barycentre_in_bins(df_bdf, df_ptc) 
 df_ptc = impute_average_bdf_in_bins(df_bdf, df_ptc)
 
-if test_imputationn_methods == True:
+if test_imputation_methods == True:
     print "Sample means:", df_ptc['gain_net_numeric_uc_{}'.format(energy)].mean(), \
         df_ptc['gain_net_numeric_barycentre_uc_{}'.format(energy)].mean()
     for i in range(-6,6):
