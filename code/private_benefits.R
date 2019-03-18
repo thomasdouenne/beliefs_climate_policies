@@ -7,31 +7,12 @@
 # Ce résultat est confirmé lorsqu'on effectue la même procédure (2SLS avec RDD paramétrique en 1st stage) appliqué au feedback.
 
 ##### 1. Spécification principale : 2SLS avec RDD paramétrique à multiples seuils en first stage #####
-
-# TODO: erase this
-s$dummy_approbation_cible <- 1*(s$taxe_cible_approbation=='Oui')
-
-s$traite_transfert <- 1 * (s$cible==20) * (s$revenu<780) + 1 * (s$cible==30) * (s$revenu<1140) + 1 * (s$cible==40) * (s$revenu<1430) + 1 * (s$cible==50) * (s$revenu<1670)
-s$traite_transfert_conjoint <- (s$nb_adultes > 1) * (1 * (s$cible==20) * (s$revenu_conjoint<780) + 1 * (s$cible==30) * (s$revenu_conjoint<1140) + 1 * (s$cible==40) * (s$revenu_conjoint<1430) + 1 * (s$cible==50) * (s$revenu_conjoint<1670))
-
-s$revenu_2 <- s$revenu^2
-s$revenu_conjoint_2 <- s$revenu_conjoint^2
-
-s$gagnant__20_categorie[is.na(s$gagnant__20_categorie)] <- 0
-s$gagnant_20_30_categorie[is.na(s$gagnant_20_30_categorie)] <- 0
-s$gagnant_30_40_categorie[is.na(s$gagnant_30_40_categorie)] <- 0
-s$gagnant_40_50_categorie[is.na(s$gagnant_40_50_categorie)] <- 0
-s$transfert_seuil_gagnant <- 1 * (s$gagnant__20_categorie=='Gagnant') + 1 * (s$gagnant_20_30_categorie=='Gagnant') + 1 * (s$gagnant_30_40_categorie=='Gagnant') + 1 * (s$gagnant_40_50_categorie=='Gagnant')
-#  COMM: définitions variable dans preparation, encodage, transfert_seuil_gagnant c'est gagnant_cible_categorie, package pour IV?
-
-s_0_70 <- subset(s, categorie_cible != '70_')
-
 # Simple OLS #
 summary(lm((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant')*(taxe_approbation!='Non'), data=s, subset=categorie_cible!='70_', weights = s$weight))
 # Une OLS standard nous donne qu'une personne se percevant gagnante a une probabilité d'approbation supérieure de 48 p.p.
 
-cor(s$transfert_seuil_gagnant, s$traite_transfert)
-cor(s$transfert_seuil_gagnant, s$traite_transfert_conjoint)
+cor(s$simule_gain_cible, s$traite_cible)
+cor(s$simule_gain_cible, s$traite_cible_conjoint)
 
 # avant il y avait hausse_depenses au lieu de simule_gain_cible
 tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
@@ -86,22 +67,17 @@ summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + (taxe_approbation!='N
 # Le problème de cette méthode est que l'on affecte les répondants aléatoirement aux différents mécanismes, mais on compare des mécanises différents
 # En moyenne, les mécanismes auxquels ils sont éligibles transferent moins à plus de gens
 
-# TODO: continue incorporating analyse.R into this file
 # Test effet des seuils sur les ménages jamais éligibles pour écarter l'effet gagnant/perdant de l'acceptation #
-s_70_plus <- subset(s, categorie_cible == '70_' & traite_transfert != 1 & traite_transfert_conjoint != 1) # To do : mieux définir ce sample, ce critère revenu n'est pas suffisant du fait du revenu du conjoint
-ols_approuve_seuils <- lm(dummy_approbation_cible ~ (cible==20) + (cible==30) + (cible==40), data=s_70_plus, weights = s_70_plus$weight)
-summary(ols_approuve_seuils)
-# On ne détecte aucun effet significatif du seuil pour les non-éligibles affectés aléatoirement à l'un d'entre eux.
-# A noter toutefois le nombre très faible d'observations
-# A noter aussi cette bizarrerie : la présence de personnes recevant un transfert positif dans ce sous-échantillon...
+# Plus la mesure est ciblée sur les plus pauvres, plus elle est acceptée
+summary(lm(taxe_cible_approbation!='Non' ~ (cible==20) + (cible==30) + (cible==40), subset=categorie_cible == '70_' & traite_cible != 1 & traite_cible_conjoint != 1, data=s, weights = s$weight))
+decrit(s$traite_cible[s$categorie_cible == '70_']) # TODO: qui sont ces gens traités malgré que catégorie_cible == 70_ ?
+decrit(s$traite_cible_conjoint[s$categorie_cible == '70_'])
 
 
 ##### 4. RDD non-paramétrique par seuil #####
-require(rddtools)
-
 # Seuil 20 #
 s_0_30 <- subset(s, cible20==1 & (categorie_cible == '_20'  | categorie_cible == '20_30'))
-data_rdd_0_30 <- rdd_data(y=s_0_30$dummy_approbation_cible, x=s_0_30$revenu, cutpoint=780)
+data_rdd_0_30 <- rdd_data(y=s_0_30$taxe_cible_approbation!='Non', x=s_0_30$revenu, cutpoint=780)
 bandwidthsize_0_30 <- rdd_bw_ik(data_rdd_0_30)
 model_rdd_0_30 = rdd_reg_np(rdd_object = data_rdd_0_30, bw = bandwidthsize_0_30)
 summary(model_rdd_0_30)
@@ -109,7 +85,7 @@ plot(model_rdd_0_30)
 
 # Seuil 30 #
 s_20_40 <- subset(s, cible30==1 & (categorie_cible == '20_30'  | categorie_cible == '30_40'))
-data_rdd_20_40 <- rdd_data(y=s_20_40$dummy_approbation_cible, x=s_20_40$revenu, cutpoint=1140)
+data_rdd_20_40 <- rdd_data(y=s_20_40$taxe_cible_approbation!='Non', x=s_20_40$revenu, cutpoint=1140)
 bandwidthsize_20_40 <- rdd_bw_ik(data_rdd_20_40)
 model_rdd_20_40 = rdd_reg_np(rdd_object = data_rdd_20_40, bw = bandwidthsize_20_40)
 summary(model_rdd_20_40)
@@ -117,7 +93,7 @@ plot(model_rdd_20_40)
 
 # Seuil 40 #
 s_30_50 <- subset(s, cible40==1 & (categorie_cible == '30_40'  | categorie_cible == '40_50'))
-data_rdd_30_50 <- rdd_data(y=s_30_50$dummy_approbation_cible, x=s_30_50$revenu, cutpoint=1430)
+data_rdd_30_50 <- rdd_data(y=s_30_50$taxe_cible_approbation!='Non', x=s_30_50$revenu, cutpoint=1430)
 bandwidthsize_30_50 <- rdd_bw_ik(data_rdd_30_50)
 model_rdd_30_50 = rdd_reg_np(rdd_object = data_rdd_30_50, bw = bandwidthsize_30_50)
 summary(model_rdd_30_50)
@@ -125,7 +101,7 @@ plot(model_rdd_30_50)
 
 # Seuil 50 #
 s_40_70 <- subset(s, cible50==1 & (categorie_cible == '40_50'  | categorie_cible == '50_70'))
-data_rdd_40_70 <- rdd_data(y=s_40_70$dummy_approbation_cible, x=s_40_70$revenu, cutpoint=1670)
+data_rdd_40_70 <- rdd_data(y=s_40_70$taxe_cible_approbation!='Non', x=s_40_70$revenu, cutpoint=1670)
 bandwidthsize_40_70 <- rdd_bw_ik(data_rdd_40_70)
 model_rdd_40_70 = rdd_reg_np(rdd_object = data_rdd_40_70, bw = bandwidthsize_40_70)
 summary(model_rdd_40_70)
@@ -135,14 +111,12 @@ plot(model_rdd_40_70)
 
 
 ##### 5. RDD non-paramétrique multivarié par seuil #####
-require(rddapp)
-
 cible <- s$cible
 categorie_cible <- s$categorie_cible
 revenu <- s$revenu
 revenu_conjoint <- s$revenu_conjoint
 approbation_avant <- s$taxe_approbation # This is just here as an example of control variable
-dummy_approbation_cible <- s$dummy_approbation_cible
+dummy_approbation_cible <- s$taxe_cible_approbation!='Non'
 
 model_2_variables_20 = mrd_est(dummy_approbation_cible ~ revenu + revenu_conjoint | approbation_avant, cutpoint = c(780, 780), method = "center", subset = cible==20 & (categorie_cible == '_20'  | categorie_cible == '20_30'), t.design = c("leq", "geq"))
 summary(model_2_variables_20)
@@ -159,34 +133,26 @@ summary(model_2_variables_50)
 
 
 ##### 6. 2SLS avec RDD paramétrique pour le feedback
-sf <- subset(s, !is.na(s$simule_gagnant))
-sf$dummy_approbation_feedback <- 1 * (sf$taxe_feedback_approbation=='Oui')
-sf$dummy_declare_gagnant_feedback_categorie <- 1 * (sf$gagnant_feedback_categorie == 'Gagnant')
-sf$simule_gagnant <- as.numeric(sf$simule_gagnant)
-sf$gains_nets_estimes <- sf$hausse_depenses - 110 * sf$nb_adultes - 16.1
-sf$gains_nets_estimes_2 <- sf$gains_nets_estimes^2
+# OLS simple: 0.30***
+summary(lm(taxe_feedback_approbation=='Oui' ~ (gagnant_feedback_categorie == 'Gagnant') + taxe_approbation, data=s, weights = s$weight))
 
-# OLS simple
-ols_feedback <- lm(dummy_approbation_feedback ~ dummy_declare_gagnant_feedback_categorie + taxe_approbation, data=sf, weights = sf$weight)
-summary(ols_feedback)
-
-# RDD simple - effet d'être gagnant
-rdd_feedback <- lm(dummy_approbation_feedback ~ simule_gagnant + gains_nets_estimes + gains_nets_estimes_2 + taxe_approbation, data=sf, weights = sf$weight)
-summary(rdd_feedback)
+# RDD simple - effet d'être gagnant: 0.08***
+summary(lm(taxe_feedback_approbation=='Oui' ~ simule_gagnant + simule_gain + I(simule_gain^2) + taxe_approbation, data=s, weights = s$weight))
 
 # 2SLS avec 1st stage RDD - effet de se considérer gagnant
-cor(sf$dummy_declare_gagnant_feedback_categorie, sf$gagnant)
-tsls_rdd_feedback_1 <- lm(dummy_declare_gagnant_feedback_categorie ~ simule_gagnant + taxe_approbation + gains_nets_estimes + gains_nets_estimes_2, data=sf, weights = sf$weight)
-d_rdd_feedback.hat <- fitted.values(tsls_rdd_feedback_1)
-tsls_rdd_feedback_2 <- lm(dummy_approbation_feedback ~ d_rdd_feedback.hat + taxe_approbation + gains_nets_estimes + gains_nets_estimes_2, data=sf, weights = sf$weight)
-summary(tsls_rdd_feedback_2)
+cor(s$gagnant_feedback_categorie == 'Gagnant', n(s$simule_gagnant), use="complete.obs") # 0.24
+tsls_rdd_feedback_1 <- lm(gagnant_feedback_categorie == 'Gagnant' ~ simule_gagnant + taxe_approbation + simule_gain + I(simule_gain^2), data=s, weights = s$weight, na.action="na.exclude")
+gagnant_feedback.hat <- fitted.values(tsls_rdd_feedback_1)
+summary(lm(taxe_feedback_approbation=='Oui' ~ gagnant_feedback.hat + taxe_approbation + simule_gain + I(simule_gain^2), data=s, weights = s$weight))
 # Les résultats sont sensiblement les mêmes que dans le cas des seuils :
-# 1) Etre gagnant augmente la probabilité d'approuver de 10p.p., 2) se considérer gagnant augmente la probabilité d'approuver de 50p.p.
+# 1) Etre gagnant augmente la probabilité d'approuver de 10p.p., 2) se considérer gagnant augmente la probabilité d'approuver de 41 p.p.
 # L'effet estimé est ici local, et concerne les personnes qui sont à la limite de gagner/perdre.
 
 
 ##### 7. Biprobit - WIP...
-biprobit_feedback <- biprobit(dummy_approbation_feedback~1+dummy_declare_gagnant_feedback_categorie, rho=~1+dummy_declare_gagnant_feedback_categorie,data=sf)
+s$dummy_approbation_feedback <- s$taxe_feedback_approbation != 'Non'
+s$dummy_declare_gagnant_feedback_categorie <- s$gagnant_feedback_categorie == 'Gagnant'
+biprobit_feedback <- biprobit(dummy_approbation_feedback~1+dummy_declare_gagnant_feedback_categorie, rho=~1+dummy_declare_gagnant_feedback_categorie, data=s)
 summary(biprobit_feedback)
-margins(biprobit_feedback)
+margins(biprobit_feedback) # TODO: bug
 summary(margins(biprobit_feedback, variables = "dummy_declare_gagnant_feedback_categorie"))

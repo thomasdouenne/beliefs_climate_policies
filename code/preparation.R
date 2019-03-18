@@ -768,7 +768,7 @@ relabel_and_rename_s <- function() {
   names(s)[307] <<- "progressivite_progressif"
   label(s[[307]]) <<- "progressivite_progressif: Une hausse de la taxe carbone compensée avantagerait les plus modestes - après information sur la progressivité - Q206"
   names(s)[308] <<- "apres_modifs"
-  label(s[[308]]) <<- "apres_modifs: Indicatrice de la seconde moitié de l'échantillon, avec des questions et informations sur la progressivité (progressivite_feedback_avec/sans_info, progressivite_progressif) et une reformulation des questions transferts_inter (aide publique au développement des Français)"
+  label(s[[308]]) <<- "apres_modifs: Indicatrice de la seconde moitié de l'échantillon, avec une info sur l'efficacité contre la pollution et des questions et informations sur la progressivité (progressivite_feedback_avec/sans_info, progressivite_progressif), et une reformulation des questions transferts_inter (aide publique au développement des Français)" # Les scientifiques s'accordent à dire qu'une taxe carbone serait efficace pour diminuer la pollution.
   names(s)[309] <<- "aide_2p" # à partir de 03/03, 10h45 (Est Coast)
   label(s[[309]]) <<- "aide_2p: Indicatrice du troisième tiers de l'échantillon, où la question sur l'aide publique au développement propose un montant de 2% du revenu des Français (au lieu de 5%)"
   names(s)[310] <<- "aide_non_autonomie_ni"
@@ -1061,6 +1061,12 @@ convert_s <- function() {
   label(s$gain_partielle_echelle) <<- "gain_partielle_echelle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (carburants ou chauffage) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
   
   # cf. consistency_belief_losses.py pour les imputations
+  s$gain_min <<- -1000*(s$gain==-6) - 280*(s$gain==-5) - 190*(s$gain==-4) - 120*(s$gain==-3) - 70*(s$gain==-2) - 30*(s$gain==-1) + 0*(s$gain==1) + 20*(s$gain==2) + 40*(s$gain==3) + 60*(s$gain==4) + 80*(s$gain==5)
+  s$gain_max <<- -280*(s$gain==-6) - 190*(s$gain==-5) - 120*(s$gain==-4) - 70*(s$gain==-3) - 30*(s$gain==-2) - 0*(s$gain==-1) + 20*(s$gain==1) + 40*(s$gain==2) + 60*(s$gain==3) + 80*(s$gain==4) + 2000*(s$gain==5)
+  s$gain_fuel_min <<- -1000*(s$gain_fuel==-6) - 160*(s$gain_fuel==-5) - 110*(s$gain_fuel==-4) - 70*(s$gain_fuel==-3) - 40*(s$gain_fuel==-2) - 15*(s$gain_fuel==-1) + 0*(s$gain_fuel==1) + 10*(s$gain_fuel==2) + 20*(s$gain_fuel==3) + 30*(s$gain_fuel==4) + 40*(s$gain_fuel==5)
+  s$gain_fuel_max <<- -160*(s$gain_fuel==-6) - 110*(s$gain_fuel==-5) - 70*(s$gain_fuel==-4) - 40*(s$gain_fuel==-3) - 15*(s$gain_fuel==-2) - 0*(s$gain_fuel==-1) + 10*(s$gain_fuel==1) + 20*(s$gain_fuel==2) + 30*(s$gain_fuel==3) + 40*(s$gain_fuel==4) + 1000*(s$gain_fuel==5)
+  s$gain_chauffage_min <<- -1000*(s$gain_chauffage==-6) - 160*(s$gain_chauffage==-5) - 110*(s$gain_chauffage==-4) - 70*(s$gain_chauffage==-3) - 40*(s$gain_chauffage==-2) - 15*(s$gain_chauffage==-1) + 0*(s$gain_chauffage==1) + 10*(s$gain_chauffage==2) + 20*(s$gain_chauffage==3) + 30*(s$gain_chauffage==4) + 40*(s$gain_chauffage==5)
+  s$gain_chauffage_max <<- -160*(s$gain_chauffage==-6) - 110*(s$gain_chauffage==-5) - 70*(s$gain_chauffage==-4) - 40*(s$gain_chauffage==-3) - 15*(s$gain_chauffage==-2) - 0*(s$gain_chauffage==-1) + 10*(s$gain_chauffage==1) + 20*(s$gain_chauffage==2) + 30*(s$gain_chauffage==3) + 40*(s$gain_chauffage==4) + 1000*(s$gain_chauffage==5)
   temp <- -405.55*(s$gain==-6) - 224.25*(s$gain==-5) - 147.91*(s$gain==-4) - 92.83*(s$gain==-3) - 48.28*(s$gain==-2) - 13.72*(s$gain==-1) + 10.39*(s$gain==1) + 30.36*(s$gain==2) + 49.96*(s$gain==3) + 69.72*(s$gain==4) + 106.89*(s$gain==5) #  - 1.66*(s$gain==0)
   s$gain <<- as.item(temp, labels = structure(c(-405.55, -224.25, -147.91, -92.83, -48.28, -13.72, 0, 10.39, 30.36, 49.96, 69.72, 106.89), names = c("<-280", "-280_-190", "-190_-120", "-120_-70", "-70_-30", "-30_0", "0", "0_20", "20_40", "40_60", "60_80", ">80")), annotation=Label(s$gain))
   temp <- NA

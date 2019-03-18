@@ -36,6 +36,10 @@ package("ivmodel")
 package("rattle")
 package("data.table")
 package("reshape2")
+package("margins")
+package("rddtools")
+package("rddapp")
+package("mets")
 # package("ergm") 
 # package("doMC") # for parallel computing, does not work on Windows
 

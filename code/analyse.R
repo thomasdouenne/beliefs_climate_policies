@@ -861,3 +861,56 @@ confirmation_bias(nb_bin = 1, method='mean')
 
 # Bizarre: les gain = non affectés sont en moyenne perdants selon simule_gain ! (valable selon quand on pondère) => TODO: clean numbers simule_gain
 decrit(s$simule_gain[s$gain==0 & s$variante_taxe_info=='f'], weights= s$weight[s$gain==0 & s$variante_taxe_info=='f'])
+
+
+##### Graph distributions subjective/objective gains #####
+objective_gains <- read.csv2("df_objective_gains.csv")
+subjective_gains <- read.csv2("df_subjective_gains.csv")
+objective_gains$transport <- n(objective_gains$gain_net_numeric_uc_fuel)
+objective_gains$housing <- n(objective_gains$gain_net_numeric_uc_chauffage)
+objective_gains$all <- n(objective_gains$gain_net_numeric_uc_taxe_carbone)
+subjective_gains$transport <- n(subjective_gains$subjective_gain_numeric_fuel)
+subjective_gains$housing <- n(subjective_gains$subjective_gain_numeric_chauffage)
+subjective_gains$all <- n(subjective_gains$subjective_gain_numeric_taxe_carbone)
+
+
+mar_old <- par()$mar
+cex_old <- par()$cex
+par(mar = c(2.1, 4.1, 1.1, 0.1), cex=1.5)
+plot(density(objective_gains$transport, bw=30), xlim=c(-400, 200), lwd=2, col="blue", xlab="", main="") + grid()
+lines(density(subjective_gains$transport, bw=30), xlim=c(-400, 200), lwd=2, col="red")
+
+plot(density(objective_gains$housing, bw=30), xlim=c(-400, 200), lwd=2, col="blue", xlab="", main="") + grid()
+lines(density(subjective_gains$housing, bw=30), xlim=c(-400, 200), lwd=2, col="red")
+
+plot(density(objective_gains$all, bw=30), xlim=c(-400, 200), lwd=2, col="blue", xlab="", main="") + grid()
+lines(density(subjective_gains$all, bw=30), xlim=c(-400, 200), lwd=2, col="red")
+
+cdf_transport <- Ecdf(objective_gains$transport)
+cdf_transport_min <- Ecdf(s$gain_fuel_min)
+cdf_transport_max <- Ecdf(s$gain_fuel_max)
+plot(Ecdf(s$gain_fuel), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_transport$x, cdf_transport$y, lwd=2, col="blue")
+lines(cdf_transport_min$x, cdf_transport_min$y, type="s", lty=2, col="red")
+lines(cdf_transport_max$x, cdf_transport_max$y, type="s", lty=2, col="red")
+axis(1, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
+
+cdf_housing <- Ecdf(objective_gains$housing)
+cdf_housing_min <- Ecdf(s$gain_chauffage_min)
+cdf_housing_max <- Ecdf(s$gain_chauffage_max)
+plot(Ecdf(s$gain_chauffage), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_housing$x, cdf_housing$y, lwd=2, col="blue")
+lines(cdf_housing_min$x, cdf_housing_min$y, type="s", lty=2, col="red")
+lines(cdf_housing_max$x, cdf_housing_max$y, type="s", lty=2, col="red")
+axis(1, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
+
+cdf_all <- Ecdf(objective_gains$all)
+cdf_min <- Ecdf(s$gain_min)
+cdf_max <- Ecdf(s$gain_max)
+plot(Ecdf(s$gain), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_all$x, cdf_all$y, lwd=2, col="blue")
+lines(cdf_min$x, cdf_min$y, type="s", lty=2, col="red")
+lines(cdf_max$x, cdf_max$y, type="s", lty=2, col="red")
+axis(1, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
+
+par(mar = mar_old, cex = cex_old)
