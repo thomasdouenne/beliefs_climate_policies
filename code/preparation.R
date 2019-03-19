@@ -128,6 +128,7 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # 
 # # Déciles de revenus inflatés : (croissance PIB 2014-2018	1.06075007	https://www.insee.fr/fr/statistiques/2830613#tableau-Tableau1 )
 # deciles_erfs_inflates <- 1.06075007*seuils_all(quantiles(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17]))
+# # This is the one used:
 # round(deciles_erfs_inflates) # 229 779 1142 1429 1671 1922 2222 2641 3436
 # deciles_erfs_inflates_weighted <- 1.06075007*seuils_all(quantiles(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17], weights = db$wprm[!is.na(db$revtot_i_par) & db$age > 17]))
 # round(deciles_erfs_inflates_weighted) # 237 789 1151 1436 1677 1927 2231 2657 3462
@@ -138,6 +139,22 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # # plot(distribution_revenu_erfs$x, distribution_revenu_erfs$ecdf, type='l', xlim=c(0,60000), col="blue")
 # distribution_rev_tot_erfs <- wtd.Ecdf(db$revdecm + db$presta_sociales)
 # distribution_rev_tot_erfs_weighted <- wtd.Ecdf(db$revdecm + db$presta_sociales, weights = db$wprm)
+# 
+# # Distribution of adults > 70th. income percentile in function of their spouse income
+# db$revenu_conjoint <- db$revdecm + db$presta_sociales - db$revtot_i_par # selon la définition du sondage où il n'y a que deux parents
+# db$revenu_conjoint[db$nb_adultes < 2] <- 9999*12
+# share__20 <- length(which((db$revtot_i_par < 734*12 | (db$revenu_conjoint < 734*12 & db$revtot_i_par > 2095*12)) & !is.na(db$revtot_i_par) & db$age > 17))/length(which(!is.na(db$revtot_i_par) & db$age > 17))
+# share_20_30 <- length(which(((db$revtot_i_par < 1077*12 & db$revtot_i_par >= 734*12) | (db$revenu_conjoint < 1077*12 & db$revenu_conjoint >= 734*12 & db$revtot_i_par > 2095*12)) & !is.na(db$revtot_i_par) & db$age > 17))/length(which(!is.na(db$revtot_i_par) & db$age > 17))
+# share_30_40 <- length(which(((db$revtot_i_par < 1347*12 & db$revtot_i_par >= 1077*12) | (db$revenu_conjoint < 1347*12 & db$revenu_conjoint >= 1077*12 & db$revtot_i_par > 2095*12)) & !is.na(db$revtot_i_par) & db$age > 17))/length(which(!is.na(db$revtot_i_par) & db$age > 17))
+# share_40_50 <- length(which(((db$revtot_i_par < 1575*12 & db$revtot_i_par >= 1347*12) | (db$revenu_conjoint < 1575*12 & db$revenu_conjoint >= 1347*12 & db$revtot_i_par > 2095*12)) & !is.na(db$revtot_i_par) & db$age > 17))/length(which(!is.na(db$revtot_i_par) & db$age > 17))
+# share_50_70 <- length(which(((db$revtot_i_par < 2095*12 & db$revtot_i_par >= 1575*12) | (db$revenu_conjoint < 2095*12 & db$revenu_conjoint >= 1575*12 & db$revtot_i_par > 2095*12)) & !is.na(db$revtot_i_par) & db$age > 17))/length(which(!is.na(db$revtot_i_par) & db$age > 17))
+# share_70_ <- length(which(db$revtot_i_par >= 2095*12 & db$revenu_conjoint >= 2095*12 & !is.na(db$revtot_i_par) & db$age > 17))/length(which(!is.na(db$revtot_i_par) & db$age > 17))
+# sum(c(share__20, share_20_30, share_30_40, share_40_50, share_50_70, share_70_))
+# expected_target_proportions <- share_70_ / 4 + c('20' = share__20 + share_20_30/2, '30' = share_20_30/2 + share_30_40/2, '40' = share_30_40/2 + share_40_50/2, '50' = share_40_50/2 + share_50_70)
+# round(expected_target_proportions, 3) 
+# # decrit(s$cible) # incredibly close!
+# # shares <- c('_20' = share__20, '20_30'=share_20_30, '30_40'=share_30_40, '40_50'=share_40_50, '50_70'=share_50_70, '70_'=share_70_)
+# # decrit(s$categorie_cible)
 # 
 # rm(db, temp, irft4, menage, indiv)
 # setwd(wd)
@@ -831,6 +848,10 @@ convert_s <- function() {
   label(s$transferts_inter) <<- "transferts_inter: Approbation d'un transfert de 5% des revenus des pays riches vers les pays pauvres"
   # s$transferts_inter <<- as.item(as.numeric(s$transferts_inter), missing.values=-1, annotation="transferts_inter: Transferts internationaux, variantes (simple) avec curseur 0-20% (s) ou champ (Quelle % des revenus des pays riches devrait être transférée aux pays pauvres ?) - Q73,91")
 
+  s$mauvaise_qualite <<- 0 # 99% if we exclude those from revenu, 92% otherwise
+  s$mauvaise_qualite[n(s$revenu) > n(s$rev_tot)] <<- 1 + s$mauvaise_qualite[n(s$revenu) > n(s$rev_tot)] # 164
+  s$mauvaise_qualite[n(s$revenu) > 10000] <<- 1 + s$mauvaise_qualite[n(s$revenu) > 10000] # 58
+  s$mauvaise_qualite[n(s$rev_tot) > 10000] <<- 1 + s$mauvaise_qualite[n(s$rev_tot) > 10000] # 55
   s$revenu <<- clean_number(s$revenu, high_numbers='divide')
   s$rev_tot <<- clean_number(s$rev_tot, high_numbers='divide')
   for (i in c( # TODO: check number outliers 
@@ -847,6 +868,17 @@ convert_s <- function() {
     s[[i]] <<- as.numeric(as.vector(s[[i]]))
     label(s[[i]]) <<- lab
   }
+  
+  s$mauvaise_qualite[s$taille_menage < s$nb_adultes | s$taille_menage < s$nb_14_et_plus] <<- 1.3 + s$mauvaise_qualite[s$taille_menage < s$nb_adultes | s$taille_menage < s$nb_14_et_plus] # 15
+  s$mauvaise_qualite[s$taille_menage > 12] <<- 1.3 + s$mauvaise_qualite[s$taille_menage > 12] # 10
+  s$mauvaise_qualite[s$nb_14_et_plus > 10] <<- 1 + s$mauvaise_qualite[s$nb_14_et_plus > 10] # 2
+  s$mauvaise_qualite[s$km > 10^6] <<- 1 + s$mauvaise_qualite[s$km > 10^6] # 1
+  s$mauvaise_qualite[s$surface < 9] <<- 1 + s$mauvaise_qualite[s$surface < 9] # 6
+  s$mauvaise_qualite[s$surface >= 1000] <<- 1 + s$mauvaise_qualite[s$surface >= 1000] # 4
+  label(s$mauvaise_qualite) <<- "mauvaise_qualite: Indicatrice d'une réponse aberrante à revenu, taille_menage, nb_14_et_plus, km ou surface."
+  s$duree_info_courte[n(s$info_CC) + n(s$info_PM) > 0] <<- FALSE # 15%
+  s$duree_info_courte[s$duree_info_CC < 5 | s$duree_info_PM < 5 | s$duree_info_CC_PM < 5] <<- T # 327
+  label(s$duree_info_courte) <<- "duree_info_courte: Indicatrice d'un temps de lecture inférieur à 5 secondes pour les informations du début."
 
   for (j in c("taxe_efficace", "rattrapage_diesel", "enfant_CC", "mode_vie_ecolo", "schiste_approbation", 
               "transferts_inter_a", "transferts_inter_a_info", "transferts_inter", "taxe_approbation",
@@ -1011,7 +1043,7 @@ convert_s <- function() {
 	  )
   	for (i in 1:9) if (as.numeric(code) %in% as.numeric(regions[[i]])) reg <- names(regions)[i]
 	  return(reg)
-	}
+	} # TODO: pourquoi Centre excède de 20% le quota? Pourquoi y a-t-il aussi des excès dee quotas dans taille_agglo?
   region_dep <- rep("", 95)
   for (i in 1:95) region_dep[i] <- region_code(i)
   s$region <<- "autre"

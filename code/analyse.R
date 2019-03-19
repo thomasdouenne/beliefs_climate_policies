@@ -16,7 +16,7 @@ lines(distribution_rev_tot$x, distribution_rev_tot$ecdf, col="orange", type='l',
 legend("bottomright", lwd=2, col=c("blue", "orange"), title = "Income distribution from:", title.col = "black", text.col = c("blue", "orange"), legend=c("ERFS (true)", "BCP (our survey)"))
 
 
-##### Durées #####
+##### Durées et qualité #####
 decrit(s$duree/60) # 18 min (moyenne 24)
 decrit(s$duree_depenses/60) # 2 min (moyenne 3.5)
 decrit(s$duree_champ_libre/60) # 0.1 min (moyenne 1)
@@ -29,6 +29,25 @@ plot(density(sa$duree/60), xlim=c(0,30))
 plot(Ecdf(sa$duree/60)$x, Ecdf(sa$duree/60)$ecdf)
 sa$duree_min <- sa$duree/60
 Ecdf(sa$duree_min) 
+# significant correlation:
+summary(lm(age ~ I(duree/60), data=s, weights = s$weight)) # -.002**
+summary(lm(revenu ~ I(duree/60), data=s, weights = s$weight)) # -.15*
+summary(lm(sexe=='Masculin' ~ I(duree/60), data=s, weights = s$weight)) # -.00004*
+# Uncorrelated:
+summary(lm(Diplome ~ duree, data=s, weights = s$weight))
+summary(lm(taille_agglo ~ duree, data=s, weights = s$weight))
+# Uncorrelated with preferences:
+summary(lm(taxe_approbation!='Non' ~ duree, data=s, weights = s$weight))
+summary(lm(gagnant_categorie!='Perdant' ~ duree, data=s, weights = s$weight))
+summary(lm(gain ~ duree, data=s, weights = s$weight))
+summary(lm(taxe_approbation!='Non' ~ duree + I(duree^2), data=s, weights = s$weight)) # .
+summary(lm(gagnant_categorie!='Perdant' ~ duree + I(duree^2), data=s, weights = s$weight))
+summary(lm(gain ~ duree + I(duree^2), data=s, weights = s$weight))
+
+# mauvaise_qualite uncorrelated with preferences
+summary(lm(taxe_approbation!='Non' ~ mauvaise_qualite, data=s, weights = s$weight))
+summary(lm(gagnant_categorie!='Perdant' ~ mauvaise_qualite, data=s, weights = s$weight))
+summary(lm(gain ~ mauvaise_qualite, data=s, weights = s$weight))
 
 
 ##### Caractéristiques énergétiques #####
