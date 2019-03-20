@@ -1,0 +1,77 @@
+%% LyX 2.3.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english,french]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=3cm,bmargin=3cm,lmargin=2cm,rmargin=2cm}
+\usepackage{float}
+\usepackage{graphicx}
+
+\makeatletter
+\@ifundefined{showcaptionsetup}{}{%
+ \PassOptionsToPackage{caption=false}{subfig}}
+\usepackage{subfig}
+\makeatother
+
+\usepackage{babel}
+\makeatletter
+\addto\extrasfrench{%
+   \providecommand{\og}{\leavevmode\flqq~}%
+   \providecommand{\fg}{\ifdim\lastskip>\z@\unskip\fi~\frqq}%
+}
+
+\makeatother
+\begin{document}
+
+\title{Opinions des Français sur les Politiques Environnementales}
+
+\author{Thomas Douenne et Adrien Fabre\thanks{Université Paris 1 --- PSE. thomas.douenne@sciencespo.fr; adrien.fabre@ens.fr}}
+\maketitle
+\begin{abstract}
+.
+
+\newpage{}
+\end{abstract}
+
+\appendix
+
+\section{Résultats d'Enquêtes}
+
+Les résultats proviennent d'une enquête réalisée par internet en février
+et mars 2019 sur un échantillon représentatif de 3002 Français, à
+l'exception du dernier graphique, qui provient d'une enquête administrée
+en 2016.
+
+\begin{figure}[H]
+\centering\includegraphics[width=0.95\columnwidth]{images/politiques_environnementales}
+\end{figure}
+\begin{figure}[H]
+\centering\includegraphics[width=1\columnwidth]{images/taxe_condition}
+\end{figure}
+
+\selectlanguage{english}%
+\begin{figure}[h]
+\selectlanguage{french}%
+\makebox[\textwidth][c]{\foreignlanguage{english}{}\subfloat{\selectlanguage{english}%
+\includegraphics[width=0.55\columnwidth]{images/gagnants}\selectlanguage{french}%
+}\foreignlanguage{english}{\qquad{}}\subfloat{\selectlanguage{english}%
+\includegraphics[width=0.55\columnwidth]{images/perdants}\selectlanguage{french}%
+}\foreignlanguage{english}{}}\selectlanguage{english}%
+\end{figure}
+\begin{figure}
+\centering\includegraphics[width=1\columnwidth]{images/benefices}
+\end{figure}
+\begin{figure}
+\centering\includegraphics[width=1\columnwidth]{images/problemes}
+\end{figure}
+
+\selectlanguage{french}%
+\begin{figure}
+\centering\includegraphics[width=1\columnwidth]{\string"images/climat sondage automne 2016\string".eps}
+
+\caption{Résultats d'un sondage réalisé à l'automne 2016 sur un échantillon
+représentatif de 545 Français.}
+\end{figure}
+
+\end{document}

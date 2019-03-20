@@ -606,6 +606,7 @@ barres_perdants_GJ_oppose
 
 
 ##### Régressions: 2.1 OLS gagnant_cible_categorie ######
+# s$tax_acceptance <- s$taxe_approbation != 'Non' # TODO: preparation
 # cible_approbation_by_group <- as.data.table(s)[, .(mean=wtd.mean(taxe_cible_approbation!='Non', weight)), by=list(gagnant_cible_categorie!='Perdant', taxe_approbation!='Non')]
 # cible_approbation_by_group
 # xtable(cible_approbation_by_group)
@@ -712,7 +713,31 @@ gagnant_f.hat <- fitted.values(tsls_rdd_feedback_D)
 summary(lm((taxe_feedback_approbation != 'Non') ~ gagnant_f.hat + taxe_approbation + simule_gain + I(simule_gain^2), data=s, weights = s$weight))
 
 
+##### Régressions: progressivité #####
+decrit(s$progressivite[s$info_progressivite==T])
+decrit(s$progressivite[s$info_progressivite==FALSE])
+# On ne convainc pas les répondants que la taxe est progressive !
+tsls1_progressivite <- lm((progressivite!='Non') ~ info_progressivite, data=s, weights = s$weight, na.action="na.exclude")
+summary(tsls1_progressivite)
+progressivite.hat <- fitted.values(tsls1_progressivite)
+# OLS: 0.56***
+summary(lm((taxe_info_approbation!='Non') ~ (progressivite!='Non'), data=s, weights = s$weight)) # TODO: rajouter contrôles
+# OLS forme réduite comme 2SLS ne fonctionnent pas
+summary(lm((taxe_info_approbation!='Non') ~ progressivite.hat, data=s, weights = s$weight))
+summary(lm((taxe_info_approbation!='Non') ~ info_progressivite, data=s, weights = s$weight))
+# petit effet: 0.03. sur la différence d'acceptation
+summary(lm(((taxe_info_approbation!='Non') - (taxe_approbation!='Non')) ~ info_progressivite, data=s, weights = s$weight))
+
+# OLS1: 9*** p.p. Peut-être que même sans changer d'avis, le 5/6 les convainc que leur groupe va gagner, donc que c'est progressif
+tsls1_progressivite <- lm((progressivite!='Non') ~ simule_gagnant + (gagnant_categorie!='Perdant') + simule_gain + taxe_approbation, data=s, weights = s$weight, na.action="na.exclude")
+summary(tsls1_progressivite)
+progressivite.hat <- fitted.values(tsls1_progressivite)
+# OLS: 138*** p.p. 
+summary(lm((taxe_info_approbation!='Non') ~ progressivite.hat + (gagnant_categorie!='Perdant') + simule_gain + taxe_approbation, data=s, weights = s$weight))
+
+
 ##### Régressions: persistance des croyances #####
+# TODO: étudier les gens gagnant en pouvoir d'achat mais perdant en utilité (en prenant une élasticité nulle)
 # 3.1 apprendre qu'on est (simulé) gagnant augmente la croyance de ne pas perdre de 23%***
 croyances_1 <- lm(((gagnant_feedback_categorie!='Perdant') - (gagnant_categorie!='Perdant')) ~ simule_gagnant + simule_gain + I(simule_gain^2), data=s, weights = s$weight, na.action="na.exclude")
 summary(croyances_1)
@@ -768,6 +793,11 @@ label(s$feedback_infirme_large) <- "feedback_infirme_large: Indicatrice de se pe
 # summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ simule_gagnant*(gagnant_categorie=='Gagnant'), data=s, weights=s$weight))
 decrit(s$feedback_infirme) # 45%
 decrit(s$feedback_infirme_large) # 70%
+decrit(s$update_correct[s$feedback_infirme==T])
+decrit(s$update_correct[s$feedback_infirme==T & s$simule_gagnant==1])
+decrit(s$update_correct[s$feedback_infirme==T & s$simule_gagnant==0])
+sum(s$weight[s$feedback_infirme & s$simule_gagnant==1])/3002 # 51%
+sum(s$weight[!is.na(s$update_correct) & s$update_correct==1 & s$feedback_infirme & s$simule_gagnant==1])/sum(s$weight[!is.na(s$update_correct) & s$feedback_infirme & s$simule_gagnant==1]) # 12%
 # 3.3 Les gens qui se croient gagnants updatent plus correctement que les autres lorsqu'ils doivent le faire
 summary(lm(update_correct_large ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight))
 summary(lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme==T, data=s, weights = s$weight)) # Non affectés exclus par feedback_infirme
@@ -913,7 +943,8 @@ lines(cdf_transport$x, cdf_transport$y, lwd=2, col="blue")
 lines(cdf_transport_min$x, cdf_transport_min$y, type="s", lty=2, col="red")
 lines(cdf_transport_max$x, cdf_transport_max$y, type="s", lty=2, col="red")
 axis(1, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
-
+abline(v = c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.5), lwd=0.2)
+# TODO: finir ça, avec les valeurs de l'échelle au-dessus
 cdf_housing <- Ecdf(objective_gains$housing)
 cdf_housing_min <- Ecdf(s$gain_chauffage_min)
 cdf_housing_max <- Ecdf(s$gain_chauffage_max)
@@ -933,3 +964,26 @@ lines(cdf_max$x, cdf_max$y, type="s", lty=2, col="red")
 axis(1, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
 
 par(mar = mar_old, cex = cex_old)
+
+
+##### Transports en commun #####
+decrit(s$transports_avis, weights = s$weight, miss=T)
+
+table_taille_agglo_transports <- round(crosstab(s[s$transports_avis!='NSP',], row.vars="taille_agglo", col.vars="transports_avis", type="j", dec.places = 0)$crosstab)
+table_taille_agglo_transports[1:5, ] <- round(crosstab(s[s$transports_avis!='NSP',], row.vars="taille_agglo", col.vars="transports_avis", type="r", dec.places = 0)$crosstab)
+table_taille_agglo_transports
+xtable(table_taille_agglo_transports, digits=0)
+# print(xtable(table_taille_agglo_transports, digits=0), file="table_taille_agglo_transports.tex")
+
+decrit(s$transports_distance, weights = s$weight)
+length(which(s$transports_distance <= 5))/length(which(!is.na(s$transports_distance))) # 49%
+length(which(s$transports_distance <= 15))/length(which(!is.na(s$transports_distance))) # 77%
+decrit(s$transports_frequence, weights = s$weight)
+decrit(s$transports_courses, weights = s$weight)
+decrit(s$transports_loisirs, weights = s$weight)
+decrit(s$transports_travail, weights = s$weight)
+decrit(s$transports_travail[s$transports_travail!='Non concerné·e'], weights = s$weight[s$transports_travail!='Non concerné·e'])
+decrit(s$transports_travail_commun, weights = s$weight) # TODO: preparation
+decrit(s$transports_travail_actif, weights = s$weight)
+decrit(s$transports_travail_actif=='Non' & s$transports_travail_commun=='Non', weights = s$weight)
+decrit(s$transports_travail_actif=='Oui, ça ne me poserait pas de grande difficulté' | s$transports_travail_commun=='Oui, ça ne me poserait pas de grande difficulté', weights = s$weight)

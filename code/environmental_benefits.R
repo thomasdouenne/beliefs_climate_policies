@@ -13,7 +13,10 @@ summary(lm(taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * info_CC * (ta
 summary(lm(taxe_approbation!='Non' ~ apres_modifs, data=s, weights = s$weight))
 
 ##### IV: A ~ efficace ~ info_CC/PM #####
-# 2SLS avec benefices_CC: effet de 110* p.p. !
+# Pourquoi l'instrument info_CC/PM fonctionne mais pas apres_modifs? Peut-être que l'info convainc plus en profondeur les gens,
+#   i.e. les convainc de la nécessité d'une taxe car le CC est grave; alors que les ancré à ce que la taxe est efficace les fait 
+#   répondre qu'elle l'est par automatisme, sans changer leur acceptation pour autant
+# 2SLS avec taxe_efficace: effet de 110* p.p. !
 decrit(s$taxe_efficace, weights = s$weight)
 tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM, data=s, weights = s$weight)
 summary(tsls1)
@@ -22,6 +25,24 @@ summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weig
 # Simple OLS: 0.51 cf. Logit pour les contrôles
 summary(lm(taxe_approbation!='Non' ~ (taxe_efficace != 'Non'), data=s, weights = s$weight))
 summary(lm((s$taxe_approbation == 'Oui') ~ (s$taxe_efficace == 'Oui'), data=s, weights = s$weight)) # 0.43
+
+# 0.52.
+tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM + apres_modifs, data=s, weights = s$weight)
+summary(tsls1)
+taxe_efficace.hat <- fitted.values(tsls1)
+summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weight))
+
+# 2SLS avec seulement info_CC: 202** p.p. !
+tsls1<-lm(taxe_efficace != 'Non' ~ info_CC, data=s, weights = s$weight)
+summary(tsls1)
+taxe_efficace.hat <- fitted.values(tsls1)
+summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weight))
+
+# 2SLS avec oui 0.55
+tsls1<-lm(taxe_efficace == 'Oui' ~ info_CC * info_PM, data=s, weights = s$weight)
+summary(tsls1)
+taxe_efficace.hat <- fitted.values(tsls1)
+summary(lm(taxe_approbation=='Oui' ~ taxe_efficace.hat, data=s, weights = s$weight))
 
 # 2SLS avec benefices_CC: pareil, effet de 106** p.p. 
 decrit(s$benefices_CC, weights = s$weight)
@@ -128,3 +149,8 @@ summary(lm((as.factor(s$cause_CC)=='anthropique') ~ info_CC, data=s, weights = s
 summary(lm(emission_cible ~ info_CC, data=s, weights = s$weight))
 summary(lm(generation_CC_2020==T ~ info_CC, data=s, weights = s$weight))
 summary(lm(responsable_CC_govts==T ~ info_CC, data=s, weights = s$weight))
+
+
+##### Stats descriptives #####
+decrit(s$taxe_efficace[s$apres_modifs==T], miss=T)
+decrit(s$taxe_efficace[s$apres_modifs==FALSE], miss=T)

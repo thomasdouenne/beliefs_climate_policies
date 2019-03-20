@@ -1,0 +1,583 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language french
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\topmargin 3cm
+\rightmargin 2cm
+\bottommargin 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style french
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Opinions des Français sur les Politiques Environnementales
+\end_layout
+
+\begin_layout Author
+Thomas Douenne et Adrien Fabre
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Université Paris 1 Panthéon-Sorbonne & École d'Économie de Paris
+\end_layout
+
+\end_inset
+
+Université Paris 1 — PSE.
+ thomas.douenne@sciencespo.fr; adrien.fabre@ens.fr
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Abstract
+.
+\end_layout
+
+\begin_layout Standard
+Cette note rapporte les résultats d'un sondage conduit en février et mars
+ 2019 sur un échantillon représentatif de 3002 Français.
+ Il permet de comprendre le positionnement des Français vis-à-vis des politiques
+ environnementales, et en particulier de la taxe carbone.
+ Le sondage a été constitué de telle sorte que l'on puisse séparer l'effet
+ des préférences de l'effet de l'information sur le positionnement des Français.
+\end_layout
+
+\begin_layout Paragraph
+La principale réforme testée
+\end_layout
+
+\begin_layout Standard
+Nous proposons aux répondants une augmentation de la contribution climat
+ énergie (CCE) de 50
+\backslash
+euro{}/tCO$_2$ dont les recettes prélevées sur les ménages leur seraient
+ redistribuées uniformément à hauteur de 110
+\backslash
+euro{} par an par adulte.
+\backslash
+footnote{Ainsi, en considérant que les entreprises ne seraient pas compensées
+ et qu'elles ont la même élasticité que les ménages ($-0.3$), la réforme
+ rapporterait 4 milliards d'euros à l'État.} Considérant le versement annuel
+ et les augmentations de prix — +13
+\backslash
+% (resp.
+ +15
+\backslash
+%) sur le gaz (resp.
+ le fioul domestique) et +0,11
+\backslash
+euro{}/L (resp.
+ +0,13
+\backslash
+euro{}/L) sur l'essence (resp.
+ le diesel), nous demandons ensuite aux répondants d'estimer si cette réforme
+ augmenterait ou diminuerait leur pouvoir d'achat.
+ Nous leur demandons ensuite d'estimer une fourchette de gains/pertes annuelles.
+ Enfin, nous leur demandons s'ils approuveraient ou non cette réforme.
+\end_layout
+
+\begin_layout Paragraph
+Désapprobation et pessimisme...
+\end_layout
+
+\begin_layout Standard
+Les résultats sont clairs : l'approbation de la réforme proposée est très
+ faible.
+ 71
+\backslash
+% des sondés désapprouvent la taxe proposée, tandis que 10
+\backslash
+% l'approuvent et 19
+\backslash
+% ne se prononcent pas (NSP).
+ Toutefois, en comparant les gains/pertes subjectives des ménages vis-à-vis
+ de ceux objectifs estimés sur les enquêtes Insee
+\backslash
+footnote{Enquête Budget de Famille 2011} via un modèle de microsimulation,
+ il apparaît également que les répondants sur-estiment largement l'effet
+ négatif de la taxe carbone sur leur pouvoir d'achat.
+ Alors que nous estimons que plus de 70
+\backslash
+% d'entre eux devraient voir leur pouvoir d'achat augmenter suite à cette
+ réforme, ils ne sont que 14
+\backslash
+% à effectivement considérer que leur pouvoir d'achat augmenterait, 21
+\backslash
+% pensant qu'ils seraient non affectés et 65
+\backslash
+% qu'ils seraient perdants.
+ La faible approbation à la réforme pourrait donc s’expliquer par des croyances
+ erronées (et donc pouvant potentiellement être corrigées) sur la réalité
+ de ses effets.
+\end_layout
+
+\begin_layout Paragraph
+...
+ expliqués par l'ignorance
+\end_layout
+
+\begin_layout Standard
+Nous explorons ensuite l’effet de trois déterminants possibles de l’acceptation
+ de la réforme : le fait de se savoir gagnant, le fait de savoir que la
+ réforme est en moyenne progressive, et le fait de croire en son efficacité
+ environnementale.
+ Notre méthodologie consiste à donner aléatoirement des informations aux
+ répondants sur ces trois facteurs, ce qui nous permet d’identifier isolément
+ et « toutes choses égales par ailleurs » l’effet de chacun ces déterminants
+ sur l’approbation.
+ Nous trouvons que lorsque les ménages apprennent qu'ils seront gagnants
+ et qu'ils croient à cette information, leur acceptation augmente en moyenne
+ de 50 points de pourcentages.
+ Les résultats sont similaires lorsqu'ils apprennent que la réforme est
+ progressive, ou qu'elle serait efficace pour réduire la pollution et les
+ émissions.
+ 
+\end_layout
+
+\begin_layout Paragraph
+...
+ et une grande méfiance
+\end_layout
+
+\begin_layout Standard
+Hélas, les croyances sont persistantes.
+ 60
+\backslash
+% pensent que la réforme n'avantagerait pas les plus modestes, qu'on leur
+ explique ou pas qu'elle serait progressive.
+ Dire que les scientifiques s'accordent sur l'efficacité environnementale
+ de la réforme ne fait que passer de 14
+\backslash
+% à 18
+\backslash
+% la part des répondants pensant qu'elle permettrait de réduire la pollution
+ et de lutter contre le changement climatique.
+ Aussi, sur les 51
+\backslash
+% de répondants qui se pensent perdants alors qu'ils seraient gagnants,
+ seuls 12
+\backslash
+% changent d'avis quand nous leur expliquons qu'ils ont 5 chances sur 6
+ d'être gagnants, d'après nos calculs utilisant les caractéristiques énergétique
+s qu'ils ont renseigné (taille du logement, type de chauffage, kilométrage
+ et consommation des véhicules).
+ Pis, les révisions semblent biaisées à la perte, car 85
+\backslash
+% des 34 répondants qui se croient à tort gagnants corrigent leur croyance.
+ Nous observons également un biais de confirmation : les répondants se mettent
+ davantage à accepter la réforme quand nous leur confirmons qu'ils gagnent
+ que quand nous leur apprenons qu'ils gagnent.
+ Ces résultats résonnent avec ceux d'Alesina et al.
+ (2018) que 85
+\backslash
+% des Français ont une vision négative du gouvernement.
+\end_layout
+
+\begin_layout Standard
+Toute la difficulté consiste donc à aligner les croyances subjectives des
+ citoyens avec les faits objectifs.
+ Nos résultats suggèrent que l'ancrage des croyances est élevé.
+ Lorsque l'on soumet aux sondés de nouvelles informations, celles-ci ne
+ sont que partiellement prises en compte.
+ Nous quantifions ce phénomène en calculant en temps réel pour chaque ménage
+ une estimation de ses gains ou pertes et en les informant que nous estimons
+ qu'ils auraient 5 chances sur 6 d'être gagnants ou perdants.
+ Lorsqu'on les ré-interroge sur l'effet de la politique sur leur pouvoir
+ d'achat, on observe qu'en moyenne les répondants sont très peu réceptifs
+ à la nouvelle information.
+ En particulier, les sondés sont très peu réceptifs lorsqu'on leur apprend
+ que la politique pourrait augmenter leur pouvoir d'achat, mais beaucoup
+ plus lorsqu'on leur dit qu'elle pourrait le baisser.
+ Nous interprétons ce résultat comme une réaction biaisée du fait d'un mauvais
+ 
+\backslash
+textit{a priori} vis-à-vis de la politique.
+\end_layout
+
+\begin_layout Subsection*
+Autres Politiques Environnementales
+\end_layout
+
+\begin_layout Standard
+Plutôt qu'une taxe, les Français préfèrent des mesures dont les coûts sont
+ « cachés », à l'excpetion notable.
+ Et surtout, des mesures qui portent sur les nouveaux équipements plutôt
+ que sur les anciens.
+ Ainsi, plus de 70% des Français approuveraient des normes plus strictes
+ sur les nouveaux véhicules, ou une politique ambitieuse de rénovation thermique
+ des bâtiments.
+\end_layout
+
+\begin_layout Paragraph
+Transports en commun
+\end_layout
+
+\begin_layout Abstract
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Résultats d'Enquêtes
+\end_layout
+
+\begin_layout Standard
+Les résultats proviennent d'une enquête réalisée par internet en février
+ et mars 2019 sur un échantillon représentatif de 3002 Français, à l'exception
+ du dernier graphique, qui provient d'une enquête administrée en 2016.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename images/politiques_environnementales.png
+	width 95col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename images/taxe_condition.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+makebox[
+\backslash
+textwidth][c]{
+\end_layout
+
+\end_inset
+
+
+\lang english
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset Graphics
+	filename images/gagnants.png
+	width 55col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \qquad{}
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset Graphics
+	filename images/perdants.png
+	width 55col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename images/benefices.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\lang english
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename images/problemes.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename images/climat sondage automne 2016.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Résultats d'un sondage réalisé à l'automne 2016 sur un échantillon représentatif
+ de 545 Français.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

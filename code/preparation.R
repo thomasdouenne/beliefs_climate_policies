@@ -948,8 +948,8 @@ convert_s <- function() {
                           # names = c("NSP","Insuffisante","Limitée, mais suffisante","Convenable, mais devrait être accrue","Satisfaisante")),
                         missing.values = -1, annotation=Label(s$transports_avis))
   
-  labels(s$transports_travail_commun) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
-  labels(s$transports_travail_actif) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
+  # labels(s$transports_travail_commun) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
+  # labels(s$transports_travail_actif) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
   s$Transports_travail_commun <<- s$transports_travail_commun
   s$Transports_travail_actif <<- s$transports_travail_actif
   s$Transports_travail_commun[is.na(s$Transports_travail_commun)] <<- "Non concerné"

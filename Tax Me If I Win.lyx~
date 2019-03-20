@@ -662,7 +662,7 @@ Sample
 \end_inset
 
 
-\begin_inset VSpace medskip
+\begin_inset VSpace bigskip
 \end_inset
 
 
@@ -1173,7 +1173,7 @@ Sample
 \end_inset
 
 
-\begin_inset VSpace medskip
+\begin_inset VSpace bigskip
 \end_inset
 
 
@@ -1516,7 +1516,7 @@ Sample
 \end_inset
 
 
-\begin_inset VSpace medskip
+\begin_inset VSpace bigskip
 \end_inset
 
 
@@ -2448,8 +2448,8 @@ Our main reform of interest is an increase by 50€/t
 \end_inset
 
  of the French carbon tax, that concerns both housing and transport.
- Its revenues redistributed equally, so that each adult receives a yearly
- compensation of 110€.
+ The revenues generated are redistributed equally, so that each adult receives
+ a yearly compensation of 110€.
  This amount was computed using the estimations of 
 \begin_inset CommandInset citation
 LatexCommand citet

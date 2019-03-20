@@ -40,6 +40,7 @@ package("margins")
 package("rddtools")
 package("rddapp")
 package("mets")
+package("plyr")
 # package("ergm") 
 # package("doMC") # for parallel computing, does not work on Windows
 

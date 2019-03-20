@@ -148,6 +148,21 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Sample-Characteristics"
+
+\end_inset
+
+Sample Characteristics
+\end_layout
+
+\end_inset
+
+
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
 <features tabularvalignment="middle">
@@ -2278,24 +2293,6 @@ Sample
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:Sample-Characteristics"
-
-\end_inset
-
-Sample Characteristics
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -2448,8 +2445,8 @@ Our main reform of interest is an increase by 50€/t
 \end_inset
 
  of the French carbon tax, that concerns both housing and transport.
- Its revenues redistributed equally, so that each adult receives a yearly
- compensation of 110€.
+ The revenues generated are redistributed equally, so that each adult receives
+ a yearly compensation of 110€.
  This amount was computed using the estimations of 
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -2692,6 +2689,21 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Compensation-amount-by"
+
+\end_inset
+
+Characteristic of the targeted reform by target of the payment.
+\end_layout
+
+\end_inset
+
+
 \begin_inset ERT
 status open
 
@@ -2971,24 +2983,6 @@ Expected proportion of respondents
 </cell>
 </row>
 </lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:Compensation-amount-by"
-
-\end_inset
-
-Characteristic of the targeted reform by target of the payment.
-\end_layout
 
 \end_inset
 
