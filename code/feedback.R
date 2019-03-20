@@ -14,6 +14,11 @@ decrit(s$gagnant_categorie[s$simule_gagnant == 0], weight = s$weight[s$simule_ga
 
 
 ##### 2. Matrices de transition
+decrit(s$gagnant_categorie[(s$simule_gagnant == 1)], weight = s$weight[(s$simule_gagnant == 1)])
+decrit(s$gagnant_categorie[(s$simule_gagnant == 0)], weight = s$weight[(s$simule_gagnant == 0)])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1)], weight = s$weight[(s$simule_gagnant == 1)])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0)], weight = s$weight[(s$simule_gagnant == 0)])
+
 # Si feedback gagnant et pensait être gagnant/ non affecté / perdant
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant')])
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté')])
@@ -71,7 +76,6 @@ decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categor
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Non')])
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Non')])
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Non')])
-
 
 
 ##### 3. Probabilité de changer d'avis sur ses gains/pertes #####
@@ -181,3 +185,6 @@ probas['cru_perdant_quand_simule_perdant']*probas['simule_perdant']/probas['simu
 
 proba_non_gagnant_coherente_Bayes <- (5/6)*probas['simule_non_gagnant']/probas['simule_non_gagnant_quand_cru_non_gagnant'] # 0.77
 proba_non_perdant_coherente_Bayes <- (5/6)*probas['simule_non_perdant']/probas['simule_non_perdant_quand_cru_non_perdant'] # 0.76
+
+
+
