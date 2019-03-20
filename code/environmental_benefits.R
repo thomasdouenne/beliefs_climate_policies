@@ -12,9 +12,15 @@ z2 <- as.numeric(s$info_PM)
 z3 <- as.numeric(s$info_PM) * as.numeric(s$info_CC)
 c <- s$score_climate_call # This is just here as an example of control variable
 
+summary(lm(s$taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * (taille_agglo==5), data=s, weights=s$weight))
+
 # Simple OLS #
 ols_approuve_efficace <- lm(y ~ x, data=s, weights = s$weight)
 summary(ols_approuve_efficace) # Effet assez fort : +0.39, si l'on ne contrôle pour rien
+
+cor(z1,y)
+cor(z2,y)
+cor(z3,y)
 
 # 2SLS #
 cor(z1,x)
@@ -25,7 +31,7 @@ tsls1<-lm(x ~ z1 + z2 + z3)
 summary(tsls1)
 
 d.hat<-fitted.values(tsls1)
-tsls2<-lm(y ~ c + d.hat)
+tsls2<-lm(y ~ d.hat)
 summary(tsls2)
 # Parce que les instruments sont faibles, l'effet n'est pas significatif
 

@@ -28,9 +28,9 @@ df_bdf = compute_gains_losses(df_bdf)
 df_bdf = compute_gain_net_uc(df_bdf)
 df_bdf = variables_names_bdf_to_ptc(df_bdf)
 (df_bdf, df_ptc) = create_new_variables_bdf_ptc(df_bdf, df_ptc)
-df_bdf['weight'] = 1
+#df_bdf['weight'] = 1
 
-df_ptc['weight'] = 1
+#df_ptc['weight'] = 1
 df_ptc['gain_taxe_carbone_echelle'] = df_ptc['gain_echelle']
 
 
@@ -48,9 +48,9 @@ except:
 
 """ Choose which function to perform """ # True to compute and display results, False otherwise
 plot_step_distribution = False
-plot_kde = True
+plot_kde = False
 save_kde_data = False
-test_imputation_methods = False # The two methods provide quite similar results
+test_imputation_methods = True # The two methods provide quite similar results
 regress = False
 
 
@@ -92,4 +92,13 @@ if regress == True:
     # Results are barely sensitive to choice of imputation method for numeric net gain
 
 
-#print df_ptc['gain_fuel_echelle']
+print float((df_ptc['gain_net_numeric_uc_fuel'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+print float((df_ptc['gain_net_numeric_uc_chauffage'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+print float((df_ptc['gain_net_numeric_uc_taxe_carbone'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+
+print float((df_bdf['gain_net_numeric_uc_fuel'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+print float((df_bdf['gain_net_numeric_uc_chauffage'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+print float((df_bdf['gain_net_numeric_uc_taxe_carbone'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+
+df_ptc['gain_net_numeric_uc_fuel'].mean()
+
