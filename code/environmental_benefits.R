@@ -33,6 +33,8 @@ summary(lm(taxe_approbation!='Non' ~ benefices_CC.hat, data=s, weights = s$weigh
 summary(lm(taxe_approbation!='Non' ~ benefices_CC, data=s, weights = s$weight))
 summary(lm(s$taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * (taille_agglo==5), data=s, weights=s$weight))
 
+summary(lm(s$taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * (taille_agglo==5), data=s, weights=s$weight))
+
 # Simple OLS #
 ols_approuve_efficace <- lm(y ~ x, data=s, weights = s$weight)
 summary(ols_approuve_efficace) # Effet assez fort : +0.39, si l'on ne contrôle pour rien
