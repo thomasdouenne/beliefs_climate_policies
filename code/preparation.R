@@ -868,7 +868,7 @@ convert_s <- function() {
     s[[i]] <<- as.numeric(as.vector(s[[i]]))
     label(s[[i]]) <<- lab
   }
-  
+  # TODO: cap taille_menage
   s$mauvaise_qualite[s$taille_menage < s$nb_adultes | s$taille_menage < s$nb_14_et_plus] <<- 1.3 + s$mauvaise_qualite[s$taille_menage < s$nb_adultes | s$taille_menage < s$nb_14_et_plus] # 15
   s$mauvaise_qualite[s$taille_menage > 12] <<- 1.3 + s$mauvaise_qualite[s$taille_menage > 12] # 10
   s$mauvaise_qualite[s$nb_14_et_plus > 10] <<- 1 + s$mauvaise_qualite[s$nb_14_et_plus > 10] # 2
