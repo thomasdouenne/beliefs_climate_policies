@@ -4,15 +4,77 @@ decrit(s$gagnant_feedback_categorie, weight = s$weight)
 decrit(s$gagnant_categorie, weight = s$weight)
 decrit(s$simule_gagnant, weight = s$weight)
 
-# Si feedback gagnant : 47.9% se disent perdants / 27.9% gagnants / 24.2% gagnants
+# Si feedback gagnant : 47.9% se disent perdants / 27.9% non affectés / 24.2% gagnants
 decrit(s$gagnant_feedback_categorie[s$simule_gagnant == 1], weight = s$weight[s$simule_gagnant == 1])
 decrit(s$gagnant_categorie[s$simule_gagnant == 1], weight = s$weight[s$simule_gagnant == 1])
 
-# Si feedback perdant : 85% se disent perdants / 12.9% gagnants / 2.2% gagnants
+# Si feedback perdant : 85% se disent perdants / 12.9% non affectés / 2.2% gagnants
 decrit(s$gagnant_feedback_categorie[s$simule_gagnant == 0], weight = s$weight[s$simule_gagnant == 0])
 decrit(s$gagnant_categorie[s$simule_gagnant == 0], weight = s$weight[s$simule_gagnant == 0])
 
-##### 2. Probabilité de changer d'avis sur ses gains/pertes #####
+
+##### 2. Matrices de transition
+# Si feedback gagnant et pensait être gagnant/ non affecté / perdant
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant')])
+
+# Si feedback perdant et pensait être gagnant/ non affecté / perdant
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant')])
+
+# Même chose chez les personnes approuvant la taxe :
+decrit(s$gagnant_categorie[(s$simule_gagnant == 1) & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 1) & (s$taxe_approbation == 'Oui')])
+decrit(s$gagnant_categorie[(s$simule_gagnant == 0) & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 0) & (s$taxe_approbation == 'Oui')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 1) & (s$taxe_approbation == 'Oui')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 0) & (s$taxe_approbation == 'Oui')])
+
+# Si feedback gagnant et pensait être gagnant/ non affecté / perdant
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Oui')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Oui')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Oui')])
+
+# Si feedback perdant et pensait être gagnant/ non affecté / perdant
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Oui')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Oui')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Oui')])
+f
+# Même chose chez les personnes acceptant la taxe :
+decrit(s$gagnant_categorie[(s$simule_gagnant == 1) & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$taxe_approbation != 'Non')])
+decrit(s$gagnant_categorie[(s$simule_gagnant == 0) & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$taxe_approbation != 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$taxe_approbation != 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$taxe_approbation != 'Non')])
+
+# Si feedback gagnant et pensait être gagnant/ non affecté / perdant
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation != 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation != 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation != 'Non')])
+
+# Si feedback perdant et pensait être gagnant/ non affecté / perdant
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation != 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation != 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation != 'Non')])
+
+# Même chose chez les personnes n'acceptant pas la taxe :
+decrit(s$gagnant_categorie[(s$simule_gagnant == 1) & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$taxe_approbation == 'Non')])
+decrit(s$gagnant_categorie[(s$simule_gagnant == 0) & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$taxe_approbation == 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$taxe_approbation == 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$taxe_approbation == 'Non')])
+
+# Si feedback gagnant et pensait être gagnant/ non affecté / perdant
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Non')])
+
+# Si feedback perdant et pensait être gagnant/ non affecté / perdant
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Non')])
+decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Non')])
+
+
+
+##### 3. Probabilité de changer d'avis sur ses gains/pertes #####
 # Si feedback gagnant et pensait être perdant : 30% changent d'avis (devient non-affecté ou gagnant)
 decrit((s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant')) # 634 répondants
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant')], weight = s$weight[(s$simule_gagnant == 1) & (s$gagnant_categorie == 'Perdant')])
