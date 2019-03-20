@@ -3,3 +3,5 @@
 code/*.Rproj.user
 code/*.Rproj
 .Rproj.user
+*.lyx#
+*.lyx~
