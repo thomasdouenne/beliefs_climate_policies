@@ -12,7 +12,10 @@ summary(lm((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant'
 # Une OLS standard nous donne qu'une personne se percevant gagnante a une probabilité d'approbation supérieure de 48 p.p.
 
 cor(s$simule_gain_cible, s$traite_cible)
-cor(s$simule_gain_cible, s$traite_cible_conjoint)
+cor(s$simule_gain_cible[s$nb_adultes>1], s$traite_cible_conjoint[s$nb_adultes>1])
+
+cor((s$gagnant_cible_categorie!='Perdant'), s$traite_cible)
+cor((s$gagnant_cible_categorie!='Perdant'), s$traite_cible_conjoint)
 
 # avant il y avait hausse_depenses au lieu de simule_gain_cible
 tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
@@ -21,6 +24,10 @@ gagnant.hat <- fitted.values(tsls_rdd_1)
 summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
 # On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
 # Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
+tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
+summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
+gagnant.hat <- fitted.values(tsls_rdd_1)
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
 
 # Avec effet hétérogène par seuil
 # s$cible <- relevel(as.factor(s$cible), '50')
@@ -65,7 +72,7 @@ gagnant.hat <- fitted.values(tsls1)
 summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + (taxe_approbation!='Non'), data=s[is.element(s$categorie_cible, c('20_30', '30_40', '40_50')),], weights = s$weight[is.element(s$categorie_cible, c('20_30', '30_40', '40_50'))]))
 # L'effet sur l'approbation est plus élevé que dans la 2SLS avec RDD en first stage, et plus élevé qu'avec OLS (ce qui est surprenant) : 0.66 p.p. d'augmentation
 # Le problème de cette méthode est que l'on affecte les répondants aléatoirement aux différents mécanismes, mais on compare des mécanises différents
-# En moyenne, les mécanismes auxquels ils sont éligibles transferent moins à plus de gens
+# En moyenne, les mécanismes auxquels ils sont éligibles transfèrent moins à plus de gens
 
 # Test effet des seuils sur les ménages jamais éligibles pour écarter l'effet gagnant/perdant de l'acceptation #
 # Plus la mesure est ciblée sur les plus pauvres, plus elle est acceptée
@@ -106,8 +113,7 @@ bandwidthsize_40_70 <- rdd_bw_ik(data_rdd_40_70)
 model_rdd_40_70 = rdd_reg_np(rdd_object = data_rdd_40_70, bw = bandwidthsize_40_70)
 summary(model_rdd_40_70)
 plot(model_rdd_40_70)
-# Les résultats sont tous très mauvais, je ne saurais pas interpréter les points sur les graphiques
-# Le problème est peut-être juste que la taille de l'échantillon est trop limitée pour détecter des effets non-paramétriques sur sous-échantillon
+# Les résultats sont corrects mais pas tous significatifs. Pb: difficile d'interpréter les points sur les graphiques
 
 
 ##### 5. RDD non-paramétrique multivarié par seuil #####
@@ -129,12 +135,13 @@ summary(model_2_variables_40)
 
 model_2_variables_50 = mrd_est(dummy_approbation_cible ~ revenu + revenu_conjoint | approbation_avant, cutpoint = c(1670, 1670), method = "center", subset = cible==50 & (categorie_cible == '40_50'  | categorie_cible == '50_70'), t.design = c("leq", "geq"))
 summary(model_2_variables_50)
-# De même, rien de significatif, et rien qui n'ait vraiment de sens
+# Rien de significatif, et rien qui n'ait vraiment de sens
 
 
 ##### 6. 2SLS avec RDD paramétrique pour le feedback
 # OLS simple: 0.30***
 summary(lm(taxe_feedback_approbation=='Oui' ~ (gagnant_feedback_categorie == 'Gagnant') + taxe_approbation, data=s, weights = s$weight))
+summary(lm(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie != 'Perdant') + (taxe_approbation!='Non'), data=s, weights = s$weight))
 
 # RDD simple - effet d'être gagnant: 0.08***
 summary(lm(taxe_feedback_approbation=='Oui' ~ simule_gagnant + simule_gain + I(simule_gain^2) + taxe_approbation, data=s, weights = s$weight))
@@ -147,6 +154,10 @@ summary(lm(taxe_feedback_approbation=='Oui' ~ gagnant_feedback.hat + taxe_approb
 # Les résultats sont sensiblement les mêmes que dans le cas des seuils :
 # 1) Etre gagnant augmente la probabilité d'approuver de 10p.p., 2) se considérer gagnant augmente la probabilité d'approuver de 41 p.p.
 # L'effet estimé est ici local, et concerne les personnes qui sont à la limite de gagner/perdre.
+cor(s$gagnant_feedback_categorie != 'Perdant', n(s$simule_gagnant), use="complete.obs") # 0.24
+tsls_rdd_feedback_1 <- lm(gagnant_feedback_categorie != 'Perdant' ~ simule_gagnant + taxe_approbation + simule_gain + I(simule_gain^2), data=s, weights = s$weight, na.action="na.exclude")
+gagnant_feedback.hat <- fitted.values(tsls_rdd_feedback_1)
+summary(lm(taxe_feedback_approbation!='Non' ~ gagnant_feedback.hat + taxe_approbation + simule_gain + I(simule_gain^2), data=s, weights = s$weight))
 
 
 ##### 7. Biprobit - WIP...
