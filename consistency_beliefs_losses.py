@@ -52,6 +52,7 @@ plot_kde = False
 save_kde_data = False
 test_imputation_methods = True # The two methods provide quite similar results
 regress = False
+number_winners = True
 
 
 """ Compare distributions BdF/BCP """ # pdf and CDF net gains of both samples (step function or Kernel density estimation)
@@ -88,17 +89,24 @@ if regress == True:
         revenu + revenu_2 + rev_tot + rev_tot_2 + fioul + gaz + taille_menage + surface + \
         age_18_24 + age_25_34 + age_35_49 + age_50_64'.format(energy),
         data = data).fit() # To do : add more variables
-    print ols_net_gain.summary() 
+    print ols_net_gain.summary()
     # Results are barely sensitive to choice of imputation method for numeric net gain
 
 
-print float((df_ptc['gain_net_numeric_uc_fuel'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
-print float((df_ptc['gain_net_numeric_uc_chauffage'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
-print float((df_ptc['gain_net_numeric_uc_taxe_carbone'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
-
-print float((df_bdf['gain_net_numeric_uc_fuel'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
-print float((df_bdf['gain_net_numeric_uc_chauffage'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
-print float((df_bdf['gain_net_numeric_uc_taxe_carbone'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
-
-df_ptc['gain_net_numeric_uc_fuel'].mean()
-
+""" Number of winners and average expected net gains"""
+if number_winners == True:
+    print float((df_ptc['gain_net_numeric_uc_fuel'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+    print float((df_ptc['gain_net_numeric_uc_chauffage'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+    print float((df_ptc['gain_net_numeric_uc_taxe_carbone'] * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+    
+    print float((df_bdf['gain_net_numeric_uc_fuel'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+    print float((df_bdf['gain_net_numeric_uc_chauffage'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+    print float((df_bdf['gain_net_numeric_uc_taxe_carbone'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+    
+    print float(((df_ptc['gain_net_numeric_barycentre_uc_fuel'] == 0) * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+    print float(((df_ptc['gain_net_numeric_uc_chauffage'] > 0) * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+    print float(((df_ptc['gain_net_numeric_barycentre_uc_taxe_carbone'] == 0) * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+    
+    print float(((df_bdf['gain_net_numeric_uc_fuel'] > 0) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+    print float(((df_bdf['gain_net_numeric_uc_chauffage'] > 0) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+    print float(((df_bdf['gain_net_numeric_uc_taxe_carbone'] > 0) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
