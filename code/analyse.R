@@ -948,3 +948,25 @@ lines(cdf_max$x, cdf_max$y, type="s", lty=2, col="red")
 axis(1, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
 
 par(mar = mar_old, cex = cex_old)
+
+##### Transports en commun #####
+decrit(s$transports_avis, weights = s$weight, miss=T)
+
+table_taille_agglo_transports <- round(crosstab(s[s$transports_avis!='NSP',], row.vars="taille_agglo", col.vars="transports_avis", type="j", dec.places = 0)$crosstab)
+table_taille_agglo_transports[1:5, ] <- round(crosstab(s[s$transports_avis!='NSP',], row.vars="taille_agglo", col.vars="transports_avis", type="r", dec.places = 0)$crosstab)
+table_taille_agglo_transports
+xtable(table_taille_agglo_transports, digits=0)
+# print(xtable(table_taille_agglo_transports, digits=0), file="table_taille_agglo_transports.tex")
+
+decrit(s$transports_distance, weights = s$weight)
+length(which(s$transports_distance <= 5))/length(which(!is.na(s$transports_distance))) # 49%
+length(which(s$transports_distance <= 15))/length(which(!is.na(s$transports_distance))) # 77%
+decrit(s$transports_frequence, weights = s$weight)
+decrit(s$transports_courses, weights = s$weight)
+decrit(s$transports_loisirs, weights = s$weight)
+decrit(s$transports_travail, weights = s$weight)
+decrit(s$transports_travail[s$transports_travail!='Non concerné·e'], weights = s$weight[s$transports_travail!='Non concerné·e'])
+decrit(s$transports_travail_commun, weights = s$weight) # TODO: preparation
+decrit(s$transports_travail_actif, weights = s$weight)
+decrit(s$transports_travail_actif=='Non' & s$transports_travail_commun=='Non', weights = s$weight)
+decrit(s$transports_travail_actif=='Oui, ça ne me poserait pas de grande difficulté' | s$transports_travail_commun=='Oui, ça ne me poserait pas de grande difficulté', weights = s$weight)
