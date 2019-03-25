@@ -35,12 +35,12 @@ for i in [.05, .1, .25, .5, .75, .9, .95]:
     print i, "PTC:", df_ptc['rev_tot'].quantile(i), " / BDF:", (df_bdf['hh_income'].quantile(i) / 12)
 
 
-# Taille logement : à peu près OK
+# Taille logement : quasi parfait
 for i in [.05, .1, .25, .5, .75, .9, .95]:
     print i, "PTC:", df_ptc['surface'].quantile(i), " / BDF:", df_bdf['accommodation_size'].quantile(i)
 
 
-# Taille ménage : à peu près OK
+# Taille ménage : quasi parfait
 for i in [.05, .1, .175, .25, .35, .5, .6, .75, .9, .95]:
     print i, "PTC:", df_ptc['taille_menage'].quantile(i), " / BDF:", df_bdf['nb_persons'].quantile(i)
 

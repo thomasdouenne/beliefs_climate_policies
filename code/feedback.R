@@ -44,7 +44,7 @@ decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 1) & (s$gagnant_categor
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Gagnant') & (s$taxe_approbation == 'Oui')])
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Non affecté') & (s$taxe_approbation == 'Oui')])
 decrit(s$gagnant_feedback_categorie[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Oui')], weight = s$weight[(s$simule_gagnant == 0) & (s$gagnant_categorie == 'Perdant') & (s$taxe_approbation == 'Oui')])
-f
+
 # Même chose chez les personnes acceptant la taxe :
 decrit(s$gagnant_categorie[(s$simule_gagnant == 1) & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 1) & (s$taxe_approbation != 'Non')])
 decrit(s$gagnant_categorie[(s$simule_gagnant == 0) & (s$taxe_approbation != 'Non')], weight = s$weight[(s$simule_gagnant == 0) & (s$taxe_approbation != 'Non')])
@@ -194,7 +194,6 @@ summary(lm(((gagnant_feedback_categorie != 'Perdant') - (gagnant_categorie != 'P
 summary(lm(((gagnant_feedback_categorie != 'Gagnant') - (gagnant_categorie != 'Gagnant')) ~ simule_gagnant, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f']))
 
 summary(lm(update ~ simule_gagnant, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f']))
-
 summary(lm(((gagnant_feedback_categorie != 'Perdant') - (gagnant_categorie != 'Perdant')) ~ gagnant_categorie, data=s[s$simule_gagnant==1,], weights = s$weight[s$simule_gagnant==1]))
 summary(lm(((gagnant_feedback_categorie != 'Gagnant') - (gagnant_categorie != 'Gagnant')) ~ gagnant_categorie, data=s[s$simule_gagnant==0,], weights = s$weight[s$simule_gagnant==0]))
 

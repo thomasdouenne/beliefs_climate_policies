@@ -9,40 +9,39 @@ summary(lm(taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * (taille_agglo
 summary(lm(taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * taille_agglo, data=s, weights = s$weight))
 summary(lm(taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * info_CC * (taille_agglo==5), data=s, weights = s$weight))
 
-# pas d'effet de l'info sur l'efficacités$t
+# pas d'effet sur l'approbation de l'info sur l'efficacité
 summary(lm(taxe_approbation!='Non' ~ apres_modifs, data=s, weights = s$weight))
+summary(lm(taxe_efficace!='Non' ~ apres_modifs, data=s, weights = s$weight))
 
 ##### IV: A ~ efficace ~ info_CC/PM #####
-# Pourquoi l'instrument info_CC/PM fonctionne mais pas apres_modifs? Peut-être que l'info convainc plus en profondeur les gens,
-#   i.e. les convainc de la nécessité d'une taxe car le CC est grave; alors que les ancré à ce que la taxe est efficace les fait 
-#   répondre qu'elle l'est par automatisme, sans changer leur acceptation pour autant
-# 2SLS avec taxe_efficace: effet de 110* p.p. !
+# 2SLS avec benefices_CC: effet de 110* p.p. ! (LATE on compliers -> small population that might have very different preferences regarding the environment)
 decrit(s$taxe_efficace, weights = s$weight)
 tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM, data=s, weights = s$weight)
 summary(tsls1)
 taxe_efficace.hat <- fitted.values(tsls1)
 summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weight))
-# Simple OLS: 0.51 cf. Logit pour les contrôles
-summary(lm(taxe_approbation!='Non' ~ (taxe_efficace != 'Non'), data=s, weights = s$weight))
-summary(lm((s$taxe_approbation == 'Oui') ~ (s$taxe_efficace == 'Oui'), data=s, weights = s$weight)) # 0.43
 
-# 0.52.
+# 60p.p. : with controls and with both types of instruments (infos CC et PM, and "apres_modifs")
+# Should we keep info_PM ? Correlation very weak
+tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM + apres_modifs + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + simule_gain, data=s, weights = s$weight)
+summary(tsls1)
+taxe_efficace.hat <- fitted.values(tsls1)
+summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + simule_gain, data=s, weights = s$weight))
+
+# 52 p.p. : same without controls, but significant at 8% only
 tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM + apres_modifs, data=s, weights = s$weight)
 summary(tsls1)
 taxe_efficace.hat <- fitted.values(tsls1)
 summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weight))
 
-# 2SLS avec seulement info_CC: 202** p.p. !
-tsls1<-lm(taxe_efficace != 'Non' ~ info_CC, data=s, weights = s$weight)
-summary(tsls1)
-taxe_efficace.hat <- fitted.values(tsls1)
-summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weight))
+# Simple OLS: 0.51 cf. Logit pour les contrôles
+summary(lm(taxe_approbation!='Non' ~ (taxe_efficace != 'Non'), data=s, weights = s$weight))
+summary(lm((s$taxe_approbation == 'Oui') ~ (s$taxe_efficace == 'Oui'), data=s, weights = s$weight)) # 0.43
 
-# 2SLS avec oui 0.55
-tsls1<-lm(taxe_efficace == 'Oui' ~ info_CC * info_PM, data=s, weights = s$weight)
-summary(tsls1)
-taxe_efficace.hat <- fitted.values(tsls1)
-summary(lm(taxe_approbation=='Oui' ~ taxe_efficace.hat, data=s, weights = s$weight))
+summary(lm(taxe_approbation!='Non' ~ (taxe_efficace != 'Non') + (gagnant_categorie != 'Perdant') + revenu + I(revenu^2) + revenu_conjoint + taille_agglo + simule_gain, data=s, weights = s$weight))
+probit_marg <- probitmfx(taxe_approbation!='Non' ~ (taxe_efficace != 'Non') + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + simule_gain, data = s, atmean = TRUE)
+probit_marg
+
 
 # 2SLS avec benefices_CC: pareil, effet de 106** p.p. 
 decrit(s$benefices_CC, weights = s$weight)
@@ -52,8 +51,6 @@ benefices_CC.hat <- fitted(tsls1_env)
 summary(lm(taxe_approbation!='Non' ~ benefices_CC.hat, data=s, weights = s$weight))
 # OLS: 0.37***
 summary(lm(taxe_approbation!='Non' ~ benefices_CC, data=s, weights = s$weight))
-summary(lm(s$taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * (taille_agglo==5), data=s, weights=s$weight))
-
 summary(lm(s$taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * (taille_agglo==5), data=s, weights=s$weight))
 
 # Simple OLS #
@@ -149,8 +146,3 @@ summary(lm((as.factor(s$cause_CC)=='anthropique') ~ info_CC, data=s, weights = s
 summary(lm(emission_cible ~ info_CC, data=s, weights = s$weight))
 summary(lm(generation_CC_2020==T ~ info_CC, data=s, weights = s$weight))
 summary(lm(responsable_CC_govts==T ~ info_CC, data=s, weights = s$weight))
-
-
-##### Stats descriptives #####
-decrit(s$taxe_efficace[s$apres_modifs==T], miss=T)
-decrit(s$taxe_efficace[s$apres_modifs==FALSE], miss=T)

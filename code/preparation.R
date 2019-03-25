@@ -1,5 +1,5 @@
 # setwd("/var/www/beliefs_climate_policies/code")
-# setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 # setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 # setwd("C:/Users/a.fabre/Documents/beliefs_climate_policies/code")
@@ -868,7 +868,7 @@ convert_s <- function() {
     s[[i]] <<- as.numeric(as.vector(s[[i]]))
     label(s[[i]]) <<- lab
   }
-  # TODO: cap taille_menage
+  
   s$mauvaise_qualite[s$taille_menage < s$nb_adultes | s$taille_menage < s$nb_14_et_plus] <<- 1.3 + s$mauvaise_qualite[s$taille_menage < s$nb_adultes | s$taille_menage < s$nb_14_et_plus] # 15
   s$mauvaise_qualite[s$taille_menage > 12] <<- 1.3 + s$mauvaise_qualite[s$taille_menage > 12] # 10
   s$mauvaise_qualite[s$nb_14_et_plus > 10] <<- 1 + s$mauvaise_qualite[s$nb_14_et_plus > 10] # 2
@@ -948,8 +948,8 @@ convert_s <- function() {
                           # names = c("NSP","Insuffisante","Limitée, mais suffisante","Convenable, mais devrait être accrue","Satisfaisante")),
                         missing.values = -1, annotation=Label(s$transports_avis))
   
-  # labels(s$transports_travail_commun) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
-  # labels(s$transports_travail_actif) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
+  labels(s$transports_travail_commun) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
+  labels(s$transports_travail_actif) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
   s$Transports_travail_commun <<- s$transports_travail_commun
   s$Transports_travail_actif <<- s$transports_travail_actif
   s$Transports_travail_commun[is.na(s$Transports_travail_commun)] <<- "Non concerné"
@@ -1294,6 +1294,9 @@ convert_s <- function() {
     s[[paste("aide_non", v, sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==FALSE & s$aide_2p==T] <<- s[[paste("aide_non", v, "ni", sep="_")]][!is.na(s$transferts_inter_info) & s$transferts_inter_info==FALSE & s$aide_2p==T]
     label(s[[paste("aide_non", v, sep="_")]]) <<- Label(s[[paste("aide_non", v, "i", sep="_")]])
   }
+  
+  s$revenu_decile <- 1 + 1 * ((s$revenu > 237) + (s$revenu > 789) + (s$revenu > 1151) + (s$revenu > 1436) + (s$revenu > 1677) + (s$revenu > 1927) + (s$revenu > 2231) + (s$revenu > 2657) + (s$revenu > 3462))
+  s$revenu_quintile <- 1 + 1 * ((s$revenu > 789) + (s$revenu > 1436) + (s$revenu > 1927) + (s$revenu > 2657))
   
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
   # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
