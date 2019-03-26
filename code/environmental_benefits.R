@@ -14,6 +14,10 @@ summary(lm(taxe_approbation!='Non' ~ apres_modifs, data=s, weights = s$weight))
 summary(lm(taxe_efficace!='Non' ~ apres_modifs, data=s, weights = s$weight))
 
 ##### IV: A ~ efficace ~ info_CC/PM #####
+# Pourquoi l'instrument info_CC/PM fonctionne mais pas apres_modifs? Peut-être que l'info convainc plus en profondeur les gens,
+#   i.e. les convainc de la nÃ©cessitÃ© d'une taxe car le CC est grave; alors que les ancrés ce que la taxe est efficace les fait 
+#   répondre qu'elle l'est par automatisme, sans changer leur acceptation pour autant
+
 # 2SLS avec benefices_CC: effet de 110* p.p. ! (LATE on compliers -> small population that might have very different preferences regarding the environment)
 decrit(s$taxe_efficace, weights = s$weight)
 tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM, data=s, weights = s$weight)
@@ -146,3 +150,9 @@ summary(lm((as.factor(s$cause_CC)=='anthropique') ~ info_CC, data=s, weights = s
 summary(lm(emission_cible ~ info_CC, data=s, weights = s$weight))
 summary(lm(generation_CC_2020==T ~ info_CC, data=s, weights = s$weight))
 summary(lm(responsable_CC_govts==T ~ info_CC, data=s, weights = s$weight))
+
+summary(lm(responsable_CC_govts==T ~ info_CC, data=s, weights = s$weight))
+
+##### Stats descriptives #####
+decrit(s$taxe_efficace[s$apres_modifs==T], miss=T)
+decrit(s$taxe_efficace[s$apres_modifs==FALSE], miss=T)

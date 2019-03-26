@@ -728,6 +728,7 @@ summary(lm((taxe_feedback_approbation != 'Non') ~ gagnant_f.hat + taxe_approbati
 
 
 ##### RÃ©gressions: persistance des croyances #####
+# TODO: Etudier les gens gagnant en pouvoir d'achat mais perdant en utilité (en prenant une élasticité nulle)
 # 3.1 apprendre qu'on est (simulÃ©) gagnant augmente la croyance de ne pas perdre de 23%***
 croyances_1 <- lm(((gagnant_feedback_categorie!='Perdant') - (gagnant_categorie!='Perdant')) ~ simule_gagnant + simule_gain + I(simule_gain^2), data=s, weights = s$weight, na.action="na.exclude")
 summary(croyances_1)
@@ -783,6 +784,12 @@ label(s$feedback_infirme_large) <- "feedback_infirme_large: Indicatrice de se pe
 # summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ simule_gagnant*(gagnant_categorie=='Gagnant'), data=s, weights=s$weight))
 decrit(s$feedback_infirme) # 45%
 decrit(s$feedback_infirme_large) # 70%
+decrit(s$update_correct[s$feedback_infirme==T])
+decrit(s$update_correct[s$feedback_infirme==T & s$simule_gagnant==1])
+decrit(s$update_correct[s$feedback_infirme==T & s$simule_gagnant==0])
+sum(s$weight[s$feedback_infirme & s$simule_gagnant==1])/3002 # 51%
+sum(s$weight[!is.na(s$update_correct) & s$update_correct==1 & s$feedback_infirme & s$simule_gagnant==1])/sum(s$weight[!is.na(s$update_correct) & s$feedback_infirme & s$simule_gagnant==1]) # 12%
+
 # 3.3 Les gens qui se croient gagnants updatent plus correctement que les autres lorsqu'ils doivent le faire
 summary(lm(update_correct_large ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight))
 summary(lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme==T, data=s, weights = s$weight)) # Non affectÃ©s exclus par feedback_infirme
@@ -928,6 +935,9 @@ lines(cdf_transport$x, cdf_transport$y, lwd=2, col="blue")
 lines(cdf_transport_min$x, cdf_transport_min$y, type="s", lty=2, col="red")
 lines(cdf_transport_max$x, cdf_transport_max$y, type="s", lty=2, col="red")
 axis(1, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
+abline(v = c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.5), lwd=0.2)
+# TODO: finir Ã§a, avec les valeurs de l'échelle au-dessus
+  
 
 cdf_housing <- Ecdf(objective_gains$housing)
 cdf_housing_min <- Ecdf(s$gain_chauffage_min)
