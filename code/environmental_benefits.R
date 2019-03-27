@@ -27,10 +27,16 @@ summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weig
 
 # 60p.p. : with controls and with both types of instruments (infos CC et PM, and "apres_modifs")
 # Should we keep info_PM ? Correlation very weak
-tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM + apres_modifs + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + simule_gain, data=s, weights = s$weight)
+tsls1<-lm(taxe_efficace != 'Non' ~ apres_modifs + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + I(revenu_conjoint^2) + simule_gain + I(simule_gain^2), data=s, weights = s$weight)
 summary(tsls1)
 taxe_efficace.hat <- fitted.values(tsls1)
-summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + simule_gain, data=s, weights = s$weight))
+summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + I(revenu_conjoint^2) + simule_gain + I(simule_gain^2), data=s, weights = s$weight))
+
+# Controls only in second stage
+tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM, data=s, weights = s$weight)
+summary(tsls1)
+taxe_efficace.hat <- fitted.values(tsls1)
+summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint, data=s, weights = s$weight))
 
 # 52 p.p. : same without controls, but significant at 8% only
 tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM + apres_modifs, data=s, weights = s$weight)
@@ -42,7 +48,8 @@ summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weig
 summary(lm(taxe_approbation!='Non' ~ (taxe_efficace != 'Non'), data=s, weights = s$weight))
 summary(lm((s$taxe_approbation == 'Oui') ~ (s$taxe_efficace == 'Oui'), data=s, weights = s$weight)) # 0.43
 
-summary(lm(taxe_approbation!='Non' ~ (taxe_efficace != 'Non') + (gagnant_categorie != 'Perdant') + revenu + I(revenu^2) + revenu_conjoint + taille_agglo + simule_gain, data=s, weights = s$weight))
+summary(lm(taxe_approbation!='Non' ~ (taxe_efficace != 'Non') + (gagnant_categorie != 'Perdant') + revenu + I(revenu^2) + revenu_conjoint + I(revenu_conjoint^2) + simule_gain + I(simule_gain^2) + taille_agglo, data=s, weights = s$weight))
+library("mfx")
 probit_marg <- probitmfx(taxe_approbation!='Non' ~ (taxe_efficace != 'Non') + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + simule_gain, data = s, atmean = TRUE)
 probit_marg
 
@@ -61,14 +68,9 @@ summary(lm(s$taxe_approbation!='Non' ~ info_CC * info_PM + info_PM * (taille_agg
 ols_approuve_efficace <- lm(y ~ x, data=s, weights = s$weight)
 summary(ols_approuve_efficace) # Effet assez fort : +0.39, si l'on ne contrôle pour rien
 
-cor(z1,y)
-cor(z2,y)
-cor(z3,y)
-
-# 2SLS #
-cor(z1,x)
-cor(z2,x)
-cor(z3,x) # Problème : weak instruments ! Nos informations ne changent pas leur croyance vis-à-vis de l'efficacité de la taxe
+cor(as.numeric(s$info_CC), as.numeric(s$taxe_efficace))
+cor(s$info_PM, as.numeric(s$taxe_efficace))
+cor(as.numeric(s$apres_modifs), as.numeric(s$taxe_efficace))
 
 tsls1<-lm(x ~ z1 + z2 + z3)
 summary(tsls1)
