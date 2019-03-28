@@ -1,5 +1,5 @@
 # setwd("/var/www/beliefs_climate_policies/code")
-setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+# setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 # setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 # setwd("C:/Users/a.fabre/Documents/beliefs_climate_policies/code")
@@ -891,15 +891,17 @@ convert_s <- function() {
                 missing.values = c("","NSP"), annotation=attr(s[j][[1]], "label"))
   }
   
-  for (j in c("mode_chauffage", "chauffage", "parle_CC", "cause_CC", "effets_CC", "transports_frequence", 
+  for (j in c("mode_chauffage", "chauffage", "parle_CC", "cause_CC", "effets_CC", "transports_frequence",
               "schiste_CC", "transports_avis", "transports_travail_actif", "transports_travail_commun"
               # "perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage", "interet_politique",
               )) {
     if (j %in% c("mode_chauffage", "chauffage", "schiste_CC", "cause_CC")) s[capitalize(j)] <<- s[j][[1]]
-    s[j][[1]] <<- as.item(as.character(s[j][[1]]),
-                labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))), 
-                missing.values = c("NSP", ""), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
-  }  
+    # s[j][[1]] <<- as.item(as.character(s[j][[1]]),
+    #             labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))),
+    #             missing.values = c("NSP", ""), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
+    s[j][[1]] <<- as.item(as.factor(s[j][[1]]),
+                          missing.values = c("NSP", ""), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
+  }
  # TODO: as.item region_CC, gagnant_fuel_categorie, gagnant_chauffage_categorie, gagnant_categorie, gagnant_feedback_categorie, gagnant_progressif_categorie, gagnant_cible_categorie?  
 
   for (j in names(s)) {
@@ -972,10 +974,14 @@ convert_s <- function() {
   # s$diplome4[s$Diplome<2] <<- "Aucun diplôme ou brevet"
   # s$diplome4[s$Diplome>3] <<- "Supérieur"
  
-  labels(s$mode_chauffage) <<- c("individuel"="Chauffage individuel", "collectif"="Chauffage collectif", "NSP"="NSP")
-  labels(s$chauffage) <<- c("Gaz réseau"="Gaz de ville", "Gaz bouteille"="Butane, propane, gaz en citerne", "Fioul"="Fioul, mazout, pétrole", "Électricité"="Électricité", "Bois, solaire..."="Bois, solaire, géothermie, aérothermie (pompe à chaleur)", "Autre"="Autre", "NSP"="NSP")
-  labels(s$schiste_CC) <<- c("malvenue"="Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir", "valable"="Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"="NSP")
-  labels(s$cause_CC) <<- c("n'existe pas"="n'est pas une réalité", "naturel"="est principalement dû à la variabilité naturelle du climat", "anthropique"="est principalement dû à l'activité humaine", "NSP"="NSP")
+  # labels(s$mode_chauffage) <<- c("individuel"="Chauffage individuel", "collectif"="Chauffage collectif", "NSP"="NSP")
+  # labels(s$chauffage) <<- c("Gaz réseau"="Gaz de ville", "Gaz bouteille"="Butane, propane, gaz en citerne", "Fioul"="Fioul, mazout, pétrole", "Électricité"="Électricité", "Bois, solaire..."="Bois, solaire, géothermie, aérothermie (pompe à chaleur)", "Autre"="Autre", "NSP"="NSP")
+  # labels(s$schiste_CC) <<- c("malvenue"="Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir", "valable"="Elle est valable : toute baisse des émissions va dans la bonne direction", "NSP"="NSP")
+  # labels(s$cause_CC) <<- c("n'existe pas"="n'est pas une réalité", "naturel"="est principalement dû à la variabilité naturelle du climat", "anthropique"="est principalement dû à l'activité humaine", "NSP"="NSP")
+  s$mode_chauffage <<- relabel(s$mode_chauffage, c("Chauffage individuel"="individuel", "Chauffage collectif"="collectif", "NSP"="NSP"))
+  s$chauffage <<- relabel(s$chauffage, c("Gaz de ville"="Gaz réseau", "Butane, propane, gaz en citerne"="Gaz bouteille", "Fioul, mazout, pétrole"="Fioul", "Électricité"="Électricité", "Bois, solaire, géothermie, aérothermie (pompe à chaleur)"="Bois, solaire...", "Autre"="Autre", "NSP"="NSP"))
+  s$schiste_CC <<- relabel(s$schiste_CC, c("Elle est malvenue : il faudrait mettre fin aux émissions, pas seulement les ralentir"="malvenue", "Elle est valable : toute baisse des émissions va dans la bonne direction"="valable", "NSP"="NSP"))
+  s$cause_CC <<- relabel(s$cause_CC, c("n'est pas une réalité"="n'existe pas", "est principalement dû à la variabilité naturelle du climat"="naturel", "est principalement dû à l'activité humaine"="anthropique", "NSP"="NSP"))
   s$Compris_depenses <<- as.character(s$compris_depenses)
   s$Compris_depenses[is.na(s$Compris_depenses)] <<- "NA"
   s$compris_depenses <<- as.item(as.character(s$compris_depenses),
