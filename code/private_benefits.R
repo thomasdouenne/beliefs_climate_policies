@@ -9,11 +9,11 @@
 ##### 1. Spécification principale : 2SLS avec RDD paramétrique à multiples seuils en first stage #####
 # Simple OLS #
 summary(lm((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant')*(taxe_approbation!='Non'), data=s, subset=categorie_cible!='70_', weights = s$weight))
-summary(lm((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant') + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2) + (taxe_approbation!='Non') + simule_gain_cible, data=s, subset=categorie_cible!='70_', weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant') + (taxe_efficace!='Non') + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2) + (taxe_approbation!='Non') + simule_gain_cible, data=s, weights = s$weight))
 # Une OLS standard nous donne qu'une personne se percevant gagnante a une probabilité d'approbation supérieure de 48 p.p.
 
 # Lorsqu'on examine les résultats à la première question, l'effet des bénéfices privés sur l'approbation est nettement plus faible. On peut interpréter cela comme une confiance moindre dans cette réponse.
-summary(lm((taxe_approbation!='Non') ~ (gain_echelle >4) + (gain_echelle < -4) + (taxe_efficace!='Non') + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2) + simule_gain_cible, data=s, subset=categorie_cible!='70_', weights = s$weight))
+summary(lm((taxe_approbation!='Non') ~ (gain_echelle > 4) + (gain_echelle < -4) + (taxe_efficace!='Non') + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2) + simule_gain_cible, data=s, subset=categorie_cible!='70_', weights = s$weight))
 
 cor(s$simule_gain_cible, s$traite_cible)
 cor(s$simule_gain_cible[s$nb_adultes>1], s$traite_cible_conjoint[s$nb_adultes>1])
@@ -22,16 +22,16 @@ cor((s$gagnant_cible_categorie!='Perdant'), s$traite_cible)
 cor((s$gagnant_cible_categorie!='Perdant'), s$traite_cible_conjoint)
 
 # avant il y avait hausse_depenses au lieu de simule_gain_cible
-tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + (taxe_approbation!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
+tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
 summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
 gagnant.hat <- fitted.values(tsls_rdd_1)
-summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + (taxe_approbation!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight))
 # On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
 # Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
-tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
+tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
 summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
 gagnant.hat <- fitted.values(tsls_rdd_1)
-summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
+summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight))
 
 # Avec effet hétérogène par seuil
 # s$cible <- relevel(as.factor(s$cible), '50')
@@ -159,9 +159,10 @@ summary(lm(taxe_feedback_approbation=='Oui' ~ gagnant_feedback.hat + taxe_approb
 # 1) Etre gagnant augmente la probabilité d'approuver de 10p.p., 2) se considérer gagnant augmente la probabilité d'approuver de 41 p.p.
 # L'effet estimé est ici local, et concerne les personnes qui sont à la limite de gagner/perdre.
 cor(s$gagnant_feedback_categorie != 'Perdant', n(s$simule_gagnant), use="complete.obs") # 0.24
-tsls_rdd_feedback_1 <- lm(gagnant_feedback_categorie != 'Perdant' ~ simule_gagnant + (taxe_approbation!='Non') + simule_gain + I(simule_gain^2), data=s, weights = s$weight, na.action="na.exclude")
+tsls_rdd_feedback_1 <- lm(gagnant_feedback_categorie != 'Perdant' ~ simule_gagnant + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain + I(simule_gain^2) + revenu + revenu_conjoint, data=s, weights = s$weight, na.action="na.exclude")
+summary(tsls_rdd_feedback_1)
 gagnant_feedback.hat <- fitted.values(tsls_rdd_feedback_1)
-summary(lm(taxe_feedback_approbation!='Non' ~ gagnant_feedback.hat + (taxe_approbation!='Non') + simule_gain + I(simule_gain^2), data=s, weights = s$weight))
+summary(lm(taxe_feedback_approbation!='Non' ~ gagnant_feedback.hat + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain + I(simule_gain^2) + revenu + revenu_conjoint, data=s, weights = s$weight))
 
 
 ##### 7. Probit - WIP
@@ -172,7 +173,7 @@ probitmarg2 <- probitmfx(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_ca
 probitmarg2 # TODO: solve bug (seems to come from revenu_conjoint^2)
 
 
-##### 8. Biprobit - WIP...
+##### 8. Biprobit - WIP...I
 s$dummy_approbation_feedback <- s$taxe_feedback_approbation != 'Non'
 s$dummy_declare_gagnant_feedback_categorie <- s$gagnant_feedback_categorie == 'Gagnant'
 biprobit_feedback <- biprobit(dummy_approbation_feedback~1+dummy_declare_gagnant_feedback_categorie, rho=~1+dummy_declare_gagnant_feedback_categorie, data=s)

@@ -27,7 +27,7 @@ summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat, data=s, weights = s$weig
 
 # 60p.p. : with controls and with both types of instruments (infos CC et PM, and "apres_modifs")
 # Should we keep info_PM ? Correlation very weak
-tsls1<-lm(taxe_efficace != 'Non' ~ apres_modifs + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + I(revenu_conjoint^2) + simule_gain + I(simule_gain^2), data=s, weights = s$weight)
+tsls1<-lm(taxe_efficace != 'Non' ~ info_CC * info_PM + apres_modifs + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + I(revenu_conjoint^2) + simule_gain + I(simule_gain^2), data=s, weights = s$weight)
 summary(tsls1)
 taxe_efficace.hat <- fitted.values(tsls1)
 summary(lm(taxe_approbation!='Non' ~ taxe_efficace.hat + (gagnant_categorie != 'Perdant') + taille_agglo + revenu + I(revenu^2) + revenu_conjoint + I(revenu_conjoint^2) + simule_gain + I(simule_gain^2), data=s, weights = s$weight))
