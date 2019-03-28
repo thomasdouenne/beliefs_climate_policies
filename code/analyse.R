@@ -330,6 +330,11 @@ cor(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)], s$Elasticite_fuel_perso[!is.na
 cor(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)], s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)])
 # Correlation positive entre �lasticit� perso et �lasticit� globale
 
+# 50% (resp. 58%) think they are strictly more contrained than average, exploit perte_relative for this issue
+# TODO: weight by their conso to see if it's consistent
+sum(s$weight[!is.na(s$Elasticite_fuel_perso) & s$Elasticite_fuel_perso > s$Elasticite_fuel])/sum(s$weight[!is.na(s$Elasticite_fuel_perso)]) # 50%
+sum(s$weight[!is.na(s$Elasticite_chauffage_perso) & s$Elasticite_chauffage_perso > s$Elasticite_chauffage])/sum(s$weight[!is.na(s$Elasticite_chauffage_perso)]) # 58%
+
 
 ##### Ciblage #####
 decrit(s$categorie_cible, weights = s$weight)
