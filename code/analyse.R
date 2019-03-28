@@ -1001,16 +1001,38 @@ decrit(s$transports_travail_actif=='Oui, ça ne me poserait pas de grande diffic
 # round(Crosstab(s[s$simule_gagnant==0,], row.vars="gagnant_categorie", col.vars="gagnant_feedback_categorie", type="r", dec.places = 0)$Crosstab)
 
 # weighted:
+s$winning_category <- as.factor(s$gagnant_categorie)
+s$winning_feedback_category <- as.factor(s$gagnant_feedback_categorie)
+levels(s$winning_category) <- c('Winner', 'Unaffected', 'Loser')
+levels(s$winning_feedback_category) <- c('Winner', 'Unaffected', 'Loser')
+
+mar_old <- par()$mar
+cex_old <- par()$cex
+par(mar = c(0.1, 3.1, 2.1, 0), cex.lab=1.2)
+
 decrit(s$simule_gagnant, weights = s$weight)
 
 decrit(s$gagnant_categorie[s$simule_gagnant==1], weights = s$weight[s$simule_gagnant==1])
 decrit(s$gagnant_feedback_categorie[s$simule_gagnant==1], weights = s$weight[s$simule_gagnant==1])
-crosstab(s$gagnant_categorie[s$simule_gagnant==1], s$gagnant_feedback_categorie[s$simule_gagnant==1], s$weight[s$simule_gagnant==1], dnn=c('Winning category, Before', 'Winning category, After'), prop.r=T, dir=c("h", "v")) # , inv.x=T, inv.y=T, color = FALSE # see mosaicplot
-# ct_simule_gagnant <- crosstab(s$gagnant_feedback_categorie[s$simule_gagnant==1], s$gagnant_categorie[s$simule_gagnant==1], s$weight[s$simule_gagnant==1], dnn=c('gagnant_feedback_categorie', 'gagnant_categorie'), prop.c=T)
-# plot(ct_simule_gagnant, inv.x=T, inv.y=T)
+crosstab_simule_gagnant <- crosstab(s$winning_category[s$simule_gagnant==1], s$winning_feedback_category[s$simule_gagnant==1], 
+         s$weight[s$simule_gagnant==1], # dnn=c(expression('Winning category,'~bold(Before)~feedback), ''),
+         prop.r=T, sort=2:1, cex.axis=0.9) # sort=2:1, dir=c("h", "v"), inv.x=T, inv.y=T, color = FALSE # see mosaicplot
+crosstab_simule_gagnant
+plot(crosstab_simule_gagnant, sort=2:1, cex.axis=0.9, ylab = expression('Winning category,'~bold(Before)~feedback), xlab=NA)
+mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
 
 decrit(s$gagnant_categorie[s$simule_gagnant==0], weights = s$weight[s$simule_gagnant==0])
 decrit(s$gagnant_feedback_categorie[s$simule_gagnant==0], weights = s$weight[s$simule_gagnant==0])
-crosstab( s$gagnant_categorie[s$simule_gagnant==0], s$gagnant_feedback_categorie[s$simule_gagnant==0],s$weight[s$simule_gagnant==0], dnn=c('Winning category, Before', 'Winning category, After'), prop.r=T, dir=c("h", "v")) # , inv.x=T, inv.y=T
-# ct_simule_perdant <- crosstab(s$gagnant_feedback_categorie[s$simule_gagnant==0], s$gagnant_categorie[s$simule_gagnant==0], s$weight[s$simule_gagnant==0], dnn=c('gagnant_feedback_categorie', 'gagnant_categorie'), prop.r=T, dir=c("h", "v")) # , inv.x=T, inv.y=T
-# plot(ct_simule_gagnant)
+crosstab_simule_gagnant <- crosstab(s$winning_category[s$simule_gagnant==0], s$winning_feedback_category[s$simule_gagnant==0], 
+         s$weight[s$simule_gagnant==0], # dnn=c(expression('Winning category,'~bold(Before)~feedback), ''),
+         prop.r=T, sort=2:1, cex.axis=0.9) # sort=2:1, dir=c("h", "v"), inv.x=T, inv.y=T, color = FALSE # see mosaicplot
+crosstab_simule_gagnant
+plot(crosstab_simule_gagnant, sort=2:1, cex.axis=0.9, ylab = expression('Winning category,'~bold(Before)~feedback), xlab=NA)
+mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
+
+par(mar = mar_old, cex = cex_old)
+
+# mosaicplot(crosstab_simule_gagnant$tab, # dnn=c(expression('Winning category,'~bold(Before)~feedback), ''),
+#          sort=2:1, cex.axis=0.9, labeling=c(1:9))
+# mosaic(crosstab_simule_gagnant$tab, shade=FALSE, labeling=c(1:9))
+# labeling_cells(text = round(100*crosstab_simule_gagnant$prop.r), margin = 0)(as.table(crosstab_simule_gagnant$prop.r))
