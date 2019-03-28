@@ -41,6 +41,7 @@ package("rddtools")
 package("rddapp")
 package("mets")
 package("plyr")
+package("descr")
 # package("ergm") 
 # package("doMC") # for parallel computing, does not work on Windows
 
@@ -402,7 +403,7 @@ CImedian <- function(vec) { # 95% confidence interval
   return(paste(res[paste('ci.lower')], res[paste('ci.median')], res[paste('ci.upper')], length(which(!is.na(vec) & vec!=-1)))) }
 
 # from http://pcwww.liv.ac.uk/~william/R/crosstab.r http://rstudio-pubs-static.s3.amazonaws.com/6975_c4943349b6174f448104a5513fed59a9.html
-crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.vars = NULL, col.vars = NULL, percentages = TRUE,  addmargins = TRUE, subtotals=TRUE) {
+Crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.vars = NULL, col.vars = NULL, percentages = TRUE,  addmargins = TRUE, subtotals=TRUE) {
   #Declare function used to convert frequency counts into relevant type of proportion or percentage
   mk.pcnt.tbl <- function(tbl, type) {
     a <- length(row.vars)
@@ -494,7 +495,7 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
   if ( (subtotals==FALSE) & (n.vars>2) )  {
     #If subtotals not required AND total table vars > 2
     #Reassign all but last col.var as row vars
-    #[because, for simplicity, crosstabs assumes removal of subtotals uses tables with only ONE col var]
+    #[because, for simplicity, Crosstabs assumes removal of subtotals uses tables with only ONE col var]
     #N.B. Subtotals only present in tables with > 2 cross-classified vars...
     if (length(col.vars)>1) {
       row.vars <- c(row.vars,col.vars[-length(col.vars)])
@@ -541,7 +542,7 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
         A <- (...)
         tbl <- table(A[var.names])
         if(length(var.names==1)) names(dimnames(tbl)) <- var.names
-        #[table() only autocompletes dimnames for multivariate crosstabs of dataframes]
+        #[table() only autocompletes dimnames for multivariate Crosstabs of dataframes]
       }
     }
     else if (class(...) == "ftable") {
@@ -593,16 +594,16 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
   }
   
   #Take the original input data, converted into table format using supplied row and col vars (tbl)
-  #and create a second version (crosstab) which stores results as percentages if a percentage table type is requested.
+  #and create a second version (Crosstab) which stores results as percentages if a percentage table type is requested.
   if (type[1] == "frequency") 
-    crosstab <- tbl
+    Crosstab <- tbl
   else 
-    crosstab <- mk.pcnt.tbl(tbl, type[1])
+    Crosstab <- mk.pcnt.tbl(tbl, type[1])
   
   
   #If multiple table types requested, create and add these to 
   if (length(type) > 1) {
-    tbldat <- as.data.frame.table(crosstab)
+    tbldat <- as.data.frame.table(Crosstab)
     z <- length(names(tbldat)) + 1
     tbldat[z] <- 1
     pcntlab <- type
@@ -613,16 +614,16 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
     pcntlab[match("total.pct", type)] <- "Total %"
     for (i in 2:length(type)) {
       if (type[i] == "frequency") 
-        crosstab <- tbl
-      else crosstab <- mk.pcnt.tbl(tbl, type[i])
-      crosstab <- as.data.frame.table(crosstab)
-      crosstab[z] <- i
-      tbldat <- rbind(tbldat, crosstab)
+        Crosstab <- tbl
+      else Crosstab <- mk.pcnt.tbl(tbl, type[i])
+      Crosstab <- as.data.frame.table(Crosstab)
+      Crosstab[z] <- i
+      tbldat <- rbind(tbldat, Crosstab)
     }
     tbldat[[z]] <- as.factor(tbldat[[z]])
     levels(tbldat[[z]]) <- pcntlab
-    crosstab <- xtabs(Freq ~ ., data = tbldat)
-    names(dimnames(crosstab))[z - 1] <- ""
+    Crosstab <- xtabs(Freq ~ ., data = tbldat)
+    names(dimnames(Crosstab))[z - 1] <- ""
   }
   
   
@@ -633,21 +634,21 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
     
     if (length(type)==1) {
       if (type=="row.pct") 
-      { crosstab <- addmargins(crosstab,margin=c(vars[n.vars]))
+      { Crosstab <- addmargins(Crosstab,margin=c(vars[n.vars]))
       tbl <- addmargins(tbl,margin=c(vars[n.vars]))
       }
       else 
       { if (type=="column.pct") 
-      { crosstab <- addmargins(crosstab,margin=c(vars[n.row.vars]))
+      { Crosstab <- addmargins(Crosstab,margin=c(vars[n.row.vars]))
       tbl <- addmargins(tbl,margin=c(vars[n.row.vars]))
       }
         else 
         { if (type=="joint.pct") 
-        { crosstab <- addmargins(crosstab,margin=c(vars[(n.row.vars)],vars[n.vars])) 
+        { Crosstab <- addmargins(Crosstab,margin=c(vars[(n.row.vars)],vars[n.vars])) 
         tbl <- addmargins(tbl,margin=c(vars[(n.row.vars)],vars[n.vars])) 
         }
           else #must be total.pct OR frequency
-          { crosstab <- addmargins(crosstab)
+          { Crosstab <- addmargins(Crosstab)
           tbl <- addmargins(tbl)
           }
         }
@@ -656,7 +657,7 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
     
     #If more than one table type requested, only adding row totals makes any sense...
     if (length(type)>1) {
-      crosstab <- addmargins(crosstab,margin=c(vars[n.vars]))
+      Crosstab <- addmargins(Crosstab,margin=c(vars[n.vars]))
       tbl <- addmargins(tbl,margin=c(vars[n.vars]))
     }
     
@@ -668,8 +669,8 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
   t1 <- NULL
   if ( (subtotals==FALSE) & (n.vars>2) )  {
     
-    #Create version of crosstab in ftable format
-    t1 <- crosstab 
+    #Create version of Crosstab in ftable format
+    t1 <- Crosstab 
     t1 <- ftable(t1,row.vars=row.vars,col.vars=col.vars)
     
     #Convert to a dataframe
@@ -716,7 +717,7 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
   
   
   
-  #Create output object 'result' [class: crosstab]
+  #Create output object 'result' [class: Crosstab]
   result <- NULL
   #(a) record of argument values used to produce tabular output
   result$row.vars <- row.vars
@@ -730,17 +731,17 @@ crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
   
   #(b) tabular output [3 variants]
   result$table <- tbl  #Stores original cross-tab frequency counts without margins [class: table]
-  result$crosstab <- crosstab #Stores cross-tab in table format using requested style(frequency/pct) and table margins (on/off)
+  result$Crosstab <- Crosstab #Stores cross-tab in table format using requested style(frequency/pct) and table margins (on/off)
   #[class: table]  
-  result$crosstab.nosub <- t1  #crosstab with subtotals suppressed [class: dataframe; or NULL if no subtotals suppressed]  
-  class(result) <- "crosstab"    
+  result$Crosstab.nosub <- t1  #Crosstab with subtotals suppressed [class: dataframe; or NULL if no subtotals suppressed]  
+  class(result) <- "Crosstab"    
   
   #Return 'result' as output of function
   result
   
 }
 
-print.crosstab <- function(x,dec.places=x$dec.places,subtotals=x$subtotals,...) {
+print.Crosstab <- function(x,dec.places=x$dec.places,subtotals=x$subtotals,...) {
   
   row.vars <- x$row.vars
   col.vars <- x$col.vars
@@ -749,7 +750,7 @@ print.crosstab <- function(x,dec.places=x$dec.places,subtotals=x$subtotals,...) 
   n.vars <- n.row.vars + n.col.vars
   
   if (length(x$type)>1) {
-    z<-length(names(dimnames(x$crosstab)))
+    z<-length(names(dimnames(x$Crosstab)))
     if (x$style=="long") {
       row.vars<-c(row.vars,z) 
     } else {
@@ -759,30 +760,30 @@ print.crosstab <- function(x,dec.places=x$dec.places,subtotals=x$subtotals,...) 
   
   if (n.vars==1) {
     if (length(x$type)==1) {
-      tmp <- data.frame(round(x$crosstab,x$dec.places))
+      tmp <- data.frame(round(x$Crosstab,x$dec.places))
       colnames(tmp)[2] <- ifelse(x$type=="frequency","Count","%")
       print(tmp,row.names=FALSE)
     } else {
-      print(round(x$crosstab,x$dec.places))
+      print(round(x$Crosstab,x$dec.places))
     }
   }
   
   
   #If table has only 2 dimensions, or subtotals required for >2 dimensional table,
-  #print table using ftable() on x$crosstab
+  #print table using ftable() on x$Crosstab
   if ((n.vars == 2) | ((subtotals==TRUE) & (n.vars>2))) {
     
-    tbl <- ftable(x$crosstab,row.vars=row.vars,col.vars=col.vars)
+    tbl <- ftable(x$Crosstab,row.vars=row.vars,col.vars=col.vars)
     
     if (!all(as.integer(tbl)==as.numeric(tbl))) tbl <- round(tbl,dec.places)
     print(tbl,...)
     
   }
   
-  #If subtotals NOT required AND > 2 dimensions, print table using write.table() on x$crosstab.nosub
+  #If subtotals NOT required AND > 2 dimensions, print table using write.table() on x$Crosstab.nosub
   if ((subtotals==FALSE) & (n.vars>2))  {
     
-    t1 <- x$crosstab.nosub
+    t1 <- x$Crosstab.nosub
     
     #Convert numbers to required decimal places, right aligned
     width <- max( nchar(t1[1,]), nchar(t1[2,]), 7 )

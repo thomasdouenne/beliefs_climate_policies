@@ -609,13 +609,13 @@ barres_perdants_GJ_oppose
 
 
 # Socio demo gilets jaunes
-table_taille_agglo_GJ <- round(crosstab(s[s$gilets_jaunes!='NSP',], row.vars="taille_agglo", col.vars="gilets_jaunes", type="j", dec.places = 0)$crosstab)
-table_taille_agglo_GJ[1:5, ] <- round(crosstab(s[s$gilets_jaunes!='NSP',], row.vars="taille_agglo", col.vars="gilets_jaunes", type="r", dec.places = 0)$crosstab)
+table_taille_agglo_GJ <- round(Crosstab(s[s$gilets_jaunes!='NSP',], row.vars="taille_agglo", col.vars="gilets_jaunes", type="j", dec.places = 0)$Crosstab)
+table_taille_agglo_GJ[1:5, ] <- round(Crosstab(s[s$gilets_jaunes!='NSP',], row.vars="taille_agglo", col.vars="gilets_jaunes", type="r", dec.places = 0)$Crosstab)
 table_taille_agglo_GJ
 xtable(table_taille_agglo_GJ, digits=0)
 
-table_categorie_cible_GJ <- round(crosstab(s[s$gilets_jaunes!='NSP',], row.vars="revenu_decile", col.vars="gilets_jaunes", type="j", dec.places = 0)$crosstab)
-table_categorie_cible_GJ[1:10, ] <- round(crosstab(s[s$gilets_jaunes!='NSP',], row.vars="revenu_decile", col.vars="gilets_jaunes", type="r", dec.places = 0)$crosstab)
+table_categorie_cible_GJ <- round(Crosstab(s[s$gilets_jaunes!='NSP',], row.vars="revenu_decile", col.vars="gilets_jaunes", type="j", dec.places = 0)$Crosstab)
+table_categorie_cible_GJ[1:10, ] <- round(Crosstab(s[s$gilets_jaunes!='NSP',], row.vars="revenu_decile", col.vars="gilets_jaunes", type="r", dec.places = 0)$Crosstab)
 table_categorie_cible_GJ
 xtable(table_categorie_cible_GJ, digits=0)
 
@@ -628,6 +628,7 @@ xtable(table_categorie_cible_GJ, digits=0)
 # with(s, tapply(X=taxe_cible_approbation!='Non', INDEX=list(gagnant_cible_categorie!='Perdant', taxe_approbation!='Non'), FUN=mean)) # cannot put weights
 # xtabs((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant') + (taxe_approbation!='Non'), s)/xtabs(~ (gagnant_cible_categorie!='Perdant') + (taxe_approbation!='Non'), s) # cannot put weights
 # s %>%  group_by((gagnant_cible_categorie!='Perdant'), tax_acceptance) %>%  summarise(mean = mean(taxe_cible_approbation!='Non')) %>%  spread(tax_acceptance, mean, sep = '') # cannot put weights
+# cf. aussi crosstab, e.g. crosstab( s$gagnant_categorie[s$simule_gagnant==0], s$gagnant_feedback_categorie[s$simule_gagnant==0],s$weight[s$simule_gagnant==0], dnn=c('Winning category, Before', 'Winning category, After'), prop.r=T, dir=c("h", "v")) # , inv.x=T, inv.y=T
 s$tax_approval <- s$taxe_approbation=='Oui'
 s$tax_acceptance <- s$taxe_approbation!='Non' # TODO: in preparation
 s$tax_cible_acceptance <- 1*(s$taxe_cible_approbation!='Non')
@@ -728,7 +729,7 @@ summary(lm((taxe_feedback_approbation != 'Non') ~ gagnant_f.hat + taxe_approbati
 
 
 ##### Régressions: persistance des croyances #####
-# TODO: Etudier les gens gagnant en pouvoir d'achat mais perdant en utilit� (en prenant une �lasticit� nulle)
+# TODO: Etudier les gens gagnant en pouvoir d'achat mais perdant en utilit? (en prenant une ?lasticit? nulle)
 # 3.1 apprendre qu'on est (simulé) gagnant augmente la croyance de ne pas perdre de 23%***
 croyances_1 <- lm(((gagnant_feedback_categorie!='Perdant') - (gagnant_categorie!='Perdant')) ~ simule_gagnant + simule_gain + I(simule_gain^2), data=s, weights = s$weight, na.action="na.exclude")
 summary(croyances_1)
@@ -936,7 +937,7 @@ lines(cdf_transport_min$x, cdf_transport_min$y, type="s", lty=2, col="red")
 lines(cdf_transport_max$x, cdf_transport_max$y, type="s", lty=2, col="red")
 axis(1, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
 abline(v = c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.5), lwd=0.2)
-# TODO: finir ça, avec les valeurs de l'�chelle au-dessus
+# TODO: finir ça, avec les valeurs de l'?chelle au-dessus
   
 
 cdf_housing <- Ecdf(objective_gains$housing)
@@ -962,8 +963,8 @@ par(mar = mar_old, cex = cex_old)
 ##### Transports en commun #####
 decrit(s$transports_avis, weights = s$weight, miss=T)
 
-table_taille_agglo_transports <- round(crosstab(s[s$transports_avis!='NSP',], row.vars="taille_agglo", col.vars="transports_avis", type="j", dec.places = 0)$crosstab)
-table_taille_agglo_transports[1:5, ] <- round(crosstab(s[s$transports_avis!='NSP',], row.vars="taille_agglo", col.vars="transports_avis", type="r", dec.places = 0)$crosstab)
+table_taille_agglo_transports <- round(Crosstab(s[s$transports_avis!='NSP',], row.vars="taille_agglo", col.vars="transports_avis", type="j", dec.places = 0)$Crosstab)
+table_taille_agglo_transports[1:5, ] <- round(Crosstab(s[s$transports_avis!='NSP',], row.vars="taille_agglo", col.vars="transports_avis", type="r", dec.places = 0)$Crosstab)
 table_taille_agglo_transports
 xtable(table_taille_agglo_transports, digits=0)
 # print(xtable(table_taille_agglo_transports, digits=0), file="table_taille_agglo_transports.tex")
@@ -980,3 +981,31 @@ decrit(s$transports_travail_commun, weights = s$weight) # TODO: preparation
 decrit(s$transports_travail_actif, weights = s$weight)
 decrit(s$transports_travail_actif=='Non' & s$transports_travail_commun=='Non', weights = s$weight)
 decrit(s$transports_travail_actif=='Oui, ça ne me poserait pas de grande difficulté' | s$transports_travail_commun=='Oui, ça ne me poserait pas de grande difficulté', weights = s$weight)
+
+
+##### Transition matrix: gagnant avant/après feedback #####
+# # non weighted:
+# decrit(s$simule_gagnant)
+# 
+# decrit(s$gagnant_categorie[s$simule_gagnant==1])
+# decrit(s$gagnant_feedback_categorie[s$simule_gagnant==1])
+# round(Crosstab(s[s$simule_gagnant==1,], row.vars="gagnant_categorie", col.vars="gagnant_feedback_categorie", type="r", dec.places = 0)$Crosstab)
+# 
+# decrit(s$gagnant_categorie[s$simule_gagnant==0])
+# decrit(s$gagnant_feedback_categorie[s$simule_gagnant==0])
+# round(Crosstab(s[s$simule_gagnant==0,], row.vars="gagnant_categorie", col.vars="gagnant_feedback_categorie", type="r", dec.places = 0)$Crosstab)
+
+# weighted:
+decrit(s$simule_gagnant, weights = s$weight)
+
+decrit(s$gagnant_categorie[s$simule_gagnant==1], weights = s$weight[s$simule_gagnant==1])
+decrit(s$gagnant_feedback_categorie[s$simule_gagnant==1], weights = s$weight[s$simule_gagnant==1])
+crosstab(s$gagnant_categorie[s$simule_gagnant==1], s$gagnant_feedback_categorie[s$simule_gagnant==1], s$weight[s$simule_gagnant==1], dnn=c('Winning category, Before', 'Winning category, After'), prop.r=T, dir=c("h", "v")) # , inv.x=T, inv.y=T, color = FALSE # see mosaicplot
+# ct_simule_gagnant <- crosstab(s$gagnant_feedback_categorie[s$simule_gagnant==1], s$gagnant_categorie[s$simule_gagnant==1], s$weight[s$simule_gagnant==1], dnn=c('gagnant_feedback_categorie', 'gagnant_categorie'), prop.c=T)
+# plot(ct_simule_gagnant, inv.x=T, inv.y=T)
+
+decrit(s$gagnant_categorie[s$simule_gagnant==0], weights = s$weight[s$simule_gagnant==0])
+decrit(s$gagnant_feedback_categorie[s$simule_gagnant==0], weights = s$weight[s$simule_gagnant==0])
+crosstab( s$gagnant_categorie[s$simule_gagnant==0], s$gagnant_feedback_categorie[s$simule_gagnant==0],s$weight[s$simule_gagnant==0], dnn=c('Winning category, Before', 'Winning category, After'), prop.r=T, dir=c("h", "v")) # , inv.x=T, inv.y=T
+# ct_simule_perdant <- crosstab(s$gagnant_feedback_categorie[s$simule_gagnant==0], s$gagnant_categorie[s$simule_gagnant==0], s$weight[s$simule_gagnant==0], dnn=c('gagnant_feedback_categorie', 'gagnant_categorie'), prop.r=T, dir=c("h", "v")) # , inv.x=T, inv.y=T
+# plot(ct_simule_gagnant)
