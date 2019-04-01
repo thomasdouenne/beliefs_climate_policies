@@ -11,7 +11,7 @@ from model_reforms_data.gains_losses_data import compute_gains_losses
 from model_reforms_data.standardize_data_bdf_ptc import variables_names_bdf_to_ptc, \
     create_new_variables_bdf_ptc, compute_gain_net_uc, compare_objective_subjective_beliefs_gain, \
     impute_barycentre_in_bins, impute_average_bdf_in_bins, extrapolate_distribution_bcp_from_bdf, \
-    save_dataframes_kernel_density
+    save_dataframes_kernel_density, compute_effort_rate_decile
 
 seaborn.set_palette(seaborn.color_palette([u'blue', u'red']))
 
@@ -34,6 +34,10 @@ df_bdf = variables_names_bdf_to_ptc(df_bdf)
 df_ptc['gain_taxe_carbone_echelle'] = df_ptc['gain_echelle']
 
 
+""" Define policy to study """ # chauffage, fuel ou taxe_carbone
+energy = 'taxe_carbone'
+
+
 """ Define sub-samples to study """ # Put None to variable, value or sign to get full sample
 variable = 'gaz'
 sign = '=='
@@ -50,14 +54,13 @@ except:
 plot_step_distribution = False
 plot_kde = False
 save_kde_data = False
-test_imputation_methods = True # The two methods provide quite similar results
+test_imputation_methods = False # The two methods provide quite similar results
 regress = False
-number_winners = True
+number_winners = False
+effort_rate = True
 
 
 """ Compare distributions BdF/BCP """ # pdf and CDF net gains of both samples (step function or Kernel density estimation)
-
-energy = 'taxe_carbone' # chauffage, fuel ou taxe_carbone
 
 if plot_step_distribution == True:
     df_to_plot = compare_objective_subjective_beliefs_gain(df_bdf, df_ptc, energy, True)    
@@ -110,3 +113,8 @@ if number_winners == True:
     print float(((df_bdf['gain_net_numeric_uc_fuel'] > 0) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
     print float(((df_bdf['gain_net_numeric_uc_chauffage'] > 0) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
     print float(((df_bdf['gain_net_numeric_uc_taxe_carbone'] > 0) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+
+
+""" Effort rate decile """
+if effort_rate == True:
+    compute_effort_rate_decile(df_bdf, energy)
