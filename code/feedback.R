@@ -189,9 +189,15 @@ proba_non_perdant_coherente_Bayes <- (5/6)*probas['simule_non_perdant']/probas['
 
 ##### 6. Régressions pour estimer effet feedback et asymétrie
 s$update <- 1*(((s$gagnant_feedback_categorie != 'Perdant') - (s$gagnant_categorie != 'Perdant')) != 0)
+s$update <- 1*(s$gagnant_feedback_categorie != s$gagnant_categorie)
 
 summary(lm(((gagnant_feedback_categorie != 'Perdant') - (gagnant_categorie != 'Perdant')) ~ simule_gagnant, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f']))
 summary(lm(((gagnant_feedback_categorie != 'Gagnant') - (gagnant_categorie != 'Gagnant')) ~ simule_gagnant, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f']))
+
+summary(lm(update ~ simule_gagnant * gagnant_categorie, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f']))
+probitmarg <- probitmfx(update ~ simule_gagnant * gagnant_categorie, data = s[s$variante_taxe_info=='f',], atmean = TRUE)
+probitmarg
+
 
 summary(lm(update ~ simule_gagnant, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f']))
 summary(lm(((gagnant_feedback_categorie != 'Perdant') - (gagnant_categorie != 'Perdant')) ~ gagnant_categorie, data=s[s$simule_gagnant==1,], weights = s$weight[s$simule_gagnant==1]))

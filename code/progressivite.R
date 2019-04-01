@@ -1,4 +1,5 @@
 ##### RÃ©gressions: progressivitÃ© #####
+decrit(s$progressivite, weights = s$weight)
 decrit(s$progressivite[s$info_progressivite==T])
 decrit(s$progressivite[s$info_progressivite==FALSE])
 # On ne convainc pas les rÃ©pondants que la taxe est progressive !
