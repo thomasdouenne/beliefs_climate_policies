@@ -8,7 +8,7 @@ import scipy.stats as stats
 import random
 import matplotlib as plt
 
-from utils import graph_builder_bar_percent
+from utils import graph_builder_bar_percent, graph_builder_bar
 
 
 def variables_names_bdf_to_ptc(df_bdf):
@@ -222,6 +222,27 @@ def extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone
     plot_1 = df_to_plot_limited['subjective_gain_numeric_{}'.format(energy)].plot.density(bw_method = bw_size, legend = True)
     
     return df_bdf, df_to_plot
+
+
+def compute_effort_rate_decile(df_bdf, energy):
+    df_to_plot = pd.DataFrame(index = range(1,11),
+        columns = ['average_cost_{}'.format(energy), 'effort_rate_{}'.format(energy)])
+    for i in range(1,11):
+        df_to_plot['average_cost_{}'.format(energy)][i] = (
+            (df_bdf.query('income_decile == {}'.format(i))['gain_net_numeric_uc_{}'.format(energy)] /
+            df_bdf.query('income_decile == {}'.format(i))['uc'] * \
+                   df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
+                )
+        df_to_plot['effort_rate_{}'.format(energy)][i] = (
+            (df_bdf.query('income_decile == {}'.format(i))['gain_net_numeric_uc_{}'.format(energy)] * \
+                   df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
+                    ) / (
+            (df_bdf.query('income_decile == {}'.format(i))['hh_disposable_income'] * \
+                   df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
+                )
+
+    return graph_builder_bar_percent(df_to_plot[['effort_rate_{}'.format(energy)]]), graph_builder_bar(df_to_plot[['average_cost_{}'.format(energy)]], True)
+        
 
 
 def save_dataframes_kernel_density(df_bdf, df_ptc):

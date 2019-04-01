@@ -23,8 +23,10 @@ def graph_builder_bar(graph, stacked):
         )
     plt.axhline(0, color = 'k')
     axes.legend(
-        bbox_to_anchor = (1.5, 1.05),
+        bbox_to_anchor = (1.8, 1.05),
         )
+    plt.xlabel('Income deciles')
+    plt.ylabel('euros per consumption unit')
     return plt.show()
 
 
@@ -37,6 +39,8 @@ def graph_builder_bar_percent(graph):
     axes.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:.1%}'.format(y)))
     # .1% means that we want one decimal
     axes.legend(
-        bbox_to_anchor = (1.5, 1.05),
+        bbox_to_anchor = (1.8, 1.05),
         )
+    plt.xlabel('Income deciles')
+    plt.ylabel('Net gains as a share of disposable income')
     return plt.show()
