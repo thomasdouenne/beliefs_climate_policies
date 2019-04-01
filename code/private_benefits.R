@@ -13,7 +13,10 @@ summary(lm((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant'
 # Une OLS standard nous donne qu'une personne se percevant gagnante a une probabilité d'approbation supérieure de 48 p.p.
 
 # Lorsqu'on examine les résultats à la première question, l'effet des bénéfices privés sur l'approbation est nettement plus faible. On peut interpréter cela comme une confiance moindre dans cette réponse.
-summary(lm((taxe_approbation!='Non') ~ (gain_echelle > 4) + (gain_echelle < -4) + (taxe_efficace!='Non') + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2) + simule_gain_cible, data=s, subset=categorie_cible!='70_', weights = s$weight))
+summary(lm((taxe_approbation!='Non') ~ (gagnant_categorie!='Perdant') + (taxe_efficace!='Non') + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2) + simule_gain + taille_agglo, data=s, weights = s$weight))
+summary(lm((taxe_approbation!='Non') ~ (gain_echelle > 3) + (gain_echelle < -3) + (taxe_efficace!='Non') + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2) + simule_gain + taille_agglo, data=s, weights = s$weight))
+probitmarg <- probitmfx(taxe_approbation!='Non' ~ (gagnant_categorie != 'Perdant') + revenu + I(revenu^2) + revenu_conjoint + (taxe_efficace!='Non') + simule_gain, data = s, atmean = TRUE)
+probitmarg
 
 cor(s$simule_gain_cible, s$traite_cible)
 cor(s$simule_gain_cible[s$nb_adultes>1], s$traite_cible_conjoint[s$nb_adultes>1])
