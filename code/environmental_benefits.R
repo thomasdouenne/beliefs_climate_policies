@@ -1,4 +1,5 @@
 ##### Effet simple sur l'approbation ####
+decrit(s$taxe_efficace, weights = s$weight, miss=T)
 
 # Effet de info_CC mais pas de info_PM
 summary(lm(taxe_approbation!='Non' ~ info_CC * info_PM, data=s, weights = s$weight))
@@ -158,3 +159,38 @@ summary(lm(responsable_CC_govts==T ~ info_CC, data=s, weights = s$weight))
 ##### Stats descriptives #####
 decrit(s$taxe_efficace[s$apres_modifs==T], miss=T)
 decrit(s$taxe_efficace[s$apres_modifs==FALSE], miss=T)
+
+##### Lien élasticité - efficacité #####
+library(stargazer)
+library(broom)
+cor((s$taxe_efficace[s$variante_partielle=='c'] != 'Non'), s$Elasticite_chauffage[s$variante_partielle=='c'])
+cor((s$taxe_efficace[s$variante_partielle=='f'] != 'Non'), s$Elasticite_fuel[s$variante_partielle=='f'])
+elas_c <- lm(taxe_efficace!='Non' ~ Elasticite_chauffage, data=s, subset = variante_partielle=='c', weights = s$weight)
+summary(elas_c)
+elas_f <- lm(taxe_efficace!='Non' ~ Elasticite_fuel, data=s, subset = variante_partielle=='f', weights = s$weight)
+summary(elas_f)
+
+elas_c_controls <- lm(taxe_efficace!='Non' ~ Elasticite_chauffage + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, subset = variante_partielle=='c', weights = s$weight)
+summary(elas_c_controls)
+elas_f_controls <- lm(taxe_efficace!='Non' ~ Elasticite_fuel + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, subset = variante_partielle=='f', weights = s$weight)
+summary(elas_f_controls)
+
+summary(lm(taxe_efficace!='Non' ~ Elasticite_chauffage_perso, data=s, subset = variante_partielle=='c', weights = s$weight))
+summary(lm(taxe_efficace!='Non' ~ Elasticite_fuel_perso, data=s, subset = variante_partielle=='f', weights = s$weight))
+
+tidy(elas_c) -> elas_c_tidy
+tidy(elas_f) -> elas_f_tidy
+tidy(elas_c_controls) -> elas_c_controls_tidy
+tidy(elas_f_controls) -> elas_f_controls_tidy
+
+merge(elas_c_tidy, elas_f_tidy, elas_c_controls_tidy, elas_f_controls_tidy, by='term', all.x=T, all.y=T) -> output
+
+stargazer(output, type='latex', summary=FALSE)
+
+stargazer(elas_c, elas_f, elas_c_controls, elas_f_controls, type="latex",
+          dep.var.labels=c("Environmental effectiveness"),
+          covariate.labels=c("Price elasticity housing", "Price elsticity transports", "Income","Size urban unit",
+                             "Age","Domestic fuel", "Natural gas", "Diesel"))
+
+decrit(s$Elasticite_chauffage[s$taxe_efficace=='Non'])
+decrit(s$Elasticite_fuel[s$taxe_efficace=='Non'])
