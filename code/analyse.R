@@ -88,6 +88,8 @@ decrit(s$gagnant_progressif_categorie, weights = s$weight)
 cdf_gain <- wtd.Ecdf(s$gain, weights = s$weight)
 plot(cdf_gain$x, cdf_gain$ecdf, type='s', lwd=2, col='orange', xlab="Category of subjective gain", ylab="Distribution of answers") + grid()
 
+
+decrit(s$gain > s$simule_gain, weights = s$weight)
 # TODO: estimer gain que le répondant devrait estimer pour lui-même avec son élasticité
 
 

@@ -138,7 +138,6 @@ Table 1 confirms that our sample is very representative.
  Nonetheless, observations are thus weighted to correct small differences
  between sample and population proportions.
  The median time for completion of the survey was 19 minutes.
- 
 \end_layout
 
 \begin_layout Standard
@@ -3090,10 +3089,29 @@ name "subsec:Consumer-survey-Budget"
 \end_layout
 
 \begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "edwards_conservatism_1968"
+literal "false"
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "benabou_self-confidence_2002,eil_good_2011,coutts_good_2018"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 btprint "btPrintCited"
-bibfiles "C:/Users/a.fabre/Google Drive/Economie/Articles/CO2_tax_acceptability"
+bibfiles "/var/www/bibs/CO2_tax_acceptability,C:/Users/a.fabre/Google Drive/Economie/Articles/CO2_tax_acceptability"
 options "C:/Users/a.fabre/Google Drive/Economie/Articles/ANDplainnat"
 
 \end_inset
