@@ -912,6 +912,63 @@ confirmation_bias(nb_bin = 1, method='mean')
 decrit(s$simule_gain[s$gain==0 & s$variante_taxe_info=='f'], weights= s$weight[s$gain==0 & s$variante_taxe_info=='f'])
 
 
+##### Adaptation bayésienne : tout nouveau modèle ######
+s$gagnant_feedback_pas_faux <- (s$simule_gagnant==1 & s$gagnant_feedback_categorie!='Perdant') | (s$simule_gagnant==0 & s$gagnant_feedback_categorie!='Gagnant')
+s$gagnant_feedback_correct <- (s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant') | (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Perdant')
+decrit(s$gagnant_feedback_pas_faux)
+decrit(s$gagnant_feedback_correct)
+nb_bin <- 8
+nb_bins <- length(levels(binning(s$simule_gain, bins=nb_bin, method="wtd.quantile", ordered=FALSE, weights=s$weight)))
+s$bins_simule_gain <- binning(s$simule_gain, bins=nb_bin, method="wtd.quantile", labels=c(1:nb_bins), ordered=FALSE, weights=s$weight)
+sigma_i <- feedback_pas_faux_i <- feedback_correct_i <- c()
+for (i in 1:nb_bins) { # TODO: make bins of same size (?)
+  if (i==3) { # bin that contains both positive and negative simule_gain
+    s$bins_simule_gain[s$simule_gain<0 & s$bins_simule_gain==i] <- 2
+    # s$bins_simule_gain[s$simule_gain>0 & s$bins_simule_gain==i] <- 4
+  } 
+  sigma_i <- c(sigma_i, sqrt(wtd.var(s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i], s$weight[s$variante_taxe_info=='f' & s$bins_simule_gain==i])))
+  feedback_pas_faux_i <- c(feedback_pas_faux_i, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_pas_faux==T & s$bins_simule_gain==i])/sum(s$weight[s$variante_taxe_info=='f' & s$bins_simule_gain==i]))
+  feedback_correct_i <- c(feedback_correct_i, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_correct==T & s$bins_simule_gain==i])/sum(s$weight[s$variante_taxe_info=='f' & s$bins_simule_gain==i]))
+  if (i<3) {
+    s$phi_g_sigma_gamma_large[s$variante_taxe_info=='f' & s$bins_simule_gain==i] <- 1-(5/6)*(1-pnorm(-s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i]/sigma_i[i], lower.tail=T))/feedback_pas_faux_i[i]
+    s$phi_g_sigma_gamma[s$variante_taxe_info=='f' & s$bins_simule_gain==i] <- 1-(5/6)*(1-pnorm(-s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i]/sigma_i[i], lower.tail=T))/feedback_correct_i[i]
+  } else {
+    s$phi_g_sigma_gamma_large[s$variante_taxe_info=='f' & s$bins_simule_gain==i] <- (5/6)*(pnorm(-s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i]/sigma_i[i], lower.tail=T))/feedback_pas_faux_i[i]
+    s$phi_g_sigma_gamma[s$variante_taxe_info=='f' & s$bins_simule_gain==i] <- (5/6)*(pnorm(-s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i]/sigma_i[i], lower.tail=T))/feedback_correct_i[i]
+  }
+  # print(mean(s$simule_gain[s$bins_simule_gain==i]))
+}
+# decrit(s$bins_simule_gain)
+s$non_bayesien_large <- s$phi_g_sigma_gamma_large < 0 | s$phi_g_sigma_gamma_large > 1
+s$non_bayesien <- s$phi_g_sigma_gamma < 0 | s$phi_g_sigma_gamma > 1
+s$sigma_gamma_large <- - s$gain/qnorm(s$phi_g_sigma_gamma_large)
+s$sigma_gamma <- - s$gain/qnorm(s$phi_g_sigma_gamma)
+
+decrit(s$non_bayesien_large, weights = s$weight) # 37%
+decrit(s$non_bayesien, weights = s$weight) # 73%
+decrit(s$phi_g_sigma_gamma_large[s$non_bayesien_large==FALSE], weights = s$weight[s$non_bayesien_large==FALSE])
+decrit(s$phi_g_sigma_gamma[s$non_bayesien==FALSE], weights = s$weight[s$non_bayesien==FALSE])
+decrit(s$sigma_gamma_large[s$non_bayesien_large==FALSE], weights = s$weight[s$non_bayesien_large==FALSE])
+decrit(s$sigma_gamma[s$non_bayesien==FALSE], weights = s$weight[s$non_bayesien==FALSE])
+decrit((s$sigma_gamma_large<0)[s$non_bayesien_large==FALSE], weights = s$weight[s$non_bayesien_large==FALSE]) # 14%
+decrit((s$sigma_gamma<0)[s$non_bayesien==FALSE], weights = s$weight[s$non_bayesien==FALSE]) # 10%
+sort(sigma_i) # 7 in 110-125, 148
+sqrt(wtd.var(s$gain ,weights = s$weight)) # 124
+feedback_pas_faux_i
+feedback_correct_i
+decrit(s$non_bayesien_large | s$sigma_gamma_large < 0, weights = s$weight) # 46%
+decrit(s$non_bayesien | s$sigma_gamma < 0, weights = s$weight) # 76%
+decrit(s$sigma_gamma_large[s$non_bayesien_large==FALSE & s$sigma_gamma_large > 0], weights = s$weight[s$non_bayesien_large==FALSE & s$sigma_gamma_large > 0]) # mean 181
+decrit(s$sigma_gamma[s$non_bayesien==FALSE & s$sigma_gamma > 0], weights = s$weight[s$non_bayesien==FALSE & s$sigma_gamma > 0]) # mean 183
+decrit(s$non_bayesien_large[s$simule_gain>0], weights = s$weight[s$simule_gain>0]) # 48%
+decrit(s$non_bayesien[s$simule_gain>0], weights = s$weight[s$simule_gain>0]) # 94%
+decrit(s$non_bayesien_large[s$simule_gain<0], weights = s$weight[s$simule_gain<0]) # 0%
+decrit(s$non_bayesien[s$simule_gain<0], weights = s$weight[s$simule_gain<0]) # 0%
+
+decrit(s$update_correct | s$gagnant_feedback_correct, weights = s$weight) # 43%
+decrit(s$update_correct_large | s$gagnant_feedback_pas_faux, weights = s$weight) # 67%
+
+
 ##### Graph distributions subjective/objective gains #####
 objective_gains <- read.csv2("df_objective_gains.csv")
 subjective_gains <- read.csv2("df_subjective_gains.csv")
