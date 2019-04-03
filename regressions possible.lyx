@@ -1893,7 +1893,7 @@ a priori
 \emph default
 ).
  Il croit que nous estimons son gain à 
-\begin_inset Formula $\widehat{\gamma_{i}}+\epsilon_{i}=\gamma_{i}+\iota_{i}+\epsilon_{i}$
+\begin_inset Formula $\widehat{\gamma_{i}}+\epsilon_{i}=\gamma_{i}-\iota_{i}+\epsilon_{i}$
 \end_inset
 
 , et que nous commettons une erreur d'espérance 
@@ -1918,11 +1918,11 @@ non nulle, où
 \begin_inset Formula $b_{B\left(i\right)}$
 \end_inset
 
- et le nôtre 
+ et notre erreur 
 \begin_inset Formula $\iota_{i}$
 \end_inset
 
- (qu'on peut estimer dans une extension pour estimer 
+ (dont on peut estimer l'espérance dans une extension pour estimer 
 \emph on
 b
 \emph default
@@ -1959,7 +1959,7 @@ b
 
 
 \emph default
- du nôtre 
+ de notre erreur 
 \begin_inset Formula $\iota_{i}$
 \end_inset
 
@@ -2075,7 +2075,580 @@ B
 \end_layout
 
 \begin_layout Standard
+________________________________________________________________________________
+___
+\end_layout
+
+\begin_layout Standard
 Tentative de cadre bayésien :
+\end_layout
+
+\begin_layout Standard
+From the previous tables it appears that respondents do not fully update
+ their beliefs once they are given our feedback.
+ We propose a model to demonstrate that a majority of them do not follow
+ Bayesian rationality in their updating process.
+ Let us assume that respondent 
+\emph on
+i
+\emph default
+ is uncertain about their actual gain and evaluates its distribution to
+ be 
+\begin_inset Formula $\mathcal{N}\left(g_{i},\sigma_{i}^{2}\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $\sigma_{i}$
+\end_inset
+
+ is their uncertainty.
+ This respondent 
+\emph on
+believes
+\emph default
+ that our evaluation of their gain follows the law 
+\begin_inset Formula $\widehat{\gamma_{i}}\,|\,\mathbf{E}_{i}\sim\mathcal{N}\left(g_{i}+b_{i},\sigma_{\gamma}^{2}\right)$
+\end_inset
+
+, where 
+\begin_inset Formula $b_{i}$
+\end_inset
+
+ is our bias and 
+\begin_inset Formula $\sigma_{\gamma}^{2}$
+\end_inset
+
+ is such that we —the surveyers— make a correct feedback in 5 out of 6 cases:
+ 
+\begin_inset Formula $\mathbb{P}\left(\text{sgn}\left(\gamma_{i}\right)=\text{sgn}\left(\text{\ensuremath{\widehat{\gamma}}}_{i}\right)\right)=\frac{5}{6}$
+\end_inset
+
+.
+ Hence, in their Bayesian reasoning, respondent 
+\emph on
+i
+\emph default
+ believes that 
+\begin_inset Formula $\mathbb{P}_{i}\left(\widehat{\gamma_{i}}<0\,|\,\mathbf{E}_{i}\right)=\Phi_{g_{i}+b_{i},\sigma_{\gamma_{i}}^{2}}\left(0\right)$
+\end_inset
+
+.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Following usual convention, we denote 
+\begin_inset Formula $\Phi_{\mu,\sigma^{2}}$
+\end_inset
+
+ the c.d.f.
+ of the normal distribution of mean 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and variance 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+, and 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ the c.d.f.
+ of the standard normal distribution.
+\end_layout
+
+\end_inset
+
+ Denoting 
+\begin_inset Formula $\mathbb{P}_{i,0}$
+\end_inset
+
+ (resp.
+ 
+\begin_inset Formula $\mathbb{P}_{i,1}$
+\end_inset
+
+) the subjective probability measure of respondent 
+\emph on
+i
+\emph default
+ before (resp.
+ after) the feedback, we have by Bayes rule:
+\end_layout
+
+\begin_layout Standard
+[quick computations :]
+\begin_inset Formula 
+\begin{align}
+\mathbb{P}_{i,1}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right) & =\mathbb{P}_{i,0}\left(\gamma_{i}<0\,|\,\mathbf{E}_{i}\right)\frac{\mathbb{P}_{i,0}\left(\widehat{\gamma_{i}}<0\,|\,\gamma_{i}<0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,0}\left(\widehat{\gamma_{i}}<0\,|\,\mathbf{E}_{i}\right)}\nonumber \\
+ & =\Phi_{g_{i},\sigma_{i}^{2}}\left(0\right)\frac{5/6}{\Phi_{g_{i}+b_{i},\sigma_{\gamma_{i}}^{2}}\left(0\right)}\nonumber \\
+ & =\frac{5}{6}\frac{\Phi\left(-\frac{g_{i}}{\sqrt{\sigma_{i}^{2}}}\right)}{\Phi\left(-\frac{g_{i}+b_{i}}{\sqrt{\sigma_{\gamma_{i}}^{2}}}\right)}\label{eq:Bayes-nv}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and
+\begin_inset Formula 
+\begin{align*}
+\mathbb{P}_{i,1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}>0,\mathbf{E}_{i}\right) & =\ldots=\frac{5}{6}\frac{1-\Phi\left(-\frac{g_{i}}{\sqrt{\sigma_{i}^{2}}}\right)}{1-\Phi\left(-\frac{g_{i}+b_{i}}{\sqrt{\sigma_{\gamma_{i}}^{2}}}\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+[detailed computations :]
+\begin_inset Formula 
+\begin{align*}
+\mathbb{P}_{i,1}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right) & =\mathbb{P}_{i,0}\left(\gamma_{i}<0\,|\,\mathbf{E}_{i}\right)\frac{\mathbb{P}_{i,0}\left(\widehat{\gamma_{i}}<0\,|\,\gamma_{i}<0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,0}\left(\widehat{\gamma_{i}}<0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\Phi_{g_{i},\sigma_{i}^{2}}\left(0\right)\frac{5/6}{\Phi_{g_{i}+b_{i},\sigma_{\gamma_{i}}^{2}}\left(0\right)}\\
+ & =\frac{5}{6}\frac{\Phi_{g_{i},\sigma_{i}^{2}}\left(0\right)}{\Phi_{g_{i}+b_{i},\sigma_{\gamma_{i}}^{2}}\left(0\right)}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\intop_{-\infty}^{0}e^{-\frac{\left(x-g_{i}\right)^{2}}{2\sigma_{i}^{2}}}dx}{\intop_{-\infty}^{0}e^{-\frac{\left(x-g_{i}-b_{i}\right)^{2}}{2\sigma_{\gamma_{i}}^{2}}}dx}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\intop_{-\infty}^{-g_{i}}e^{-\frac{u^{2}}{2\sigma_{i}^{2}}}du}{\intop_{-\infty}^{-g_{i}-b_{i}}e^{-\frac{u^{2}}{2\sigma_{\gamma_{i}}^{2}}}du}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\sigma_{i}}{\sigma_{\gamma_{i}}}\frac{\intop_{-\infty}^{-\frac{g_{i}}{\sigma_{i}}}e^{-\frac{v^{2}}{2}}dv}{\intop_{-\infty}^{-\frac{g_{i}+b_{i}}{\sigma_{\gamma_{i}}}}e^{-\frac{v^{2}}{2}}dv}\\
+ & =\frac{5}{6}\frac{\Phi\left(-\frac{g_{i}}{\sigma_{i}}\right)}{\Phi\left(-\frac{g_{i}+b_{i}}{\sigma_{\gamma_{i}}}\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this model, we have made the following assumptions: respondent 
+\emph on
+i
+\emph default
+ is Bayesian; s-he has a normal priori which s-he thinks is unbiased; s-he
+ thinks that our estimation of their gain is normally distributed with a
+ certain bias (possibly nil) and a certain variance; and s-he believes our
+ claim to provide a correct feedback in 5 out of 6 cases.
+ In order to go one step further, we need to make an additional assumption
+ on the value of the respondents' uncertainty 
+\begin_inset Formula $\sigma_{i}^{2}$
+\end_inset
+
+.
+ We classify respondents into bins of similar estimated gain; we denote
+ 
+\begin_inset Formula $B\left(i\right)$
+\end_inset
+
+ the bin of respondent 
+\emph on
+i
+\emph default
+, and we impose that each bin 
+\emph on
+B
+\emph default
+ is homogenous in the sign of the gain: 
+\begin_inset Formula $\forall i,j,B\left(i\right)=B\left(j\right)=B\implies\widehat{\Gamma_{B}}:=\widehat{\Gamma_{i}}=\widehat{\Gamma_{j}}$
+\end_inset
+
+
+\emph on
+.
+
+\emph default
+ We assume that respondents with similar gain do not differ in their uncertainty
+ 
+\begin_inset Formula $\sigma_{B\left(i\right)}^{2}$
+\end_inset
+
+, somewhat known to them.
+ Thus, we can see the answers of respondents in bin 
+\emph on
+
+\begin_inset Formula $B\left(i\right)$
+\end_inset
+
+ 
+\emph default
+as different realizations of the same normal distribution with variance
+ 
+\begin_inset Formula $\sigma_{B\left(i\right)}^{2}$
+\end_inset
+
+, and we identify 
+\begin_inset Formula $\sigma_{B\left(i\right)}^{2}$
+\end_inset
+
+ with the sample variance of gain for respondents in bin 
+\emph on
+
+\begin_inset Formula $B\left(i\right)$
+\end_inset
+
+
+\emph default
+.
+ Similarly, the share of respondents in bin 
+\begin_inset Formula $B\left(i\right)$
+\end_inset
+
+ whose winning category after feedback coincides with our feedback, can
+ be identified with 
+\begin_inset Formula $\mathbb{P}_{i,1}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right)$
+\end_inset
+
+ (or 
+\begin_inset Formula $\mathbb{P}_{i,1}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right)$
+\end_inset
+
+, depending on the bin of estimated gain): 
+\begin_inset Formula $\mathbb{P}\left(G_{i}^{F}<0\,|\,\widehat{\gamma_{i}}<0,\,B\left(i\right)=B\right)\overset{\text{hyp.}}{=}\mathbb{P}_{i,1}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right)$
+\end_inset
+
+.
+ With these additional assumptions, we can retrieve from equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Bayes-nv"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\phi_{i}:=\Phi\left(-\frac{g_{i}+b_{i}}{\sqrt{\sigma_{\gamma_{i}}^{2}}}\right)=\begin{cases}
+\frac{5}{6}\frac{\Phi\left(-\frac{g_{i}}{\sqrt{\sigma_{B\left(i\right)}^{2}}}\right)}{\mathbb{P}\left(G_{i}^{F}<0\,|\,\widehat{\gamma_{i}}<0,\,B\left(i\right)=B\right)} & \text{for \emph{B} s.t. }\widehat{\Gamma_{B}}>0\\
+1-\frac{5}{6}\frac{1-\Phi\left(-\frac{g_{i}}{\sqrt{\sigma_{B\left(i\right)}^{2}}}\right)}{\mathbb{P}\left(G_{i}^{F}<0\,|\,\widehat{\gamma_{i}}<0,\,B\left(i\right)=B\right)} & \text{for \emph{B} s.t. }\widehat{\Gamma_{B}}<0
+\end{cases}\label{eq:Bayes-phi}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As 
+\begin_inset Formula $\phi_{i}$
+\end_inset
+
+ must belong to 
+\begin_inset Formula $\left[0;1\right]$
+\end_inset
+
+, we should conclude that one of our assumption is false when 
+\begin_inset Formula $\phi_{i}\notin\left[0;1\right]$
+\end_inset
+
+.
+ We think that the least credible assumption is that respondent 
+\emph on
+i
+\emph default
+ is Bayesian, and hence interpret 
+\begin_inset Formula $\phi_{i}\notin\left[0;1\right]$
+\end_inset
+
+ as evidence that respondent 
+\emph on
+i
+\emph default
+ is not Bayesian.
+\end_layout
+
+\begin_layout Standard
+Forming 8 bins of equal sizes (including two with negative gains) defined
+ using quantiles of simulated gains, we observe that for all bin 
+\emph on
+B
+\emph default
+ 
+\begin_inset Formula $\sqrt{\sigma_{B}^{2}}\in\left[112;148\right]$
+\end_inset
+
+.
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Actually, 
+\begin_inset Formula $\sqrt{\sigma_{B}^{2}}=148$
+\end_inset
+
+ is an outlier and corresponds to the bin of lowest gains.
+ All other variances are in 
+\begin_inset Formula $\left[112;125\right]$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+ Taking a strict definition of agreeing with our feedback (i.e.
+ excluding those who think they are unaffected from this definition), we
+ find that 73% of the respondents are not Bayesians.
+ Taking a loose definition, there are still 37%.
+ As this tests for 
+\emph on
+not 
+\emph default
+having a Bayesian reasoning, failing to flag a respondent as non Bayesian
+ does not mean that s-he has a Bayesian reasoning, because the only way
+ to reconcile this respondent with Bayesianism is generally to attribute
+ them an extreme prior.
+ To see this, we can make one last assumption: that respondents believe
+ that we —the surveyers— are unbiased: 
+\begin_inset Formula $b_{i}=0$
+\end_inset
+
+.
+ Using this assumption, we can now identify 
+\begin_inset Formula $\sqrt{\sigma_{\gamma_{i}}^{2}}$
+\end_inset
+
+ from equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Bayes-phi"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) we have that: 
+\begin_inset Formula $\sqrt{\sigma_{\gamma_{i}}^{2}}=-\frac{g_{i}}{\Phi^{-1}\left(\phi_{i}\right)}$
+\end_inset
+
+.
+ Among those for which we failed to reject Bayesianism with the previous
+ test, 10% obtain a negative value for 
+\begin_inset Formula $\sqrt{\sigma_{\gamma_{i}}^{2}}$
+\end_inset
+
+ (14% if we take the loose definition above), which is another indication
+ of non Bayesianism.
+\end_layout
+
+\begin_layout Standard
+Combining these two sources of inconsistency with Bayesianism, we thus find
+ 76% of non Bayesians (or 46% if we accept the loose definition).
+ For respondents that can be thought of Bayesians, we find an average 
+\begin_inset Formula $\sqrt{\sigma_{\gamma_{i}}^{2}}$
+\end_inset
+
+ of 183 (181 in the loose definition).
+ The fact that 
+\begin_inset Formula $\sqrt{\sigma_{\gamma_{i}}^{2}}>\sqrt{\sigma_{B}^{2}}$
+\end_inset
+
+ shows that Bayesian respondents thought that they knew their gain more
+ precisely than us, which is consistent with the tendency to update little
+ their beliefs.
+\end_layout
+
+\begin_layout Standard
+_______________________________________________________________
+\end_layout
+
+\begin_layout Standard
+On pourrait estimer 
+\begin_inset Formula $\sigma_{i}$
+\end_inset
+
+ en regardant la variance des estimations pour une catégorie de gain objectif
+ donnée.
+ On estimerait aussi le membre de gauche pour cette même catégorie de gain
+ objectif.
+ On en déduirait alors l'écart-type 
+\begin_inset Formula $\sigma_{\gamma_{i}}$
+\end_inset
+
+ qui rendrait cohérent le raisonnement bayésien de l'individu 
+\emph on
+i 
+\emph default
+: il peut croire que notre écart-type est bien plus grand que le sien, i.e.
+ que son estimation est plus précise, ce qui justifierait de réviser peu
+ ses croyances.
+ Si 
+\begin_inset Formula $\Phi\left(-\frac{g_{i}}{\sigma_{\gamma_{i}}}\right)=\frac{5}{6}\frac{\Phi\left(-\frac{g_{i}}{\sigma_{i}}\right)}{\widetilde{\mathbb{P}}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right)}\notin\left[0;1\right]$
+\end_inset
+
+, on en déduit que l'individu 
+\emph on
+i 
+\emph default
+n'est pas bayésien.
+ Le problème de ce modèle est qu'on exclut les biais, or l'individu 
+\emph on
+i
+\emph default
+ pourrait penser que notre estimation est biaisée.
+ Introduisons donc un biais 
+\begin_inset Formula $b_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+________________________________________________________________________________
+___
+\end_layout
+
+\begin_layout Standard
+L'individu 
+\emph on
+i 
+\emph default
+évalue la distribution de son gain à 
+\begin_inset Formula $\mathcal{N}\left(g_{i},\sigma_{i}^{2}\right)$
+\end_inset
+
+.
+ Notre évaluation de son gain suit la loi 
+\begin_inset Formula $\widehat{\gamma_{i}}\,|\,\mathbf{E}_{i}\sim\mathcal{N}\left(\gamma_{i},\sigma_{\gamma}^{2}\right)$
+\end_inset
+
+, où 
+\begin_inset Formula $\sigma_{\gamma}^{2}$
+\end_inset
+
+ est tel que 
+\begin_inset Formula $\mathbb{P}\left(\text{sgn}\left(\gamma_{i}\right)=\text{sgn}\left(\text{\ensuremath{\widehat{\gamma}}}_{i}\right)\right)=\frac{5}{6}$
+\end_inset
+
+.
+ Ainsi, parmi les individus au gain 
+\begin_inset Formula $\gamma_{i}$
+\end_inset
+
+, pour lesquels nous connaissons 
+\begin_inset Formula $\mathbf{E}_{i}$
+\end_inset
+
+, nous donnerons 5 fois sur 6 un feedback juste.
+ Dans le raisonnement bayésien, l'individu croit que 
+\begin_inset Formula $g_{i}=\gamma_{i}$
+\end_inset
+
+ et donc que 
+\begin_inset Formula $\widetilde{\mathbb{P}}\left(\widehat{\gamma_{i}}<0\,|\,\mathbf{E}_{i}\right)=\Phi_{g_{i},\sigma_{\gamma_{i}}}\left(0\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\widetilde{\mathbb{P}}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}\left(\gamma_{i}<0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}\left(\widehat{\gamma_{i}}<0\,|\,\gamma_{i}<0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}\left(\widehat{\gamma_{i}}<0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\Phi_{g_{i},\sigma_{i}^{2}}\left(0\right)\frac{5/6}{\Phi_{g_{i},\sigma_{\gamma_{i}}^{2}}\left(0\right)}\\
+ & =\frac{5}{6}\frac{\Phi_{g_{i},\sigma_{i}^{2}}\left(0\right)}{\Phi_{g_{i},\sigma_{\gamma_{i}}^{2}}\left(0\right)}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\intop_{-\infty}^{0}e^{-\frac{\left(x-g_{i}\right)^{2}}{2\sigma_{i}^{2}}}dx}{\intop_{-\infty}^{0}e^{-\frac{\left(x-g_{i}\right)^{2}}{2\sigma_{\gamma_{i}}^{2}}}dx}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\intop_{-\infty}^{-g_{i}}e^{-\frac{u^{2}}{2\sigma_{i}^{2}}}du}{\intop_{-\infty}^{-g_{i}}e^{-\frac{u^{2}}{2\sigma_{\gamma_{i}}^{2}}}du}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\sigma_{i}}{\sigma_{\gamma_{i}}}\frac{\intop_{-\infty}^{-\frac{g_{i}}{\sigma_{i}}}e^{-\frac{v^{2}}{2}}dv}{\intop_{-\infty}^{-\frac{g_{i}}{\sigma_{\gamma_{i}}}}e^{-\frac{v^{2}}{2}}dv}\\
+ & =\frac{5}{6}\frac{\Phi\left(-\frac{g_{i}}{\sigma_{i}}\right)}{\Phi\left(-\frac{g_{i}}{\sigma_{\gamma_{i}}}\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+On pourrait estimer 
+\begin_inset Formula $\sigma_{i}$
+\end_inset
+
+ en regardant la variance des estimations pour une catégorie de gain objectif
+ donnée.
+ On estimerait aussi le membre de gauche pour cette même catégorie de gain
+ objectif.
+ On en déduirait alors l'écart-type 
+\begin_inset Formula $\sigma_{\gamma_{i}}$
+\end_inset
+
+ qui rendrait cohérent le raisonnement bayésien de l'individu 
+\emph on
+i 
+\emph default
+: il peut croire que notre écart-type est bien plus grand que le sien, i.e.
+ que son estimation est plus précise, ce qui justifierait de réviser peu
+ ses croyances.
+ Si 
+\begin_inset Formula $\Phi\left(-\frac{g_{i}}{\sigma_{\gamma_{i}}}\right)=\frac{5}{6}\frac{\Phi\left(-\frac{g_{i}}{\sigma_{i}}\right)}{\widetilde{\mathbb{P}}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right)}\notin\left[0;1\right]$
+\end_inset
+
+, on en déduit que l'individu 
+\emph on
+i 
+\emph default
+n'est pas bayésien.
+ Le problème de ce modèle est qu'on exclut les biais, or l'individu 
+\emph on
+i
+\emph default
+ pourrait penser que notre estimation est biaisée.
+ Introduisons donc un biais 
+\begin_inset Formula $\iota_{i}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\widetilde{\mathbb{P}}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}\left(\gamma_{i}<0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}\left(\widehat{\gamma_{i}}<0\,|\,\gamma_{i}<0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}\left(\widehat{\gamma_{i}}<0\,|\,\mathbf{E}_{i}\right)}\\
+ & =\Phi_{g_{i},\sigma_{i}^{2}}\left(0\right)\frac{5/6}{\Phi_{g_{i}+\iota_{i},\sigma_{\gamma_{i}}^{2}}\left(0\right)}\\
+ & =\frac{5}{6}\frac{\Phi_{g_{i},\sigma_{i}^{2}}\left(0\right)}{\Phi_{g_{i}+\iota_{i},\sigma_{\gamma_{i}}^{2}}\left(0\right)}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\intop_{-\infty}^{0}e^{-\frac{\left(x-g_{i}\right)^{2}}{2\sigma_{i}^{2}}}dx}{\intop_{-\infty}^{0}e^{-\frac{\left(x-g_{i}-\iota_{i}\right)^{2}}{2\sigma_{\gamma_{i}}^{2}}}dx}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\intop_{-\infty}^{-g_{i}}e^{-\frac{u^{2}}{2\sigma_{i}^{2}}}du}{\intop_{-\infty}^{-g_{i}-\iota_{i}}e^{-\frac{u^{2}}{2\sigma_{\gamma_{i}}^{2}}}du}\\
+ & =\frac{5}{6}\frac{\sigma_{\gamma_{i}}}{\sigma_{i}}\frac{\sigma_{i}}{\sigma_{\gamma_{i}}}\frac{\intop_{-\infty}^{-\frac{g_{i}}{\sigma_{i}}}e^{-\frac{v^{2}}{2}}dv}{\intop_{-\infty}^{-\frac{g_{i}+\iota_{i}}{\sigma_{\gamma_{i}}}}e^{-\frac{v^{2}}{2}}dv}\\
+ & =\frac{5}{6}\frac{\Phi\left(-\frac{g_{i}}{\sigma_{i}}\right)}{\Phi\left(-\frac{g_{i}+\iota_{i}}{\sigma_{\gamma_{i}}}\right)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+On ne peut plus identifier la distribution que l'individu 
+\emph on
+i
+\emph default
+ nous attribue car il y a désormais deux inconnues : 
+\begin_inset Formula $\sigma_{\gamma_{i}}$
+\end_inset
+
+ et 
+\begin_inset Formula $\iota_{i}$
+\end_inset
+
+.
+ Néanmoins, le critère reste le même pour savoir si le répondant n'est pas
+ bayésien : 
+\begin_inset Formula $\frac{5}{6}\frac{\Phi\left(-\frac{g_{i}}{\sigma_{i}}\right)}{\widetilde{\mathbb{P}}\left(\gamma_{i}<0\,|\,\widehat{\gamma_{i}}<0,\mathbf{E}_{i}\right)}\notin\left[0;1\right]$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+________________________________________________________________________________
+___
 \end_layout
 
 \begin_layout Standard
@@ -2091,17 +2664,20 @@ Tentative de cadre bayésien :
 \widetilde{\mathbb{P}}_{i,t}\left(G_{i}>0\,|\,\mathbf{E}_{i}\right) & =f\left(g_{i}\right)\\
 \widetilde{\mathbb{P}}_{i,t+1}\left(\Gamma_{i}>0\,|\,\widehat{\Gamma_{i}}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\Gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\Gamma_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\Gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
 \widetilde{\mathbb{P}}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\widetilde{\mathbb{P}}_{i,t}\left(\widehat{\gamma_{i}}>0\,|\,\mathbf{E}_{i}\right)}\\
-\mathbb{P}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}-\epsilon_{i}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}-\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}-\epsilon_{i}>0\,|\,\mathbf{E}_{i}\right)}\\
- & \overset{\text{si trust}}{=}\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(\gamma_{i}-\iota_{i}-\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}>\epsilon_{i}\,|\,\mathbf{E}_{i}\right)}\\
- & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}>\epsilon_{i}+\iota_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(g_{i}>\epsilon_{i}+\iota_{i}\right)}\\
- & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}-\iota_{i}>\epsilon_{i}\,|\,g_{i}>\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi_{b_{i},\sigma_{\epsilon}^{2}+\sigma_{\iota}^{2}}\left(g_{i}\right)}\\
+\mathbb{P}_{i,t+1}\left(\gamma_{i}>0\,|\,\widehat{\gamma_{i}}+\epsilon_{i}>0,\mathbf{E}_{i}\right) & =\widetilde{\mathbb{P}}_{i,t}\left(\gamma_{i}>0\,|\,\mathbf{E}_{i}\right)\frac{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}+\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}+\epsilon_{i}>0\,|\,\mathbf{E}_{i}\right)}\\
+ & \overset{\text{si trust}}{=}\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(\gamma_{i}+\iota_{i}+\epsilon_{i}>0\,|\,\gamma_{i}>0,\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\widehat{\gamma_{i}}+\epsilon_{i}>\,|\,\mathbf{E}_{i}\right)}\\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(\iota_{i}+\epsilon_{i}>-\gamma_{i}\,|\,0>-\gamma_{i},\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(\iota_{i}+\epsilon_{i}>-\gamma_{i}\right)}\\
 \\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}>-\left(\epsilon_{i}+\iota_{i}\right)\,|\,g_{i}>-\epsilon_{i},\mathbf{E}_{i}\right)}{\mathbb{P}_{i,t}\left(g_{i}>-\left(\epsilon_{i}+\iota_{i}\right)\right)}\\
+ & =\frac{5}{6}\frac{\mathbb{P}_{i,t}\left(g_{i}+\iota_{i}>-\epsilon_{i}\,|\,g_{i}>-\epsilon_{i},\mathbf{E}_{i}\right)}{\Phi_{b_{i},\sigma_{\epsilon}^{2}+\sigma_{\iota}^{2}}\left(g_{i}\right)}\\
 \\
+g_{i} & =\gamma_{i}-b_{B\left(i\right)}+\epsilon_{i}\\
+g_{i}+\iota_{i}+b_{B\left(i\right)} & =\widehat{\gamma_{i}}+\epsilon_{i}\\
  & \mathbb{P}_{i,t+1}\left(g_{i}^{F}>0\,|\,\widehat{\Gamma_{i}}>0\right)\\
 \\
 \mathbb{P}\left(X+Y<a\,|\,X<a\right)\mathbb{P}\left(X<a\right) & =\int_{-\infty}^{a}\left(\int_{-\infty}^{+\infty}\varphi\left(y\right)\boldsymbol{1}_{x+y<a}dy\right)\varphi\left(x\right)dx\\
  & =\frac{1}{2\pi\sqrt{\sigma_{X}^{2}\sigma_{Y}^{2}}}\int_{-\infty}^{a}\int_{-\infty}^{+\infty}e^{-\frac{x^{2}}{2\sigma_{X}^{2}}-\frac{y^{2}}{2\sigma_{Y}^{2}}}\boldsymbol{1}_{x+y<a}dydx\\
-\\
+\mathbb{P}\left(X+Y<a\,|\,X<a\right)\\
 \\
 \\
 \\
