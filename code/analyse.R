@@ -741,9 +741,9 @@ summary(lm((taxe_feedback_approbation != 'Non') ~ gagnant_f.hat + taxe_approbati
 croyances_1 <- lm(((gagnant_feedback_categorie!='Perdant') - (gagnant_categorie!='Perdant')) ~ simule_gagnant + simule_gain + I(simule_gain^2), data=s, weights = s$weight, na.action="na.exclude")
 summary(croyances_1)
 Dgagnant.hat <- fitted.values(croyances_1)
-# 2.4 apprendre qu'on est (simulé) gagnant augmente l'acceptation de 9%***
+# 2.4 apprendre qu'on est (simulé) gagnant augmente l'acceptation de 12%***
 summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ simule_gagnant + simule_gain + I(simule_gain^2), data=s, weights = s$weight)) # TODO: rajouter contrôles
-# 3.2 comprendre qu'on est non perdant augmente l'approbation de 41%*** = 9/0.23 (0.407540~0.09224/0.22634)
+# 3.2 comprendre qu'on est non perdant augmente l'approbation de 51%*** = 11/0.23 (0.5313=0.1182/0.2304)
 summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ Dgagnant.hat + simule_gain + I(simule_gain^2), data=s, weights = s$weight))
 
 
@@ -790,12 +790,13 @@ label(s$feedback_confirme_large) <- "feedback_confirme_large: Indicatrice de se 
 label(s$feedback_infirme_large) <- "feedback_infirme_large: Indicatrice de se penser non gagnant et être simulé gagnant, ou de se penser non perdant et être simulé perdant (gagnant_categorie, simule_gagnant)"
 # summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ I(feedback_confirme - feedback_infirme)*(s$gagnant_categorie=='Perdant'), data=s, weights=s$weight))
 # summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ simule_gagnant*(gagnant_categorie=='Gagnant'), data=s, weights=s$weight))
-decrit(s$feedback_infirme) # 45%
-decrit(s$feedback_infirme_large) # 70%
-decrit(s$update_correct[s$feedback_infirme==T])
-decrit(s$update_correct[s$feedback_infirme==T & s$simule_gagnant==1])
-decrit(s$update_correct[s$feedback_infirme==T & s$simule_gagnant==0])
-sum(s$weight[s$feedback_infirme & s$simule_gagnant==1])/3002 # 51%
+decrit(s$feedback_infirme, weights = s$weight) # 48%
+decrit(s$feedback_infirme_large, weights = s$weight) # 70%
+decrit(s$update_correct[s$feedback_infirme==T], weights = s$weight[s$feedback_infirme==T]) # 15%
+decrit(s$update_correct[s$feedback_infirme_large==T], weights = s$weight[s$feedback_infirme_large==T]) # 18%
+decrit(s$update_correct[s$feedback_infirme==T & s$simule_gagnant==1], weights = s$weight[s$feedback_infirme==T & s$simule_gagnant==1])
+decrit(s$update_correct[s$feedback_infirme==T & s$simule_gagnant==0], weights = s$weight[s$feedback_infirme==T & s$simule_gagnant==0])
+sum(s$weight[s$feedback_infirme & s$simule_gagnant==1])/3002 # 46%
 sum(s$weight[!is.na(s$update_correct) & s$update_correct==1 & s$feedback_infirme & s$simule_gagnant==1])/sum(s$weight[!is.na(s$update_correct) & s$feedback_infirme & s$simule_gagnant==1]) # 12%
 
 # 3.3 Les gens qui se croient gagnants updatent plus correctement que les autres lorsqu'ils doivent le faire
