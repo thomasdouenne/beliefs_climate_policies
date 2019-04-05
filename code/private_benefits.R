@@ -28,13 +28,15 @@ cor((s$gagnant_cible_categorie!='Perdant'), s$traite_cible_conjoint)
 tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
 summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
 gagnant.hat <- fitted.values(tsls_rdd_1)
-summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight))
+self_2 <- lm((taxe_cible_approbation!='Non') ~ gagnant.hat + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
+summary(self_2)
 # On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
 # Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
 tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
 summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
 gagnant.hat <- fitted.values(tsls_rdd_1)
-summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight))
+self_1 <- lm((taxe_cible_approbation!='Non') ~ gagnant.hat + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
+summary(self_1)
 
 # Avec effet hétérogène par seuil
 # s$cible <- relevel(as.factor(s$cible), '50')
@@ -165,13 +167,14 @@ cor(s$gagnant_feedback_categorie != 'Perdant', n(s$simule_gagnant), use="complet
 tsls_rdd_feedback_1 <- lm(gagnant_feedback_categorie != 'Perdant' ~ simule_gagnant + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain + I(simule_gain^2) + revenu + revenu_conjoint, data=s, weights = s$weight, na.action="na.exclude")
 summary(tsls_rdd_feedback_1)
 gagnant_feedback.hat <- fitted.values(tsls_rdd_feedback_1)
-summary(lm(taxe_feedback_approbation!='Non' ~ gagnant_feedback.hat + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain + I(simule_gain^2) + revenu + revenu_conjoint, data=s, weights = s$weight))
+self_6 <- lm(taxe_feedback_approbation!='Non' ~ gagnant_feedback.hat + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain + I(simule_gain^2) + revenu + revenu_conjoint, data=s, weights = s$weight)
+summary(self_6)
 
 
 ##### 7. Probit - WIP
 library("mfx")
-probitmarg <- probitmfx(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie != 'Perdant') + (taxe_approbation!='Non') + revenu + I(revenu^2) + revenu_conjoint + (taxe_efficace!='Non') + simule_gain, data = s, atmean = TRUE)
-probitmarg
+self_4 <- probitmfx(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie != 'Perdant') + (taxe_approbation!='Non') + revenu + I(revenu^2) + revenu_conjoint + (taxe_efficace!='Non') + simule_gain, data = s, atmean = TRUE)
+self_4
 probitmarg2 <- probitmfx(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie != 'Perdant') + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2) + (taxe_approbation!='Non') + simule_gain, data = s, atmean = TRUE)
 probitmarg2 # TODO: solve bug (seems to come from revenu_conjoint^2)
 
