@@ -38,7 +38,7 @@ def gasoline_example(expenditures):
     # Compute prices :
     new_final_price = final_price_adjusted(current_price, i, new_excise_tax, old_excise_tax)
     final_price_variation = variation_final_price(i, current_price, new_excise_tax, old_excise_tax)
-    #print "Final price (before/after)", current_price, "/", new_final_price
+    print "Final price (before/after)", current_price, "/", new_final_price
     
     current_price_without_tax = price_without_tax(current_price, old_excise_tax)
     new_price_without_tax = price_without_tax(new_final_price, new_excise_tax)

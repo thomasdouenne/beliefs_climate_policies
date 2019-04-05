@@ -3088,6 +3088,259 @@ name "subsec:Consumer-survey-Budget"
 
 \end_layout
 
+\begin_layout Section
+Review of the Literature
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand citet
+key "stern_value_1993"
+literal "false"
+
+\end_inset
+
+ is an early work proposing and testing a model of preferences for environmental
+ quality aimed at disentangling egoistic from altruistic motives on the
+ one hand, and beliefs from values on the other hand.
+ Among all possible attitudes, they show that belief about consequences
+ on self-interest is the only predictor of the willingness to pay Pigouvian
+ taxes.
+ Using a post-electoral survey in Switzerland, 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "thalmann_public_2004"
+literal "false"
+
+\end_inset
+
+ studies socio-demographic determinants for the approval of environmental
+ policies, and finds a positive correlative with having a secondary degree
+ or an affinity for left-wing or green parties.
+ Similarly to 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "stern_value_1993"
+literal "false"
+
+\end_inset
+
+, he does not find a significant correlation for age or gender, but he finds
+ one for self-interest, proxied by the number of cars owned.
+ Surveying Norwegian people, 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "kallbekken_you_2011"
+literal "false"
+
+\end_inset
+
+ shows that self-interest matters for acceptance, but less than concerns
+ for environmental effectiveness or distributional effects.
+ In the present paper, we also study how these three motives affect acceptance.
+ We contribute to the literature by providing evidence for causal effects
+ where 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "kallbekken_public_2011"
+literal "false"
+
+\end_inset
+
+ essentially show correlations.
+ Besides, 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "kallbekken_public_2011"
+literal "false"
+
+\end_inset
+
+ study the three motives through proxies, such as fuel consumption used
+ for self-interest.
+ On the contrary, we do not assume that people are rational nor have perfect
+ information, and our methodology allows to disentangle erroneous beliefs
+ from 
+\emph on
+pure 
+\emph default
+effects of self-interest or progressivity.
+ In surveys on British and Swedish respondents respectively, 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "bristow_public_2010"
+literal "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "brannlund_tax_2012"
+literal "false"
+
+\end_inset
+
+ document a higher approval when the reform addresses distributional issues.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "bristow_public_2010"
+literal "false"
+
+\end_inset
+
+ find that respondents focus on costs and do not discuss gain even when
+ they are made salient, either because of loss aversion or distrust than
+ the government would distribute a lump sum transfer.
+ Their finding that people prefer that a non-for profit organize the scheme
+ rather than the government is consistent with that of 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "alesina_intergenerational_2018"
+literal "false"
+
+\end_inset
+
+ that only 17% of British and 6% of French people trust the government.
+ This generalized distrust resonates with the more specific suspicion against
+ the environmental objective of the reform we find, as 62% of our respondents
+ think that either 
+\begin_inset Quotes eld
+\end_inset
+
+tax and dividend
+\begin_inset Quotes erd
+\end_inset
+
+ is a pretext to increase taxes or that it is not effective to reduce pollution.
+ Similarly, 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "baranzini_effectiveness_2017"
+literal "false"
+
+\end_inset
+
+ report that a majority of the people they interviewed in Geneva do not
+ believe the tax would be effective, which confirms what 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "dresner_history_2006"
+literal "false"
+
+\end_inset
+
+ find with focus groups in the UK.
+\end_layout
+
+\begin_layout Standard
+Furthermore, several papers study how approval of a carbon tax varies with
+ usage of its revenues 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "thalmann_public_2004,kallbekken_you_2011,saelen_choice_2011,gevrek_public_2015,baranzini_effectiveness_2017"
+literal "false"
+
+\end_inset
+
+.
+ A common finding is that earmarking the revenues to environmental policies
+ increases approval, which can be explained by a stronger belief in environmenta
+l effectiveness 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "saelen_choice_2011"
+literal "false"
+
+\end_inset
+
+.
+ We document a similar pattern in our (more descriptive) companion paper.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+TODO:Kallbekken&Aasen,importance_of_alternatives? TODO:enquêtes_opinion
+ TODO:our_contribution
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Some papers show lower support when the price instrument is labeled as a
+ 
+\begin_inset Quotes eld
+\end_inset
+
+tax
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "kallbekken_you_2011,brannlund_tax_2012,baranzini_effectiveness_2017"
+literal "false"
+
+\end_inset
+
+.
+ The French government probably took this result into account when creating
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+Climate-Energy Contribution
+\begin_inset Quotes erd
+\end_inset
+
+.
+ However, this does not fool anyone anymore.
+ Nowadays, the media, the yellow vests and the government all plainly call
+ this instrument a 
+\emph on
+tax
+\emph default
+.
+ As it is unlikely that the government can still use labeling as a nudge
+ in this context, we do not study this —already well-documented— effect.
+\end_layout
+
+\begin_layout Standard
+For a more complete review of the literature, we refer the reader to the
+ thorough survey of 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "carattini_overcoming_2018"
+literal "false"
+
+\end_inset
+
+.
+ We also signal the less recent 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "dresner_social_2006"
+literal "false"
+
+\end_inset
+
+ and the more synthetic 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "klenert_making_2018"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Standard
 \begin_inset CommandInset citation
 LatexCommand citealp

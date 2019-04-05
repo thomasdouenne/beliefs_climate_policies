@@ -44,6 +44,12 @@ def quantity_data(price, data, key):
     return data
 
 
+def co2_emissions_data(co2_content, data, key):
+    data['{}_co2_emissions'.format(key)] = co2_content * data['{}_quantity'.format(key)]
+    
+    return data
+
+
 def adjusted_quantity_data(e, variation_final_price, data, key):
     data['{}_adjusted_quantity'.format(key)] = data['{}_quantity'.format(key)] * (1 + e * variation_final_price)
     
@@ -53,6 +59,12 @@ def adjusted_quantity_data(e, variation_final_price, data, key):
 def adjusted_expenditures_data(e, variation_final_price, data, key):
     data['{}_adjusted_expenditures'.format(key)] = \
         data['{}_expenditures'.format(key)] * (1 + (1 + e) * variation_final_price)
+    
+    return data
+
+
+def adjusted_co2_emissions_data(co2_content, data, key):
+    data['{}_adjusted_co2_emissions'.format(key)] = co2_content * data['{}_adjusted_quantity'.format(key)]
     
     return data
 

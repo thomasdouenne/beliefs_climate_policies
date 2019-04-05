@@ -22,8 +22,8 @@ def natural_gas_example(expenditures):
     dict_gas = dict()
     # Set common parameters :
     vat = 0.2 # ???
-    e_housing = -0.15
-    i = 0.9
+    e_housing = -0.2
+    i = 0.8
     
     current_price = 0.0651 # For someone in zone 3 that use gas for heating
     
@@ -48,7 +48,7 @@ def natural_gas_example(expenditures):
     # Compute prices :
     new_final_price = final_price_adjusted(current_price, i, new_excise_tax, old_excise_tax)
     final_price_variation = variation_final_price(i, current_price, new_excise_tax, old_excise_tax)
-    #print "Final price (before/after)", current_price, "/", new_final_price
+    print "Final price (before/after)", current_price, "/", new_final_price
     
     current_price_without_tax = price_without_tax(current_price, old_excise_tax)
     new_price_without_tax = price_without_tax(new_final_price, new_excise_tax)
