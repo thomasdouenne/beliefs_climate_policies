@@ -935,6 +935,10 @@ I
 \emph on
 U
 \emph default
+:
+\emph on
+U
+\emph default
 : update_correct vaut +1 si le répondant adopte le feedback qui infirme
  sa croyance initiale, 
 \begin_inset Formula $-$
@@ -1629,7 +1633,7 @@ Biais d'update à la perte
 \begin_layout Standard
 \begin_inset Formula 
 \[
-U_{i}=\delta_{0}+\beta_{j}\bar{G}_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=G_{i}
+U_{i}=\delta_{0}+\beta_{j}G+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}=G_{i}
 \]
 
 \end_inset
@@ -1647,7 +1651,7 @@ Among those who receive a feedback contradicting their subjective gain,
 \begin_layout Standard
 \begin_inset Formula 
 \[
-U_{i}=\delta_{0}+.59^{***}\bar{G}_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
+U_{i}=\delta_{0}+.59^{***}G_{i}+\epsilon_{i}\,|\,\widehat{\Gamma_{i}}\neq G_{i}
 \]
 
 \end_inset
@@ -1662,7 +1666,7 @@ Biais à la perte
 \begin_layout Standard
 Among those who should have updated, those who revised their subjective
  gain upwards were disproportionately correct in doing so than those whose
- revised it downards, indicating a bias towards loss when updating.
+ revised it downwards, indicating a bias towards loss when updating.
 \end_layout
 
 \begin_layout Standard
@@ -1706,28 +1710,9 @@ Pas de biais à la perte
 \end_layout
 
 \begin_layout Standard
-6% of those who felt unaffected start approving the reform after the feedback,
- and learning to be a winner does not increase this figure significantly.
-\end_layout
-
-\begin_layout Standard
-TODO: rephrase 
-\begin_inset Quotes fld
-\end_inset
-
-start disapproving
-\begin_inset Quotes frd
-\end_inset
-
- because it can be 
-\begin_inset Quotes fld
-\end_inset
-
-stop disapproving
-\begin_inset Quotes frd
-\end_inset
-
-.
+6% of those who felt unaffected start approving or stop disapproving the
+ reform after the feedback, and learning to be a winner does not increase
+ this figure significantly.
 \end_layout
 
 \begin_layout Standard
