@@ -117,6 +117,7 @@ def prepare_dataset():
     # Keep only some variables :
     df_hh = df_hh[['distance'] + ['diesel_expenditures'] + ['domestic_fuel_expenditures'] + ['gasoline_expenditures'] +
         ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] + ['income_decile'] +
+        ['domestic_fuel_quantity'] + ['gas_quantity'] + ['diesel_quantity'] + ['gasoline_quantity'] +
         ['hh_income'] + ['hh_disposable_income'] + ['domestic_fuel'] + ['natural_gas'] + ['age_hh_representative'] +
         ['accommodation_size'] + ['consumption_units'] + ['nb_children'] + ['nb_persons'] + ['hh_weight'] +
         ['hh_id']]
