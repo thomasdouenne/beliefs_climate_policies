@@ -3341,6 +3341,7 @@ literal "false"
 .
 \end_layout
 
+<<<<<<< refs/remotes/thomasdouenne/master
 \begin_layout Standard
 \begin_inset CommandInset citation
 LatexCommand citealp
@@ -3360,6 +3361,8 @@ literal "false"
 
 \end_layout
 
+=======
+>>>>>>> Auto stash before rebase of "origin/master"
 \begin_layout Standard
 \begin_inset CommandInset citation
 LatexCommand citealp
