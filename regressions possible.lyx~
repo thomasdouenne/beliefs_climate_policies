@@ -2079,10 +2079,14 @@ i
 \emph default
  is uncertain about their actual gain and evaluates its distribution to
 <<<<<<< refs/remotes/thomasdouenne/master
+<<<<<<< refs/remotes/thomasdouenne/master
  be 
 =======
  be
 >>>>>>> Bayes
+=======
+ be 
+>>>>>>> small change
 \begin_inset Formula $\mathcal{N}\left(g_{i},\sigma_{i}^{2}\right)$
 \end_inset
 
