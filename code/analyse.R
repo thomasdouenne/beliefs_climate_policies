@@ -821,6 +821,80 @@ summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ ga
 summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ gagnant_categorie!='Perdant', subset = simule_gagnant==0, data=s, weights=s$weight))
 decrit(s$feedback_confirme)
 
+# 3.3 et 3.4, all regressions possibles:
+base_winner_all <- lm(update_correct ~ gagnant_categorie=='Gagnant', data=s, weights = s$weight) #
+base_feedback_winner_all <- lm(update_correct ~ gagnant_feedback_categorie=='Gagnant',  data=s, weights = s$weight) 
+base_winner_validated <- lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==FALSE, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+base_feedback_winner_validated <- lm(update_correct ~ gagnant_feedback_categorie=='Gagnant', subset = feedback_infirme_large==FALSE, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+asymmetric <- stargazer(base_winner, base_feedback_winner, base_winner_validated, base_feedback_winner_validated,
+          title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+          covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Winner, after feedback ($\\dot{G}^F$)"),
+          dep.var.labels = "Correct updating ($U$)", dep.var.caption = "",
+          add.lines = c("Among: invalidated & \\checkmark & \\checkmark &  &  ", "Among: validated & & & \\checkmark & \\checkmark  "),
+          no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+base_winner <- lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+large_winner <- lm(update_correct_large ~ gagnant_categorie=='Gagnant', subset = feedback_infirme==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+base_not_loser <- lm(update_correct ~ gagnant_categorie!='Perdant', subset = feedback_infirme==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+large_not_loser <- lm(update_correct_large ~ gagnant_categorie!='Perdant', subset = feedback_infirme==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+base_winner_large <- lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+large_winner_large <- lm(update_correct_large ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+base_not_loser_large <- lm(update_correct ~ gagnant_categorie!='Perdant', subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+large_not_loser_large <- lm(update_correct_large ~ gagnant_categorie!='Perdant', subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+summary(base_winner)
+summary(large_winner)
+summary(base_not_loser)
+summary(large_not_loser)
+summary(base_winner_large)
+summary(large_winner_large)
+summary(base_not_loser_large)
+summary(large_not_loser_large)
+
+stargazer(base_winner, base_winner_large, base_not_loser_large, large_winner, large_winner_large, large_not_loser_large, 
+          title="Asymmetric updating of winning category", star.cutoffs = c(0.1, 1e-5, 1e-30),
+          covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Not loser, before feedback ($G$)"),
+          # covariate.labels = c("Constant", "Winner, before feedback", "Not loser, before feedback", "Winner, after feedback", "Not loser, after feedback"),
+          # omit = c(),  dep.var.caption = "", 
+          dep.var.labels = c("Correct updating", "Correct updating direction"), dep.var.caption = "",
+          add.lines = c("Among: invalidated & \\checkmark & \\checkmark &  &  & \\checkmark & \\checkmark &  & ",
+                        "Among: loosely invalidated &  &  & \\checkmark & \\checkmark &  &  & \\checkmark & \\checkmark"),
+          no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_all")
+
+base_feedback_winner <- lm(update_correct ~ gagnant_feedback_categorie=='Gagnant', subset = feedback_infirme==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+large_feedback_winner <- lm(update_correct_large ~ gagnant_feedback_categorie=='Gagnant', subset = feedback_infirme==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+base_feedback_not_loser <- lm(update_correct ~ gagnant_feedback_categorie!='Perdant', subset = feedback_infirme==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+large_feedback_not_loser <- lm(update_correct_large ~ gagnant_feedback_categorie!='Perdant', subset = feedback_infirme==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+base_feedback_winner_large <- lm(update_correct ~ gagnant_feedback_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+large_feedback_winner_large <- lm(update_correct_large ~ gagnant_feedback_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+base_feedback_not_loser_large <- lm(update_correct ~ gagnant_feedback_categorie!='Perdant', subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+large_feedback_not_loser_large <- lm(update_correct_large ~ gagnant_feedback_categorie!='Perdant', subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+summary(base_feedback_winner)
+summary(large_feedback_winner)
+summary(base_feedback_not_loser)
+summary(large_feedback_not_loser)
+summary(base_feedback_winner_large)
+summary(large_feedback_winner_large)
+summary(base_feedback_not_loser_large)
+summary(large_feedback_not_loser_large)
+
+stargazer(base_feedback_winner, base_feedback_not_loser, base_feedback_winner_large, base_feedback_not_loser_large, large_feedback_winner, large_feedback_not_loser, large_feedback_winner_large, large_feedback_not_loser_large, 
+          title="Asymmetric updating of winning category", star.cutoffs = c(0.1, 1e-5, 1e-30),
+          covariate.labels = c("Constant", "Winner, after feedback ($\\dot{G^F}$)", "Not loser, after feedback ($G^F$)"),
+          # covariate.labels = c("Constant", "Winner, before feedback", "Not loser, before feedback", "Winner, after feedback", "Not loser, after feedback"),
+          # omit = c(),  dep.var.caption = "", 
+          dep.var.labels = c("Correct updating", "Correct updating direction"), dep.var.caption = "",
+          add.lines = c("Among: invalidated & \\checkmark & \\checkmark &  &  & \\checkmark & \\checkmark &  & ",
+                        "Among: loosely invalidated &  &  & \\checkmark & \\checkmark &  &  & \\checkmark & \\checkmark"),
+          no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_after_all")
+
+base_winner_interact <- lm(update_correct ~ (gagnant_categorie=='Gagnant')*(taxe_approbation=='Oui'), subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+base_feedback_winner_interact <- lm(update_correct ~ (gagnant_feedback_categorie=='Gagnant')*(taxe_approbation=='Oui'), subset = feedback_infirme_large==T, data=s, weights = s$weight) # Non affectés exclus par feedback_infirme
+summary(base_winner_interact)
+summary(base_feedback_winner_interact)
+
+
 
 ##### Adaptation Bayesienne: nouveau modèle #####
 plot(s$simule_gain, jitter(s$gain, 10), xlim=c(-400,300), type='p', col='blue', cex=0.1, xlab='Simulated gain', ylab='Subjective gain')
@@ -889,9 +963,20 @@ confirmation_bias <- function(by_variable = 'gain', nb_bin = 8, local_b = TRUE, 
   hat_g_F_i <- f__1(G_F_i)
   hat_alpha_i <- 1 + (gain_i - hat_g_F_i)/(b_i*local_b + (!local_b)*wtd.mean(s$simule_gain - s$gain, weights = s$weight))
   
+  alphas_i <- mean_alphas_i <- median_alphas_i <- c()
+  for (i in 1:nb_bins) {
+    alphas_i[s$variante_taxe_info=='f' & bins==i] <- 1 + (s$gain[s$variante_taxe_info=='f' & bins==i] - hat_g_F_i[i])/(s$simule_gain[s$variante_taxe_info=='f' & bins==i] - s$gain[s$variante_taxe_info=='f' & bins==i])
+    mean_alphas_i <- c(mean_alphas_i, wtd.mean(alphas_i[s$variante_taxe_info=='f' & bins==i], weights = s$weight[s$variante_taxe_info=='f' & bins==i]))
+    median_alphas_i <- c(median_alphas_i, wtd.median(alphas_i[s$variante_taxe_info=='f' & bins==i], weight = s$weight[s$variante_taxe_info=='f' & bins==i]))
+  }
+  
   name_by_var <- paste(by_variable, 'i', sep='_')
   if (return=='alpha') return(median(hat_alpha_i))
-  else if (return=='all') return(list('alpha'=median(hat_alpha_i),  name_by_var=variable_i, 'G_i'=G_i, 'gain_i'=gain_i, 'b_i'=b_i ,'G_F_i'=G_F_i, 'hat_g_F_i'=hat_g_F_i, 'hat_alpha_i'=hat_alpha_i)) #
+  else if (return=='all') return(list('alpha'=median(hat_alpha_i),  name_by_var=variable_i, 'G_i'=G_i, 'gain_i'=gain_i, 
+                                      'b_i'=b_i ,'G_F_i'=G_F_i, 'hat_g_F_i'=hat_g_F_i, 'hat_alpha_i'=hat_alpha_i,
+                                      'share_alphas_i>0'=sum(s$weight[alphas_i>0 & s$variante_taxe_info=='f'])/sum(s$weight[s$variante_taxe_info=='f']), 'share_alphas_i>1'=sum(s$weight[alphas_i>1 & s$variante_taxe_info=='f'])/sum(s$weight[s$variante_taxe_info=='f']),
+                                      'mean(alphas_i)'=wtd.mean(alphas_i, weights = s$weight, na.rm=T),
+                                      'median(alphas_i)'=wtd.median(alphas_i, weight = s$weight, na.rm=T), 'mean_alphas_i'=mean_alphas_i, 'median_alphas_i'=median_alphas_i)) #
   else if (return=='hat_alpha_i') return(hat_alpha_i)
   else if (return=='b_i') return(b_i)
   else return(list('alpha'=median(hat_alpha_i), 'hat_alpha_i'=hat_alpha_i, 'b_i'=b_i))
@@ -911,6 +996,7 @@ confirmation_bias(nb_bin = 1, method='mean')
 
 # Bizarre: les gain = non affectés sont en moyenne perdants selon simule_gain ! (valable selon quand on pondère) => TODO: clean numbers simule_gain
 decrit(s$simule_gain[s$gain==0 & s$variante_taxe_info=='f'], weights= s$weight[s$gain==0 & s$variante_taxe_info=='f'])
+max(s$simule_gain[bins==4])
 
 
 ##### Adaptation bayésienne : tout nouveau modèle ######
@@ -973,12 +1059,16 @@ decrit(s$update_correct_large | s$gagnant_feedback_pas_faux, weights = s$weight)
 ##### Graph distributions subjective/objective gains #####
 objective_gains <- read.csv2("df_objective_gains.csv")
 subjective_gains <- read.csv2("df_subjective_gains.csv")
+objective_gains_inelastic <- read.csv2("df_objective_gains_inelastic.csv")
 objective_gains$transport <- n(objective_gains$gain_net_numeric_uc_fuel)
 objective_gains$housing <- n(objective_gains$gain_net_numeric_uc_chauffage)
 objective_gains$all <- n(objective_gains$gain_net_numeric_uc_taxe_carbone)
 subjective_gains$transport <- n(subjective_gains$subjective_gain_numeric_fuel)
 subjective_gains$housing <- n(subjective_gains$subjective_gain_numeric_chauffage)
 subjective_gains$all <- n(subjective_gains$subjective_gain_numeric_taxe_carbone)
+objective_gains_inelastic$transport <- n(objective_gains_inelastic$gain_net_numeric_uc_fuel)
+objective_gains_inelastic$housing <- n(objective_gains_inelastic$gain_net_numeric_uc_chauffage)
+objective_gains_inelastic$all <- n(objective_gains_inelastic$gain_net_numeric_uc_taxe_carbone)
 
 
 mar_old <- par()$mar
@@ -993,35 +1083,45 @@ lines(density(subjective_gains$housing, bw=30), xlim=c(-400, 200), lwd=2, col="r
 plot(density(objective_gains$all, bw=30), xlim=c(-400, 200), lwd=2, col="blue", xlab="", main="") + grid()
 lines(density(subjective_gains$all, bw=30), xlim=c(-400, 200), lwd=2, col="red")
 
+par(mar = c(2.1, 4.1, 1.1, 0.1), cex=1.5)
 cdf_transport <- Ecdf(objective_gains$transport)
+cdf_transport_inelastic <- Ecdf(objective_gains_inelastic$transport)
 cdf_transport_min <- Ecdf(s$gain_fuel_min)
 cdf_transport_max <- Ecdf(s$gain_fuel_max)
 plot(Ecdf(s$gain_fuel), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
 lines(cdf_transport$x, cdf_transport$y, lwd=2, col="blue")
-lines(cdf_transport_min$x, cdf_transport_min$y, type="s", lty=2, col="red")
-lines(cdf_transport_max$x, cdf_transport_max$y, type="s", lty=2, col="red")
-axis(1, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
-abline(v = c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.5), lwd=0.2)
-# TODO: finir ça, avec les valeurs de l'?chelle au-dessus
-  
+lines(cdf_transport_inelastic$x, cdf_transport_inelastic$y, lwd=2, lty=2, col="blue")
+# lines(cdf_transport_min$x, cdf_transport_min$y, type="s", lty=2, col="red")
+# lines(cdf_transport_max$x, cdf_transport_max$y, type="s", lty=2, col="red")
+# axis(1, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
+abline(v = c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.7))
+axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
 
 cdf_housing <- Ecdf(objective_gains$housing)
+cdf_housing_inelastic <- Ecdf(objective_gains_inelastic$housing)
 cdf_housing_min <- Ecdf(s$gain_chauffage_min)
 cdf_housing_max <- Ecdf(s$gain_chauffage_max)
 plot(Ecdf(s$gain_chauffage), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
 lines(cdf_housing$x, cdf_housing$y, lwd=2, col="blue")
-lines(cdf_housing_min$x, cdf_housing_min$y, type="s", lty=2, col="red")
-lines(cdf_housing_max$x, cdf_housing_max$y, type="s", lty=2, col="red")
-axis(1, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
+lines(cdf_housing_inelastic$x, cdf_housing_inelastic$y, lwd=2, lty=2, col="blue")
+# lines(cdf_housing_min$x, cdf_housing_min$y, type="s", lty=2, col="red")
+# lines(cdf_housing_max$x, cdf_housing_max$y, type="s", lty=2, col="red")
+abline(v=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.7))
+axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
 
 cdf_all <- Ecdf(objective_gains$all)
+cdf_all_inelastic <- Ecdf(objective_gains_inelastic$all)
 cdf_min <- Ecdf(s$gain_min)
 cdf_max <- Ecdf(s$gain_max)
 plot(Ecdf(s$gain), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
 lines(cdf_all$x, cdf_all$y, lwd=2, col="blue")
-lines(cdf_min$x, cdf_min$y, type="s", lty=2, col="red")
-lines(cdf_max$x, cdf_max$y, type="s", lty=2, col="red")
-axis(1, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
+lines(cdf_all_inelastic$x, cdf_all_inelastic$y, lwd=2, lty=2, col="blue")
+# lines(cdf_min$x, cdf_min$y, type="s", lty=2, col="red")
+# lines(cdf_max$x, cdf_max$y, type="s", lty=2, col="red")
+# axis(1, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.04, lwd=0, lwd.ticks = 1, col="red", labels=rep("", 10))
+abline(v=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), lty=3, col=rgb(1,0,0,0.7))
+axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
+
 
 par(mar = mar_old, cex = cex_old)
 

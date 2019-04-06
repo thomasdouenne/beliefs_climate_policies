@@ -42,7 +42,9 @@ package("rddapp")
 # package("mets")
 package("plyr")
 package("descr")
-# package("ergm") 
+package("stargazer")
+package("clipr")
+package("ergm") # wtd.median
 # package("doMC") # for parallel computing, does not work on Windows
 
 # Fs <- function(QID) { s[QID][[1]] }
