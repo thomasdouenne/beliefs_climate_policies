@@ -198,7 +198,6 @@ summary(lm(update ~ simule_gagnant * gagnant_categorie, data=s[s$variante_taxe_i
 probitmarg <- probitmfx(update ~ simule_gagnant * gagnant_categorie, data = s[s$variante_taxe_info=='f',], atmean = TRUE)
 probitmarg
 
-
 summary(lm(update ~ simule_gagnant, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f']))
 # s$gagnant_categorie <- relevel(as.factor(s$gagnant_categorie), 'Non affecté')
 summary(lm(((gagnant_feedback_categorie != 'Perdant') - (gagnant_categorie != 'Perdant')) ~ gagnant_categorie, data=s[s$simule_gagnant==1,], weights = s$weight[s$simule_gagnant==1]))
@@ -206,6 +205,9 @@ summary(lm(((gagnant_feedback_categorie != 'Gagnant') - (gagnant_categorie != 'G
 
 summary(lm(((gagnant_feedback_categorie == 'Gagnant') - (gagnant_categorie == 'Gagnant')) ~ gagnant_categorie, data=s[s$simule_gagnant==1,], weights = s$weight[s$simule_gagnant==1]))
 summary(lm(((gagnant_feedback_categorie == 'Perdant') - (gagnant_categorie == 'Perdant')) ~ gagnant_categorie, data=s[s$simule_gagnant==0,], weights = s$weight[s$simule_gagnant==0]))
+
+summary(lm(((gagnant_feedback_categorie == 'Perdant')) ~ (gagnant_categorie == 'Gagnant') + (gagnant_categorie == 'Perdant'), data=s[s$simule_gagnant==0,], weights = s$weight[s$simule_gagnant==0]))
+summary(lm(((gagnant_feedback_categorie == 'Gagnant')) ~ (gagnant_categorie == 'Gagnant') + (gagnant_categorie == 'Perdant'), data=s[s$simule_gagnant==1,], weights = s$weight[s$simule_gagnant==0]))
 
 summary(lm(update ~ gagnant_categorie, data=s[s$simule_gagnant==1,], weights = s$weight[s$simule_gagnant==1]))
 summary(lm(update ~ gagnant_categorie, data=s[s$simule_gagnant==0,], weights = s$weight[s$simule_gagnant==0]))
