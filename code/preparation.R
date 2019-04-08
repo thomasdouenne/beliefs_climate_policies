@@ -737,7 +737,7 @@ relabel_and_rename_s <- function() {
   names(s)[283] <<- "simule_gagnant"
   label(s[[283]]) <<- "simule_gagnant: Indicatrice sur la prédiction que le ménage serait gagnant avec la taxe compensée, d'après nos simulations"
   names(s)[284] <<- "hausse_chauffage"
-  label(s[[284]]) <<- "hausse_chauffage:  Hausse des dépenses de chauffage simulées pour le ménage, suite à la taxe (élasticité de 0.2)"
+  label(s[[284]]) <<- "hausse_chauffage: Hausse des dépenses de chauffage simulées pour le ménage, suite à la taxe (élasticité de 0.15 au lieu de 0.2)"
   names(s)[285] <<- "hausse_diesel"
   label(s[[285]]) <<- "hausse_diesel: Hausse des dépenses de diesel simulées pour le ménage, suite à la taxe (élasticité de 0.4)"
   names(s)[286] <<- "hausse_essence"
@@ -875,6 +875,7 @@ convert_s <- function() {
   s$mauvaise_qualite[s$km > 10^6] <<- 1 + s$mauvaise_qualite[s$km > 10^6] # 1
   s$mauvaise_qualite[s$surface < 9] <<- 1 + s$mauvaise_qualite[s$surface < 9] # 6
   s$mauvaise_qualite[s$surface >= 1000] <<- 1 + s$mauvaise_qualite[s$surface >= 1000] # 4
+  s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)] <<- 1.2 + s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)]
   label(s$mauvaise_qualite) <<- "mauvaise_qualite: Indicatrice d'une réponse aberrante à revenu, taille_menage, nb_14_et_plus, km ou surface."
   s$duree_info_courte[n(s$info_CC) + n(s$info_PM) > 0] <<- FALSE # 15%
   s$duree_info_courte[s$duree_info_CC < 5 | s$duree_info_PM < 5 | s$duree_info_CC_PM < 5] <<- T # 327
@@ -1251,8 +1252,8 @@ convert_s <- function() {
   s$essence <<- (!is.na(s$fuel_1) & (s$fuel_1=='Essence')) | (!is.na(s$fuel_2_2) & ((s$fuel_2_1=='Essence') | (s$fuel_2_2=='Essence')))
   label(s$diesel) <<- "diesel: Indicatrice de la possession d'un véhicule diesel par le ménage (fuel_1 ou fuel_2_1 ou fuel_2_2 = 'Diesel')"
   label(s$essence) <<- "essence: Indicatrice de la possession d'un véhicule à essence par le ménage (fuel_1 ou fuel_2_1 ou fuel_2_2 = 'Essence')"
-
-  s$simule_gain <<- 16.1 + s$nb_adultes * 110 - s$hausse_depenses
+  
+  s$simule_gain <<- 16.1 + s$nb_adultes * 110 - s$hausse_depenses # élasticité de 0.15 sur le gaz
   s$simule_gain_repondant <<- 16.1 + 110 - s$hausse_depenses
   label(s$simule_gain) <<- "simule_gain: Gain net annuel simulé pour le ménage du répondant suite à une hausse de taxe carbone compensée: 16.1 + nb_adultes * 110 - hausse_depenses"
   label(s$simule_gain_repondant) <<- "simule_gain_repondant: Gain net annuel simulé pour le répondant (sans tenir compte du potentiel versement reçu par les autres adultes du ménage) suite à une hausse de taxe carbone compensée: 116.1 - hausse_depenses"
@@ -1261,6 +1262,18 @@ convert_s <- function() {
   label(s$simule_gain_cible) <<- "simule_gain_cible: Gain net simulé pour le ménage du répondant suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
   label(s$simule_gain_cible_sans_conjoint) <<- "simule_gain_cible_sans_conjoint: Gain net simulé pour le répondant (sans tenir compte du potentiel versement reçu par son conjoint) suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
   s$simule_gagnant[is.na(s$simule_gagnant)] <<- 1*(s$simule_gain[is.na(s$simule_gagnant)] > 0)
+  
+  s$hausse_chauffage_interaction_inelastique <<- 152.6786*s$fioul + s$surface * (1.6765*s$gaz + 1.1116*s$fioul)
+  s$simule_gain_interaction <<- 9.1 + s$nb_adultes * 110 - s$hausse_carburants - s$hausse_chauffage_interaction_inelastique * (1 - 0.2) # élasticité de 0.2 pour le gaz
+  s$simule_gagnant_interaction <<- 1*(s$simule_gain_interaction > 0)
+  s$simule_gain_inelastique <<- s$nb_adultes * 110 - s$hausse_carburants/(1 - 0.4) - s$hausse_chauffage_interaction_inelastique # élasticité nulle. Inclure + 22.4 rendrait le taux d'erreur uniforme suivant les deux catégories, on ne le fait pas pour être volontairement conservateur
+  s$simule_gain_elast_perso[s$variante_partielle=='c'] <<- s$nb_adultes[s$variante_partielle=='c'] * 110 - (s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='c'] * (1 + s$Elasticite_chauffage_perso[s$variante_partielle=='c']) + s$hausse_carburants)
+  s$simule_gain_elast_perso[s$variante_partielle=='f'] <<- s$nb_adultes[s$variante_partielle=='f'] * 110 - (s$hausse_carburants[s$variante_partielle=='f'] * (1 + s$Elasticite_fuel_perso[s$variante_partielle=='f']) / (1 - 0.4) + s$hausse_chauffage_interaction_inelastique * (1 - 0.2))
+  label(s$hausse_chauffage_interaction_inelastique) <<- "hausse_chauffage_interaction_inelastique: Hausse des dépenses de chauffage simulées pour le ménage avec des termes d'interaction entre surface et gaz/fioul plutôt que sans, suite à la taxe (élasticité nulle)"
+  label(s$simule_gain_interaction) <<- "simule_gain_interaction: Gain net annuel simulé avec des termes d'interaction surface*fioul/gaz pour le ménage du répondant suite à une hausse de taxe carbone compensée: 9.1 + nb_adultes * 110 - hausse_chauffage_interaction_inelastique * 0.8 - hausse_carburants"
+  label(s$simule_gagnant_interaction) <<- "simule_gagnant_interaction: Indicatrice sur la prédiction que le ménage serait gagnant avec la taxe compensée, d'après nos simulations avec des termes d'interaction surface*fioul/gaz: 1*(simule_gain_interaction > 0)"
+  label(s$simule_gain_inelastique) <<- "simule_gain_inelastique: Gain net annuel simulé (avec interaction) avec une élasticité nulle, pour le ménage du répondant suite à une hausse de taxe carbone compensée:  nb_adultes * 110 - hausse_chauffage_interaction_inelastique - hausse_carburants / 0.6"
+  label(s$simule_gain_elast_perso) <<- "simule_gain_elast_perso: Gain net annuel simulé (avec interaction) avec l'élasticité renseignée par le répondant, pour le ménage du répondant suite à une hausse de taxe carbone compensée: nb_adultes * 110 - hausse_partielle_inelastique * (1 - Elasticite_partielle_perso) - hausse_autre_partielle"
   
   s$progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- s$progressivite_feedback_sans_info[!is.na(s$progressivite_feedback_sans_info)]
   s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
@@ -1288,6 +1301,14 @@ convert_s <- function() {
   s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) + 1*(s$ges_nucleaire == FALSE)
   label(s$score_climate_call) <<- "score_climate_call: Somme des bonnes réponses au questionnaire Climate Call (avion-train / boeuf-pates / nucleaire-eolien) ges_avion/boeuf/nucleaire"  
 
+  s$generation_CC_min <<- 1960*(s$generation_CC_1960==T) + 1990*(s$generation_CC_1990==T)*(s$generation_CC_1960!=T) + 2020*(s$generation_CC_2020==T)*(s$generation_CC_1960!=T)*(s$generation_CC_1990!=T) + 2050*(s$generation_CC_2050==T)*(s$generation_CC_1960!=T)*(s$generation_CC_1990!=T)*(s$generation_CC_2020!=T)
+  s$generation_CC_max <<- 2050*(s$generation_CC_2050==T) + 2020*(s$generation_CC_2020==T)*(s$generation_CC_2050!=T) + 1990*(s$generation_CC_1990==T)*(s$generation_CC_2020!=T)*(s$generation_CC_2050!=T) + 1960*(s$generation_CC_1960==T)*(s$generation_CC_2050!=T)*(s$generation_CC_1990!=T)*(s$generation_CC_2020!=T)
+  s$generation_CC_max[s$generation_CC_aucune==T] <<- s$generation_CC_min[s$generation_CC_aucune==T] <- NA
+  s$nb_generation_CC <<- (s$generation_CC_1960==T) + (s$generation_CC_2050==T) + (s$generation_CC_1990==T) + (s$generation_CC_2020==T)
+  label(s$generation_CC_min) <<- "generation_CC_min: Génération minimale de Français qui sera gravement affectée par le changeent climatique (1960/1990/2020/2050/NA si le répondant à répondu aucune d'entre elles) - Q71" 
+  label(s$generation_CC_max) <<- "generation_CC_max: Génération maximale de Français qui sera gravement affectée par le changeent climatique (1960/1990/2020/2050/NA si le répondant à répondu aucune d'entre elles) - Q71" 
+  label(s$nb_generation_CC) <<- "nb_generation_CC: Nombre de générations de Français qui seront gravement affectées par le changeent climatique (de 0 à 4) - Q71" 
+  
   s$duree_info[s$info_CC==1 & s$info_PM==1] <<- s$duree_info_CC_PM[s$info_CC==1 & s$info_PM==1]
   s$duree_info[s$info_CC==0 & s$info_PM==1] <<- s$duree_info_PM[s$info_CC==0 & s$info_PM==1]
   s$duree_info[s$info_CC==1 & s$info_PM==0] <<- s$duree_info_CC[s$info_CC==1 & s$info_PM==0]
@@ -1431,3 +1452,5 @@ write.csv(s, "survey_prepared.csv")
 # decrit(n(sid$duree)/60)
 # length(which(n(sid$duree) > 7*60))
 # decrit(sid$test_qualite)
+
+fit_housing <- read.csv("../model_reforms_data/prediction housing expenditures.csv")

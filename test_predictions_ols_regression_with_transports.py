@@ -20,6 +20,8 @@ def compute_probability_to_win_from_ols_regression(df_hh, df_estimation):
     
     df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
     df_hh['Intercept'] = 1
+    df_hh['natural_gas:accommodation_size'] = df_hh['natural_gas']*df_hh['accommodation_size']
+    df_hh['domestic_fuel:accommodation_size'] = df_hh['domestic_fuel']*df_hh['accommodation_size']
     
     params = results_regressions.params
     params = params.to_frame().T
@@ -52,7 +54,7 @@ if __name__ == "__main__":
     df_hh['winner'] = 0 + 1 * (df_hh['total_expenditures_increase'] < 110 * df_hh['nb_beneficiaries'])
     
     df_hh = compute_probability_to_win_from_ols_regression(df_hh, df_estimation)
-    df_hh['predicted_winner'] = 0 + 1 * (df_hh['predicted_total_expenditures_increase'] < 16.1 + 110 * df_hh['nb_beneficiaries'])
+    df_hh['predicted_winner'] = 0 + 1 * (df_hh['predicted_total_expenditures_increase'] < 9.1 + 110 * df_hh['nb_beneficiaries']) # 16.1
     
     df_hh['mistake'] = \
         1 * ((df_hh['winner'] - df_hh['predicted_winner']) != 0)
