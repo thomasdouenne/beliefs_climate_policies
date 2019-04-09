@@ -47,7 +47,13 @@ def compute_gain_net_uc(df_bdf):
     df_bdf['gain_net_numeric_uc_chauffage'] = \
         (50 * df_bdf['nb_beneficiaries'] - df_bdf['housing_expenditures_increase']) / df_bdf['consumption_units']
     df_bdf['gain_net_numeric_uc_taxe_carbone'] = \
-        (110 * df_bdf['nb_beneficiaries'] - df_bdf['total_expenditures_increase']) / df_bdf['consumption_units']
+        (136 * df_bdf['nb_beneficiaries'] - df_bdf['total_expenditures_increase']) / df_bdf['consumption_units']
+    df_bdf['gain_fiscal_net_numeric_uc_fuel'] = \
+        (60 * df_bdf['nb_beneficiaries'] - df_bdf['transport_tax_increase']) / df_bdf['consumption_units']
+    df_bdf['gain_fiscal_net_numeric_uc_chauffage'] = \
+        (50 * df_bdf['nb_beneficiaries'] - df_bdf['housing_tax_increase']) / df_bdf['consumption_units']
+    df_bdf['gain_fiscal_net_numeric_uc_taxe_carbone'] = \
+        (110 * df_bdf['nb_beneficiaries'] - df_bdf['total_tax_increase']) / df_bdf['consumption_units']
 
     for energy in ['chauffage', 'fuel']:
         df_bdf['gain_{}_echelle'.format(energy)] = 0 + (
@@ -194,7 +200,7 @@ def extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone
         loc_param, scale_param = stats.norm.fit(local_hh['gain_net_numeric_uc_{}'.format(energy)])
         param_density = stats.norm.cdf(local_hh['gain_net_numeric_uc_{}'.format(energy)], loc=loc_param, scale=scale_param)
         vector_weights = np.vstack((local_hh['gain_net_numeric_uc_{}'.format(energy)], param_density)).T
-                
+
         if vector == True:
             array_size = int(hh_index) - int(hh_index_old)
             random_array = np.random.randint(1,100001, size = array_size)
@@ -224,25 +230,37 @@ def extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone
     return df_bdf, df_to_plot
 
 
-def compute_effort_rate_decile(df_bdf, energy):
+def compute_effort_rate_decile(df_bdf, energy): # ATTENTION : Problème avec les uc divisés deux fois / WIP
     df_to_plot = pd.DataFrame(index = range(1,11),
-        columns = ['average_cost_{}'.format(energy), 'effort_rate_{}'.format(energy)])
+        columns = ['average_cost_{}'.format(energy), 'average_fiscal_cost_{}'.format(energy), 'effort_rate_{}'.format(energy), 'effort_rate_fiscal_{}'.format(energy)])
     for i in range(1,11):
         df_to_plot['average_cost_{}'.format(energy)][i] = (
-            (df_bdf.query('income_decile == {}'.format(i))['gain_net_numeric_uc_{}'.format(energy)] /
-            df_bdf.query('income_decile == {}'.format(i))['uc'] * \
-                   df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
+            (df_bdf.query('income_decile == {}'.format(i))['gain_net_numeric_uc_{}'.format(energy)] * df_bdf.query('income_decile == {}'.format(i))['weight']).sum() /
+            df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
+                )
+        df_to_plot['average_fiscal_cost_{}'.format(energy)][i] = (
+            (df_bdf.query('income_decile == {}'.format(i))['gain_fiscal_net_numeric_uc_{}'.format(energy)] * df_bdf.query('income_decile == {}'.format(i))['weight']).sum() /
+            df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
                 )
         df_to_plot['effort_rate_{}'.format(energy)][i] = (
             (df_bdf.query('income_decile == {}'.format(i))['gain_net_numeric_uc_{}'.format(energy)] * \
                    df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
                     ) / (
-            (df_bdf.query('income_decile == {}'.format(i))['hh_disposable_income'] * \
+            (df_bdf.query('income_decile == {}'.format(i))['hh_disposable_income'] / \
+                         df_bdf.query('income_decile == {}'.format(i))['uc'] * \
+                   df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
+                )
+        df_to_plot['effort_rate_fiscal_{}'.format(energy)][i] = (
+            (df_bdf.query('income_decile == {}'.format(i))['gain_fiscal_net_numeric_uc_{}'.format(energy)] * \
+                   df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
+                    ) / (
+            (df_bdf.query('income_decile == {}'.format(i))['hh_disposable_income'] / \
+                         df_bdf.query('income_decile == {}'.format(i))['uc'] * \
                    df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
                 )
 
-    return graph_builder_bar_percent(df_to_plot[['effort_rate_{}'.format(energy)]]), graph_builder_bar(df_to_plot[['average_cost_{}'.format(energy)]], True)
-        
+    return graph_builder_bar_percent(df_to_plot[['effort_rate_{}'.format(energy)]]), graph_builder_bar(df_to_plot[['average_cost_{}'.format(energy)]], True), \
+        graph_builder_bar_percent(df_to_plot[['effort_rate_fiscal_{}'.format(energy)]]), graph_builder_bar(df_to_plot[['average_fiscal_cost_{}'.format(energy)]], True)
 
 
 def save_dataframes_kernel_density(df_bdf, df_ptc):
@@ -255,3 +273,11 @@ def save_dataframes_kernel_density(df_bdf, df_ptc):
     df_subjective = df_subjective[['subjective_gain_numeric_fuel'] + ['subjective_gain_numeric_chauffage'] + ['subjective_gain_numeric_taxe_carbone']]
     
     return df_objective.to_csv('df_objective_gains.csv', sep = ';'), df_subjective.to_csv('df_subjective_gains.csv', sep = ';')
+
+
+#print (df_bdf['transport_tax_increase'] / df_bdf['nb_beneficiaries']).mean()
+#print (df_bdf['housing_tax_increase'] / df_bdf['nb_beneficiaries']).mean()
+#print (df_bdf['total_tax_increase'] / df_bdf['nb_beneficiaries']).mean()
+#print (df_bdf['nb_beneficiaries'] * df_bdf['weight']).sum()
+#print ((df_bdf['nb_persons'] - df_bdf['nb_children']) * df_bdf['weight']).sum()
+#print ((df_bdf['plus_18']) * df_bdf['weight']).sum()
