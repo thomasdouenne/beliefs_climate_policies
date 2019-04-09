@@ -12,7 +12,7 @@ decrit(s$gagnant_categorie[s$simule_gagnant == 1], weight = s$weight[s$simule_ga
 decrit(s$gagnant_feedback_categorie[s$simule_gagnant == 0], weight = s$weight[s$simule_gagnant == 0])
 decrit(s$gagnant_categorie[s$simule_gagnant == 0], weight = s$weight[s$simule_gagnant == 0])
 
-# TODO: refaire résultats en excluant les simule_gagnant_interaction != simule_gagnant_interaction
+# TODO: refaire résultats en excluant les simule_gagnant_interaction != simule_gagnant
 ##### 2. Matrices de transition
 decrit(s$gagnant_categorie[(s$simule_gagnant == 1)], weight = s$weight[(s$simule_gagnant == 1)])
 decrit(s$gagnant_categorie[(s$simule_gagnant == 0)], weight = s$weight[(s$simule_gagnant == 0)])

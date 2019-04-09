@@ -26,14 +26,14 @@ cor((s$gagnant_cible_categorie!='Perdant'), s$traite_cible_conjoint)
 
 # avant il y avait hausse_depenses au lieu de simule_gain_cible
 tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
-summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
+summary(tsls_rdd_1) # exclure les >70 ou pas ? Non
 gagnant.hat <- fitted.values(tsls_rdd_1)
 self_2 <- lm((taxe_cible_approbation!='Non') ~ gagnant.hat + (taxe_approbation!='Non') + (taxe_efficace!='Non') + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
 summary(self_2)
 # On estime un TOT : ceteris paribus, se considérer comme gagnant augmente la probabilité d'approbation de 47 p.p.
 # Note : je ne suis pas sûr que d_rdd.hat exprime ce que l'on souhaite : quel rôle des variables de contrôle dans le 1er et 2e stage ? Revoir la théorie
 tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
-summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
+summary(tsls_rdd_1) # exclure les >70 ou pas ? Non
 gagnant.hat <- fitted.values(tsls_rdd_1)
 self_1 <- lm((taxe_cible_approbation!='Non') ~ gagnant.hat + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=categorie_cible!='70_', weights = s$weight)
 summary(self_1)
