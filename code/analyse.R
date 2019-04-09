@@ -336,8 +336,8 @@ summary(glm(, family = binomial(link = "probit", data=s)))
 
 
 ##### Elasticites #####
-decrit(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)], weights = s$weight[!is.na(s$Elasticite_fuel)])
-decrit(s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)], weights = s$weight[!is.na(s$Elasticite_fuel_perso)]) #
+decrit(s$Elasticite_fuel, weights = s$weight)
+decrit(s$Elasticite_fuel_perso, weights = s$weight) #
 decrit(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)], weights = s$weight[!is.na(s$Elasticite_chauffage)]) #
 decrit(s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)], weights = s$weight[!is.na(s$Elasticite_chauffage_perso)]) #
 

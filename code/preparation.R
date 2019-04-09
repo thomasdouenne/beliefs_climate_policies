@@ -875,7 +875,6 @@ convert_s <- function() {
   s$mauvaise_qualite[s$km > 10^6] <<- 1 + s$mauvaise_qualite[s$km > 10^6] # 1
   s$mauvaise_qualite[s$surface < 9] <<- 1 + s$mauvaise_qualite[s$surface < 9] # 6
   s$mauvaise_qualite[s$surface >= 1000] <<- 1 + s$mauvaise_qualite[s$surface >= 1000] # 4 # TODO: below
-  # s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)] <<- 1.2 + s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)]
   label(s$mauvaise_qualite) <<- "mauvaise_qualite: Indicatrice d'une réponse aberrante à revenu, taille_menage, nb_14_et_plus, km ou surface."
   s$duree_info_courte[n(s$info_CC) + n(s$info_PM) > 0] <<- FALSE # 15%
   s$duree_info_courte[s$duree_info_CC < 5 | s$duree_info_PM < 5 | s$duree_info_CC_PM < 5] <<- T # 327
@@ -1120,8 +1119,8 @@ convert_s <- function() {
   s$Elasticite_chauffage <<- - round(s$Elasticite_chauffage / 30, 2) # converts into elasticity
   label(s$Elasticite_chauffage) <<- "Elasticite_chauffage: Élasticité-prix des dépenses de chauffage des Français, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 30%)"
 
-  s$Elasticite_chauffage_perso <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_chauffage_perso))))
-  s$Elasticite_chauffage_perso <<- (s$Elasticite_chauffage_perso==0)*1.5 + (s$Elasticite_chauffage_perso==3)*6.5 + (s$Elasticite_chauffage_perso>3)*(s$Elasticite_chauffage_perso + 5) # Take the average of thresholds, take 40% for >30%
+  s$Elasticite_chauffage_perso <<- as.numeric(sub(".*\\s(\\d*)%\\s.*", "\\1", s$elasticite_chauffage_perso))
+  s$Elasticite_chauffage_perso <<- ifelse(s$variante_partielle=='f', NA, ifelse(is.na(s$Elasticite_chauffage_perso), 0, s$Elasticite_chauffage_perso+5*(1+1*(s$Elasticite_chauffage_perso==30)))) # Take the average of thresholds, take 40% for >30%
   s$Elasticite_chauffage_perso <<- - round(s$Elasticite_chauffage_perso / 30, 2) # converts into elasticity
   label(s$Elasticite_chauffage_perso) <<- "Elasticite_chauffage_perso: Élasticité-prix des dépenses de chauffage du ménage, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 30%)"
 
@@ -1130,8 +1129,8 @@ convert_s <- function() {
   s$Elasticite_fuel <<- - round(s$Elasticite_fuel / 30, 2) # converts into elasticity
   label(s$Elasticite_fuel) <<- "Elasticite_fuel: Élasticité-prix des dépenses de carburants des Français, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 0.5€/L)"
 
-  s$Elasticite_fuel_perso <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_fuel_perso))))
-  s$Elasticite_fuel_perso <<- (s$Elasticite_fuel_perso==0)*1.5 + (s$Elasticite_fuel_perso==3)*6.5 + (s$Elasticite_fuel_perso>3)*(s$Elasticite_fuel_perso + 5) # Take the average of thresholds, take 40% for >30%
+  s$Elasticite_fuel_perso <<- as.numeric(sub(".*\\s(\\d*)%\\s.*", "\\1", s$elasticite_fuel_perso))
+  s$Elasticite_fuel_perso <<- ifelse(s$variante_partielle=='c', NA, ifelse(is.na(s$Elasticite_fuel_perso), 0, s$Elasticite_fuel_perso+5*(1+1*(s$Elasticite_fuel_perso==30)))) # Take the average of thresholds, take 40% for >30%
   s$Elasticite_fuel_perso <<- - round(s$Elasticite_fuel_perso / 30, 2) # converts into elasticity
   label(s$Elasticite_fuel_perso) <<- "Elasticite_fuel_perso: Élasticité-prix des dépenses de carburants du ménage, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 0.5€/L)"
   
@@ -1303,6 +1302,7 @@ convert_s <- function() {
   s$score_climate_call <<- 1*(s$ges_avion == TRUE) + 1*(s$ges_boeuf == TRUE) + 1*(s$ges_nucleaire == FALSE)
   label(s$score_climate_call) <<- "score_climate_call: Somme des bonnes réponses au questionnaire Climate Call (avion-train / boeuf-pates / nucleaire-eolien) ges_avion/boeuf/nucleaire"  
 
+  s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)] <<- 1.2 + s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)]
   s$generation_CC_min <<- 1960*(s$generation_CC_1960==T) + 1990*(s$generation_CC_1990==T)*(s$generation_CC_1960!=T) + 2020*(s$generation_CC_2020==T)*(s$generation_CC_1960!=T)*(s$generation_CC_1990!=T) + 2050*(s$generation_CC_2050==T)*(s$generation_CC_1960!=T)*(s$generation_CC_1990!=T)*(s$generation_CC_2020!=T)
   s$generation_CC_max <<- 2050*(s$generation_CC_2050==T) + 2020*(s$generation_CC_2020==T)*(s$generation_CC_2050!=T) + 1990*(s$generation_CC_1990==T)*(s$generation_CC_2020!=T)*(s$generation_CC_2050!=T) + 1960*(s$generation_CC_1960==T)*(s$generation_CC_2050!=T)*(s$generation_CC_1990!=T)*(s$generation_CC_2020!=T)
   s$generation_CC_max[s$generation_CC_aucune==T] <<- s$generation_CC_min[s$generation_CC_aucune==T] <- NA
