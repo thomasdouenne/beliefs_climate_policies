@@ -874,7 +874,7 @@ convert_s <- function() {
   s$mauvaise_qualite[s$nb_14_et_plus > 10] <<- 1 + s$mauvaise_qualite[s$nb_14_et_plus > 10] # 2
   s$mauvaise_qualite[s$km > 10^6] <<- 1 + s$mauvaise_qualite[s$km > 10^6] # 1
   s$mauvaise_qualite[s$surface < 9] <<- 1 + s$mauvaise_qualite[s$surface < 9] # 6
-  s$mauvaise_qualite[s$surface >= 1000] <<- 1 + s$mauvaise_qualite[s$surface >= 1000] # 4
+  s$mauvaise_qualite[s$surface >= 1000] <<- 1 + s$mauvaise_qualite[s$surface >= 1000] # 4 # TODO: below
   # s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)] <<- 1.2 + s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)]
   label(s$mauvaise_qualite) <<- "mauvaise_qualite: Indicatrice d'une réponse aberrante à revenu, taille_menage, nb_14_et_plus, km ou surface."
   s$duree_info_courte[n(s$info_CC) + n(s$info_PM) > 0] <<- FALSE # 15%
