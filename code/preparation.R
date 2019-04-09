@@ -875,7 +875,7 @@ convert_s <- function() {
   s$mauvaise_qualite[s$km > 10^6] <<- 1 + s$mauvaise_qualite[s$km > 10^6] # 1
   s$mauvaise_qualite[s$surface < 9] <<- 1 + s$mauvaise_qualite[s$surface < 9] # 6
   s$mauvaise_qualite[s$surface >= 1000] <<- 1 + s$mauvaise_qualite[s$surface >= 1000] # 4
-  s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)] <<- 1.2 + s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)]
+  # s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)] <<- 1.2 + s$mauvaise_qualite[s$generation_CC_aucune==T & (s$generation_CC_1960==T | s$generation_CC_1990==T | s$generation_CC_2020==T | s$generation_CC_2050==T)]
   label(s$mauvaise_qualite) <<- "mauvaise_qualite: Indicatrice d'une réponse aberrante à revenu, taille_menage, nb_14_et_plus, km ou surface."
   s$duree_info_courte[n(s$info_CC) + n(s$info_PM) > 0] <<- FALSE # 15%
   s$duree_info_courte[s$duree_info_CC < 5 | s$duree_info_PM < 5 | s$duree_info_CC_PM < 5] <<- T # 327
@@ -1146,7 +1146,9 @@ convert_s <- function() {
   s$elasticite_partielle_perso <<- s$elasticite_chauffage_perso
   s$elasticite_partielle_perso[!is.na(s$elasticite_fuel_perso)] <<- s$elasticite_fuel_perso[!is.na(s$elasticite_fuel_perso)]
   label(s$elasticite_partielle_perso) <<- "elasticite_partielle_perso: Réduction de la conso de fioul et gaz OU de carburants du ménage suite à augmentation du prix de 30% (0% - Je n'en consomme déjà presque pas/0% - Je suis contraint sur tous mes déplacements/de 0% à 10%/de 10% à 20%/de 20% à 30%/+ de 30% - Je changerais largement mes habitudes de déplacement)"
-
+# TODO: depenses_chauffage,  _fuel
+  #TODO: Elasticite
+  #TODO: feedback robustesse sans gagnant !=, sans les +/-50
   s$Elasticite_partielle_perso <<- s$Elasticite_chauffage_perso
   s$Elasticite_partielle_perso[!is.na(s$Elasticite_fuel_perso)] <<- s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)]
   label(s$Elasticite_partielle_perso) <<- "Elasticite_partielle_perso: Élasticité-prix des dépenses de fioul et gaz OU de carburants du ménage, calculée en prenant la valeur moyenne des intervalles proposées"

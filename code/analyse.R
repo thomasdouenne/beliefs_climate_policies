@@ -88,20 +88,25 @@ decrit(s$gagnant_progressif_categorie, weights = s$weight)
 cdf_gain <- wtd.Ecdf(s$gain, weights = s$weight)
 plot(cdf_gain$x, cdf_gain$ecdf, type='s', lwd=2, col='orange', xlab="Category of subjective gain", ylab="Distribution of answers") + grid()
 
+decrit(s$simule_gagnant_interaction != s$simule_gagnant, weights = s$weight)
+decrit(1*(s$simule_gain_inelastique > 0) != s$simule_gagnant, weights = s$weight)
 decrit(s$gain > s$simule_gain, weights = s$weight)
 decrit(s$gain > s$simule_gain_interaction, weights = s$weight)
 decrit(s$gain > s$simule_gain_inelastique, weights = s$weight)
 decrit(s$gain > s$simule_gain_elast_perso, weights = s$weight)
-fit_housing$vrai_gain_chauffage <- 50 * fit_housing$nb_adultes - fit_housing$obj
-fit_housing$estimation_gain_chauffage <- 50 * fit_housing$nb_adultes - fit_housing$fit
+fit_housing$vrai_gain_chauffage <- 50 * pmax(2, fit_housing$nb_adultes) - fit_housing$obj
+fit_housing$estimation_gain_chauffage <- 50 * pmax(2, fit_housing$nb_adultes) - fit_housing$fit
 ggplot(data=fit_housing, aes(x=vrai_gain_chauffage)) + 
-  geom_smooth(method = "glm", method.args = list(family = "binomial"), aes(y=1*(estimation_gain_chauffage > 0))) + ylim(c(0,1)) + xlab("Objective gain without fuel (density in black)") + ylab("P(gain - (hausse_carburants-60) > 0) i.e. proba gain") + xlim(c(-200, 120)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
+  geom_smooth(method = "auto", aes(y=1*(estimation_gain_chauffage > 0))) + ylim(c(0,1)) + xlab("Objective gain without fuel (density in black)") + ylab("P(gain - (hausse_carburants-60) > 0) i.e. proba gain") + xlim(c(-200, 120)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
 # ggplot(data=fit_housing, aes(x=obj)) + geom_smooth(aes(y=1*(fit < 110)), method = "glm", method.args = list(family = "binomial")) + ylim(c(0,1)) + xlab("Objective housing expenditure increase (density in black)") + ylab("P(hausse_chauffage_interaction < 110) i.e. proba gain") + xlim(c(0, 500)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=110, col='red')
 # length(which(fit_housing$obj > 50 & fit_housing$obj < 200))/length(fit_housing$obj) # 25%
 # length(which(fit_housing$obj > 75 & fit_housing$obj < 170))/length(fit_housing$obj) # 15%
 length(which(fit_housing$vrai_gain_chauffage > -50 & fit_housing$vrai_gain_chauffage < 50))/length(fit_housing$vrai_gain_chauffage) # 20% de chances d'avoir une proba entre 0.1 et 0.9
 length(which(fit_housing$estimation_gain_chauffage > 0 & fit_housing$vrai_gain_chauffage==50))/length(which(fit_housing$vrai_gain_chauffage==50))
-sum(s$weight[s$gain > -50 & s$gain < 50])/sum(s$weight) # 51%
+sum(s$weight[s$simule_gain_interaction > -50 & s$simule_gain_interaction < 50])/sum(s$weight) # 21%
+ggplot(data=s, aes(x=hausse_carburants)) + geom_density() + xlim(c(0, 300))
+ggplot(data=s, aes(x=simule_gain_interaction)) + geom_density() + xlim(c(-200, 300))
+ggplot(data=s, aes(x=60 * pmax(2, nb_adultes) - hausse_carburants)) + geom_density() + xlim(c(-100, 200))
 
 
 ##### Approbation #####
