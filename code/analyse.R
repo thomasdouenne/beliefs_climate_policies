@@ -88,9 +88,25 @@ decrit(s$gagnant_progressif_categorie, weights = s$weight)
 cdf_gain <- wtd.Ecdf(s$gain, weights = s$weight)
 plot(cdf_gain$x, cdf_gain$ecdf, type='s', lwd=2, col='orange', xlab="Category of subjective gain", ylab="Distribution of answers") + grid()
 
-
+decrit(s$simule_gagnant_interaction != s$simule_gagnant, weights = s$weight)
+decrit(1*(s$simule_gain_inelastique > 0) != s$simule_gagnant, weights = s$weight)
 decrit(s$gain > s$simule_gain, weights = s$weight)
-# TODO: estimer gain que le répondant devrait estimer pour lui-même avec son élasticité
+decrit(s$gain > s$simule_gain_interaction, weights = s$weight)
+decrit(s$gain > s$simule_gain_inelastique, weights = s$weight)
+decrit(s$gain > s$simule_gain_elast_perso, weights = s$weight)
+fit_housing$vrai_gain_chauffage <- 50 * pmax(2, fit_housing$nb_adultes) - fit_housing$obj
+fit_housing$estimation_gain_chauffage <- 50 * pmax(2, fit_housing$nb_adultes) - fit_housing$fit
+ggplot(data=fit_housing, aes(x=vrai_gain_chauffage)) + 
+  geom_smooth(method = "auto", aes(y=1*(estimation_gain_chauffage > 0))) + ylim(c(0,1)) + xlab("Objective gain without fuel (density in black)") + ylab("P(gain - (hausse_carburants-60) > 0) i.e. proba gain") + xlim(c(-200, 120)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
+# ggplot(data=fit_housing, aes(x=obj)) + geom_smooth(aes(y=1*(fit < 110)), method = "glm", method.args = list(family = "binomial")) + ylim(c(0,1)) + xlab("Objective housing expenditure increase (density in black)") + ylab("P(hausse_chauffage_interaction < 110) i.e. proba gain") + xlim(c(0, 500)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=110, col='red')
+# length(which(fit_housing$obj > 50 & fit_housing$obj < 200))/length(fit_housing$obj) # 25%
+# length(which(fit_housing$obj > 75 & fit_housing$obj < 170))/length(fit_housing$obj) # 15%
+length(which(fit_housing$vrai_gain_chauffage > -50 & fit_housing$vrai_gain_chauffage < 50))/length(fit_housing$vrai_gain_chauffage) # 20% de chances d'avoir une proba entre 0.1 et 0.9
+length(which(fit_housing$estimation_gain_chauffage > 0 & fit_housing$vrai_gain_chauffage==50))/length(which(fit_housing$vrai_gain_chauffage==50))
+sum(s$weight[s$simule_gain_interaction > -50 & s$simule_gain_interaction < 50])/sum(s$weight) # 21%
+ggplot(data=s, aes(x=hausse_carburants)) + geom_density() + xlim(c(0, 300))
+ggplot(data=s, aes(x=simule_gain_interaction)) + geom_density() + xlim(c(-200, 300))
+ggplot(data=s, aes(x=60 * pmax(2, nb_adultes) - hausse_carburants)) + geom_density() + xlim(c(-100, 200))
 
 
 ##### Approbation #####
@@ -162,7 +178,7 @@ variables_connaissances_CC <- c("Cause_CC", "ges_CO2", "ges_CH4", "ges_O2", "ges
                                 "emission_cible", "score_ges", "score_climate_call")
 variables_avis_CC <- c("parle_CC", "effets_CC", "generation_CC_1960", "generation_CC_1990", "generation_CC_2020", "generation_CC_2050", "generation_CC_aucune",
                        "responsable_CC_chacun", "responsable_CC_riches", "responsable_CC_govts", "responsable_CC_etranger", "responsable_CC_passe", 
-                       "responsable_CC_nature", "enfant_CC", "enfant_CC_pour_lui", "enfant_CC_pour_CC") # TODO: generation_min generation_max 
+                       "responsable_CC_nature", "enfant_CC", "enfant_CC_pour_lui", "enfant_CC_pour_CC", "generation_CC_min", "generation_CC_max") 
 variables_comportement_CC <- c("mode_vie_ecolo", "changer_si_politiques", "changer_si_moyens", "changer_si_tous", "changer_non_riches", "changer_non_interet", "changer_non_negation", "changer_deja_fait", "changer_essaie")
 variables_schiste <- c("schiste_approbation", "schiste_avantage", "Schiste_CC", "schiste_traite")
 variables_transferts_inter <- c("transferts_inter", "aide_2p", "transferts_inter_info", "aide_non_autonomie", "aide_non_priorite", "aide_non_etats", 
@@ -320,10 +336,12 @@ summary(glm(, family = binomial(link = "probit", data=s)))
 
 
 ##### Elasticites #####
-decrit(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)], weights = s$weight[!is.na(s$Elasticite_fuel)])
-decrit(s$Elasticite_fuel_perso[!is.na(s$Elasticite_fuel_perso)], weights = s$weight[!is.na(s$Elasticite_fuel_perso)]) #
-decrit(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)], weights = s$weight[!is.na(s$Elasticite_chauffage)]) #
-decrit(s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)], weights = s$weight[!is.na(s$Elasticite_chauffage_perso)]) #
+decrit(s$Elasticite_fuel, weights = s$weight) # -0.43
+decrit(s$Elasticite_fuel_perso, weights = s$weight) #
+decrit(s$Elasticite_chauffage, weights = s$weight) # -0.41
+decrit(s$Elasticite_chauffage_perso, weights = s$weight) #
+decrit(s$Elasticite_fuel_perso, weights = s$weight * s$depense_carburants) # -0.41
+decrit(s$Elasticite_chauffage_perso, weights = s$weight * s$depense_chauffage) # -0.33
 
 summary(lm(Elasticite_fuel ~ (taxe_efficace=='Oui'), data=s, weights = s$weight))
 summary(lm(Elasticite_chauffage ~ (taxe_efficace=='Oui'), data=s, weights = s$weight)) # Aucun lien évident élasticité / efficacité environnementale
@@ -332,8 +350,8 @@ cor(s$Elasticite_fuel[!is.na(s$Elasticite_fuel)], s$Elasticite_fuel_perso[!is.na
 cor(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)], s$Elasticite_chauffage_perso[!is.na(s$Elasticite_chauffage_perso)])
 # Correlation positive entre �lasticit� perso et �lasticit� globale
 
-# 50% (resp. 58%) think they are strictly more contrained than average, exploit perte_relative for this issue
-# TODO: weight by their conso to see if it's consistent
+# 71% (resp. 80%) think they are strictly more contrained than average for fuel (resp. chauffage)
+# TODO: weight by their conso to see if it's consistent, exploit perte_relative for this issue
 sum(s$weight[!is.na(s$Elasticite_fuel_perso) & s$Elasticite_fuel_perso > s$Elasticite_fuel])/sum(s$weight[!is.na(s$Elasticite_fuel_perso)]) # 50%
 sum(s$weight[!is.na(s$Elasticite_chauffage_perso) & s$Elasticite_chauffage_perso > s$Elasticite_chauffage])/sum(s$weight[!is.na(s$Elasticite_chauffage_perso)]) # 58%
 
@@ -513,18 +531,18 @@ for (v in variables_problemes[1:(length(variables_problemes)-2)]) {
 # oui_non(margin_l=430, variables_benefices[1:(length(variables_benefices)-2)], "barres_benefices", labels_benefices)
 # oui_non(margin_l=430, variables_problemes[1:(length(variables_problemes)-2)], "barres_problemes", labels_problemes)
 
-# TODO: créer variables avec nombre de bénéfices / problèmes cochés, voire l'influence des traitements
+# TODO: utiliser nb_bénéfices / problèmes cochés, voire l'influence des traitements
 
 barres_benefices <- barres(file="benefices", title="<b>Bénéfices d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_benefices, ncol=length(values_benefices)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_benefices, hover=labels_benefices, legend="empty")
 barres_problemes <- barres(file="problemes", title="<b>Problèmes d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_problemes, ncol=length(values_problemes)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_problemes, hover=labels_problemes, legend="empty")
 barres_benefices
-dev.print(png, '../images/benefice.png')
-dev.copy(png, filename="../images/benefice.png") # TODO: manage expost image
-dev.off()
 barres_problemes
-dev.print(png, '../images/probleme.png')
 # orca(barres_problemes, "../images/problemes.png")
 # orca(barres_benefices, "../images/benefices.png")
+
+# plot(1:3,1:3)
+# dev.copy(png, filename="../images/test.png") # plot from R (not from plotly)
+# dev.off()
 
 
 ##### Perdants/Gagnants #####
@@ -636,10 +654,6 @@ xtable(table_categorie_cible_GJ, digits=0)
 # xtabs((taxe_cible_approbation!='Non') ~ (gagnant_cible_categorie!='Perdant') + (taxe_approbation!='Non'), s)/xtabs(~ (gagnant_cible_categorie!='Perdant') + (taxe_approbation!='Non'), s) # cannot put weights
 # s %>%  group_by((gagnant_cible_categorie!='Perdant'), tax_acceptance) %>%  summarise(mean = mean(taxe_cible_approbation!='Non')) %>%  spread(tax_acceptance, mean, sep = '') # cannot put weights
 # cf. aussi crosstab, e.g. crosstab( s$gagnant_categorie[s$simule_gagnant==0], s$gagnant_feedback_categorie[s$simule_gagnant==0],s$weight[s$simule_gagnant==0], dnn=c('Winning category, Before', 'Winning category, After'), prop.r=T, dir=c("h", "v")) # , inv.x=T, inv.y=T
-s$tax_approval <- s$taxe_approbation=='Oui'
-s$tax_acceptance <- s$taxe_approbation!='Non' # TODO: in preparation
-s$tax_cible_acceptance <- 1*(s$taxe_cible_approbation!='Non')
-s$win_cible_category <- 1*(s$gagnant_cible_categorie!='Perdant')
 dcast(s, win_cible_category ~ tax_acceptance, value.var="tax_cible_acceptance", fun.aggregate = mean, margins=T)
 
 # 45%*** more chance of acceptance when thinking to not loose
@@ -674,8 +688,6 @@ summary(lm((taxe_cible_approbation!='Non') ~ versement_cible*cible + simule_gain
 
 
 ##### Régressions: 2.3 2SLS gagnant_cible_categorie ######
-s$tax_approval <- s$taxe_approbation=='Oui'
-s$tax_acceptance <- s$taxe_approbation!='Non' # TODO: in preparation
 # traite_cible: 19%*** (conjoint 10%**) 
 tsls1 <- lm(gagnant_cible_categorie !='Perdant'~ traite_cible + traite_cible_conjoint + tax_acceptance, subset=is.element(categorie_cible, c('20_30', '30_40', '40_50')), data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1)
@@ -686,7 +698,7 @@ summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + tax_acceptance, data=
 
 # tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + taxe_approbation + hausse_depenses + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
 tsls_rdd_1 <- lm((gagnant_cible_categorie!='Perdant') ~ traite_cible * traite_cible_conjoint + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight)
-summary(tsls_rdd_1) # TODO: exclure les >70 ou pas ?
+summary(tsls_rdd_1) # exclure les >70 ou pas ? Non
 gagnant.hat <- fitted.values(tsls_rdd_1)
 # summary(lm(dummy_approbation_cible ~ gagnant.hat + taxe_approbation + hausse_depenses + revenu + revenu_conjoint, data=s, weights = s$weight))
 summary(lm((taxe_cible_approbation!='Non') ~ gagnant.hat + taxe_approbation + simule_gain_cible + revenu + revenu_conjoint + I(revenu^2) + I(revenu_conjoint^2), data=s, subset=cible!='70_', weights = s$weight))
@@ -748,7 +760,7 @@ summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ Dg
 
 
 ##### Adaptation Bayesienne biaisée des croyances (aka. "on se fait Bayeser") #####
-summary(lm((gain*uc) ~ versement + hausse_depenses, subset = s$hausse_depenses<200, data=s, weights = s$weight)) # TODO: renomme gain -> gain_subjectif
+summary(lm((gain*uc) ~ versement + hausse_depenses, subset = s$hausse_depenses<200, data=s, weights = s$weight)) 
 summary(lm((gain - versement/uc) ~ 1, data=s, weights = s$weight)) 
 summary(lm(gain ~ I(versement/uc) + I(hausse_depenses/uc) + I(hausse_depenses^2/uc) + taille_menage + diplome + age + csp + region + revenu + rev_tot + I(revenu^2) + I(rev_tot^2), data=s, weights = s$weight))
 
@@ -761,16 +773,6 @@ plot(s$hausse_carburants, jitter(s$perte_relative_fuel), xlim=c(0, 500))
 plot(s$hausse_chauffage, jitter(s$perte_relative_chauffage), xlim=c(0, 500))
 length(which(s$gain <= 0 & s$km < 1000 & s$gaz==FALSE & s$fioul==FALSE))
 
-s$update_correct <- ((s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') 
-                    + (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')
-                    - (s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant')
-                    - (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant'))
-label(s$update_correct) <- "update_correct: Différence entre l'indicatrice de ne pas se penser gagnant/perdant et le penser après feedback infirmant, moins la même après feedback confirmant"
-s$update_correct_large <- ((s$simule_gagnant==1 & ((s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') | (s$gagnant_feedback_categorie!='Perdant' & s$gagnant_categorie=='Perdant'))) 
-  + (s$simule_gagnant==0 & ((s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant') | (s$gagnant_feedback_categorie!='Gagnant' & s$gagnant_categorie=='Gagnant')))
-  - (s$simule_gagnant==1 & ((s$gagnant_feedback_categorie=='Perdant' & s$gagnant_categorie!='Perdant') | (s$gagnant_feedback_categorie!='Gagnant' & s$gagnant_categorie=='Gagnant')))
-  - (s$simule_gagnant==0 & ((s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant') | (s$gagnant_feedback_categorie!='Perdant' & s$gagnant_categorie=='Perdant'))))
-label(s$update_correct_large) <- "update_correct_large: Différence entre faire un update dans la bonne direction quand le feedback y conduit et faire un update dans la mauvaise direction"
 decrit(s$update_correct)
 decrit(s$update_correct_large) # TODO: in preparation
 # Les gens pensant perdre légèrement updatent plus correctement que la moyenne et plus ils se trompent, plus ils updatent correctement.
@@ -780,14 +782,6 @@ summary(lm(update_correct_large ~ I(simule_gain - gain)*as.factor(gain), data=s,
 # Biais à la perte : (Tout est significatif) Ceux qui gagnent (simulé) updatent moins correctement, ceux qui croient perdrent aussi. 
 summary(lm(update_correct_large ~ simule_gagnant*gagnant_categorie, data=s, weights = s$weight))
 
-s$feedback_confirme <- (s$gagnant_categorie=='Gagnant' & s$simule_gagnant==1) | (s$gagnant_categorie=='Perdant' & s$simule_gagnant==0)
-s$feedback_infirme <- (s$gagnant_categorie=='Perdant' & s$simule_gagnant==1) | (s$gagnant_categorie=='Gagnant' & s$simule_gagnant==0)
-s$feedback_confirme_large <- s$feedback_confirme | (s$gagnant_categorie!='Perdant' & s$simule_gagnant==1) | (s$gagnant_categorie!='Gagnant' & s$simule_gagnant==0)
-s$feedback_infirme_large <- s$feedback_infirme | (s$gagnant_categorie!='Perdant' & s$simule_gagnant==0) | (s$gagnant_categorie!='Gagnant' & s$simule_gagnant==1)
-label(s$feedback_confirme) <- "feedback_confirme: Indicatrice de se penser et être simulé gagnant/perdant (gagnant_categorie, simule_gagnant)"
-label(s$feedback_infirme) <- "feedback_infirme: Indicatrice de se penser gagnant et être simulé perdant, ou l'inverse (gagnant_categorie, simule_gagnant)"
-label(s$feedback_confirme_large) <- "feedback_confirme_large: Indicatrice de se penser non perdant et être simulé gagnant, ou de se penser non gagnant et être simulé perdant (gagnant_categorie, simule_gagnant)"
-label(s$feedback_infirme_large) <- "feedback_infirme_large: Indicatrice de se penser non gagnant et être simulé gagnant, ou de se penser non perdant et être simulé perdant (gagnant_categorie, simule_gagnant)"
 # summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ I(feedback_confirme - feedback_infirme)*(s$gagnant_categorie=='Perdant'), data=s, weights=s$weight))
 # summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ simule_gagnant*(gagnant_categorie=='Gagnant'), data=s, weights=s$weight))
 decrit(s$feedback_infirme, weights = s$weight) # 48%
@@ -994,9 +988,66 @@ confirmation_bias('gain_echelle', 8, TRUE, 'all', 'mean')
 
 confirmation_bias(nb_bin = 1, method='mean')
 
-# Bizarre: les gain = non affectés sont en moyenne perdants selon simule_gain ! (valable selon quand on pondère) => TODO: clean numbers simule_gain
+# Bizarre: les gain = non affectés sont en moyenne perdants selon simule_gain ! (valable selon quand on pondère) => TODO: clean numbers simule_gain, also hausse_carburants
 decrit(s$simule_gain[s$gain==0 & s$variante_taxe_info=='f'], weights= s$weight[s$gain==0 & s$variante_taxe_info=='f'])
 max(s$simule_gain[bins==4])
+
+
+##### Adaptation bayésienne : tout nouveau modèle ######
+s$gagnant_feedback_pas_faux <- (s$simule_gagnant==1 & s$gagnant_feedback_categorie!='Perdant') | (s$simule_gagnant==0 & s$gagnant_feedback_categorie!='Gagnant')
+s$gagnant_feedback_correct <- (s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant') | (s$simule_gagnant==0 & s$gagnant_feedback_categorie=='Perdant')
+decrit(s$gagnant_feedback_pas_faux)
+decrit(s$gagnant_feedback_correct)
+nb_bin <- 8
+nb_bins <- length(levels(binning(s$simule_gain, bins=nb_bin, method="wtd.quantile", ordered=FALSE, weights=s$weight)))
+s$bins_simule_gain <- binning(s$simule_gain, bins=nb_bin, method="wtd.quantile", labels=c(1:nb_bins), ordered=FALSE, weights=s$weight)
+sigma_i <- feedback_pas_faux_i <- feedback_correct_i <- c()
+for (i in 1:nb_bins) { # TODO: make bins of same size (?)
+  if (i==3) { # bin that contains both positive and negative simule_gain
+    s$bins_simule_gain[s$simule_gain<0 & s$bins_simule_gain==i] <- 2
+    # s$bins_simule_gain[s$simule_gain>0 & s$bins_simule_gain==i] <- 4
+  } 
+  sigma_i <- c(sigma_i, sqrt(wtd.var(s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i], s$weight[s$variante_taxe_info=='f' & s$bins_simule_gain==i])))
+  feedback_pas_faux_i <- c(feedback_pas_faux_i, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_pas_faux==T & s$bins_simule_gain==i])/sum(s$weight[s$variante_taxe_info=='f' & s$bins_simule_gain==i]))
+  feedback_correct_i <- c(feedback_correct_i, sum(s$weight[s$variante_taxe_info=='f' & s$gagnant_feedback_correct==T & s$bins_simule_gain==i])/sum(s$weight[s$variante_taxe_info=='f' & s$bins_simule_gain==i]))
+  if (i<3) {
+    s$phi_g_sigma_gamma_large[s$variante_taxe_info=='f' & s$bins_simule_gain==i] <- 1-(5/6)*(1-pnorm(-s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i]/sigma_i[i], lower.tail=T))/feedback_pas_faux_i[i]
+    s$phi_g_sigma_gamma[s$variante_taxe_info=='f' & s$bins_simule_gain==i] <- 1-(5/6)*(1-pnorm(-s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i]/sigma_i[i], lower.tail=T))/feedback_correct_i[i]
+  } else {
+    s$phi_g_sigma_gamma_large[s$variante_taxe_info=='f' & s$bins_simule_gain==i] <- (5/6)*(pnorm(-s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i]/sigma_i[i], lower.tail=T))/feedback_pas_faux_i[i]
+    s$phi_g_sigma_gamma[s$variante_taxe_info=='f' & s$bins_simule_gain==i] <- (5/6)*(pnorm(-s$gain[s$variante_taxe_info=='f' & s$bins_simule_gain==i]/sigma_i[i], lower.tail=T))/feedback_correct_i[i]
+  }
+  # print(mean(s$simule_gain[s$bins_simule_gain==i]))
+}
+# decrit(s$bins_simule_gain)
+s$non_bayesien_large <- s$phi_g_sigma_gamma_large < 0 | s$phi_g_sigma_gamma_large > 1
+s$non_bayesien <- s$phi_g_sigma_gamma < 0 | s$phi_g_sigma_gamma > 1
+s$sigma_gamma_large <- - s$gain/qnorm(s$phi_g_sigma_gamma_large)
+s$sigma_gamma <- - s$gain/qnorm(s$phi_g_sigma_gamma)
+
+decrit(s$non_bayesien_large, weights = s$weight) # 37%
+decrit(s$non_bayesien, weights = s$weight) # 73%
+decrit(s$phi_g_sigma_gamma_large[s$non_bayesien_large==FALSE], weights = s$weight[s$non_bayesien_large==FALSE])
+decrit(s$phi_g_sigma_gamma[s$non_bayesien==FALSE], weights = s$weight[s$non_bayesien==FALSE])
+decrit(s$sigma_gamma_large[s$non_bayesien_large==FALSE], weights = s$weight[s$non_bayesien_large==FALSE])
+decrit(s$sigma_gamma[s$non_bayesien==FALSE], weights = s$weight[s$non_bayesien==FALSE])
+decrit((s$sigma_gamma_large<0)[s$non_bayesien_large==FALSE], weights = s$weight[s$non_bayesien_large==FALSE]) # 14%
+decrit((s$sigma_gamma<0)[s$non_bayesien==FALSE], weights = s$weight[s$non_bayesien==FALSE]) # 10%
+sort(sigma_i) # 7 in 110-125, 148
+sqrt(wtd.var(s$gain ,weights = s$weight)) # 124
+feedback_pas_faux_i
+feedback_correct_i
+decrit(s$non_bayesien_large | s$sigma_gamma_large < 0, weights = s$weight) # 46%
+decrit(s$non_bayesien | s$sigma_gamma < 0, weights = s$weight) # 76%
+decrit(s$sigma_gamma_large[s$non_bayesien_large==FALSE & s$sigma_gamma_large > 0], weights = s$weight[s$non_bayesien_large==FALSE & s$sigma_gamma_large > 0]) # mean 181
+decrit(s$sigma_gamma[s$non_bayesien==FALSE & s$sigma_gamma > 0], weights = s$weight[s$non_bayesien==FALSE & s$sigma_gamma > 0]) # mean 183
+decrit(s$non_bayesien_large[s$simule_gain>0], weights = s$weight[s$simule_gain>0]) # 48%
+decrit(s$non_bayesien[s$simule_gain>0], weights = s$weight[s$simule_gain>0]) # 94%
+decrit(s$non_bayesien_large[s$simule_gain<0], weights = s$weight[s$simule_gain<0]) # 0%
+decrit(s$non_bayesien[s$simule_gain<0], weights = s$weight[s$simule_gain<0]) # 0%
+
+decrit(s$update_correct | s$gagnant_feedback_correct, weights = s$weight) # 43%
+decrit(s$update_correct_large | s$gagnant_feedback_pas_faux, weights = s$weight) # 67%
 
 
 ##### Adaptation bayésienne : tout nouveau modèle ######
@@ -1196,3 +1247,5 @@ par(mar = mar_old, cex = cex_old)
 #          sort=2:1, cex.axis=0.9, labeling=c(1:9))
 # mosaic(crosstab_simule_gagnant$tab, shade=FALSE, labeling=c(1:9))
 # labeling_cells(text = round(100*crosstab_simule_gagnant$prop.r), margin = 0)(as.table(crosstab_simule_gagnant$prop.r))
+
+#TODO: feedback robustesse sans gagnant !=, sans les +/-50

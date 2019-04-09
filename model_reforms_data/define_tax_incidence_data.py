@@ -73,3 +73,9 @@ def taxes_data(price_without_tax, excise_tax, data, key):
     data['{}_taxes'.format(key)] = data['{}_quantity'.format(key)] * (vat * price_without_tax + excise_tax * (1 + vat))
     
     return data
+
+
+def adjusted_taxes_data(new_price_without_tax, new_excise_tax, data, key):
+    data['{}_adjusted_taxes'.format(key)] = data['{}_adjusted_quantity'.format(key)] * (vat * new_price_without_tax + new_excise_tax * (1 + vat))
+    
+    return data

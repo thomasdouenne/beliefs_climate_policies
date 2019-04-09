@@ -2078,7 +2078,19 @@ From the previous tables it appears that respondents do not fully update
 i
 \emph default
  is uncertain about their actual gain and evaluates its distribution to
+<<<<<<< HEAD
  be 
+=======
+<<<<<<< refs/remotes/thomasdouenne/master
+<<<<<<< refs/remotes/thomasdouenne/master
+ be 
+=======
+ be
+>>>>>>> Bayes
+=======
+ be 
+>>>>>>> small change
+>>>>>>> master
 \begin_inset Formula $\mathcal{N}\left(g_{i},\sigma_{i}^{2}\right)$
 \end_inset
 
