@@ -3341,6 +3341,28 @@ literal "false"
 .
 \end_layout
 
+<<<<<<< refs/remotes/thomasdouenne/master
+\begin_layout Standard
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "edwards_conservatism_1968"
+literal "false"
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "benabou_self-confidence_2002,eil_good_2011,coutts_good_2018"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+=======
+>>>>>>> Auto stash before rebase of "origin/master"
 \begin_layout Standard
 \begin_inset CommandInset citation
 LatexCommand citealp
