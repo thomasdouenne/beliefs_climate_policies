@@ -41,7 +41,7 @@ def compute_probability_to_win_from_ols_regression(df_hh, df_estimation):
 
 
 if __name__ == "__main__":
-    df_hh = prepare_dataset_housing('enl')
+    df_hh = prepare_dataset_housing('bdf')
     df_transports = prepare_dataset()
     df_hh = merge_transport_data(df_hh, df_transports)
     df_hh = compute_gains_losses(df_hh)

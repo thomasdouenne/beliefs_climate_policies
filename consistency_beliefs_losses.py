@@ -27,7 +27,7 @@ df_ptc = pd.read_csv(r'code/survey_prepared.csv')
 df_bdf = compute_gains_losses(df_bdf)
 df_bdf = compute_gain_net_uc(df_bdf)
 df_bdf = variables_names_bdf_to_ptc(df_bdf)
-(df_bdf, df_ptc) = create_new_variables_bdf_ptc(df_bdf, df_ptc)
+#(df_bdf, df_ptc) = create_new_variables_bdf_ptc(df_bdf, df_ptc)
 #df_bdf['weight'] = 1
 
 #df_ptc['weight'] = 1
@@ -56,8 +56,8 @@ plot_kde = False
 save_kde_data = False
 test_imputation_methods = False # The two methods provide quite similar results
 regress = False
-number_winners = False
-effort_rate = True
+number_winners = True
+effort_rate = False
 
 
 """ Compare distributions BdF/BCP """ # pdf and CDF net gains of both samples (step function or Kernel density estimation)
