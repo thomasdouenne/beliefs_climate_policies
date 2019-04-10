@@ -28,7 +28,7 @@ df_ptc = pd.read_csv(r'code/survey_prepared.csv', sep = ";", decimal = ',')
 df_bdf = compute_gains_losses(df_bdf)
 df_bdf = compute_gain_net_uc(df_bdf)
 df_bdf = variables_names_bdf_to_ptc(df_bdf)
-(df_bdf, df_ptc) = create_new_variables_bdf_ptc(df_bdf, df_ptc)
+#(df_bdf, df_ptc) = create_new_variables_bdf_ptc(df_bdf, df_ptc)
 #df_bdf['weight'] = 1
 
 #df_ptc['weight'] = 1
@@ -107,10 +107,10 @@ if number_winners == True:
     print float((df_bdf['gain_net_numeric_uc_fuel'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
     print float((df_bdf['gain_net_numeric_uc_chauffage'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
     print float((df_bdf['gain_net_numeric_uc_taxe_carbone'] * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
-             
-    print float(((df_ptc['gain_net_numeric_barycentre_uc_fuel'] == 0) * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+    
+    print float(((df_ptc['gain_net_numeric_uc_fuel'] > 0) * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
     print float(((df_ptc['gain_net_numeric_uc_chauffage'] > 0) * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
-    print float(((df_ptc['gain_net_numeric_barycentre_uc_taxe_carbone'] == 0) * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
+    print float(((df_ptc['gain_net_numeric_uc_taxe_carbone'] > 0) * df_ptc['weight']).sum()) / df_ptc['weight'].sum()
     
     print float(((df_bdf['gain_net_numeric_uc_fuel'] > 0) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
     print float(((df_bdf['gain_net_numeric_uc_chauffage'] > 0) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
