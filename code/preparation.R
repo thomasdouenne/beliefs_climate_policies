@@ -1493,3 +1493,17 @@ write.csv(s, "survey_prepared.csv")
 # decrit(sid$test_qualite)
 
 fit_housing <- read.csv("../model_reforms_data/prediction housing expenditures.csv")
+
+# Preparation for Figures 1 and 2: importation of distribution calculated (for objective) or smoothed (for subjective) in python
+objective_gains <- read.csv2("df_objective_gains.csv") 
+subjective_gains <- read.csv2("df_subjective_gains.csv")
+objective_gains_inelastic <- read.csv2("df_objective_gains_inelastic.csv")
+objective_gains$transport <- n(objective_gains$gain_net_numeric_uc_fuel)
+objective_gains$housing <- n(objective_gains$gain_net_numeric_uc_chauffage)
+objective_gains$all <- n(objective_gains$gain_net_numeric_uc_taxe_carbone)
+subjective_gains$transport <- n(subjective_gains$subjective_gain_numeric_fuel)
+subjective_gains$housing <- n(subjective_gains$subjective_gain_numeric_chauffage)
+subjective_gains$all <- n(subjective_gains$subjective_gain_numeric_taxe_carbone)
+objective_gains_inelastic$transport <- n(objective_gains_inelastic$gain_net_numeric_uc_fuel)
+objective_gains_inelastic$housing <- n(objective_gains_inelastic$gain_net_numeric_uc_chauffage)
+objective_gains_inelastic$all <- n(objective_gains_inelastic$gain_net_numeric_uc_taxe_carbone)

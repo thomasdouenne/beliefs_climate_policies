@@ -74,7 +74,7 @@ summary(lm(perte ~ variante_perte, data = s_perte, weights = s_perte$weight)) # 
 
 
 ##### Gain (dividende - hausse dépenses énergétiques) #####
-decrit(110 * s$nb_adultes - s$hausse_depenses, weights = s$weight) # Ok !
+decrit(110 * pmin(2, s$nb_adultes) - s$hausse_depenses, weights = s$weight) # Ok !
 decrit(s$gain, weights = s$weight) 
 decrit(s$gagnant_categorie, weights = s$weight)
 decrit(s$gagnant_feedback_categorie, weights = s$weight)
@@ -94,8 +94,8 @@ decrit(s$gain > s$simule_gain, weights = s$weight)
 decrit(s$gain > s$simule_gain_interaction, weights = s$weight)
 decrit(s$gain > s$simule_gain_inelastique, weights = s$weight)
 decrit(s$gain > s$simule_gain_elast_perso, weights = s$weight)
-fit_housing$vrai_gain_chauffage <- 50 * pmax(2, fit_housing$nb_adultes) - fit_housing$obj
-fit_housing$estimation_gain_chauffage <- 50 * pmax(2, fit_housing$nb_adultes) - fit_housing$fit
+fit_housing$vrai_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$obj
+fit_housing$estimation_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$fit
 ggplot(data=fit_housing, aes(x=vrai_gain_chauffage)) + 
   geom_smooth(method = "auto", aes(y=1*(estimation_gain_chauffage > 0))) + ylim(c(0,1)) + xlab("Objective gain without fuel (density in black)") + ylab("P(gain - (hausse_carburants-60) > 0) i.e. proba gain") + xlim(c(-200, 120)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
 # ggplot(data=fit_housing, aes(x=obj)) + geom_smooth(aes(y=1*(fit < 110)), method = "glm", method.args = list(family = "binomial")) + ylim(c(0,1)) + xlab("Objective housing expenditure increase (density in black)") + ylab("P(hausse_chauffage_interaction < 110) i.e. proba gain") + xlim(c(0, 500)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=110, col='red')
@@ -106,7 +106,7 @@ length(which(fit_housing$estimation_gain_chauffage > 0 & fit_housing$vrai_gain_c
 sum(s$weight[s$simule_gain_interaction > -50 & s$simule_gain_interaction < 50])/sum(s$weight) # 21%
 ggplot(data=s, aes(x=hausse_carburants)) + geom_density() + xlim(c(0, 300))
 ggplot(data=s, aes(x=simule_gain_interaction)) + geom_density() + xlim(c(-200, 300))
-ggplot(data=s, aes(x=60 * pmax(2, nb_adultes) - hausse_carburants)) + geom_density() + xlim(c(-100, 200))
+ggplot(data=s, aes(x=60 * pmin(2, nb_adultes) - hausse_carburants)) + geom_density() + xlim(c(-100, 200))
 
 
 ##### Approbation #####
@@ -352,8 +352,8 @@ cor(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)], s$Elasticite_chauffa
 
 # 71% (resp. 80%) think they are strictly more contrained than average for fuel (resp. chauffage)
 # TODO: weight by their conso to see if it's consistent, exploit perte_relative for this issue
-sum(s$weight[!is.na(s$Elasticite_fuel_perso) & s$Elasticite_fuel_perso > s$Elasticite_fuel])/sum(s$weight[!is.na(s$Elasticite_fuel_perso)]) # 50%
-sum(s$weight[!is.na(s$Elasticite_chauffage_perso) & s$Elasticite_chauffage_perso > s$Elasticite_chauffage])/sum(s$weight[!is.na(s$Elasticite_chauffage_perso)]) # 58%
+wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel, weights=s$weight, na.rm = T) # 71%
+wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage, weights=s$weight, na.rm = T) # 80%
 
 
 ##### Ciblage #####
@@ -1249,3 +1249,4 @@ par(mar = mar_old, cex = cex_old)
 # labeling_cells(text = round(100*crosstab_simule_gagnant$prop.r), margin = 0)(as.table(crosstab_simule_gagnant$prop.r))
 
 #TODO: feedback robustesse sans gagnant !=, sans les +/-50
+#TODO: étudier les socio-démos des gens qui changent d'avis, voir si le LATE qu'on estime repose sur la non représentativité du groupe (au moins en ce qui concerne les variables observées)
