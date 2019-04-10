@@ -36,7 +36,7 @@ def variables_names_bdf_to_ptc(df_bdf):
 
 def create_new_variables_bdf_ptc(df_bdf, df_ptc):
     df_bdf['ni_fioul_ni_gaz'] = 1 * ((df_bdf['fioul'] + df_bdf['gaz']) == 0)
-    df_ptc['ni_fioul_ni_gaz'] = 1 * (((df_ptc['fioul']==False) | (df_ptc['fioul']=='FALSE') | (df_ptc['fioul']=='0')) & ((df_ptc['gaz']==False) | (df_ptc['gaz']=='FALSE') | (df_ptc['gaz']=='0')))
+    df_ptc['ni_fioul_ni_gaz'] = 1 * ((df_ptc['fioul'] + df_ptc['gaz']) == 0)
   
     return df_bdf, df_ptc
 
@@ -47,7 +47,7 @@ def compute_gain_net_uc(df_bdf):
     df_bdf['gain_net_numeric_uc_chauffage'] = \
         (50 * df_bdf['nb_beneficiaries'] - df_bdf['housing_expenditures_increase']) / df_bdf['consumption_units']
     df_bdf['gain_net_numeric_uc_taxe_carbone'] = \
-        (110 * df_bdf['nb_beneficiaries'] - df_bdf['total_expenditures_increase']) / df_bdf['consumption_units']
+        (136 * df_bdf['nb_beneficiaries'] - df_bdf['total_expenditures_increase']) / df_bdf['consumption_units']
     df_bdf['gain_fiscal_net_numeric_uc_fuel'] = \
         (60 * df_bdf['nb_beneficiaries'] - df_bdf['transport_tax_increase']) / df_bdf['consumption_units']
     df_bdf['gain_fiscal_net_numeric_uc_chauffage'] = \
