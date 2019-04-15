@@ -1212,10 +1212,6 @@ decrit(s$transports_travail_actif=='Oui, ça ne me poserait pas de grande diffic
 # round(Crosstab(s[s$simule_gagnant==0,], row.vars="gagnant_categorie", col.vars="gagnant_feedback_categorie", type="r", dec.places = 0)$Crosstab)
 
 # weighted:
-s$winning_category <- as.factor(s$gagnant_categorie)
-s$winning_feedback_category <- as.factor(s$gagnant_feedback_categorie)
-levels(s$winning_category) <- c('Winner', 'Unaffected', 'Loser')
-levels(s$winning_feedback_category) <- c('Winner', 'Unaffected', 'Loser')
 
 mar_old <- par()$mar
 cex_old <- par()$cex

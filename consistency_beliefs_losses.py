@@ -5,6 +5,7 @@ from __future__ import division
 import pandas as pd
 import seaborn
 import statsmodels.formula.api as smf
+import numpy as np
 
 from model_reforms_data.prepare_dataset import prepare_dataset
 from model_reforms_data.gains_losses_data import compute_gains_losses
@@ -58,6 +59,7 @@ test_imputation_methods = False # The two methods provide quite similar results
 regress = False
 number_winners = True
 effort_rate = False
+prop_constrained = True
 
 
 """ Compare distributions BdF/BCP """ # pdf and CDF net gains of both samples (step function or Kernel density estimation)
@@ -118,3 +120,10 @@ if number_winners == True:
 """ Effort rate decile """
 if effort_rate == True:
     compute_effort_rate_decile(df_bdf, energy)
+
+""" Proportion of households more constrained than average """
+if prop_constrained == True:
+    mean_transport_expenditure_increase = (df_bdf['transport_expenditures_increase'] * df_bdf['weight']).sum() / df_bdf['weight'].sum()
+    print float(((df_bdf['transport_expenditures_increase'] < mean_transport_expenditure_increase) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()
+    mean_housing_expenditure_increase = (df_bdf['transport_expenditures_increase'] * df_bdf['weight']).sum() / df_bdf['weight'].sum()
+    print float(((df_bdf['housing_expenditures_increase'] < mean_housing_expenditure_increase) * df_bdf['weight']).sum()) / df_bdf['weight'].sum()

@@ -45,6 +45,10 @@ s$taille_menage[s$taille_menage > 12] # most look like zipcode
 decrit(s$gain_fuel, weights = s$weight) # mean -61 instead of +18
 decrit(s$gain_chauffage, weights = s$weight) # -43 instead of +6
 decrit(s$gain, weights = s$weight) # -89 instead of +24
+# Objective winning category: cf. consistency_belief_losses.py for weighted results
+decrit(objective_gains$transport > 0)
+decrit(objective_gains$housing > 0)
+decrit(objective_gains$all > 0)
 # Subjective winning category
 decrit(s$gagnant_categorie, weights = s$weight) # 14.0% think they win (21.7% unaffected)
 decrit(s$gagnant_fuel_categorie, weights = s$weight) # 15.5% think they win (21.8% unaffected)
@@ -97,18 +101,68 @@ par(mar = mar_old, cex = cex_old)
 ## 3.2 Robustness to assumptions on elasticities
 # Households perceived elasticities
 decrit(s$Elasticite_fuel, weights = s$weight) # -0.43 mean perceived gasoline elasticity of French people
-decrit(s$Elasticite_chauffage, weights = s$weight) # -0.41 mean perceived housing elasticity of French people
 decrit(s$Elasticite_fuel_perso, weights = s$weight * s$depense_carburants) # -0.41 perceived own gasoline elasticity (weighted by share in aggregate spending: only 'mean' is meaningful)
+decrit(s$Elasticite_chauffage, weights = s$weight) # -0.41 mean perceived housing elasticity of French people
 decrit(s$Elasticite_chauffage_perso, weights = s$weight * s$depense_chauffage) # -0.33 perceived own housing elasticity (weighted by share in aggregate spending: only 'mean' is meaningful)
 # 71% (resp. 80%) think they are strictly more contrained than average for fuel (resp. housing)
 wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel, weights=s$weight, na.rm = T) # 71%
 wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage, weights=s$weight, na.rm = T) # 80%
+# Objective proportion of HH with higher expenditure increase in transport: 59% / housing: 67%. cf. consistency_belief_losses.py 
+# Objective proportion of winners in the totally inelastic case: 53%. cf. consistency_belief_losses.py (after replacing elasticities to 0 in gain_losses_data.py)
 
 
+## 3.3 Perception on other tax’ properties
+# Environmental effectiveness: Table IX
+decrit(s$taxe_efficace, weights = s$weight, miss = T) # 16.6% vs. 65.9%
+elas_c <- lm(taxe_efficace!='Non' ~ Elasticite_chauffage, data=s, subset = variante_partielle=='c', weights = s$weight)
+summary(elas_c)
+elas_f <- lm(taxe_efficace!='Non' ~ Elasticite_fuel, data=s, subset = variante_partielle=='f', weights = s$weight)
+summary(elas_f)
+elas_c_controls <- lm(taxe_efficace!='Non' ~ Elasticite_chauffage + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, subset = variante_partielle=='c', weights = s$weight)
+summary(elas_c_controls)
+elas_f_controls <- lm(taxe_efficace!='Non' ~ Elasticite_fuel + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, subset = variante_partielle=='f', weights = s$weight)
+summary(elas_f_controls)
+TableIX <- stargazer(elas_c, elas_f, elas_c_controls, elas_f_controls, type="latex",
+          dep.var.labels=c("Environmental effectiveness"),
+          covariate.labels=c("Price elasticity housing", "Price elsticity transports", "Income","Size urban unit",
+                             "Age","Domestic fuel", "Natural gas", "Diesel"))
+# TODO: use Elasticite_partielle ? cf. ci-dessous
+# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle, data=s, weights = s$weight))
+# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, weights = s$weight))
+# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle * variante_partielle, data=s, weights = s$weight))
+# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle * variante_partielle + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, weights = s$weight))
+
+# Progressivity
+decrit(s$progressivite, weights = s$weight) # 19.4% vs. 59.5%
 
 
 ##### 4. Are beliefs well anchored? #####
 ## 4.1 Self-interest
+# Raw results
+mar_old <- par()$mar
+cex_old <- par()$cex
+par(mar = c(0.1, 3.1, 2.1, 0), cex.lab=1.2)
+decrit(s$simule_gagnant, weights = s$weight) # objective winning category
+# Figure 3 ,Tables VII and VIII: Transition matrix among simulated ...
+# (a) winners
+decrit(s$gagnant_categorie[s$simule_gagnant==1], weights = s$weight[s$simule_gagnant==1])
+decrit(s$gagnant_feedback_categorie[s$simule_gagnant==1], weights = s$weight[s$simule_gagnant==1])
+crosstab_simule_gagnant <- crosstab(s$winning_category[s$simule_gagnant==1], s$winning_feedback_category[s$simule_gagnant==1], 
+                                    s$weight[s$simule_gagnant==1], # dnn=c(expression('Winning category,'~bold(Before)~feedback), ''),
+                                    prop.r=T, sort=2:1, cex.axis=0.9) # sort=2:1, dir=c("h", "v"), inv.x=T, inv.y=T, color = FALSE # see mosaicplot
+crosstab_simule_gagnant
+plot(crosstab_simule_gagnant, sort=2:1, cex.axis=0.9, ylab = expression('Winning category,'~bold(Before)~feedback), xlab=NA)
+mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
+# (b) losers
+decrit(s$gagnant_categorie[s$simule_gagnant==0], weights = s$weight[s$simule_gagnant==0])
+decrit(s$gagnant_feedback_categorie[s$simule_gagnant==0], weights = s$weight[s$simule_gagnant==0])
+crosstab_simule_perdant <- crosstab(s$winning_category[s$simule_gagnant==0], s$winning_feedback_category[s$simule_gagnant==0], 
+                                    s$weight[s$simule_gagnant==0], # dnn=c(expression('Winning category,'~bold(Before)~feedback), ''),
+                                    prop.r=T, sort=2:1, cex.axis=0.9) # sort=2:1, dir=c("h", "v"), inv.x=T, inv.y=T, color = FALSE # see mosaicplot
+plot(crosstab_simule_perdant, sort=2:1, cex.axis=0.9, ylab = expression('Winning category,'~bold(Before)~feedback), xlab=NA)
+mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
+par(mar = mar_old, cex = cex_old)
+
 # Conservative updating
 decrit(s$feedback_infirme_large, weights = s$weight) # 70%
 decrit(s$update_correct[s$feedback_infirme_large==T], weights = s$weight[s$feedback_infirme_large==T]) # 18%
@@ -139,7 +193,45 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 
 ##### 5. Motives for acceptance #####
 ## 5.1 Self-interest
+# Identification challenge
 sum(s$weight[s$simule_gagnant==1])/sum(s$weight) # 76%
-sum(s$weight[s$taxe_approbation=='Non' & s$gagnant_categorie!='Gagnant' & s$simule_gagnant==1])/sum(s$weight[s$simule_gagnant==1]) # 63%
+sum(s$weight[s$taxe_approbation=='Non' & s$gagnant_categorie!='Gagnant' & s$simule_gagnant==1])/sum(s$weight[s$simule_gagnant==1]) # 62%
 # sum(s$weight[s$taxe_approbation=='Non' & s$gagnant_categorie!='Gagnant'])/sum(s$weight) # 66%
 # sum(s$weight[s$taxe_approbation=='Non' & s$gagnant_categorie=='Perdant'])/sum(s$weight) # 55%
+# Main identification strategy
+# Alternative specifications for robustness checks
+# Results
+TableV # TODO
+
+## 5.2 Environmental effectiveness
+# Main identification strategy
+# Alternative specifications for robustness checks
+# Results
+TableVI # TODO
+
+## 5.3 Progressivity
+# Identification challenge and strategies
+
+
+### Appendix A. Raw data
+## A.1 Perception of net gains
+## A.2 Estimation for feedback
+## A.3 Distributive effects
+# TODO: reference to python file
+
+
+### Appendix B. Perceptions
+## B.1 Self-interest: Tables VII and VIII
+crosstab_simule_gagnant
+crosstab_simule_perdant
+
+## B.2 Environmental effectiveness: Table IX
+TableIX
+
+
+### Apendix C. Estimation acceptation motives
+## C.1 Two stage least squares: first stage results
+TableX # TODO 1st stage self-interest
+
+## C.2 Additional specifications
+TableXI # TODO 1st stage environmental effectiveness

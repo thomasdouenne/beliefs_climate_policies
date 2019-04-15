@@ -1275,8 +1275,8 @@ convert_s <- function() {
   s$simule_gain_interaction <<- 9.1 + s$nb_adultes * 110 - s$hausse_carburants - s$hausse_chauffage_interaction_inelastique * (1 - 0.2) # élasticité de 0.2 pour le gaz
   s$simule_gagnant_interaction <<- 1*(s$simule_gain_interaction > 0)
   s$simule_gain_inelastique <<- s$nb_adultes * 110 - s$hausse_carburants/(1 - 0.4) - s$hausse_chauffage_interaction_inelastique # élasticité nulle. Inclure + 22.4 rendrait le taux d'erreur uniforme suivant les deux catégories, on ne le fait pas pour être volontairement conservateur
-  s$simule_gain_elast_perso[s$variante_partielle=='c'] <<- s$nb_adultes[s$variante_partielle=='c'] * 110 - (s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='c'] * (1 + s$Elasticite_chauffage_perso[s$variante_partielle=='c']) + s$hausse_carburants)
-  s$simule_gain_elast_perso[s$variante_partielle=='f'] <<- s$nb_adultes[s$variante_partielle=='f'] * 110 - (s$hausse_carburants[s$variante_partielle=='f'] * (1 + s$Elasticite_fuel_perso[s$variante_partielle=='f']) / (1 - 0.4) + s$hausse_chauffage_interaction_inelastique * (1 - 0.2))
+  s$simule_gain_elast_perso[s$variante_partielle=='c'] <<- s$nb_adultes[s$variante_partielle=='c'] * 110 - (s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='c'] * (1 + s$Elasticite_chauffage_perso[s$variante_partielle=='c']) + s$hausse_carburants[s$variante_partielle=='c'])
+  s$simule_gain_elast_perso[s$variante_partielle=='f'] <<- s$nb_adultes[s$variante_partielle=='f'] * 110 - (s$hausse_carburants[s$variante_partielle=='f'] * (1 + s$Elasticite_fuel_perso[s$variante_partielle=='f']) / (1 - 0.4) + s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='f'] * (1 - 0.2))
   label(s$hausse_chauffage_interaction_inelastique) <<- "hausse_chauffage_interaction_inelastique: Hausse des dépenses de chauffage simulées pour le ménage avec des termes d'interaction entre surface et gaz/fioul plutôt que sans, suite à la taxe (élasticité nulle)"
   label(s$depense_chauffage) <<- "depense_chauffage: Dépense de chauffage annuelle estimée du ménage, avant la réforme"
   label(s$simule_gain_interaction) <<- "simule_gain_interaction: Gain net annuel simulé avec des termes d'interaction surface*fioul/gaz pour le ménage du répondant suite à une hausse de taxe carbone compensée: 9.1 + nb_adultes * 110 - hausse_chauffage_interaction_inelastique * 0.8 - hausse_carburants"
@@ -1364,6 +1364,13 @@ convert_s <- function() {
   label(s$feedback_confirme_large) <<- "feedback_confirme_large: Indicatrice de se penser non perdant et être simulé gagnant, ou de se penser non gagnant et être simulé perdant (gagnant_categorie, simule_gagnant)"
   label(s$feedback_infirme_large) <<- "feedback_infirme_large: Indicatrice de se penser non gagnant et être simulé gagnant, ou de se penser non perdant et être simulé perdant (gagnant_categorie, simule_gagnant)"
 
+  s$winning_category <<- as.factor(s$gagnant_categorie)
+  s$winning_feedback_category <<- as.factor(s$gagnant_feedback_categorie)
+  levels(s$winning_category) <<- c('Winner', 'Unaffected', 'Loser')
+  levels(s$winning_feedback_category) <<- c('Winner', 'Unaffected', 'Loser')
+  label(s$winning_category) <<- "Winning category before feedback"
+  label(s$winning_feedback_category) <<- "Winning category after feedback"
+  
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
   # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
   for (i in 0:10) {
