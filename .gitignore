@@ -6,4 +6,4 @@ code/*.Rproj
 *.lyx#
 *.lyx~
 code/.Rhistory
-code/.RData
+code/.Rhistory

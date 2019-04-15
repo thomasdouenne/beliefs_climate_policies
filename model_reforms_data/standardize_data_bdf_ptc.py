@@ -135,6 +135,8 @@ def impute_barycentre_in_bins(df_bdf, df_ptc): # Maybe add weights for bins size
                 + ((30 * df_ptc.query('gain_{}_echelle == 3'.format(energy))['weight'].sum() + 40 * df_ptc.query('gain_{}_echelle == 5'.format(energy))['weight'].sum()) / (df_ptc.query('gain_{}_echelle == 3'.format(energy))['weight'].sum() + df_ptc.query('gain_{}_echelle == 5'.format(energy))['weight'].sum())) * (df_ptc['gain_{}_echelle'.format(energy)] == 4)
                 + df_bdf.query('gain_{}_echelle == 5'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}_echelle'.format(energy)] == 5)
                 )
+        df_ptc['gain_net_numeric_barycentre_uc_{}'.format(energy)][np.isnan(df_ptc['gain_{}_echelle'.format(energy)])] = np.nan
+        
     for energy in ['taxe_carbone']:
         df_ptc['gain_net_numeric_barycentre_uc_{}'.format(energy)] = 0 + (
                 df_bdf.query('gain_{}_echelle == -6'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}_echelle'.format(energy)] == -6)
@@ -174,6 +176,7 @@ def impute_average_bdf_in_bins(df_bdf, df_ptc): # More consistent with method us
                 + df_bdf.query('gain_{}_echelle == 4'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}_echelle'.format(energy)] == 4)
                 + df_bdf.query('gain_{}_echelle == 5'.format(energy))['gain_net_numeric_uc_{}'.format(energy)].mean() * (df_ptc['gain_{}_echelle'.format(energy)] == 5)
                 )
+        df_ptc['gain_net_numeric_uc_{}'.format(energy)][np.isnan(df_ptc['gain_{}_echelle'.format(energy)])] = np.nan
 
     return df_ptc
 

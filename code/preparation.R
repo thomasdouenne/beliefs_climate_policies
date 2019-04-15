@@ -1481,7 +1481,7 @@ sa <- s
 
 prepare_s()
 
-write.csv(s, "survey_prepared.csv")
+write.csv2(s, "survey_prepared.csv", row.names=FALSE)
 
 # write.csv(s[,c("id", "taille_agglo", "sexe", "age", "diplome4", "region", "csp")], "IDs.csv")
 

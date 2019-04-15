@@ -45,9 +45,6 @@ s$taille_menage[s$taille_menage > 12] # most look like zipcode
 decrit(s$gain_fuel, weights = s$weight) # mean -61 instead of +18
 decrit(s$gain_chauffage, weights = s$weight) # -43 instead of +6
 decrit(s$gain, weights = s$weight) # -89 instead of +24
-decrit(subjective_gains$transport)
-decrit(subjective_gains$housing)
-decrit(subjective_gains$all)
 # Subjective winning category
 decrit(s$gagnant_categorie, weights = s$weight) # 14.0% think they win (21.7% unaffected)
 decrit(s$gagnant_fuel_categorie, weights = s$weight) # 15.5% think they win (21.8% unaffected)
