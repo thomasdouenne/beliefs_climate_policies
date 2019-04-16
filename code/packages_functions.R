@@ -45,6 +45,8 @@ package("descr")
 package("stargazer")
 package("clipr")
 package("ergm") # wtd.median
+package("mfx")
+package("margins")
 # package("doMC") # for parallel computing, does not work on Windows
 
 # Fs <- function(QID) { s[QID][[1]] }

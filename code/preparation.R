@@ -1231,6 +1231,13 @@ convert_s <- function() {
   s$versement <<- 110 * s$nb_adultes
   label(s$versement) <<- "versement: Versement annuel reçu par le ménage suite à une hausse de la taxe carbone compensée (110 * nb_adultes)"
   
+  s$convaincu_cible <<- s$taxe_cible_approbation!='Non' & s$taxe_approbation=='Non' & (s$traite_cible==T | s$traite_cible_conjoint==T)
+  s$convaincu_feedback <<- !is.na(s$taxe_feedback_approbation) & s$taxe_feedback_approbation!='Non' & s$taxe_approbation=='Non' & s$simule_gagnant==1 # without !is.na(...), NAs are simule_gagnant variante=='p' & taxe_approbation=='Non' because NA & FALSE = FALSE but NA & T = NA
+  s$convaincu_cible[s$categorie_cible %in% c('_20', '50_70', '70_')] <<- NA
+  s$convaincu_feedback[s$simule_gagnant==0 | s$variante_taxe_info!='f'] <<- NA
+  label(s$convaincu_feedback) <<- "convaincu_feedback: Indicatrice que le répondant est passé de désapprobation à non désapprobation suite à un feedback gagnant"
+  label(s$convaincu_cible) <<- "convaincu_cible: Indicatrice que le répondant est passé de désapprobation à non désapprobation suite à un versement ciblé pour lui ou son conjoint"
+  
   s$km[!is.na(s$km_0)] <<- s$km_0[!is.na(s$km_0)]
   s$km[!is.na(s$km_1)] <<- s$km_1[!is.na(s$km_1)]
   s$km[!is.na(s$km_2)] <<- s$km_2[!is.na(s$km_2)]
@@ -1299,11 +1306,11 @@ convert_s <- function() {
 
   s$variante_monetaire[is.na(s$variante_monetaire)] <<- 0 # concerne seulement une observation. Évite des complications inutiles.
   
-  s$age_18_24 <<- 1*(s$age == '18 à 24 ans')
-  s$age_25_34 <<- 1*(s$age == '25 à 34 ans')
-  s$age_35_49 <<- 1*(s$age == '35 à 49 ans')
-  s$age_50_64 <<- 1*(s$age == '50 à 64 ans')
-  s$age_65_plus <<- 1*(s$age == '65 ans ou plus')
+  s$age_18_24 <<- 1*(s$age == '18-24')
+  s$age_25_34 <<- 1*(s$age == '25-34')
+  s$age_35_49 <<- 1*(s$age == '35-49')
+  s$age_50_64 <<- 1*(s$age == '50-64')
+  s$age_65_plus <<- 1*(s$age == '65+')
   
   s$score_ges <<- 1 * (s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) + 1*(s$ges_O2 == FALSE) + 1*(s$ges_pm == FALSE)
   label(s$score_ges) <<- "score_ges: Somme des bonnes réponses au questionnaire gaz à effet de serre (ges_O2/CH4/pm/CO2)"
