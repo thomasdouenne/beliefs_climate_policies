@@ -199,7 +199,9 @@ sum(s$weight[s$taxe_approbation=='Non' & s$gagnant_categorie!='Gagnant' & s$simu
 # sum(s$weight[s$taxe_approbation=='Non' & s$gagnant_categorie!='Gagnant'])/sum(s$weight) # 66%
 # sum(s$weight[s$taxe_approbation=='Non' & s$gagnant_categorie=='Perdant'])/sum(s$weight) # 55%
 # Main identification strategy
+
 # Alternative specifications for robustness checks
+
 # Results
 TableV # TODO
 
