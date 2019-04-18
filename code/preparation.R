@@ -1027,7 +1027,14 @@ convert_s <- function() {
   s$revdisp <<- round((s$rev_tot -  irpp(s$rev_tot, s$nb_adultes, s$taille_menage)))
   s$uc <<- uc(s$taille_menage, s$nb_14_et_plus)
   s$niveau_vie <<- s$revdisp / s$uc
-
+  s$Revenu <<- s$revenu/1e3 # TODO: preparation
+  s$Revenu_conjoint <<- s$revenu_conjoint/1e3
+  s$Simule_gain <<- s$simule_gain/1e3
+  s$Revenu2 <<- s$revenu^2/1e6
+  s$Revenu_conjoint2 <<- s$revenu_conjoint^2/1e6
+  s$Simule_gain2 <<- s$simule_gain^2/1e6
+  s$Simule_gain_cible <<- s$simule_gain_cible/1e3
+  
   # s$age <<- as.factor(as.character(s$age))
   # s$Region <<- as.factor(as.character(s$region)) 
   # s$taille_agglo <<- as.factor(gsub("[[:alpha:] ]", "", s$taille_agglo))

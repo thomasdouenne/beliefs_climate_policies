@@ -1267,13 +1267,6 @@ summary(lm(benefices_revenu==T ~ info_progressivite, data=s, weights = s$weight)
 
 
 ##### 5.1 Self-Interest and Acceptance #####
-s$Revenu <- s$revenu/1e3 # TODO: preparation
-s$Revenu_conjoint <- s$revenu_conjoint/1e3
-s$Simule_gain <- s$simule_gain/1e3
-s$Revenu2 <- s$revenu^2/1e6
-s$Revenu_conjoint2 <- s$revenu_conjoint^2/1e6
-s$Simule_gain2 <- s$simule_gain^2/1e6
-s$Simule_gain_cible <- s$simule_gain_cible/1e3
 # To pool all RDD together, it is better to control for the reform, i.e. for cible. 
 # Otherwise the effect of being treated might be confounded with the effect of a more targeted reform.
 # TODO: graphs
@@ -1807,18 +1800,25 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 
 ##### Graphiques RDD #####
 # Seul le revenu du répondant est pris en compte, sont exclus de l'analyse les répondants au revenu > 2220
+deciles <- c(780, 1140, 1430, 1670, 2220)
+arguments_rdd <- matrix(c(-Inf, deciles[1:3], -Inf, deciles[2:4], deciles[c(1:4,2:5)], rep(T, 4), rep(FALSE, 4)), nrow=8)
+ci_mean_cible_acceptance <- apply(arguments_rdd, 1, function(row) { low <- row[1];  up <- row[2];  traite <- row[3]; return(binconf(sum(s$weight[s$taxe_cible_approbation!='Non' & s$revenu >= low & s$revenu < up & s$traite_cible==traite]), sum(s$weight[s$revenu >= low & s$revenu < up & s$traite_cible==traite]), 0.1))})
+
 mar_old <- par()$mar
 par(mar=c(4.1, 4.1, 1.1, 1.1))
 # RDD All incomes TODO: add confidence interval
-plot(c(0, 780), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu < 780 & s$traite_cible==T], weights=s$weight[s$revenu < 780 & s$traite_cible==T]), 2), type='l', col = 'cyan', lwd=2,
-     xlab="Income of respondent (€/month)", ylab="Average Targeted Tax Acceptance", xlim=c(500, 2000), ylim=c(0.2, 0.5), xaxt='n')
-lines(c(780, 1140), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 780 & s$revenu < 1140 & s$traite_cible==T], weights=s$weight[s$revenu >= 780 & s$revenu < 1140 & s$traite_cible==T]), 2), type='l', col = 'deepskyblue3', lwd=2)
-lines(c(1140, 1430), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible==T], weights=s$weight[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible==T]), 2), type='l', col = 'blue', lwd=2)
-lines(c(1430, 1670), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible==T], weights=s$weight[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible==T]), 2), type='l', col = 'black', lwd=2)
-lines(c(780, 1140), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu < 1140 & s$traite_cible!=T], weights=s$weight[s$revenu < 1140 & s$traite_cible!=T]), 2), type='l', col = 'cyan', lwd=2, lty=2)
-lines(c(1140, 1430), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible!=T], weights=s$weight[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible!=T]), 2), type='l', col = 'deepskyblue3', lwd=2, lty=2)
-lines(c(1430, 1670), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible!=T], weights=s$weight[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible!=T]), 2), type='l', col = 'blue', lwd=2, lty=2)
-lines(c(1670, 2220), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1670 & s$revenu < 2220 & s$traite_cible!=T], weights=s$weight[s$revenu >= 1670 & s$revenu < 2220 & s$traite_cible!=T]), 2), type='l', col = 'black', lwd=2, lty=2)
+plot(c(0, 780), rep(ci_mean_cible_acceptance[1,1], 2), type='l', col = 'cyan', lwd=2,
+     xlab="Income of respondent (€/month)", ylab="Average Targeted Tax Acceptance", xlim=c(500, 2000), ylim=c(0.2, 0.55), xaxt='n')
+lines(c(780, 1140), rep(ci_mean_cible_acceptance[1,2], 2), type='l', col = 'deepskyblue3', lwd=2)
+lines(c(1140, 1430), rep(ci_mean_cible_acceptance[1,3], 2), type='l', col = 'blue', lwd=2)
+lines(c(1430, 1670), rep(ci_mean_cible_acceptance[1,4], 2), type='l', col = 'black', lwd=2)
+lines(c(780, 1140), rep(ci_mean_cible_acceptance[1,5], 2), type='l', col = 'cyan', lwd=2, lty=2)
+lines(c(1140, 1430), rep(ci_mean_cible_acceptance[1,6], 2), type='l', col = 'deepskyblue3', lwd=2, lty=2)
+lines(c(1430, 1670), rep(ci_mean_cible_acceptance[1,7], 2), type='l', col = 'blue', lwd=2, lty=2)
+lines(c(1670, 2220), rep(ci_mean_cible_acceptance[1,8], 2), type='l', col = 'black', lwd=2, lty=2)
+plotCI(x=c((c(500, deciles[c(1:3,1:4)]) + c(deciles[c(1:4,2:4)], 2000))/2) + c(rep(-30,4), rep(30,4)), 
+       y=ci_mean_cible_acceptance[1,], li=ci_mean_cible_acceptance[2,], ui=ci_mean_cible_acceptance[3,], add=T,
+       col=c('cyan', 'deepskyblue3', 'blue', 'black', 'cyan', 'deepskyblue3', 'blue', 'black'), lwd=0.7, pch=NA)
 axis(1, at=c(500, 780, 1140, 1430, 1670, 2000))
 grid() + abline(v = c(780, 1140, 1430, 1670), lwd=0.5)
 legend("topright", lwd=2, lty=c(1,2), col=c("blue"), title.col = "black", legend=c("Transfer to respondent", "No transfer")) # , text.col = c("blue")
@@ -1866,6 +1866,16 @@ grid() + abline(v = c(780, 1140, 1430, 1670), lwd=0.5)
 legend("topright", lwd=2, lty=c(1,2), col=c("blue"), title.col = "black", text.col = c("blue"), legend=c("Transfer to respondent", "No transfer"))
 
 par(mar=mar_old)
+
+# plot(c(0, 780), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu < 780 & s$traite_cible==T], weights=s$weight[s$revenu < 780 & s$traite_cible==T]), 2), type='l', col = 'cyan', lwd=2,
+#      xlab="Income of respondent (€/month)", ylab="Average Targeted Tax Acceptance", xlim=c(500, 2000), ylim=c(0.2, 0.5), xaxt='n')
+# lines(c(780, 1140), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 780 & s$revenu < 1140 & s$traite_cible==T], weights=s$weight[s$revenu >= 780 & s$revenu < 1140 & s$traite_cible==T]), 2), type='l', col = 'deepskyblue3', lwd=2)
+# lines(c(1140, 1430), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible==T], weights=s$weight[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible==T]), 2), type='l', col = 'blue', lwd=2)
+# lines(c(1430, 1670), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible==T], weights=s$weight[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible==T]), 2), type='l', col = 'black', lwd=2)
+# lines(c(780, 1140), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu < 1140 & s$traite_cible!=T], weights=s$weight[s$revenu < 1140 & s$traite_cible!=T]), 2), type='l', col = 'cyan', lwd=2, lty=2)
+# lines(c(1140, 1430), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible!=T], weights=s$weight[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible!=T]), 2), type='l', col = 'deepskyblue3', lwd=2, lty=2)
+# lines(c(1430, 1670), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible!=T], weights=s$weight[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible!=T]), 2), type='l', col = 'blue', lwd=2, lty=2)
+# lines(c(1670, 2220), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu >= 1670 & s$revenu < 2220 & s$traite_cible!=T], weights=s$weight[s$revenu >= 1670 & s$revenu < 2220 & s$traite_cible!=T]), 2), type='l', col = 'black', lwd=2, lty=2)
 
 # rdd_20 <- lm(taxe_cible_approbation!='Non' ~ revenu + traite_cible, subset=categorie_cible %in% c('_20', '20_30') & revenu < 2220, data=s, weights=s$weight)
 # rdd_30 <- lm(taxe_cible_approbation!='Non' ~ revenu + traite_cible, subset=categorie_cible %in% c('30_40', '20_30') & revenu < 2220, data=s, weights=s$weight)
