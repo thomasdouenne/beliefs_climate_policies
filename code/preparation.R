@@ -1,5 +1,5 @@
 # setwd("/var/www/beliefs_climate_policies/code")
-# setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 # setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 # setwd("C:/Users/a.fabre/Documents/beliefs_climate_policies/code")
@@ -1521,3 +1521,48 @@ subjective_gains$all <- n(subjective_gains$subjective_gain_numeric_taxe_carbone)
 objective_gains_inelastic$transport <- n(objective_gains_inelastic$gain_net_numeric_uc_fuel)
 objective_gains_inelastic$housing <- n(objective_gains_inelastic$gain_net_numeric_uc_chauffage)
 objective_gains_inelastic$all <- n(objective_gains_inelastic$gain_net_numeric_uc_taxe_carbone)
+
+# Pooling variables
+variables_taxe_gagnant <- c("taxe_gagnant_personne", "taxe_gagnant_pauvres", "taxe_gagnant_moyennes", "taxe_gagnant_riches", "taxe_gagnant_tous", "taxe_gagnant_citadins", "taxe_gagnant_certains", "taxe_gagnant_NSP")
+variables_taxe_perdant <- c("taxe_perdant_personne", "taxe_perdant_pauvres", "taxe_perdant_moyennes", "taxe_perdant_riches", "taxe_perdant_tous", "taxe_perdant_ruraux", "taxe_perdant_certains", "taxe_perdant_NSP")
+
+variables_approbation <- c("taxe_approbation", "taxe_info_approbation", "taxe_cible_approbation") # "taxe_feedback_approbation", "taxe_progressif_approbation", 
+variables_qualite <- c("duree", "duree_info", "duree_champ_libre") # champ_libre != "", exclu, "test_qualite"
+variables_aleatoires <- c("info_CC", "info_PM", "variante_monetaire", "apres_modifs", "variante_taxe_info", "variante_progressivite",
+                          "info_progressivite", "cible", "categorie_cible")
+variables_demo <- c("sexe", "age", "statut_emploi", "csp", "region", "diplome4", "taille_menage", "revenu", "rev_tot", "nb_14_et_plus", "nb_adultes", 
+                    "fume", "actualite", "taille_agglo", "uc", "niveau_vie", "age_18_24", "age_25_34", "age_35_49", "age_50_64", "age_65_plus") # weight, age_x_y, diplome
+variables_energie <- c("surface", "Mode_chauffage", "Chauffage", "km", "conso", "diesel", "essence", "nb_vehicules", "gaz", "fioul", # hausse_carburants "versement_cible", 
+                       "hausse_chauffage", "hausse_diesel", "hausse_essence", "hausse_depenses", "simule_gain") #, 
+# "simule_gain_cible", "simule_gain_cible_sans_conjoint", "simule_gain_repondant")
+variables_transport <- c("Transports_distance", "transports_frequence", "transports_avis", "transports_travail", "transports_courses", "transports_loisirs", 
+                         "Transports_travail_commun", "Transports_travail_actif") 
+variables_politiques <- c("interet_politique", "conservateur", "liberal", "humaniste", "patriote", "apolitique", "ecologiste", "Gauche_droite")
+variables_gilets_jaunes <- c("gilets_jaunes_dedans", "gilets_jaunes_soutien", "gilets_jaunes_compris", "gilets_jaunes_oppose", "gilets_jaunes_NSP") # , "gilets_jaunes"
+variables_gains_subjectifs <- c("perte_relative_tva", "perte_relative_partielle", "gagnant_partielle_categorie", "gain_partielle", "gagnant_categorie", "gain", 
+                                "gagnant_info_categorie", "gagnant_cible_categorie", "gain_echelle", "gain_partielle_echelle") # "gagnant_feedback_categorie", "gagnant_progressif_categorie", 
+variables_Elasticite <- c("Elasticite_partielle", "Elasticite_partielle_perso") # "Elasticite_fuel", "Elasticite_fuel_perso", "Elasticite_chauffage", "Elasticite_chauffage_perso", 
+variables_elasticite <- c("elasticite_partielle", "elasticite_partielle_perso") # "elasticite_fuel", "elasticite_fuel_perso", "elasticite_chauffage", "elasticite_chauffage_perso", 
+variables_taxe_croyances <- c("taxe_efficace", variables_taxe_gagnant, variables_taxe_perdant, "progressivite") #  "progressivite_feedback_avec_info", "progressivite_feedback_sans_info", "progressivite_progressif"
+variables_benefices <- names(s)[which(grepl("benefice", names(s)))[which(grepl("benefice", names(s)))>300]]
+variables_problemes <- names(s)[which(grepl("problemes", names(s)))[which(grepl("problemes", names(s)))>300]]
+variables_taxe_condition <- c("si_pauvres", "si_compensee", "si_contraints", "si_baisse_cotsoc", "si_baisse_tva", "si_baisse_deficit", "si_renovation", "si_renouvelables", "si_transports")
+variables_politiques_environnementales <- c("taxe_kerosene", "taxe_viande", "normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants", 
+                                            "peages_urbains", "fonds_mondial") # "rattrapage_diesel"
+variables_connaissances_CC <- c("Cause_CC", "ges_CO2", "ges_CH4", "ges_O2", "ges_pm", "ges_boeuf", "ges_nucleaire", "ges_avion", "region_CC", 
+                                "emission_cible", "score_ges", "score_climate_call")
+variables_avis_CC <- c("parle_CC", "effets_CC", "generation_CC_1960", "generation_CC_1990", "generation_CC_2020", "generation_CC_2050", "generation_CC_aucune",
+                       "responsable_CC_chacun", "responsable_CC_riches", "responsable_CC_govts", "responsable_CC_etranger", "responsable_CC_passe", 
+                       "responsable_CC_nature", "enfant_CC", "enfant_CC_pour_lui", "enfant_CC_pour_CC", "generation_CC_min", "generation_CC_max") 
+variables_comportement_CC <- c("mode_vie_ecolo", "changer_si_politiques", "changer_si_moyens", "changer_si_tous", "changer_non_riches", "changer_non_interet", "changer_non_negation", "changer_deja_fait", "changer_essaie")
+variables_schiste <- c("schiste_approbation", "schiste_avantage", "Schiste_CC", "schiste_traite")
+variables_transferts_inter <- c("transferts_inter", "aide_2p", "transferts_inter_info", "aide_non_autonomie", "aide_non_priorite", "aide_non_etats", 
+                                "aide_non_global", "aide_non_trop", "aide_non_autonomie")
+variables_depenses_publiques <- c("depenses_confiant", "Compris_depenses", "duree_depenses", "nombre_clics_depenses", "depense_totale", # budget_eq, regle_or, variations, dep_i_en_position
+                                  "depense_sante", "depense_retraites", "depense_protection", "depense_education", "depense_recherche", "depense_loisirs", "depense_infrastructures", "depense_justice", "depense_armee", "depense_securite", "depense_aide", "recette_totale", 
+                                  "en_position_0", "en_position_1", "en_position_2", "en_position_3", "en_position_4", "en_position_5", "en_position_6", "en_position_7", "en_position_8", "en_position_9", "en_position_10")
+variables_toutes <- c(variables_approbation, variables_qualite, variables_aleatoires, variables_demo, "versement_cible", variables_energie, "simule_gagnant", 
+                      "simule_gain_cible", "simule_gain_cible_sans_conjoint", "simule_gain_repondant", variables_transport, variables_politiques, 
+                      variables_gilets_jaunes, "gilets_jaunes", variables_gains_subjectifs, variables_Elasticite, variables_elasticite, variables_taxe_croyances, variables_benefices, 
+                      variables_problemes, variables_taxe_condition, variables_politiques_environnementales, "rattrapage_diesel", variables_connaissances_CC, variables_avis_CC, 
+                      variables_comportement_CC, variables_schiste, variables_depenses_publiques)

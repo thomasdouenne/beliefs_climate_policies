@@ -148,49 +148,6 @@ decrit(s$taxe_feedback_approbation[s$gagnant_categorie!='Gagnant' & s$gagnant_fe
 #   (introduced by Zhao, Rocha &  Yu (2009) who only coded it in matlab; R package quadrupen provides a related method cran.r-project.org/web/packages/quadrupen/quadrupen.pdf)
 # Multinomial regression is an alternative to logit, as we have 3 categories in our dependant variable (Oui/Non/NSP)
 #   This is family="multinomial". type.multinomial="grouped" forces that the same variables be taken for our categories (Oui/Non/NSP)
-variables_taxe_gagnant <- c("taxe_gagnant_personne", "taxe_gagnant_pauvres", "taxe_gagnant_moyennes", "taxe_gagnant_riches", "taxe_gagnant_tous", "taxe_gagnant_citadins", "taxe_gagnant_certains", "taxe_gagnant_NSP")
-variables_taxe_perdant <- c("taxe_perdant_personne", "taxe_perdant_pauvres", "taxe_perdant_moyennes", "taxe_perdant_riches", "taxe_perdant_tous", "taxe_perdant_ruraux", "taxe_perdant_certains", "taxe_perdant_NSP")
-
-variables_approbation <- c("taxe_approbation", "taxe_info_approbation", "taxe_cible_approbation") # "taxe_feedback_approbation", "taxe_progressif_approbation", 
-variables_qualite <- c("duree", "duree_info", "duree_champ_libre") # champ_libre != "", exclu, "test_qualite"
-variables_aleatoires <- c("info_CC", "info_PM", "variante_monetaire", "apres_modifs", "variante_taxe_info", "variante_progressivite",
-                          "info_progressivite", "cible", "categorie_cible")
-variables_demo <- c("sexe", "age", "statut_emploi", "csp", "region", "diplome4", "taille_menage", "revenu", "rev_tot", "nb_14_et_plus", "nb_adultes", 
-                    "fume", "actualite", "taille_agglo", "uc", "niveau_vie", "age_18_24", "age_25_34", "age_35_49", "age_50_64", "age_65_plus") # weight, age_x_y, diplome
-variables_energie <- c("surface", "Mode_chauffage", "Chauffage", "km", "conso", "diesel", "essence", "nb_vehicules", "gaz", "fioul", # hausse_carburants "versement_cible", 
-                       "hausse_chauffage", "hausse_diesel", "hausse_essence", "hausse_depenses", "simule_gain") #, 
-                       # "simule_gain_cible", "simule_gain_cible_sans_conjoint", "simule_gain_repondant")
-variables_transport <- c("Transports_distance", "transports_frequence", "transports_avis", "transports_travail", "transports_courses", "transports_loisirs", 
-                         "Transports_travail_commun", "Transports_travail_actif") 
-variables_politiques <- c("interet_politique", "conservateur", "liberal", "humaniste", "patriote", "apolitique", "ecologiste", "Gauche_droite")
-variables_gilets_jaunes <- c("gilets_jaunes_dedans", "gilets_jaunes_soutien", "gilets_jaunes_compris", "gilets_jaunes_oppose", "gilets_jaunes_NSP") # , "gilets_jaunes"
-variables_gains_subjectifs <- c("perte_relative_tva", "perte_relative_partielle", "gagnant_partielle_categorie", "gain_partielle", "gagnant_categorie", "gain", 
-                                "gagnant_info_categorie", "gagnant_cible_categorie", "gain_echelle", "gain_partielle_echelle") # "gagnant_feedback_categorie", "gagnant_progressif_categorie", 
-variables_Elasticite <- c("Elasticite_partielle", "Elasticite_partielle_perso") # "Elasticite_fuel", "Elasticite_fuel_perso", "Elasticite_chauffage", "Elasticite_chauffage_perso", 
-variables_elasticite <- c("elasticite_partielle", "elasticite_partielle_perso") # "elasticite_fuel", "elasticite_fuel_perso", "elasticite_chauffage", "elasticite_chauffage_perso", 
-variables_taxe_croyances <- c("taxe_efficace", variables_taxe_gagnant, variables_taxe_perdant, "progressivite") #  "progressivite_feedback_avec_info", "progressivite_feedback_sans_info", "progressivite_progressif"
-variables_benefices <- names(s)[which(grepl("benefice", names(s)))[which(grepl("benefice", names(s)))>300]]
-variables_problemes <- names(s)[which(grepl("problemes", names(s)))[which(grepl("problemes", names(s)))>300]]
-variables_taxe_condition <- c("si_pauvres", "si_compensee", "si_contraints", "si_baisse_cotsoc", "si_baisse_tva", "si_baisse_deficit", "si_renovation", "si_renouvelables", "si_transports")
-variables_politiques_environnementales <- c("taxe_kerosene", "taxe_viande", "normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants", 
-                          "peages_urbains", "fonds_mondial") # "rattrapage_diesel"
-variables_connaissances_CC <- c("Cause_CC", "ges_CO2", "ges_CH4", "ges_O2", "ges_pm", "ges_boeuf", "ges_nucleaire", "ges_avion", "region_CC", 
-                                "emission_cible", "score_ges", "score_climate_call")
-variables_avis_CC <- c("parle_CC", "effets_CC", "generation_CC_1960", "generation_CC_1990", "generation_CC_2020", "generation_CC_2050", "generation_CC_aucune",
-                       "responsable_CC_chacun", "responsable_CC_riches", "responsable_CC_govts", "responsable_CC_etranger", "responsable_CC_passe", 
-                       "responsable_CC_nature", "enfant_CC", "enfant_CC_pour_lui", "enfant_CC_pour_CC", "generation_CC_min", "generation_CC_max") 
-variables_comportement_CC <- c("mode_vie_ecolo", "changer_si_politiques", "changer_si_moyens", "changer_si_tous", "changer_non_riches", "changer_non_interet", "changer_non_negation", "changer_deja_fait", "changer_essaie")
-variables_schiste <- c("schiste_approbation", "schiste_avantage", "Schiste_CC", "schiste_traite")
-variables_transferts_inter <- c("transferts_inter", "aide_2p", "transferts_inter_info", "aide_non_autonomie", "aide_non_priorite", "aide_non_etats", 
-                                "aide_non_global", "aide_non_trop", "aide_non_autonomie")
-variables_depenses_publiques <- c("depenses_confiant", "Compris_depenses", "duree_depenses", "nombre_clics_depenses", "depense_totale", # budget_eq, regle_or, variations, dep_i_en_position
-                                  "depense_sante", "depense_retraites", "depense_protection", "depense_education", "depense_recherche", "depense_loisirs", "depense_infrastructures", "depense_justice", "depense_armee", "depense_securite", "depense_aide", "recette_totale", 
-                                  "en_position_0", "en_position_1", "en_position_2", "en_position_3", "en_position_4", "en_position_5", "en_position_6", "en_position_7", "en_position_8", "en_position_9", "en_position_10")
-variables_toutes <- c(variables_approbation, variables_qualite, variables_aleatoires, variables_demo, "versement_cible", variables_energie, "simule_gagnant", 
-                      "simule_gain_cible", "simule_gain_cible_sans_conjoint", "simule_gain_repondant", variables_transport, variables_politiques, 
-                      variables_gilets_jaunes, "gilets_jaunes", variables_gains_subjectifs, variables_Elasticite, variables_elasticite, variables_taxe_croyances, variables_benefices, 
-                      variables_problemes, variables_taxe_condition, variables_politiques_environnementales, "rattrapage_diesel", variables_connaissances_CC, variables_avis_CC, 
-                      variables_comportement_CC, variables_schiste, variables_depenses_publiques)
 
 variables_toutes_sauf_approbation <- setdiff(variables_toutes, variables_approbation)
 variables_wo_missing <- variables_toutes_sauf_approbation
@@ -1316,6 +1273,7 @@ s$Simule_gain <- s$simule_gain/1e3
 s$Revenu2 <- s$revenu^2/1e6
 s$Revenu_conjoint2 <- s$revenu_conjoint^2/1e6
 s$Simule_gain2 <- s$simule_gain^2/1e6
+s$Simule_gain_cible <- s$simule_gain_cible/1e3
 # To pool all RDD together, it is better to control for the reform, i.e. for cible. 
 # Otherwise the effect of being treated might be confounded with the effect of a more targeted reform.
 # TODO: graphs
@@ -1345,6 +1303,18 @@ s$non_perdant <- tsls1_si2bis$fitted.values
 tsls2_si2bis <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (taxe_approbation!='Non') + Simule_gain_cible + (taxe_efficace=='Oui'), data=s, weights = s$weight)
 summary(tsls2_si2bis)
 
+# (2ter) With many controls
+formula_tsls1_si2ter <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + I(traite_cible*traite_cible_conjoint) + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + taxe_approbation + Simule_gain_cible + taxe_efficace +", 
+                                      paste(c(variables_demo, variables_politiques), collapse = ' + ')))
+tsls1_si2ter <- lm(formula_tsls1_si2ter, data=s, weights = s$weight)
+summary(tsls1_si2ter)
+s$non_perdant <- tsls1_si2ter$fitted.values
+# 52 p.p.*** 
+formula_tsls2_si2ter <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + taxe_approbation + Simule_gain_cible + taxe_efficace +", 
+                                         paste(c(variables_demo, variables_politiques), collapse = ' + ')))
+tsls2_si2ter <- lm(formula_tsls2_si2ter, data=s, weights = s$weight)
+summary(tsls2_si2ter)
+
 # (3) Simple OLS (same results and same distinction as before for 'bis' or not)
 s$non_perdant <- n(s$gagnant_cible_categorie!='Perdant')
 tsls1_si3 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + taxe_approbation + Simule_gain_cible + taxe_efficace, data=s, weights = s$weight)
@@ -1355,13 +1325,24 @@ summary(tsls2_si3bis)
 
 # (4) Simple Probit
 # 53 p.p.***
-s$non_perdant <- n(s$gagnant_cible_categorie!='Perdant')
+s$non_perdant <- s$gagnant_cible_categorie!='Perdant'
 # Warning when weighting: it relates to number of trials and not to survey weights. TODO: use svyglm to weight correctly cf. https://stats.stackexchange.com/questions/57107/use-of-weights-in-svyglm-vs-glm
-probit_si4 <- glm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2, family = binomial(link='probit'), data=s)
+probit_si4 <- glm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + tax_acceptance, family = binomial(link='probit'), data=s)
 summary(probit_si4)
 probit_si4_margins <- summary(margins(data=s, model=probit_si4))
 probit_si4_margins
-probitmfx(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2, data=s, atmean = TRUE)
+probitmfx(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + tax_acceptance, data=s, atmean =FALSE)
+probit_si4_margins <- probitmfx(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + tax_acceptance, data=s, atmean = FALSE)
+probit_si4_margins
+probit_si4_margins$mfxest[1,1]
+probit_si4_margins$mfxest[1,2]
+probit_si4_margins$mfxest[,1]
+probit_si4_margins$mfxest
+
+test <- glm(tax_acceptance ~traite_cible, data=s, family = binomial(link='probit'))
+summary(margins(data=s, model=test))
+probitmfx(tax_acceptance ~ traite_cible, data=s)
+probitmfx(tax_acceptance ~ traite_cible, data=s, atmean=FALSE)
 
 # # (4 deprecated) Probit for second stage
 # # tsls1_si4 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible * traite_cible_conjoint + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2), data=s, weights = s$weight)
@@ -1414,7 +1395,7 @@ TableV <- stargazer(tsls2_si1, tsls2_si2bis, tsls2_si3bis, probit_si4, tsls2_si6
       omit = "cible.+",
       # add.lines = c("Method: 2SLS & \\checkmark & \\checkmark & \\checkmark &  & \\checkmark"),
       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="results_private_benefits")
-  write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableV, fixed=TRUE), fixed=TRUE), collapse=' ')
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableV, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # à la Adrien
 TableV <- stargazer(tsls2_si1, tsls2_si2bis, tsls2_si3bis, probit_si4, tsls2_si6bis, # tsls2_si4: Unrecognized object type
@@ -1680,6 +1661,11 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 
 
 ##### 5.3 Progressivity #####
+# IV doesn't work because instrument is weak:
+prog1 <- lm((progressivite!='Non') ~ info_progressivite, weights=s$weight, data=s, na.action='na.exclude')
+summary(prog1)
+summary(lm(tax_acceptance ~ fitted.values(prog1), weights=s$weight, data=s))
+
 s$progressif <- n(s$progressivite=='Oui') 
 # (1) OLS simple: 22 p.p.***
 ols_prog0 <- lm(tax_acceptance ~ progressif, weights=s$weight, data=s)
@@ -1699,10 +1685,10 @@ ols_prog2 <- lm(formula_ols_prog2, weights=s$weight, data=s)
 summary(ols_prog2)
 
 # (4) probit: 21 p.p.***
-probit_prog0 <- glm(tax_acceptance ~ progressif, binomial(link="probit"), data=s)
-summary(probit_prog0)
-probit_prog0_margins <- summary(margins(data=s, model=probit_prog0, variable="progressif"))
-probit_prog0_margins
+logit_prog0 <- glm(tax_acceptance ~ progressif, binomial(link="logit"), data=s)
+summary(logit_prog0)
+logit_prog0_margins <- summary(margins(data=s, model=logit_prog0, variable="progressif"))
+logit_prog0_margins
 
 # (5) probit: 19 p.p.***
 formula_probit_prog1 <- as.formula(paste("tax_acceptance ~ progressif + ", paste(variables_demo[1:(length(variables_demo)-2)], collapse=' + ')))
