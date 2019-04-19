@@ -186,3 +186,38 @@ biprobit_feedback <- biprobit(dummy_approbation_feedback~1+dummy_declare_gagnant
 summary(biprobit_feedback)
 margins(biprobit_feedback) # TODO: bug
 summary(margins(biprobit_feedback, variables = "dummy_declare_gagnant_feedback_categorie"))
+
+
+##### 9. Answers at the initial question
+s$non_perdant <- n(s$gagnant_categorie!='Perdant')
+formula_ols_si7 <- as.formula(paste("taxe_approbation!='Non' ~ non_perdant + cible + ", 
+                                    paste(variables_reg_self_interest, collapse = ' + '))) # 
+ols_si7 <- lm(formula_ols_si7, data=s, weights = s$weight)
+summary(ols_si7)
+
+s$gagnant <- n(s$gagnant_categorie=='Gagnant')
+formula_ols_si8 <- as.formula(paste("taxe_approbation!='Non' ~ gagnant + cible + ", 
+                                    paste(variables_reg_self_interest, collapse = ' + '))) # 
+ols_si8 <- lm(formula_ols_si8, data=s, weights = s$weight)
+summary(ols_si8)
+
+s$non_perdant <- n(s$gagnant_categorie!='Perdant')
+# Warning when weighting: it relates to number of trials and not to survey weights. 
+# TODO: use svyglm to weight correctly cf. https://stats.stackexchange.com/questions/57107/use-of-weights-in-svyglm-vs-glm
+logit_si9 <- glm(formula_ols_si7, family = binomial(link='logit'), data=s)
+summary(logit_si9)
+logit_si9_margins <- logitmfx(formula_ols_si7, s, atmean=FALSE)$mfxest
+logit_si9_margins
+
+TableVbis <- stargazer(ols_si7, ols_si8, logit_si9_margins,
+                       title="Effect of self-interest on acceptance at the initial question",
+                       covariate.labels = c("Believes does not lose", "Believes wins"),
+                       dep.var.labels = c("Initial Acceptance ($A^I$)"), dep.var.caption = "", header = FALSE,
+                       keep = c("non_perdant", "gagnant"),
+                       coef = list(NULL, NULL, logit_si9_margins[,1]), 
+                       se = list(NULL, NULL, logit_si9_margins[,2]),
+                       add.lines = list(
+                         c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  "),
+                         c("Controls: Estimated gain ", "\\checkmark ", "\\checkmark ", "\\checkmark  "),
+                         c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark  ")),
+                       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
