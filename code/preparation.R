@@ -1027,13 +1027,6 @@ convert_s <- function() {
   s$revdisp <<- round((s$rev_tot -  irpp(s$rev_tot, s$nb_adultes, s$taille_menage)))
   s$uc <<- uc(s$taille_menage, s$nb_14_et_plus)
   s$niveau_vie <<- s$revdisp / s$uc
-  s$Revenu <<- s$revenu/1e3 # TODO: preparation
-  s$Revenu_conjoint <<- s$revenu_conjoint/1e3
-  s$Simule_gain <<- s$simule_gain/1e3
-  s$Revenu2 <<- s$revenu^2/1e6
-  s$Revenu_conjoint2 <<- s$revenu_conjoint^2/1e6
-  s$Simule_gain2 <<- s$simule_gain^2/1e6
-  s$Simule_gain_cible <<- s$simule_gain_cible/1e3
   
   # s$age <<- as.factor(as.character(s$age))
   # s$Region <<- as.factor(as.character(s$region)) 
@@ -1255,6 +1248,14 @@ convert_s <- function() {
   s$conso[is.na(s$conso)] <<- (6.39 + 7.31) / 2
   label(s$conso) <<- "conso:  Consommation moyenne du véhicule (en litres aux 100 km)"
 
+  s$mauvaise_qualite[s$conso > 90] <<- 1 + s$mauvaise_qualite[s$conso > 90] # 28
+  s$km_original <<- s$km
+  s$conso_original <<- s$conso
+  s$surface_original <<- s$surface
+  s$km <<- pmin(s$km, 200000) # 4
+  s$conso <<- pmin(s$conso, 30) # 75
+  s$surface <<- pmin(s$surface, 650) # 5
+  
   s$gaz <<- grepl('gaz', s$chauffage, ignore.case = T)
   s$fioul <<- grepl('fioul', s$chauffage, ignore.case = T)
   s$hausse_chauffage <<- -55.507189 + s$gaz * 124.578484 + s$fioul * 221.145441 + s$surface * 0.652174  
@@ -1384,6 +1385,15 @@ convert_s <- function() {
   levels(s$winning_feedback_category) <<- c('Winner', 'Unaffected', 'Loser')
   label(s$winning_category) <<- "Winning category before feedback"
   label(s$winning_feedback_category) <<- "Winning category after feedback"
+  
+  s$Revenu <<- s$revenu/1e3 # TODO: labels
+  s$Revenu_conjoint <<- s$revenu_conjoint/1e3
+  s$Simule_gain <<- s$simule_gain/1e3
+  s$Revenu2 <<- s$revenu^2/1e6
+  s$Revenu_conjoint2 <<- s$revenu_conjoint^2/1e6
+  s$Simule_gain2 <<- s$simule_gain^2/1e6
+  s$Simule_gain_cible <<- s$simule_gain_cible/1e3
+  s$Simule_gain_cible2 <<- s$simule_gain_cible/1e6
   
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
   # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA

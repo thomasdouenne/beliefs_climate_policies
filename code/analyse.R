@@ -709,7 +709,7 @@ summary(lm((taxe_feedback_approbation != 'Non') ~ gagnant_f.hat + taxe_approbati
 
 
 ##### Régressions: persistance des croyances #####
-# TODO: Etudier les gens gagnant en pouvoir d'achat mais perdant en utilit? (en prenant une ?lasticit? nulle)
+# TODO!: Etudier les gens gagnant en pouvoir d'achat mais perdant en utilit? (en prenant une ?lasticit? nulle)
 # 3.1 apprendre qu'on est (simulé) gagnant augmente la croyance de ne pas perdre de 23%***
 croyances_1 <- lm(((gagnant_feedback_categorie!='Perdant') - (gagnant_categorie!='Perdant')) ~ simule_gagnant + simule_gain + I(simule_gain^2), data=s, weights = s$weight, na.action="na.exclude")
 summary(croyances_1)
@@ -735,7 +735,7 @@ plot(s$hausse_chauffage, jitter(s$perte_relative_chauffage), xlim=c(0, 500))
 length(which(s$gain <= 0 & s$km < 1000 & s$gaz==FALSE & s$fioul==FALSE))
 
 decrit(s$update_correct)
-decrit(s$update_correct_large) # TODO: in preparation
+decrit(s$update_correct_large) 
 # Les gens pensant perdre légèrement updatent plus correctement que la moyenne et plus ils se trompent, plus ils updatent correctement.
 # Les autres catégories ne sont pas significatives: notamment le fait de se tromper davantage n'est pas associé à updater plus correctement que la moyenne, même si le signe est +.
 summary(lm(update_correct_large ~ I(simule_gain - gain)*as.factor(gain), data=s, weights = s$weight))
@@ -1527,7 +1527,7 @@ formula_probit_ee5bis <- as.formula(paste("tax_approval ~ taxe_inefficace.hat +"
           c("age_50_64", "age_65_plus", "gaz", "fioul", "hausse_chauffage", "hausse_depenses", "simule_gain"))], collapse = ' + ')))
 probit_ee5bis <- glm(formula_probit_ee5bis, binomial(link='probit'), data=s)
 summary(probit_ee5bis)
-probit_ee5bis_margins <- summary(margins(data=s, model=probit_ee5bis, variable = "taxe_inefficace.hat"))
+probit_ee5bis_margins <- summary(margins(data=s, model=probit_ee5bis, variable = "taxe_inefficace.hat")) # 
 probit_ee5bis_margins
 
 # (6) biprobit: TODO
@@ -1680,14 +1680,14 @@ summary(ols_prog2)
 # (4) probit: 21 p.p.***
 logit_prog0 <- glm(tax_acceptance ~ progressif, binomial(link="logit"), data=s)
 summary(logit_prog0)
-logit_prog0_margins <- summary(margins(data=s, model=logit_prog0, variable="progressif"))
+logit_prog0_margins <- summary(margins(data=s, model=logit_prog0, variable="progressif")) # 
 logit_prog0_margins
 
 # (5) probit: 19 p.p.***
 formula_probit_prog1 <- as.formula(paste("tax_acceptance ~ progressif + ", paste(variables_demo[1:(length(variables_demo)-2)], collapse=' + ')))
 probit_prog1 <- glm(formula_probit_prog1, binomial(link="probit"), data=s[s$region!='autre',])
 summary(probit_prog1)
-probit_prog1_margins <- summary(margins(data=s[s$region!='autre',], model=probit_prog1, variable="progressif"))
+probit_prog1_margins <- summary(margins(data=s[s$region!='autre',], model=probit_prog1, variable="progressif")) # 
 probit_prog1_margins
 
 # (6) probit tous contrôles: 10 p.p.***
@@ -1700,7 +1700,7 @@ formula_probit_prog2 <- as.formula(paste("tax_acceptance ~ progressif + ", paste
      collapse=' + ')))
 probit_prog2 <- glm(formula_probit_prog2, binomial(link="probit"), data=s[s$region!='autre',])
 summary(probit_prog2)
-probit_prog2_margins <- summary(margins(data=s[s$region!='autre',], model=probit_prog2, variable="progressif"))
+probit_prog2_margins <- summary(margins(data=s[s$region!='autre',], model=probit_prog2, variable="progressif")) # 
 probit_prog2_margins
 # probit_prog3 <- glm(as.formula(paste("tax_acceptance ~ progressif + ", paste(variables_exogenes, collapse=' + '))), binomial(link="probit"), data=s[s$region!='autre',])
 # summary(probit_prog3)
@@ -1724,14 +1724,14 @@ summary(nols_prog2)
 # (4) probit: 21 p.p.***
 nprobit_prog0 <- glm(tax_acceptance ~ non_progressif, binomial(link="probit"), data=s)
 summary(nprobit_prog0)
-nprobit_prog0_margins <- summary(margins(data=s, model=nprobit_prog0, variable="non_progressif"))
+nprobit_prog0_margins <- summary(margins(data=s, model=nprobit_prog0, variable="non_progressif")) # 
 nprobit_prog0_margins
 
 # (5) probit: 19 p.p.***
 nformula_probit_prog1 <- as.formula(paste("tax_acceptance ~ non_progressif + ", paste(variables_demo[1:(length(variables_demo)-2)], collapse=' + ')))
 nprobit_prog1 <- glm(nformula_probit_prog1, binomial(link="probit"), data=s[s$region!='autre',])
 summary(nprobit_prog1)
-nprobit_prog1_margins <- summary(margins(data=s[s$region!='autre',], model=nprobit_prog1, variable="non_progressif"))
+nprobit_prog1_margins <- summary(margins(data=s[s$region!='autre',], model=nprobit_prog1, variable="non_progressif")) # 
 nprobit_prog1_margins
 
 # (6) probit tous contrôles: 10 p.p.***
@@ -1741,7 +1741,7 @@ nformula_probit_prog2 <- as.formula(paste("tax_acceptance ~ non_progressif + ", 
      collapse=' + ')))
 nprobit_prog2 <- glm(nformula_probit_prog2, binomial(link="probit"), data=s[s$region!='autre',])
 summary(nprobit_prog2)
-nprobit_prog2_margins <- summary(margins(data=s[s$region!='autre',], model=nprobit_prog2, variable="non_progressif"))
+nprobit_prog2_margins <- summary(margins(data=s[s$region!='autre',], model=nprobit_prog2, variable="non_progressif")) # 
 nprobit_prog2_margins
 
 # (5bis) OLS Approval ~ progressivite == Oui, tous contrôles
@@ -1796,6 +1796,64 @@ table_prog_non <- stargazer(ols_prog2, probit_prog2, ols_prog0, nols_prog2, pols
         "Controls (101 variables) & \\checkmark & \\checkmark &  & \\checkmark & \\checkmark & \\checkmark"), #  (energy and transport characteristics, attitudes on policies and climate change)
       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog_non")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', table_prog_non, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+##### 5.4 All effects #####
+variables_reg_all <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo)
+variables_reg_all <- variables_reg_all[!(variables_reg_all %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
+# With all exogenous variables, we obtain the same result
+# variables_reg_all <- c("Revenu2", "Revenu_conjoint2", "Simule_gain2", variables_exogenes[!(variables_exogenes %in% c("age_50_64", "age_65_plus", "Transports_travail_commun", "Transports_travail_actif", "gaz", "fioul", "hausse_chauffage", 
+#       "hausse_depenses", "Simule_gain", "simule_gain", "elasticite_partielle", "elasticite_partielle_perso", "score_ges", "score_climate_call", "enfant_CC_pour_lui", "enfant_CC_pour_CC"))])
+s$gagnant <- s$gagnant_categorie=='Gagnant'
+s$gagnant_NSP <- s$gagnant_categorie=='Non affecté'
+s$taxe_efficace_oui <- s$taxe_efficace=='Oui'
+s$taxe_efficace_NSP <- s$taxe_efficace=='NSP'
+s$progressif <- s$progressivite=='Oui'
+s$progressif_NSP <- s$progressivite=='NSP'
+formula_all_acc <- as.formula(paste("tax_acceptance ~ gagnant + taxe_efficace_oui + progressif + gagnant_NSP + taxe_efficace_NSP + progressif_NSP +",paste(variables_reg_all, collapse = ' + '))) 
+formula_all_app <- as.formula(paste("tax_approval ~ gagnant + taxe_efficace_oui + progressif + gagnant_NSP + taxe_efficace_NSP + progressif_NSP +", paste(variables_reg_all, collapse = ' + '))) 
+
+# (1) OLS Acceptance with controls
+ols_all1 <- lm(formula_all_acc, data=s, weights = s$weight)
+summary(ols_all1)
+
+# (2) OLS Acceptance without controls
+ols_all2 <- lm(tax_acceptance ~ gagnant + taxe_efficace_oui + progressif + gagnant_NSP + taxe_efficace_NSP + progressif_NSP, data=s, weights = s$weight)
+summary(ols_all2)
+
+# (3) Logit Acceptance with controls
+logit_all3 <- glm(formula_all_acc, family = binomial(link='logit'), data=s[s$region!='autre',])
+summary(logit_all3)
+logit_all3_margins <- logitmfx(data=s, formula=logit_all3, atmean=FALSE)$mfxest
+logit_all3_margins
+
+# (4) OLS Approval with controls
+ols_all4 <- lm(formula_all_app, data=s, weights = s$weight)
+summary(ols_all4)
+
+# (5) OLS Approval without controls
+ols_all5 <- lm(tax_approval ~ gagnant + taxe_efficace_oui + progressif + gagnant_NSP + taxe_efficace_NSP + progressif_NSP, data=s, weights = s$weight)
+summary(ols_all5)
+
+# (6) Logit Approval with controls
+logit_all6 <- glm(formula_all_app, family = binomial(link='logit'), data=s[s$region!='autre',])
+summary(logit_all6)
+logit_all6_margins <- logitmfx(data=s, formula=logit_all6, atmean=FALSE)$mfxest 
+logit_all6_margins
+
+# Results
+TableXIII <- stargazer(ols_all1, ols_all2, logit_all3, ols_all4, ols_all5, logit_all6,
+                    title="Effects of three motives on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                    covariate.labels = c("Believes wins ($\\dot{G}>0$)", "Environmental effectiveness: `Yes'", "Progressivity: `Yes'",
+                                         "Believes unaffected ($\\dot{G}=0$)", "Environmental effectiveness: `PNR'", "Progressivity: `PNR'"),
+                    dep.var.labels = c("Acceptance", "Approval"), 
+                    dep.var.caption = c("Tax and dividend"), header = FALSE,
+                    keep = c("gagnant", "efficace", "progressif"),
+                    coef = list(NULL, NULL, logit_all3_margins[,1], NULL, NULL, logit_all6_margins[,1]), 
+                    se = list(NULL, NULL, logit_all3_margins[,2], NULL, NULL, logit_all6_margins[,2]),
+                    add.lines = list(c("Controls: Incomes, socio-demographics", "\\checkmark ", "", "\\checkmark  ", "\\checkmark", "", "\\checkmark")),
+                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:all_effects")
+write_clip(gsub("logistic", "logit", gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXIII, fixed=TRUE), fixed=TRUE)), collapse=' ')
 
 
 ##### Graphiques RDD #####
