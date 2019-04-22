@@ -114,32 +114,13 @@ wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage, weights=s$weight
 ## 3.3 Perception on other tax’ properties
 # Environmental effectiveness: Table IX
 decrit(s$taxe_efficace, weights = s$weight, miss = T) # 16.6% vs. 65.9%
+variables_reg_elast <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
+variables_reg_elast <- variables_reg_elast[!(variables_reg_elast %in%
+    c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
 elas_c <- lm(taxe_efficace!='Non' ~ Elasticite_chauffage, data=s, subset = variante_partielle=='c', weights = s$weight)
 summary(elas_c)
 elas_f <- lm(taxe_efficace!='Non' ~ Elasticite_fuel, data=s, subset = variante_partielle=='f', weights = s$weight)
 summary(elas_f)
-elas_c_controls <- lm(taxe_efficace!='Non' ~ Elasticite_chauffage + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, subset = variante_partielle=='c', weights = s$weight)
-summary(elas_c_controls)
-elas_f_controls <- lm(taxe_efficace!='Non' ~ Elasticite_fuel + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, subset = variante_partielle=='f', weights = s$weight)
-summary(elas_f_controls)
-# TableX <- stargazer(elas_c, elas_f, elas_c_controls, elas_f_controls, type="latex",
-#           dep.var.labels=c("Environmental effectiveness"),
-#           covariate.labels=c("Price elasticity housing", "Price elsticity transports", "Income","Size urban unit", "Age","Domestic fuel", "Natural gas", "Diesel"))
-
-# à la Thomas
-TableX <- stargazer(elas_c, elas_f, elas_c_controls, elas_f_controls,
-                    title="Effect of subjective elasticities on perceived environmental effectiveness", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                    covariate.labels = c("Constant", "Price elasticity: Housing", "Price elasticity: Transports", "Income","Size of town", "Age","Domestic fuel", "Natural gas", "Diesel"), 
-                    dep.var.labels = c("Environmental effectiveness: not `No'"), dep.var.caption = "", header = FALSE,
-                    # keep = c("gagnant", "non_perdant", "tax_acceptance"),
-                    # add.lines = list(c("Controls: Socio-demographics, energy ", "", "", "\\checkmark  ", "\\checkmark")),
-                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableX, fixed=TRUE), fixed=TRUE), collapse=' ')
-
-# à la Adrien
-variables_reg_elast <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
-variables_reg_elast <- variables_reg_elast[!(variables_reg_elast %in%
-    c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
 formula_c <- as.formula(paste("taxe_efficace!='Non' ~ Elasticite_chauffage + ", paste(variables_reg_elast, collapse=' + ')))
 elast_c_controls <- lm(formula_c, data=s, subset = variante_partielle=='c', weights = s$weight)
 summary(elas_c_controls)
@@ -154,16 +135,6 @@ TableX <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls, #  elas_
                     add.lines = list(c("Controls: Socio-demographics, incomes, energy", "", "", "\\checkmark  ", "\\checkmark")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableX, fixed=TRUE), fixed=TRUE), collapse=' ')
-
-# TODO: use Elasticite_partielle ? cf. ci-dessous
-# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle, data=s, weights = s$weight))
-# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, weights = s$weight))
-# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle * variante_partielle , data=s, weights = s$weight))
-# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle + Elasticite_partielle:variante_partielle, data=s, weights = s$weight))
-# summary(lm(taxe_efficace=='Oui' ~ Elasticite_partielle * variante_partielle, data=s, weights = s$weight))
-# summary(lm(taxe_efficace!='Non' ~ Elasticite_partielle * variante_partielle + revenu + taille_agglo + age + fioul + gaz + diesel, data=s, weights = s$weight))
-# reg_elast_controls <- lm(as.formula(paste("taxe_efficace!='Non' ~ Elasticite_partielle * variante_partielle + ", paste(variables_reg_elast, collapse=' + '))), data=s, weights = s$weight)
-# summary(reg_elast_controls)
 
 # Progressivity
 decrit(s$progressivite, weights = s$weight) # 19.4% vs. 59.5%
@@ -262,18 +233,7 @@ s$non_perdant <- n(s$gagnant_cible_categorie!='Perdant')
 ols_si3 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
 summary(ols_si3)
 
-# (4) Simple Logit
-# 53 p.p.***
-# s$non_perdant <- s$gagnant_cible_categorie!='Perdant'
-# logit_si4 <- glm(formula_tsls2_si2, family = binomial(link='logit'), data=s)
-# summary(logit_si4)
-# logit_si4_margins <- summary(margins(data=s, model=logit_si4, variables = c("non_perdant", "tax_acceptance"))) # 
-# logit_si4_margins
-# s$non_perdant <- n(s$non_perdant)
-# s$tax_acceptance <- n(s$tax_acceptance)
-# logit_si4 <- glm(formula_tsls2_si2, family = binomial(link='logit'), data=s)
-# s$tax_acceptance <- as.logical(s$tax_acceptance)
-
+# (4) Simple Logit: 53 p.p.***
 s$non_perdant <- n(s$gagnant_cible_categorie!='Perdant')
 # Warning when weighting: it relates to number of trials and not to survey weights. 
 # TODO: use svyglm to weight correctly cf. https://stats.stackexchange.com/questions/57107/use-of-weights-in-svyglm-vs-glm
@@ -310,10 +270,6 @@ TableV <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, # tsls2
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS}", "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\textit{IV}", 
                gsub('\\end{table}', '', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableV, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
-
-# Due to a bug for logit, we have to include manually its coefficients. One can simply copy/paste the following lines
-# Initial tax Acceptance ($A^I$) &  & 0.343$^{***}$ & 0.362$^{***}$ & 0.2721$^{***}$ & 0.460$^{***}$ \\
-# &  & (0.034) & (0.026) & (0.022) & (0.041) \\
 
 TableXI <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5,
                     title="First stage regressions results for self-interest", #star.cutoffs = c(0.1, 1e-5, 1e-30),
@@ -361,11 +317,6 @@ summary(ols_ee3)
 
 # (4) Logit
 # 46 p.p.
-# s$taxe_efficace.hat <- s$taxe_efficace!='Non'
-# logit_ee4 <- glm(formula_ee3, family = binomial(link='logit'), data=s)
-# summary(logit_ee4)
-# logit_ee4_margins <- summary(margins(data=s, model=logit_ee4, variables = c("taxe_efficace.hat")))
-# logit_ee4_margins
 s$taxe_efficace.hat <- n(s$taxe_efficace!='Non')
 logit_ee4 <- glm(formula_ee3, family = binomial(link='logit'), data=s)
 summary(logit_ee4)
@@ -401,10 +352,6 @@ TableVI <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls2_
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
                "\\textit{IV} & \\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
                gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVI, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
-
-# Due to a bug for logit, we have to include manually its coefficients. One can simply copy/paste the following lines
-# Environmental effectiveness: not `No' & 0.521$^{*}$ & 0.458$^{*}$ & 0.413$^{***}$ & 0.398$^{***}$ &  & 0.421$^{**}$ \\
-# & (0.298) & (0.277) & (0.015) & (0.018) &  & (0.199) \\
 
 TableXII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                       title="First stage regressions results for environmental effectiveness", #star.cutoffs = c(0.1, 1e-5, 1e-30),
@@ -471,13 +418,13 @@ TableVII <- stargazer(ols_prog1, ols_prog2, logit_prog3, ols_prog4, ols_prog5, o
                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
-# Due to a bug for logit, we have to include manually its coefficients. One can simply copy/paste the following lines
-# Progressivity: not `No' & 0.269$^{***}$ & 0.380$^{***}$ & 0.255$^{***}$ &  & 0.093$^{***}$ &  \\ 
-#   & (0.022) & (0.022) & (0.024) &  & (0.017) &  \\ 
 
 ##### Appendix A. Raw data #####
 ## A.1 Perception of net gains
 ## A.2 Estimation for feedback
+# A.2.2: cf. test_predictions_ols_regression_with_transports.py and regression_feedback.py
+# A.2.3: cf. test_predictions_binary_models.py (and regression_feedback.py)
+
 ## A.3 Distributive effects
 # TODO: reference to python file
 

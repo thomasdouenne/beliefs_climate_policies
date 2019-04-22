@@ -72,6 +72,46 @@ s_perte <- merge(temp1, temp2, all=T)
 summary(lm(perte ~ variante_perte, data = s_perte, weights = s_perte$weight)) # *** -0.31 chauffage, -0.18 fuel: les gens s'estiment plus perdants avec hausse TVA
 # TODO: restreindre aux seuls gagnants/perdants
 
+decrit(s$gain_chauffage, weights = s$weight)
+decrit(s$gain_chauffage[(s$fioul | s$gaz) == FALSE], weights = s$weight[(s$fioul | s$gaz) == FALSE])
+wtd.mean((s$gain_chauffage<0)[(s$fioul | s$gaz) == FALSE], weights = s$weight[(s$fioul | s$gaz) == FALSE]) # 32% think they lose although they don't use hydrocarbon!
+wtd.mean((s$gain_chauffage<50)[(s$fioul | s$gaz) == FALSE], weights = s$weight[(s$fioul | s$gaz) == FALSE]) # 82% think they win less than 50 although they don't use hydrocarbon!
+wtd.mean((s$gain_chauffage<0)[(s$fioul | s$gaz) == T], weights = s$weight[(s$fioul | s$gaz) == T]) # 79% of hydrocarbon users they think lose 
+wtd.mean((s$gain_chauffage<50)[(s$fioul | s$gaz) == T], weights = s$weight[(s$fioul | s$gaz) == T]) # 100% of hydrocarbon users they think lose 
+decrit(s$chauffage[(s$fioul | s$gaz) == FALSE & s$gain_chauffage < 0], weights = s$weight[(s$fioul | s$gaz) == FALSE & s$gain_chauffage < 0]) # 60% à l'électricité
+wtd.mean((s$gain_chauffage<0)[(s$fioul | s$gaz) == FALSE & s$mode_chauffage=='individuel' & s$chauffage!='NSP'], 
+         weights = s$weight[(s$fioul | s$gaz) == FALSE & s$mode_chauffage=='individuel' & s$chauffage!='NSP']) # 30%: ce n'est pas dû au mode de chauffage
+wtd.mean((s$gain_chauffage<50)[(s$fioul | s$gaz) == FALSE & s$mode_chauffage=='individuel' & s$chauffage!='NSP'], 
+         weights = s$weight[(s$fioul | s$gaz) == FALSE & s$mode_chauffage=='individuel' & s$chauffage!='NSP']) # 87%
+decrit(s$gain_chauffage[(s$fioul | s$gaz) == FALSE & s$mode_chauffage=='individuel' & s$chauffage!='NSP']) # 684 personnes
+decrit(s$gain_chauffage[(s$fioul | s$gaz) == FALSE]) # 831 personnes 
+decrit((s$gain_fuel<0)[s$km <= 1000], weights = s$weight[s$km <= 1000]) # 32% sur 245 personnes (271 en weighted)
+decrit((s$gain_fuel<40)[s$km <= 1000], weights = s$weight[s$km <= 1000]) # 92%. 40€ de hausse pour 1000 km * 30 L/100 km * 0.13€/L d'essence
+formula_perte_absurde <- as.formula(paste("gain_partielle < 0 ~ ", paste(variables_demo, collapse=' + ')))
+summary(lm(formula_perte_absurde, subset=km <= 1000 | (fioul != T & gaz != T), data=s, weights=s$weight)) # adjusted R^2: 0.01, R^2: 0.04
+
+decrit(s$gain_chauffage[s$perte_relative_chauffage=='= Moyenne'], weights=s$weight[s$perte_relative_chauffage=='= Moyenne']) # médiane à 0, moyenne à -30
+decrit((s$gain_chauffage==0)[s$perte_relative_chauffage=='= Moyenne'], weights=s$weight[s$perte_relative_chauffage=='= Moyenne']) # 40% à 0, 
+decrit(s$gain_fuel[s$perte_relative_fuel=='= Moyenne'], weights=s$weight[s$perte_relative_fuel=='= Moyenne']) # 40% à 0, moyenne à -44
+decrit(s$gain_partielle[s$perte_relative_partielle==0], weights=s$weight[s$perte_relative_partielle==0]) # médiane à 0, 35% à 0, moyenne à -38
+decrit((s$gain_partielle>0)[s$perte_relative_partielle==0], weights=s$weight[s$perte_relative_partielle==0]) # médiane à 0, 16% > 0
+
+decrit(s$perte_relative_chauffage[(s$fioul | s$gaz) == FALSE], weights = s$weight[(s$fioul | s$gaz) == FALSE]) # médiane: = Moyenne, 40% + dont 25% bcp +
+decrit(s$perte_relative_fuel[s$km <= 1000], weights = s$weight[s$km <= 1000]) # comme ci-dessus
+decrit(s$perte_relative_chauffage[(s$fioul | s$gaz) == FALSE & s$gain_chauffage<0], weights = s$weight[(s$fioul | s$gaz) == FALSE & s$gain_chauffage<0]) # 46%: bcp +
+decrit(s$perte_relative_fuel[s$km <= 1000 & s$gain_fuel<0], weights = s$weight[s$km <= 1000 & s$gain_fuel<0]) # comme ci-dessus
+decrit(s$perte_relative_partielle[(s$km <= 1000 & s$gain_fuel<0) | ((s$fioul | s$gaz) == FALSE & s$gain_chauffage<0)], weights = s$weight[(s$km <= 1000 & s$gain_fuel<0) | ((s$fioul | s$gaz) == FALSE & s$gain_chauffage<0)]) # comme ci-dessus
+
+
+##### Correlates of the bias #####
+# taille_agglo, composition du ménage et sexe corrélés, mais ça reste très idiosyncratique
+summary(lm(as.formula(paste("(simule_gain/uc - gain > 50) ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # nb_adultes: 0.11, Masculin: -0.05, R^2: 0.04 (la moitié due à la composition du ménage)
+summary(lm(as.formula(paste("(simule_gain/uc - gain) ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # uc, nb_adultes: +, nb>14, taille_menage: -, R^2: 0.03 (la moitié due à la composition du ménage)
+summary(lm(as.formula(paste("(simule_gain/uc - gain > 50) ~ ", paste(variables_demo[!(variables_demo %in% c('taille_menage', 'nb_14_et_plus', 'nb_adultes', 'uc'))], collapse=' + '))), data=s, weights=s$weight))
+summary(lm(as.formula(paste("(simule_gain/uc - gain) ~ ", paste(variables_demo[!(variables_demo %in% c('taille_menage', 'nb_14_et_plus', 'nb_adultes', 'uc'))], collapse=' + '))), data=s, weights=s$weight)) # taille_agglo: -4
+summary(lm(as.formula(paste("gain ~ ", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # revenu: -4.4 / k€, taille_agglo: +10, age 18-34: +30, R^2: 0.04
+summary(lm(as.formula(paste("gain ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # revenu: -4.4 / k€, taille_agglo: +10, age 18-34: +30, R^2: 0.04
+
 
 ##### Gain (dividende - hausse dépenses énergétiques) #####
 decrit(110 * pmin(2, s$nb_adultes) - s$hausse_depenses, weights = s$weight) # Ok !

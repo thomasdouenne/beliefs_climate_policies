@@ -36,7 +36,7 @@ if __name__ == "__main__":
     regr = tree.DecisionTreeRegressor(max_depth=3)
     regr.fit(df_hh[variables], df_hh['winner'])
     
-    dot_data = tree.export_graphviz(clf, feature_names = variables, class_names = ['loose', 'win'])
+    dot_data = tree.export_graphviz(clf, feature_names = variables, class_names = ['lose', 'win'], leaves_parallel=True, impurity=False, proportion=True, rounded=True, special_characters=True) # filled = True, 
     graph = graphviz.Source(dot_data)
     graph
     graph.render('decision_tree', format='png')

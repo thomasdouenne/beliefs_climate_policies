@@ -27,12 +27,12 @@ def compute_gains_losses_housing(df_hh):
             
         if element == 'domestic_fuel':
             current_price = 0.859 # This is roughly the value of domestic fuel prices
-            e = -0.15
+            e = -0.2
             carbon_intensity = 0.00265
             initial_excise_tax = 0.038 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         else:
             current_price = 0.0651 # For someone in zone 3 that use gas for heating
-            e = -0.15
+            e = -0.2
             carbon_intensity = 0.000182
             initial_excise_tax = 0.0003 # Cf. excel, level of the TICGN if carbon price was null
         
@@ -85,7 +85,8 @@ def regress_ols_housing_expenditures_increase(df_hh):
 
     regression_ols = smf.ols(formula = 'housing_expenditures_increase ~ \
         natural_gas + domestic_fuel + accommodation_size',
-#        natural_gas : accommodation_size + domestic_fuel + domestic_fuel : accommodation_size - 1',
+#        natural_gas : accommodation_size + domestic_fuel + domestic_fuel : accommodation_size - 1 ',
+#        natural_gas * accommodation_size + domestic_fuel + domestic_fuel : accommodation_size  ',
         data = df_hh).fit()
     
     alpha = 90.
@@ -118,20 +119,24 @@ def regress_ols_housing_expenditures_increase(df_hh):
 def predict_winner_looser_housing(df_hh):
 
     df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
+    df_hh['natural_gas:accommodation_size'] = df_hh['accommodation_size'] * df_hh['natural_gas']
+    df_hh['domestic_fuel:accommodation_size'] = df_hh['accommodation_size'] * df_hh['domestic_fuel']
 
-    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['nb_beneficiaries'])
+    df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['nb_beneficiaries']) # weird to put 55, but works better
 
-    variables = ['hh_income', 'hh_income_2', 'consumption_units', 'nb_beneficiaries', 'natural_gas',
+    variables = ['hh_income', 'hh_income_2', 'consumption_units', 'nb_beneficiaries', 'natural_gas', #'domestic_fuel:accommodation_size', 'natural_gas:accommodation_size',
         'domestic_fuel', 'accommodation_size', 'age_18_24', 'age_25_34', 'age_35_49', 'age_50_64']
+    variables_ols = ['natural_gas', 'domestic_fuel', 'accommodation_size', 'age_18_24', 'age_25_34', 'age_35_49', 'age_50_64']
 
     logit = smf.Logit(df_hh['winner'], df_hh[variables]).fit()
     
     probit = smf.Probit(df_hh['winner'], df_hh[variables]).fit()
 
     ols = smf.ols(formula = 'winner ~ \
-        natural_gas + domestic_fuel + \
-        accommodation_size + age_18_24 + age_25_34 + age_35_49 + age_50_64',
+        natural_gas + domestic_fuel + accommodation_size + \
+        age_18_24 + age_25_34 + age_35_49 + age_50_64',
         data = df_hh).fit()
+#        natural_gas * accommodation_size + domestic_fuel * accommodation_size + \
 
     clf = tree.DecisionTreeClassifier(max_depth=3)
     clf = clf.fit(df_hh[variables], df_hh['winner'])
@@ -152,6 +157,7 @@ if __name__ == "__main__":
     probit_winner = predict_winner_looser_housing(df_hh)[1]
     ols_winner = predict_winner_looser_housing(df_hh)[2]
     
+    #print ols_winner.summary()
     #print logit_winner.summary()
     #print probit_winner.summary()
     #print ols_winner.summary()

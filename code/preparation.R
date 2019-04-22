@@ -263,7 +263,7 @@ relabel_and_rename_s <- function() {
   names(s)[46] <<- "mode_chauffage"
   label(s[[46]]) <<- "mode_chauffage: Mode de chauffage du logement (individuel/collectif/NSP) - Q178"
   names(s)[47] <<- "chauffage"
-  label(s[[47]]) <<- "chauffage: source d'énergie princiale (Électricité/Gaz de ville/Butane, propane, gaz en citerne/Fioul, mazout, pétrole/Bois, solaire, géothermie, aérothermie (pompe à chaleur)/Autre/NSP)"
+  label(s[[47]]) <<- "chauffage: source d'énergie principale (Électricité/Gaz de ville/Butane, propane, gaz en citerne/Fioul, mazout, pétrole/Bois, solaire, géothermie, aérothermie (pompe à chaleur)/Autre/NSP)"
   names(s)[48] <<- "nb_vehicules_texte"
   label(s[[48]]) <<- "nb_vehicules_texte: Nombre de véhicules motorisés dont dispose le ménage (Aucun/Un/Deux ou plus) - Q37"
   names(s)[49] <<- "km_0"
@@ -1079,9 +1079,6 @@ convert_s <- function() {
   s$gagnant_partielle_categorie[s$variante_partielle=='c'] <<- s$gagnant_chauffage_categorie[s$variante_partielle=='c'] 
   s$gagnant_partielle_categorie[s$variante_partielle=='f'] <<- s$gagnant_fuel_categorie[s$variante_partielle=='f']
   label(s$gagnant_partielle_categorie) <<- "gagnant_partielle_categorie: Ménage Gagnant/Non affecté/Perdant par hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gagnant_fuel_categorie/chauffage)"
-  s$gain_partielle[s$variante_partielle=='c'] <<- s$gain_chauffage[s$variante_partielle=='c'] 
-  s$gain_partielle[s$variante_partielle=='f'] <<- s$gain_fuel[s$variante_partielle=='f']
-  label(s$gain_partielle) <<- "gain_partielle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gain_fuel/chauffage)"
   
   s$gain[s$gagnant_categorie=='Non affecté' & s$variante_partielle!='NA'] <<- 0
   s$gain[s$gagnant_categorie=='Gagnant' & s$variante_partielle!='NA'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_hausse[s$gagnant_categorie=='Gagnant' & s$variante_partielle!='NA']))))/50
@@ -1098,7 +1095,7 @@ convert_s <- function() {
   label(s$gain_fuel_echelle) <<- "gain_fuel_echelle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe carburants compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
   label(s$gain_partielle_echelle) <<- "gain_partielle_echelle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (carburants ou chauffage) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40)"
   
-  # cf. consistency_belief_losses.py pour les imputations
+  # cf. consistency_belief_losses.py pour les imputations. Average of BdF in each bin has been used.
   s$gain_min <<- -1000*(s$gain==-6) - 280*(s$gain==-5) - 190*(s$gain==-4) - 120*(s$gain==-3) - 70*(s$gain==-2) - 30*(s$gain==-1) + 0*(s$gain==1) + 20*(s$gain==2) + 40*(s$gain==3) + 60*(s$gain==4) + 80*(s$gain==5)
   s$gain_max <<- -280*(s$gain==-6) - 190*(s$gain==-5) - 120*(s$gain==-4) - 70*(s$gain==-3) - 30*(s$gain==-2) - 0*(s$gain==-1) + 20*(s$gain==1) + 40*(s$gain==2) + 60*(s$gain==3) + 80*(s$gain==4) + 2000*(s$gain==5)
   s$gain_fuel_min <<- -1000*(s$gain_fuel==-6) - 160*(s$gain_fuel==-5) - 110*(s$gain_fuel==-4) - 70*(s$gain_fuel==-3) - 40*(s$gain_fuel==-2) - 15*(s$gain_fuel==-1) + 0*(s$gain_fuel==1) + 10*(s$gain_fuel==2) + 20*(s$gain_fuel==3) + 30*(s$gain_fuel==4) + 40*(s$gain_fuel==5)
@@ -1113,6 +1110,9 @@ convert_s <- function() {
   temp <- NA
   temp[!is.na(s$gain_chauffage)] <- (-262.07*(s$gain_chauffage==-6) - 132.69*(s$gain_chauffage==-5) - 87.05*(s$gain_chauffage==-4) - 53.65*(s$gain_chauffage==-3) - 26.57*(s$gain_chauffage==-2) - 7.20*(s$gain_chauffage==-1) + 4.53*(s$gain_chauffage==1) + 15.44*(s$gain_chauffage==2) + 25.26*(s$gain_chauffage==3) + 35.66*(s$gain_chauffage==4) + 54.67*(s$gain_chauffage==5))[!is.na(s$gain_chauffage)] #  - 1.34*(s$gain_chauffage==0)
   s$gain_chauffage <<- as.item(temp, labels = structure(c(-262.07, -132.69, -87.05, -53.65, -26.57, -7.20, 0, 4.53, 15.44, 25.26, 35.66, 54.67), names = c("<-160", "-160_-110", "-110_-70", "-70_-40", "-40_-15", "-15_0", "0", "0_10", "10_20", "20_30", "30_40", ">40")), annotation=Label(s$gain_chauffage))
+  s$gain_partielle[s$variante_partielle=='c'] <<- s$gain_chauffage[s$variante_partielle=='c'] 
+  s$gain_partielle[s$variante_partielle=='f'] <<- s$gain_fuel[s$variante_partielle=='f']
+  label(s$gain_partielle) <<- "gain_partielle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gain_fuel/chauffage)"
 
   s$Elasticite_chauffage <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_chauffage))))
   s$Elasticite_chauffage <<- (s$Elasticite_chauffage==0)*1.5 + (s$Elasticite_chauffage==3)*6.5 + (s$Elasticite_chauffage>3)*(s$Elasticite_chauffage + 5) # Take the average of thresholds, take 40% for >30%
