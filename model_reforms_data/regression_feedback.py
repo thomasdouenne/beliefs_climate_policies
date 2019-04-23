@@ -27,12 +27,12 @@ def compute_gains_losses_housing(df_hh):
             
         if element == 'domestic_fuel':
             current_price = 0.859 # This is roughly the value of domestic fuel prices
-            e = -0.2
+            e = -0.15
             carbon_intensity = 0.00265
             initial_excise_tax = 0.038 # This is roughly the value of the TICPE without carbon tax, but I need to check more precisly
         else:
             current_price = 0.0651 # For someone in zone 3 that use gas for heating
-            e = -0.2
+            e = -0.15
             carbon_intensity = 0.000182
             initial_excise_tax = 0.0003 # Cf. excel, level of the TICGN if carbon price was null
         
