@@ -1,6 +1,8 @@
 source("packages_functions.R")
 load(".RData")
 
+# TODO: check nb_adultes et nb_beneficiaires for simule_gain
+
 ##### 2 Data #####
 ## 2.1 Survey "Beliefs climate policies"
 # 2.1.1 Table I: Sample Characteristics
@@ -96,6 +98,19 @@ abline(v=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), lty=3, col=rgb(1,0,0,
 axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
 # restore graphical parameters
 par(mar = mar_old, cex = cex_old)
+
+# Heterogeneity in bias
+reg_bias <- lm((simule_gain - gain > 50) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes, data=s, weights=s$weight)
+summary(reg_bias) # R^2: 0.03 (la moitié due aux gilets jaunes)
+Table_heterogenous_bias <- stargazer(reg_bias, #
+     title="Determinants of bias in subjective gains", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
+     covariate.labels = c("Constant", "Sex: Female", "Diploma: Bachelor or above", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"), 
+     dep.var.labels = c("Estimated bias per C.U. ($\\widehat{\\gamma}-g$) > 50"), dep.var.caption = "", header = FALSE,
+     omit = c("Gauche_droite", "taille_agglo", "revenu"),
+     add.lines = list(c("Controls: Size of town, political leaning, income", "\\checkmark  ")),
+     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
+
 
 
 ## 3.2 Robustness to assumptions on elasticities

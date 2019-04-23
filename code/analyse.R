@@ -96,21 +96,39 @@ decrit(s$gain_fuel[s$perte_relative_fuel=='= Moyenne'], weights=s$weight[s$perte
 decrit(s$gain_partielle[s$perte_relative_partielle==0], weights=s$weight[s$perte_relative_partielle==0]) # médiane à 0, 35% à 0, moyenne à -38
 decrit((s$gain_partielle>0)[s$perte_relative_partielle==0], weights=s$weight[s$perte_relative_partielle==0]) # médiane à 0, 16% > 0
 
+decrit(s$perte_relative_chauffage, weights = s$weight) # médiane: = Moyenne, 40% + dont 25% bcp +
 decrit(s$perte_relative_chauffage[(s$fioul | s$gaz) == FALSE], weights = s$weight[(s$fioul | s$gaz) == FALSE]) # médiane: = Moyenne, 40% + dont 25% bcp +
 decrit(s$perte_relative_fuel[s$km <= 1000], weights = s$weight[s$km <= 1000]) # comme ci-dessus
 decrit(s$perte_relative_chauffage[(s$fioul | s$gaz) == FALSE & s$gain_chauffage<0], weights = s$weight[(s$fioul | s$gaz) == FALSE & s$gain_chauffage<0]) # 46%: bcp +
 decrit(s$perte_relative_fuel[s$km <= 1000 & s$gain_fuel<0], weights = s$weight[s$km <= 1000 & s$gain_fuel<0]) # comme ci-dessus
 decrit(s$perte_relative_partielle[(s$km <= 1000 & s$gain_fuel<0) | ((s$fioul | s$gaz) == FALSE & s$gain_chauffage<0)], weights = s$weight[(s$km <= 1000 & s$gain_fuel<0) | ((s$fioul | s$gaz) == FALSE & s$gain_chauffage<0)]) # comme ci-dessus
 
+decrit((s$gain<0)[s$simule_gain > 90], weights = s$weight[s$simule_gain > 90]) # 50% sur 1100 personnes 
+decrit((s$gain<0)[s$simule_gain >= 110], weights = s$weight[s$simule_gain >= 110]) # 47% sur 700 personnes 
+
 
 ##### Correlates of the bias #####
 # taille_agglo, composition du ménage et sexe corrélés, mais ça reste très idiosyncratique
-summary(lm(as.formula(paste("(simule_gain/uc - gain > 50) ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # nb_adultes: 0.11, Masculin: -0.05, R^2: 0.04 (la moitié due à la composition du ménage)
-summary(lm(as.formula(paste("(simule_gain/uc - gain) ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # uc, nb_adultes: +, nb>14, taille_menage: -, R^2: 0.03 (la moitié due à la composition du ménage)
-summary(lm(as.formula(paste("(simule_gain/uc - gain > 50) ~ ", paste(variables_demo[!(variables_demo %in% c('taille_menage', 'nb_14_et_plus', 'nb_adultes', 'uc'))], collapse=' + '))), data=s, weights=s$weight))
-summary(lm(as.formula(paste("(simule_gain/uc - gain) ~ ", paste(variables_demo[!(variables_demo %in% c('taille_menage', 'nb_14_et_plus', 'nb_adultes', 'uc'))], collapse=' + '))), data=s, weights=s$weight)) # taille_agglo: -4
+wtd.mean(s$simule_gain - s$gain > 50, weights = s$weight) # 75%
+decrit(s$simule_gain - s$gain, weights = s$weight)
+summary(lm(as.formula(paste("(simule_gain - gain > 110) ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # nb_adultes: 0.11, Masculin: -0.05, R^2: 0.04 (la moitié due à la composition du ménage)
+summary(lm(as.formula(paste("(simule_gain - gain > 50) ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # nb_adultes: 0.11, Masculin: -0.05, R^2: 0.04 (la moitié due à la composition du ménage)
+summary(lm(as.formula(paste("(simule_gain - gain) / simule_gain ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # uc, nb_adultes: +, nb>14, taille_menage: -, R^2: 0.03 (la moitié due à la composition du ménage)
+summary(lm(as.formula(paste("(simule_gain - gain > 50) ~ ", paste(variables_demo[!(variables_demo %in% c('taille_menage', 'nb_14_et_plus', 'nb_adultes', 'uc'))], collapse=' + '))), data=s, weights=s$weight))
+summary(lm(as.formula(paste("(simule_gain - gain) ~ ", paste(variables_demo[!(variables_demo %in% c('taille_menage', 'nb_14_et_plus', 'nb_adultes', 'uc'))], collapse=' + '))), data=s, weights=s$weight)) # taille_agglo: -4
 summary(lm(as.formula(paste("gain ~ ", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # revenu: -4.4 / k€, taille_agglo: +10, age 18-34: +30, R^2: 0.04
 summary(lm(as.formula(paste("gain ~ as.factor(taille_agglo) + diplome +", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight)) # revenu: -4.4 / k€, taille_agglo: +10, age 18-34: +30, R^2: 0.04
+
+plot(s$simule_gain, jitter(s$gain, 10), xlim=c(-400,300), type='p', col='blue', cex=0.1, xlab='Simulated gain', ylab='Subjective gain')
+abline(lm(gain ~ simule_gain, data=s), col='blue', lwd=2)
+lines(seq(-500, 500, by=10), seq(-500, 500, by=10), type='l', col='black') + grid()
+abline(h = 0, v=0)
+
+summary(lm(gain ~ simule_gain, data=s, weights=s$weight))
+summary(lm(gain ~ simule_gain + I(simule_gain^2), data=s, weights=s$weight))
+summary(lm(as.formula(paste("gain ~ simule_gain + ", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight))
+summary(lm(as.formula(paste("gain ~ simule_gain + I(simule_gain^2)", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight))
+summary(lm(as.formula(paste("simule_gain  gain ~ ", paste(variables_demo, collapse=' + '))), data=s, weights=s$weight))
 
 
 ##### Gain (dividende - hausse dépenses énergétiques) #####
@@ -134,6 +152,7 @@ decrit(s$gain > s$simule_gain, weights = s$weight)
 decrit(s$gain > s$simule_gain_interaction, weights = s$weight)
 decrit(s$gain > s$simule_gain_inelastique, weights = s$weight)
 decrit(s$gain > s$simule_gain_elast_perso, weights = s$weight)
+# TODO: pourquoi si peu d'erreur pour les gains négatifs ? parce qu'on utilise la spécification (1): on a la bonne courbe en prenant la spécification (2)
 fit_housing$vrai_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$obj
 fit_housing$estimation_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$fit
 ggplot(data=fit_housing, aes(x=vrai_gain_chauffage)) + 
@@ -1111,20 +1130,6 @@ decrit(s$update_correct_large | s$gagnant_feedback_pas_faux, weights = s$weight)
 
 
 ##### Graph distributions subjective/objective gains #####
-objective_gains <- read.csv2("df_objective_gains.csv")
-subjective_gains <- read.csv2("df_subjective_gains.csv")
-objective_gains_inelastic <- read.csv2("df_objective_gains_inelastic.csv")
-objective_gains$transport <- n(objective_gains$gain_net_numeric_uc_fuel)
-objective_gains$housing <- n(objective_gains$gain_net_numeric_uc_chauffage)
-objective_gains$all <- n(objective_gains$gain_net_numeric_uc_taxe_carbone)
-subjective_gains$transport <- n(subjective_gains$subjective_gain_numeric_fuel)
-subjective_gains$housing <- n(subjective_gains$subjective_gain_numeric_chauffage)
-subjective_gains$all <- n(subjective_gains$subjective_gain_numeric_taxe_carbone)
-objective_gains_inelastic$transport <- n(objective_gains_inelastic$gain_net_numeric_uc_fuel)
-objective_gains_inelastic$housing <- n(objective_gains_inelastic$gain_net_numeric_uc_chauffage)
-objective_gains_inelastic$all <- n(objective_gains_inelastic$gain_net_numeric_uc_taxe_carbone)
-
-
 mar_old <- par()$mar
 cex_old <- par()$cex
 par(mar = c(2.1, 4.1, 1.1, 0.1), cex=1.5)

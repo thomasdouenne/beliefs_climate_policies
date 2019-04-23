@@ -872,6 +872,9 @@ convert_s <- function() {
   s$mauvaise_qualite[s$taille_menage < s$nb_adultes | s$taille_menage < s$nb_14_et_plus] <<- 1.3 + s$mauvaise_qualite[s$taille_menage < s$nb_adultes | s$taille_menage < s$nb_14_et_plus] # 15
   s$mauvaise_qualite[s$taille_menage > 12] <<- 1.3 + s$mauvaise_qualite[s$taille_menage > 12] # 10
   s$mauvaise_qualite[s$nb_14_et_plus > 10] <<- 1 + s$mauvaise_qualite[s$nb_14_et_plus > 10] # 2
+  s$taille_menage <<- pmin(s$taille_menage, 12)
+  s$nb_14_et_plus <<- pmin(s$nb_14_et_plus, 10)
+  s$nb_adultes <<- pmin(s$nb_adultes, 5)
   s$mauvaise_qualite[s$km > 10^6] <<- 1 + s$mauvaise_qualite[s$km > 10^6] # 1
   s$mauvaise_qualite[s$surface < 9] <<- 1 + s$mauvaise_qualite[s$surface < 9] # 6
   s$mauvaise_qualite[s$surface >= 1000] <<- 1 + s$mauvaise_qualite[s$surface >= 1000] # 4
@@ -1007,14 +1010,16 @@ convert_s <- function() {
   s$interet_politique <<- 1*(s$interet_politique=='Un peu') + 2*(s$interet_politique=='Beaucoup')
   s$interet_politique <<- as.item(s$interet_politique, labels=structure(c(0:2), names=c('Presque pas', 'Un peu', 'Beaucoup')), annotation=temp)
 
-  # s$gilets_jaunes[s$gilets_jaunes_NSP==T] <<- -99
+  s$gilets_jaunes[s$gilets_jaunes_NSP==T] <<- -99
   s$gilets_jaunes[s$gilets_jaunes_compris==T] <<- 0 # total à 115%
   s$gilets_jaunes[s$gilets_jaunes_oppose==T] <<- -1 # 2 oppose et soutien en même temps
   s$gilets_jaunes[s$gilets_jaunes_soutien==T] <<- 1
   s$gilets_jaunes[s$gilets_jaunes_dedans==T] <<- 2
   label(s$gilets_jaunes) <<- "gilets_jaunes: -1: s'oppose / 0: comprend sans soutenir ni s'opposer / 1: soutient / 2: fait partie des gilets jaunes (gilets_jaunes_compris/oppose/soutien/dedans/NSP)" 
-  s$gilets_jaunes <<- as.item(n(s$gilets_jaunes), labels = structure(c(-1:2), names=c('oppose', 'comprend', 'soutient', 'est_dedans')), 
+  s$gilets_jaunes <<- as.item(n(s$gilets_jaunes), labels = structure(c(-99,-1:2), missing.values=-99, names=c('NSP', 'oppose', 'comprend', 'soutient', 'est_dedans')), 
                              annotation=attr(s$gilets_jaunes, "label"))
+  s$Gilets_jaunes <<- as.factor(s$gilets_jaunes)
+  s$Gilets_jaunes <<- relevel(s$Gilets_jaunes, 'oppose')
   
   # temp <- label(s$diplome)
   # s$diplome <<- factor(s$diplome, c("","Aucun diplôme","Brevet des collèges","CAP ou BEP","Baccalauréat","Bac +2 (BTS, DUT, DEUG, écoles de formation sanitaires et sociales...)","Bac +3 (licence...)","Bac +5 ou plus (master, école d'ingénieur ou de commerce, doctorat, médecine, maîtrise, DEA, DESS...)","NSP (Ne se prononce pas)") )
@@ -1228,8 +1233,8 @@ convert_s <- function() {
   s$versement_cible_sans_conjoint <<- (s$traite_cible) * ((s$cible==20)*550 + (s$cible==30)*360 + (s$cible==40)*270 + (s$cible==50)*220)
   label(s$versement_cible) <<- "versement_cible: Versement annuel reçu par le ménage du répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/parent pour cible à 20/30/40/50"
   label(s$versement_cible_sans_conjoint) <<- "versement_cible_sans_conjoint: Versement annuel reçu par le répondant lors de la hausse de la taxe carbone avec compensation ciblée. Montants: 550/360/270/220 €/an/adulte pour cible à 20/30/40/50"
-  s$versement <<- 110 * s$nb_adultes
-  label(s$versement) <<- "versement: Versement annuel reçu par le ménage suite à une hausse de la taxe carbone compensée (110 * nb_adultes)"
+  s$versement <<- 110 * pmin(2, s$nb_adultes)
+  label(s$versement) <<- "versement: Versement annuel reçu par le ménage suite à une hausse de la taxe carbone compensée (110 * min(2, nb_adultes))"
   
   s$convaincu_cible <<- s$taxe_cible_approbation!='Non' & s$taxe_approbation=='Non' & (s$traite_cible==T | s$traite_cible_conjoint==T)
   s$convaincu_feedback <<- !is.na(s$taxe_feedback_approbation) & s$taxe_feedback_approbation!='Non' & s$taxe_approbation=='Non' & s$simule_gagnant==1 # without !is.na(...), NAs are simule_gagnant variante=='p' & taxe_approbation=='Non' because NA & FALSE = FALSE but NA & T = NA
@@ -1275,29 +1280,31 @@ convert_s <- function() {
   label(s$diesel) <<- "diesel: Indicatrice de la possession d'un véhicule diesel par le ménage (fuel_1 ou fuel_2_1 ou fuel_2_2 = 'Diesel')"
   label(s$essence) <<- "essence: Indicatrice de la possession d'un véhicule à essence par le ménage (fuel_1 ou fuel_2_1 ou fuel_2_2 = 'Essence')"
   
-  s$simule_gain <<- 16.1 + s$nb_adultes * 110 - s$hausse_depenses # élasticité de 0.15 sur le gaz
+  s$simule_gain_menage <<- 16.1 + pmin(2, s$nb_adultes) * 110 - s$hausse_depenses # élasticité de 0.15 sur le gaz
+  s$simule_gain <<- s$simule_gain_menage / s$uc
   s$simule_gain_repondant <<- 16.1 + 110 - s$hausse_depenses
-  label(s$simule_gain) <<- "simule_gain: Gain net annuel simulé pour le ménage du répondant suite à une hausse de taxe carbone compensée: 16.1 + nb_adultes * 110 - hausse_depenses"
+  label(s$simule_gain_menage) <<- "simule_gain_menage: Gain net annuel simulé pour le ménage du répondant suite à une hausse de taxe carbone compensée: 16.1 + pmin(2, nb_adultes) * 110 - hausse_depenses"
+  label(s$simule_gain) <<- "simule_gain: Gain net annuel simulé par UC pour le ménage du répondant suite à une hausse de taxe carbone compensée: (16.1 + pmin(2, nb_adultes) * 110 - hausse_depenses)/UC"
   label(s$simule_gain_repondant) <<- "simule_gain_repondant: Gain net annuel simulé pour le répondant (sans tenir compte du potentiel versement reçu par les autres adultes du ménage) suite à une hausse de taxe carbone compensée: 116.1 - hausse_depenses"
-  s$simule_gain_cible <<- s$versement_cible - s$hausse_depenses
-  s$simule_gain_cible_sans_conjoint <<- s$versement_cible - s$hausse_depenses
-  label(s$simule_gain_cible) <<- "simule_gain_cible: Gain net simulé pour le ménage du répondant suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
-  label(s$simule_gain_cible_sans_conjoint) <<- "simule_gain_cible_sans_conjoint: Gain net simulé pour le répondant (sans tenir compte du potentiel versement reçu par son conjoint) suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
+  s$simule_gain_cible <<- (s$versement_cible - s$hausse_depenses) / s$uc
+  s$simule_gain_cible_sans_conjoint <<- (s$versement_cible_sans_conjoint - s$hausse_depenses) / s$uc
+  label(s$simule_gain_cible) <<- "simule_gain_cible: Gain net par UC simulé pour le ménage du répondant suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
+  label(s$simule_gain_cible_sans_conjoint) <<- "simule_gain_cible_sans_conjoint: Gain net par UC simulé pour le répondant (sans tenir compte du potentiel versement reçu par son conjoint) suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses"
   s$simule_gagnant[is.na(s$simule_gagnant)] <<- 1*(s$simule_gain[is.na(s$simule_gagnant)] > 0)
   
   s$hausse_chauffage_interaction_inelastique <<- 152.6786*s$fioul + s$surface * (1.6765*s$gaz + 1.1116*s$fioul)
   s$depense_chauffage <<- ((1*(s$fioul) * (152.6786 + 1.1116*s$surface)) / 0.148079 + 1.6765*s$gaz*s$surface / 0.133456)
-  s$simule_gain_interaction <<- 9.1 + s$nb_adultes * 110 - s$hausse_carburants - s$hausse_chauffage_interaction_inelastique * (1 - 0.2) # élasticité de 0.2 pour le gaz
+  s$simule_gain_interaction <<- (9.1 + pmin(2, s$nb_adultes) * 110 - s$hausse_carburants - s$hausse_chauffage_interaction_inelastique * (1 - 0.2)) / s$uc # élasticité de 0.2 pour le gaz
   s$simule_gagnant_interaction <<- 1*(s$simule_gain_interaction > 0)
-  s$simule_gain_inelastique <<- s$nb_adultes * 110 - s$hausse_carburants/(1 - 0.4) - s$hausse_chauffage_interaction_inelastique # élasticité nulle. Inclure + 22.4 rendrait le taux d'erreur uniforme suivant les deux catégories, on ne le fait pas pour être volontairement conservateur
-  s$simule_gain_elast_perso[s$variante_partielle=='c'] <<- s$nb_adultes[s$variante_partielle=='c'] * 110 - (s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='c'] * (1 + s$Elasticite_chauffage_perso[s$variante_partielle=='c']) + s$hausse_carburants[s$variante_partielle=='c'])
-  s$simule_gain_elast_perso[s$variante_partielle=='f'] <<- s$nb_adultes[s$variante_partielle=='f'] * 110 - (s$hausse_carburants[s$variante_partielle=='f'] * (1 + s$Elasticite_fuel_perso[s$variante_partielle=='f']) / (1 - 0.4) + s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='f'] * (1 - 0.2))
+  s$simule_gain_inelastique <<- (pmin(2, s$nb_adultes) * 110 - s$hausse_carburants/(1 - 0.4) - s$hausse_chauffage_interaction_inelastique) / s$uc # élasticité nulle. Inclure + 22.4 rendrait le taux d'erreur uniforme suivant les deux catégories, on ne le fait pas pour être volontairement conservateur
+  s$simule_gain_elast_perso[s$variante_partielle=='c'] <<- (pmin(2, s$nb_adultes[s$variante_partielle=='c']) * 110 - (s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='c'] * (1 + s$Elasticite_chauffage_perso[s$variante_partielle=='c']) + s$hausse_carburants[s$variante_partielle=='c'])) / s$uc
+  s$simule_gain_elast_perso[s$variante_partielle=='f'] <<- (pmin(2, s$nb_adultes[s$variante_partielle=='f']) * 110 - (s$hausse_carburants[s$variante_partielle=='f'] * (1 + s$Elasticite_fuel_perso[s$variante_partielle=='f']) / (1 - 0.4) + s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='f'] * (1 - 0.2))) / s$uc
   label(s$hausse_chauffage_interaction_inelastique) <<- "hausse_chauffage_interaction_inelastique: Hausse des dépenses de chauffage simulées pour le ménage avec des termes d'interaction entre surface et gaz/fioul plutôt que sans, suite à la taxe (élasticité nulle)"
   label(s$depense_chauffage) <<- "depense_chauffage: Dépense de chauffage annuelle estimée du ménage, avant la réforme"
-  label(s$simule_gain_interaction) <<- "simule_gain_interaction: Gain net annuel simulé avec des termes d'interaction surface*fioul/gaz pour le ménage du répondant suite à une hausse de taxe carbone compensée: 9.1 + nb_adultes * 110 - hausse_chauffage_interaction_inelastique * 0.8 - hausse_carburants"
+  label(s$simule_gain_interaction) <<- "simule_gain_interaction: Gain net par UC annuel simulé avec des termes d'interaction surface*fioul/gaz pour le ménage du répondant suite à une hausse de taxe carbone compensée: 9.1 + pmin(2, nb_adultes) * 110 - hausse_chauffage_interaction_inelastique * 0.8 - hausse_carburants"
   label(s$simule_gagnant_interaction) <<- "simule_gagnant_interaction: Indicatrice sur la prédiction que le ménage serait gagnant avec la taxe compensée, d'après nos simulations avec des termes d'interaction surface*fioul/gaz: 1*(simule_gain_interaction > 0)"
-  label(s$simule_gain_inelastique) <<- "simule_gain_inelastique: Gain net annuel simulé (avec interaction) avec une élasticité nulle, pour le ménage du répondant suite à une hausse de taxe carbone compensée:  nb_adultes * 110 - hausse_chauffage_interaction_inelastique - hausse_carburants / 0.6"
-  label(s$simule_gain_elast_perso) <<- "simule_gain_elast_perso: Gain net annuel simulé (avec interaction) avec l'élasticité renseignée par le répondant, pour le ménage du répondant suite à une hausse de taxe carbone compensée: nb_adultes * 110 - hausse_partielle_inelastique * (1 - Elasticite_partielle_perso) - hausse_autre_partielle"
+  label(s$simule_gain_inelastique) <<- "simule_gain_inelastique: Gain net par UC annuel simulé (avec interaction) avec une élasticité nulle, pour le ménage du répondant suite à une hausse de taxe carbone compensée:  nb_adultes * 110 - hausse_chauffage_interaction_inelastique - hausse_carburants / 0.6"
+  label(s$simule_gain_elast_perso) <<- "simule_gain_elast_perso: Gain net par UC annuel simulé (avec interaction) avec l'élasticité renseignée par le répondant, pour le ménage du répondant suite à une hausse de taxe carbone compensée: pmin(2, nb_adultes) * 110 - hausse_partielle_inelastique * (1 - Elasticite_partielle_perso) - hausse_autre_partielle"
   
   s$progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- s$progressivite_feedback_sans_info[!is.na(s$progressivite_feedback_sans_info)]
   s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
@@ -1411,7 +1418,7 @@ convert_s <- function() {
   # TODO: qualité, connaissances CC, opinions CC
 }
 # convert_s()
-# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=FALSE)
+# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T)
 # sa <- s
 # prepare_s()
 
