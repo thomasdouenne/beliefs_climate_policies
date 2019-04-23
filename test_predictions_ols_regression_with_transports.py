@@ -41,14 +41,15 @@ def compute_probability_to_win_from_ols_regression(df_hh, df_estimation):
 
 
 if __name__ == "__main__":
+    # Data for test
     df_hh = prepare_dataset_housing('bdf')
     df_transports = prepare_dataset()
     df_hh = merge_transport_data(df_hh, df_transports)
     df_hh = compute_gains_losses(df_hh)
         
-    ########### Reprendre ici
-    
-    df_estimation = prepare_dataset_housing('enl')
+    # Data for estimation
+    data_for_estimation = 'enl'    
+    df_estimation = prepare_dataset_housing(data_for_estimation)
     df_estimation = compute_gains_losses_housing(df_estimation)
     
     df_hh['winner'] = 0 + 1 * (df_hh['total_expenditures_increase'] < 110 * df_hh['nb_beneficiaries'])
@@ -65,3 +66,8 @@ if __name__ == "__main__":
 
     print df_hh['predicted_winner'].mean() 
     print df_hh['winner'].mean()
+    
+    if data_for_estimation == 'enl':
+        df_estimation['housing_expenditures_increase_to_impute'] = df_estimation['housing_expenditures_increase']
+        df_estimation.to_csv('df_donor_enl.csv', sep = ';')
+        df_hh.to_csv('df_receiver_bdf.csv', sep = ';')
