@@ -19,7 +19,7 @@ year = 2016
 data_year = 2011
 #elasticities = get_elasticities(data_year)
 elasticities = get_elasticities_aidsills(data_year, True)
-inflation_kwargs = dict(inflator_by_    ²²²²²²²²²ble = inflators_by_year[year])
+inflation_kwargs = dict(inflator_by_variable = inflators_by_year[year])
 
 
 # Homogeneous + SL :
@@ -86,6 +86,7 @@ simulated_variables = [
     'age_vehicule',
     'stalog',
     'situapr',
+    'tuu',
     ]
 
 data_menages = survey_scenario.create_data_frame_by_entity(simulated_variables, period = year)['menage']

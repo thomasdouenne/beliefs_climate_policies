@@ -90,7 +90,8 @@ def prepare_dataset():
                     'situacj' : 'situation_hh_second',
                     'situapr' : 'situation_hh_representative',
                     'strate' : 'urbanisation',
-                    'surfhab_d' : 'accommodation_size'
+                    'surfhab_d' : 'accommodation_size',
+                    'tuu' : 'size_urban_unit'
                     },
                 inplace = True,
                 )
@@ -120,7 +121,7 @@ def prepare_dataset():
         ['domestic_fuel_quantity'] + ['gas_quantity'] + ['diesel_quantity'] + ['gasoline_quantity'] +
         ['hh_income'] + ['hh_disposable_income'] + ['domestic_fuel'] + ['natural_gas'] + ['age_hh_representative'] +
         ['accommodation_size'] + ['consumption_units'] + ['nb_children'] + ['nb_persons'] + ['hh_weight'] +
-        ['hh_id']]
+        ['hh_id'] + ['size_urban_unit']]
 
     return df_hh
 
