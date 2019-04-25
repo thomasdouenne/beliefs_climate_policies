@@ -201,7 +201,17 @@ controled_winner <- lm(update_correct ~ (gagnant_categorie=='Gagnant') + taxe_ap
 controled_feedback_winner <- lm(update_correct ~ (gagnant_feedback_categorie=='Gagnant') + taxe_approbation + gain + Gauche_droite + sexe + as.factor(age) + 
                          diplome + region + revenu + I(revenu^2) + revenu_conjoint + I(revenu_conjoint^2) + statut_emploi + csp + 
                          as.factor(taille_agglo), subset = feedback_infirme_large==T, data=s, weights = s$weight)
-asymmetric_simple <- stargazer(base_winner, controled_winner, base_feedback_winner, controled_feedback_winner,
+
+# Determinants of correct revision
+s$retraites <- s$statut_emploi == 'retraité·e'
+s$actifs <- s$statut_emploi %in% c("autre actif", "CDD", "CDI", "fonctionnaire", "intérimaire ou contrat précaire")
+s$etudiants <- s$statut_emploi == 'étudiant·e'
+variables_update <- c("niveau_vie", "(gagnant_categorie=='Gagnant')", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, variables_politiques, "Gilets_jaunes", "score_ges") # 
+variables_update <- variables_update[!(variables_update %in% c("revenu", "rev_tot", "age", "age_65_plus", "taille_agglo", "statut_emploi"))]
+covariates_update_correct <- lm(as.formula(paste("update_correct ~ ", paste(variables_update, collapse=' + '))), subset = feedback_infirme_large==T, data=s, weights = s$weight)
+summary(covariates_update_correct)
+
+asymmetric_simple <- stargazer(base_winner, controled_winner, base_feedback_winner, controled_feedback_winner, covariates_update_correct,
           title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
           covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Winner, after feedback ($\\dot{G}^F$)"),
           dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, keep = c('Constant', '.*Gagnant.*'), 
