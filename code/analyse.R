@@ -106,6 +106,15 @@ decrit(s$perte_relative_partielle[(s$km <= 1000 & s$gain_fuel<0) | ((s$fioul | s
 decrit((s$gain<0)[s$simule_gain > 90], weights = s$weight[s$simule_gain > 90]) # 50% sur 1100 personnes 
 decrit((s$gain<0)[s$simule_gain >= 110], weights = s$weight[s$simule_gain >= 110]) # 47% sur 700 personnes 
 
+decrit(s$gagnant_categorie, weights = s$weight) # 64/22/14 +1/0/-1
+decrit(s$simule_gagnant, weights = s$weight)
+decrit(n(s$gain) - s$simule_gain, weights = s$weight) # mean -165, median -163
+decrit(s$simule_gain > s$gain, weights = s$weight) # 89%
+decrit(s$simule_gain - s$gain > 50, weights = s$weight) # 81%
+decrit(s$simule_gain_inelastique - s$gain > 0, weights = s$weight) # 76%
+decrit(s$simule_gain_inelastique - s$gain > 50, weights = s$weight) # 65%
+decrit(s$simule_gain_inelastique - n(s$gain), weights = s$weight) # mean 83, median 108
+
 
 ##### Correlates of the bias #####
 # taille_agglo, composition du ménage et sexe corrélés, mais ça reste très idiosyncratique
