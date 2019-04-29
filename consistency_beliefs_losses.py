@@ -58,8 +58,8 @@ save_kde_data = False
 test_imputation_methods = False # The two methods provide quite similar results
 regress = False
 number_winners = True
-effort_rate = False
-prop_constrained = True
+effort_rate = True
+prop_constrained = False
 
 
 """ Compare distributions BdF/BCP """ # pdf and CDF net gains of both samples (step function or Kernel density estimation)
@@ -120,6 +120,7 @@ if number_winners == True:
 """ Effort rate decile """
 if effort_rate == True:
     compute_effort_rate_decile(df_bdf, energy)
+
 
 """ Proportion of households more constrained than average """
 if prop_constrained == True:
