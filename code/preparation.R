@@ -1294,9 +1294,13 @@ convert_s <- function() {
   
   s$hausse_chauffage_interaction_inelastique <<- 152.6786*s$fioul + s$surface * (1.6765*s$gaz + 1.1116*s$fioul)
   s$depense_chauffage <<- ((1*(s$fioul) * (152.6786 + 1.1116*s$surface)) / 0.148079 + 1.6765*s$gaz*s$surface / 0.133456)
-  s$simule_gain_interaction <<- (9.1 + pmin(2, s$nb_adultes) * 110 - s$hausse_carburants - s$hausse_chauffage_interaction_inelastique * (1 - 0.2)) / s$uc # élasticité de 0.2 pour le gaz
+  s$hausse_depenses_interaction <<- s$hausse_carburants + s$hausse_chauffage_interaction_inelastique * (1 - 0.2)
+  s$hausse_depenses_interaction_inelastique <<- s$hausse_carburants/(1 - 0.4) + s$hausse_chauffage_interaction_inelastique
+  s$simule_gain_interaction <<- (9.1 + pmin(2, s$nb_adultes) * 110 - s$hausse_depenses_interaction) / s$uc # élasticité de 0.2 pour le gaz
   s$simule_gagnant_interaction <<- 1*(s$simule_gain_interaction > 0)
-  s$simule_gain_inelastique <<- (pmin(2, s$nb_adultes) * 110 - s$hausse_carburants/(1 - 0.4) - s$hausse_chauffage_interaction_inelastique) / s$uc # élasticité nulle. Inclure + 22.4 rendrait le taux d'erreur uniforme suivant les deux catégories, on ne le fait pas pour être volontairement conservateur
+  s$simule_gain_inelastique <<- (pmin(2, s$nb_adultes) * 110 - s$hausse_depenses_interaction_inelastique) / s$uc # élasticité nulle. Inclure + 22.4 rendrait le taux d'erreur uniforme suivant les deux catégories, on ne le fait pas pour être volontairement conservateur
+  s$simule_gain_cible_interaction <<- (s$versement_cible - s$hausse_depenses_interaction) / s$uc
+  s$simule_gain_cible_interaction_inelastique <<- (s$versement_cible - s$hausse_depenses_interaction_inelastique) / s$uc
   s$simule_gain_elast_perso[s$variante_partielle=='c'] <<- (pmin(2, s$nb_adultes[s$variante_partielle=='c']) * 110 - (s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='c'] * (1 + s$Elasticite_chauffage_perso[s$variante_partielle=='c']) + s$hausse_carburants[s$variante_partielle=='c'])) / s$uc
   s$simule_gain_elast_perso[s$variante_partielle=='f'] <<- (pmin(2, s$nb_adultes[s$variante_partielle=='f']) * 110 - (s$hausse_carburants[s$variante_partielle=='f'] * (1 + s$Elasticite_fuel_perso[s$variante_partielle=='f']) / (1 - 0.4) + s$hausse_chauffage_interaction_inelastique[s$variante_partielle=='f'] * (1 - 0.2))) / s$uc
   label(s$hausse_chauffage_interaction_inelastique) <<- "hausse_chauffage_interaction_inelastique: Hausse des dépenses de chauffage simulées pour le ménage avec des termes d'interaction entre surface et gaz/fioul plutôt que sans, suite à la taxe (élasticité nulle)"
@@ -1305,6 +1309,10 @@ convert_s <- function() {
   label(s$simule_gagnant_interaction) <<- "simule_gagnant_interaction: Indicatrice sur la prédiction que le ménage serait gagnant avec la taxe compensée, d'après nos simulations avec des termes d'interaction surface*fioul/gaz: 1*(simule_gain_interaction > 0)"
   label(s$simule_gain_inelastique) <<- "simule_gain_inelastique: Gain net par UC annuel simulé (avec interaction) avec une élasticité nulle, pour le ménage du répondant suite à une hausse de taxe carbone compensée:  nb_adultes * 110 - hausse_chauffage_interaction_inelastique - hausse_carburants / 0.6"
   label(s$simule_gain_elast_perso) <<- "simule_gain_elast_perso: Gain net par UC annuel simulé (avec interaction) avec l'élasticité renseignée par le répondant, pour le ménage du répondant suite à une hausse de taxe carbone compensée: pmin(2, nb_adultes) * 110 - hausse_partielle_inelastique * (1 - Elasticite_partielle_perso) - hausse_autre_partielle"
+  label(s$hausse_depenses_interaction) <<- "hausse_depenses_interaction: Hausse des dépenses énergétiques simulées pour le ménage avec les termes d'interaction, suite à la taxe (élasticité de 0.4/0.2 pour carburants/chauffage)"
+  label(s$hausse_depenses_interaction_inelastique) <<- "hausse_depenses_interaction_inelastique: Hausse des dépenses énergétiques simulées pour le ménage avec les termes d'interaction, suite à la taxe (élasticité nulle)"
+  label(s$simule_gain_cible_interaction) <<- "simule_gain_cible_interaction: Gain net par UC annuel simulé avec des termes d'interaction surface*fioul/gaz pour le ménage du répondant suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses_interaction) / uc"
+  label(s$simule_gain_cible_interaction_inelastique) <<- "simule_gain_cible_interaction_inelastique: Gain net par UC annuel simulé avec des termes d'interaction surface*fioul/gaz pour le ménage du répondant suite à une hausse de taxe carbone avec compensation ciblée: versement_cible - hausse_depenses_interaction_inelastique) / uc"
   
   s$progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- s$progressivite_feedback_sans_info[!is.na(s$progressivite_feedback_sans_info)]
   s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
