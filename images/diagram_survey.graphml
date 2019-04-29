@@ -19,7 +19,7 @@
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-552.3000000000002" y="-247.7000000000001"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="16.796875" x="22.1015625" xml:space="preserve" y="7.0">CC<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="ellipse"/>
@@ -31,7 +31,7 @@
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-552.3000000000002" y="-206.20000000000022"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="20.458984375" x="20.2705078125" xml:space="preserve" y="7.0">PM<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="ellipse"/>
@@ -43,7 +43,7 @@
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-552.3000000000002" y="-164.70000000000033"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="46.8671875" x="7.06640625" xml:space="preserve" y="7.0">CC &amp; PM<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="ellipse"/>
@@ -55,7 +55,7 @@
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-552.3000000000002" y="-123.20000000000044"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="39.8359375" x="10.58203125" xml:space="preserve" y="7.0">No info<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="ellipse"/>
@@ -67,7 +67,7 @@
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="89.0" x="-432.0000000000002" y="-198.5000000000001"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="5" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">Households characteristics<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="rectangle"/>
@@ -78,11 +78,11 @@
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="30.0" width="61.0" x="-260.7000000000002" y="-219.00000000000023"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="48.25000000000003" width="97.80000000000001" x="-163.25000000000023" y="-204.9750000000003"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="43.509765625" x="8.7451171875" xml:space="preserve" y="7.0">Housing<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-          <y:Shape type="ellipse"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="48.25000000000003" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="10" verticalTextPosition="bottom" visible="true" width="97.80000000000001" x="0.0" xml:space="preserve" y="-2.8421709430404007E-14">Partial reforms: TVA &amp; energy<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="rectangle"/>
         </y:ShapeNode>
       </data>
     </node>
@@ -91,7 +91,7 @@
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-260.7000000000002" y="-172.70000000000033"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="51.61328125" x="4.693359375" xml:space="preserve" y="7.0">Transport<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="ellipse"/>
@@ -102,12 +102,11 @@
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="46.89999999999989" width="89.0" x="-9.000000000000398" y="-204.30000000000024"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="30.0" width="61.0" x="-260.7000000000002" y="-219.00000000000023"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="46.89999999999989" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="10" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">Tax &amp; Dividend
-ex ante<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-          <y:Shape type="rectangle"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="43.509765625" x="8.7451171875" xml:space="preserve" y="7.0">Housing<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="ellipse"/>
         </y:ShapeNode>
       </data>
     </node>
@@ -115,11 +114,12 @@ ex ante<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:Mo
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="-72.60000000000022"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="46.89999999999989" width="89.0" x="-9.000000000000398" y="-204.30000000000024"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="50.341796875" x="19.3291015625" xml:space="preserve" y="11.0">Feedback<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-          <y:Shape type="ellipse"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="46.89999999999989" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="10" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="-2.8421709430404007E-14">Tax &amp; Dividend
+ex ante<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="rectangle"/>
         </y:ShapeNode>
       </data>
     </node>
@@ -127,28 +127,16 @@ ex ante<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:Mo
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="-16.30000000000001"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="61.4999999999996" width="89.0" x="-148.8500000000003" y="-29.35000000000022"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="66.279296875" x="11.3603515625" xml:space="preserve" y="11.0">Progressivity<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-          <y:Shape type="ellipse"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="node_size" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="61.4999999999996" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">
+Tax &amp; Dividend after knowledge<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="rectangle"/>
         </y:ShapeNode>
       </data>
     </node>
     <node id="n10">
-      <data key="d5"/>
-      <data key="d6">
-        <y:ShapeNode>
-          <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="37.39999999999938"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
-          <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="node_width" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="36.296875" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="internal" modelPosition="c" rightInset="0" textColor="#000000" topInset="5" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.8515625">Feedback &amp; 
-Progressivity</y:NodeLabel>
-          <y:Shape type="ellipse"/>
-        </y:ShapeNode>
-      </data>
-    </node>
-    <node id="n11">
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
@@ -167,16 +155,28 @@ Progressivity</y:NodeLabel>
         </y:ShapeNode>
       </data>
     </node>
+    <node id="n11">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="37.39999999999938"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
+          <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="node_width" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="36.296875" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="internal" modelPosition="c" rightInset="0" textColor="#000000" topInset="5" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.8515625">Feedback &amp; 
+Progressivity</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
     <node id="n12">
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="61.4999999999996" width="89.0" x="-148.8500000000003" y="-29.35000000000022"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="-16.30000000000001"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="node_size" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="61.4999999999996" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">
-Tax &amp; Dividend after knowledge<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-          <y:Shape type="rectangle"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="66.279296875" x="11.3603515625" xml:space="preserve" y="11.0">Progressivity<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="ellipse"/>
         </y:ShapeNode>
       </data>
     </node>
@@ -184,11 +184,10 @@ Tax &amp; Dividend after knowledge<y:LabelModel><y:SmartNodeLabelModel distance=
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="38.0" width="97.80000000000001" x="-279.10000000000025" y="-72.60000000000022"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="-72.60000000000022"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="5" verticalTextPosition="bottom" visible="true" width="97.80000000000001" x="0.0" xml:space="preserve" y="0.0">No adult
-targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="50.341796875" x="19.3291015625" xml:space="preserve" y="11.0">Feedback<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="ellipse"/>
         </y:ShapeNode>
       </data>
@@ -197,11 +196,12 @@ targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:M
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="38.0" width="89.0" x="-274.7000000000003" y="-17.60000000000042"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="54.80000000000001" width="89.0" x="-432.0000000000002" y="-33.10000000000002"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="5" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">One adult targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-          <y:Shape type="ellipse"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="node_size" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="54.80000000000001" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">
+Tax &amp; Targeted Dividend<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="rectangle"/>
         </y:ShapeNode>
       </data>
     </node>
@@ -210,7 +210,7 @@ targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:M
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="89.0" x="-274.7000000000003" y="37.39999999999938"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="5" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">Two adults targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="ellipse"/>
@@ -221,12 +221,11 @@ targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:M
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="54.80000000000001" width="89.0" x="-432.0000000000002" y="-33.10000000000002"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="38.0" width="89.0" x="-274.7000000000003" y="-17.60000000000042"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="node_size" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="54.80000000000001" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">
-Tax &amp; Targeted Dividend<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-          <y:Shape type="rectangle"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="5" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">One adult targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="ellipse"/>
         </y:ShapeNode>
       </data>
     </node>
@@ -234,12 +233,12 @@ Tax &amp; Targeted Dividend<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/>
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="47.099999999999596" width="89.0" x="-557.1000000000001" y="-29.249999999999815"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="38.0" width="97.80000000000001" x="-279.10000000000025" y="-72.60000000000022"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="node_size" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="47.099999999999596" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">
-Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-          <y:Shape type="rectangle"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="5" verticalTextPosition="bottom" visible="true" width="97.80000000000001" x="0.0" xml:space="preserve" y="0.0">No adult
+targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:Shape type="ellipse"/>
         </y:ShapeNode>
       </data>
     </node>
@@ -247,10 +246,11 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="48.25000000000003" width="97.80000000000001" x="-163.25000000000023" y="-204.9750000000003"/>
-          <y:Fill color="#99CCFF60" transparent="false"/>
+          <y:Geometry height="47.099999999999596" width="89.0" x="-552.3000000000002" y="-29.249999999999815"/>
+          <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="48.25000000000003" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="10" verticalTextPosition="bottom" visible="true" width="97.80000000000001" x="0.0" xml:space="preserve" y="-2.8421709430404007E-14">Partial reforms: TVA &amp; energy<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="node_size" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="47.099999999999596" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="0.0">
+Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="rectangle"/>
         </y:ShapeNode>
       </data>
@@ -299,11 +299,11 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e4" source="n4" target="n5">
+    <edge id="e4" source="n4" target="n7">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="0.0" tx="-29.799999999999784" ty="0.0"/>
+          <y:Path sx="44.5" sy="0.0" tx="-29.799999999999784" ty="0.0"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
           <y:BendStyle smoothed="false"/>
@@ -314,14 +314,14 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:Path sx="44.5" sy="0.0" tx="0.0" ty="0.0"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e6" source="n7" target="n8">
+    <edge id="e6" source="n8" target="n13">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -335,7 +335,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e7" source="n7" target="n9">
+    <edge id="e7" source="n8" target="n12">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -350,7 +350,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e8" source="n7" target="n10">
+    <edge id="e8" source="n8" target="n11">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -365,7 +365,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e9" source="n8" target="n12">
+    <edge id="e9" source="n13" target="n9">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -376,7 +376,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e10" source="n9" target="n12">
+    <edge id="e10" source="n12" target="n9">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -387,7 +387,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e11" source="n10" target="n12">
+    <edge id="e11" source="n11" target="n9">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -398,7 +398,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e12" source="n12" target="n13">
+    <edge id="e12" source="n9" target="n17">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -409,7 +409,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e13" source="n12" target="n14">
+    <edge id="e13" source="n9" target="n16">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -420,7 +420,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e14" source="n12" target="n15">
+    <edge id="e14" source="n9" target="n15">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -431,7 +431,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e15" source="n15" target="n16">
+    <edge id="e15" source="n15" target="n14">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -442,7 +442,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e16" source="n14" target="n16">
+    <edge id="e16" source="n16" target="n14">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -453,7 +453,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e17" source="n13" target="n16">
+    <edge id="e17" source="n17" target="n14">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -464,7 +464,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e18" source="n18" target="n7">
+    <edge id="e18" source="n5" target="n8">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -475,7 +475,7 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e19" source="n5" target="n18">
+    <edge id="e19" source="n7" target="n5">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
@@ -486,21 +486,18 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e20" source="n16" target="n17">
+    <edge id="e20" source="n14" target="n18">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
-            <y:Point x="-467.68" y="-5.700000000000017"/>
-            <y:Point x="-467.68" y="-5.700000000000017"/>
-          </y:Path>
+          <y:Path sx="0.0" sy="0.0" tx="40.120000000000175" ty="0.0"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e21" source="n6" target="n18">
+    <edge id="e21" source="n6" target="n5">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
