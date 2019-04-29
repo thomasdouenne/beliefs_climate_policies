@@ -102,6 +102,12 @@ par(mar = mar_old, cex = cex_old)
 # Heterogeneity in bias
 reg_bias <- lm((simule_gain - gain > 50) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes, data=s, weights=s$weight)
 summary(reg_bias) # R^2: 0.03 (la moitié due aux gilets jaunes)
+formula_bias <- (simule_gain - gain > 50) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes
+logit_bias <- glm(formula_bias, family = binomial(link='logit'), data=s)
+summary(logit_bias)
+logit_bias_margins <- logitmfx(formula_bias, s, atmean=FALSE)$mfxest
+logit_bias_margins # TODO: add logit in Table
+
 Table_heterogenous_bias <- stargazer(reg_bias, #
      title="Determinants of bias in subjective gains", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
      covariate.labels = c("Constant", "Sex: Female", "Diploma: Bachelor or above", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"), 
@@ -239,7 +245,7 @@ tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + R
 summary(tsls2_si1)
 
 # Alternative specifications for robustness checks
-# (2) With many controls 
+# (2) With many controls
 variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain_cible", "taxe_efficace", variables_demo, variables_politiques) # 
 variables_reg_self_interest <- variables_reg_self_interest[!(variables_reg_self_interest %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
@@ -247,7 +253,7 @@ formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ trai
 tsls1_si2 <- lm(formula_tsls1_si2, data=s, weights = s$weight)
 summary(tsls1_si2)
 s$non_perdant <- tsls1_si2$fitted.values
-# 52 p.p.*** 
+# 52 p.p.***
 formula_tsls2_si2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + tax_acceptance + I(taxe_approbation=='NSP') + ", 
                                       paste(variables_reg_self_interest, collapse = ' + '))) # 
 tsls2_si2 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
