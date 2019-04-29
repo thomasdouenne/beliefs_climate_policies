@@ -214,15 +214,19 @@ s$actifs <- s$statut_emploi %in% c("autre actif", "CDD", "CDI", "fonctionnaire",
 s$etudiants <- s$statut_emploi == 'étudiant·e'
 variables_update <- c("niveau_vie", "(gagnant_categorie=='Gagnant')", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, variables_politiques, "Gilets_jaunes", "score_ges") # 
 variables_update <- variables_update[!(variables_update %in% c("revenu", "rev_tot", "age", "age_65_plus", "taille_agglo", "statut_emploi"))]
-covariates_update_correct <- lm(as.formula(paste("update_correct ~ ", paste(variables_update, collapse=' + '))), subset = feedback_infirme_large==T, data=s, weights = s$weight)
+formula_update <- as.formula(paste("update_correct ~ ", paste(variables_update, collapse=' + ')))
+covariates_update_correct <- lm(formula_update, subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(covariates_update_correct)
 
 asymmetric_simple <- stargazer(base_winner, controled_winner, base_feedback_winner, controled_feedback_winner, covariates_update_correct,
           title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-          covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Winner, after feedback ($\\dot{G}^F$)"),
-          dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, keep = c('Constant', '.*Gagnant.*'), 
-          add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark"), 
-                             c("Includes controls", "", "\\checkmark", "", "checkmark", "")),
+          covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Winner, after feedback ($\\dot{G}^F$)",
+                               "Retired", "Active", "Student", "Yellow vests: PNR", "Yellow vests: understands", "Yellow vests: supports", "Yellow vests: is part"),
+          dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, 
+          keep = c('Constant', '.*Gagnant.*', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
+          order = c('Constant', '.*Gagnant.*', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
+          add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark"), 
+                             c("Includes controls", "", "\\checkmark", "", "\\checkmark", "\\checkmark")),
           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple, fixed=TRUE), fixed=TRUE), collapse=' ')
 
