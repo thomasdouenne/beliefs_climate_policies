@@ -1352,7 +1352,7 @@ convert_s <- function() {
   s$duree_info[s$info_CC==1 & s$info_PM==1] <<- s$duree_info_CC_PM[s$info_CC==1 & s$info_PM==1]
   s$duree_info[s$info_CC==0 & s$info_PM==1] <<- s$duree_info_PM[s$info_CC==0 & s$info_PM==1]
   s$duree_info[s$info_CC==1 & s$info_PM==0] <<- s$duree_info_CC[s$info_CC==1 & s$info_PM==0]
-  s$duree_info[s$info_CC==0 & s$info_PM==0] <<- s$duree_no_info[s$info_CC==0 & s$info_PM==0]
+  s$duree_info[s$info_CC==0 & s$info_PM==0] <<- s$duree_no_info[s$info_CC==0 & s$info_PM==0] # TODO: type character info_PM/CC
   label(s$duree_info) <<- "duree_info: Temps de soumission - Ancrage (information procurée ou non au début sur changement climatique ou particules fines) (duree_info_CC/PM/CC_PM/no_info)"
   
   for (v in c("autonomie", "priorite", "etats", "global", "trop")) {

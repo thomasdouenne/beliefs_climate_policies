@@ -1893,6 +1893,12 @@ summary(logit_all6)
 logit_all6_margins <- logitmfx(data=s, formula=logit_all6, atmean=FALSE)$mfxest 
 logit_all6_margins
 
+# (6bis) OLS Acceptance with all controls
+formula_ols_all6 <- as.formula(paste("tax_acceptance ~ non_perdant + taxe_efficace_not_no + progressif_not_no + non_perdant * taxe_efficace_not_no * progressif_not_no +",
+                                     paste(c(variables_reg_all, variables_energie, variables_politiques, variables_gilets_jaunes), collapse = ' + '))) 
+ols_all6 <- lm(formula_ols_all6, data=s, weights = s$weight)
+summary(ols_all6)
+
 # Results
 TableXIII <- stargazer(ols_all1, ols_all2, logit_all3, ols_all4, ols_all5, logit_all6,
                     title="Effects of three motives on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
@@ -2012,3 +2018,26 @@ par(mar=mar_old)
 # lines(s$revenu[s$revenu >= 1140 & s$revenu < 1430 & s$traite_cible!=T][order(rdd_30_nT$fitted.values)], sort(rdd_30_nT$fitted.values), type='l', col = 'blue', lwd=2, lty=2)
 # lines(s$revenu[s$revenu >= 1430 & s$revenu < 1670 & s$traite_cible!=T][order(rdd_40_nT$fitted.values)], sort(rdd_40_nT$fitted.values), type='l', col = 'blue', lwd=2, lty=2)
 # lines(s$revenu[s$revenu >= 1670 & s$revenu < 2220 & s$traite_cible!=T][order(rdd_50_nT$fitted.values)], sort(rdd_50_nT$fitted.values), type='l', col = 'blue', lwd=2, lty=2)
+
+###### Effets des infos environnement #####
+# rien sur le CC
+summary(lm((cause_CC=='anthropique') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(n(effets_CC) ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(n(effets_CC)>1 ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)) # seul spécification significative pour effets_CC
+summary(lm(generation_CC_min > 1990 ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(generation_CC_max > 1990 ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(changer_essaie==T ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(n(parle_CC) ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(responsable_CC_chacun==T ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(enfant_CC!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(emission_cible ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+summary(lm(region_CC=='Autant dans les deux' ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
+# quelques interactions entre le fait d'être convaincu et des socio-démos
+summary(lm(taxe_efficace!='Non' ~ apres_modifs * Gilets_jaunes + info_CC * Gilets_jaunes + info_PM * Gilets_jaunes, data=s, weights = s$weight)) # soutiens moins sensibles à PM
+summary(lm(taxe_efficace!='Non' ~ apres_modifs * sexe + info_CC * sexe + info_PM * sexe, data=s, weights = s$weight)) # femme plus sensibles à apres_modifs
+summary(lm(taxe_efficace!='Non' ~ apres_modifs * statut_emploi + info_CC * statut_emploi + info_PM * statut_emploi, data=s, weights = s$weight)) # étudiants + sensibles à apres_modifs, fonctionnaires + à PM
+summary(lm(taxe_efficace!='Non' ~ apres_modifs * diplome4 + info_CC * diplome4 + info_PM * diplome4, data=s, weights = s$weight)) # diplômés plus sensibles à apres_modifs
+summary(lm(taxe_efficace!='Non' ~ apres_modifs * (Diplome>4) + info_CC * (Diplome>4) + info_PM * (Diplome>4), data=s, weights = s$weight))  # licenciés plus sensibles à apres_modifs
+summary(lm(taxe_efficace!='Non' ~ apres_modifs * Gauche_droite + info_CC * Gauche_droite + info_PM * Gauche_droite, data=s, weights = s$weight)) # extrême-droite et indéterminés moins sensibles à apres_modifs
+
+summary(lm(taxe_efficace!='Non' ~ apres_modifs * (Diplome>4) + apres_modifs * sexe, data=s, weights = s$weight))
