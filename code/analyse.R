@@ -371,6 +371,11 @@ cor(s$Elasticite_chauffage[!is.na(s$Elasticite_chauffage)], s$Elasticite_chauffa
 # TODO: weight by their conso to see if it's consistent, exploit perte_relative for this issue
 wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel, weights=s$weight, na.rm = T) # 71%
 wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage, weights=s$weight, na.rm = T) # 80%
+# Actually it's more 45% and 53% because categories were not directly comparable
+s$Elasticite_fuel_max <- s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05))
+s$Elasticite_chauffage_max <- s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05))
+wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel_max, weights=s$weight, na.rm = T) # 45%
+wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage_max, weights=s$weight, na.rm = T) # 53%
 
 summary(lm(Elasticite_fuel_perso ~ (taille_agglo == 'rural') + (taille_agglo == '-20k') + (taille_agglo == '20-100k') + (taille_agglo == '+100k'), data=s, subset=variante_partielle=='f', weights = s$weight))
 summary(lm(Elasticite_fuel_perso ~ Revenu, data=s, subset=variante_partielle=='f', weights = s$weight))

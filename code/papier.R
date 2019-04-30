@@ -141,6 +141,19 @@ wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel, weights=s$weight, na.rm = 
 wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage, weights=s$weight, na.rm = T) # 80%
 # Objective proportion of HH with higher expenditure increase in transport: 59% / housing: 67%. cf. consistency_belief_losses.py 
 # Objective proportion of winners in the totally inelastic case: 53%. cf. consistency_belief_losses.py (after replacing elasticities to 0 in gain_losses_data.py)
+wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 45%
+wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 53%
+wtd.mean(s$Elasticite_fuel_perso >= s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 78%
+wtd.mean(s$Elasticite_chauffage_perso >= s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 82%
+wtd.mean(s$Elasticite_fuel_perso == s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 33%
+wtd.mean(s$Elasticite_chauffage_perso == s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 29%
+wtd.mean(s$Elasticite_fuel_perso == -0.17 & s$Elasticite_fuel == -0.05, weights = s$weight) # 3%
+wtd.mean(s$Elasticite_chauffage_perso == -0.17 & s$Elasticite_chauffage == -0.05, weights = s$weight) # 2%
+decrit(s$elasticite_chauffage_perso, weights = s$weight) # 24% contraints
+decrit(s$elasticite_fuel_perso, weights = s$weight) # 34% contraints
+# more feel more constrained than average among users, i.e. those who do not consume think more that others do not consume
+wtd.mean((s$Elasticite_fuel_perso - s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)))[!grepl("déjà", s$elasticite_fuel_perso)] > 0, weights=s$weight[!grepl("déjà", s$elasticite_fuel_perso)], na.rm = T) # 64%
+wtd.mean((s$Elasticite_chauffage_perso - s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)))[!grepl("déjà", s$elasticite_chauffage_perso)] > 0, weights=s$weight[!grepl("déjà", s$elasticite_chauffage_perso)], na.rm = T) # 68%
 
 
 ## 3.3 Perception on other tax’ properties
@@ -200,7 +213,8 @@ mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, ce
 par(mar = mar_old, cex = cex_old)
 
 ## Use binomial law to compute confidence intervals around share of respondents
-library("Hmisc")
+decrit(s$gagnant_categorie, weights= s$weight)
+decrit(s$simule_gagnant, weights= s$weight)
 # Simulés gagnants :
 x = sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==1 & s$gagnant_categorie == 'Gagnant' & s$gagnant_feedback_categorie == 'Gagnant',]$weight)
 n = sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==1 & s$gagnant_categorie == 'Gagnant',]$weight)
