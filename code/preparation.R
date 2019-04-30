@@ -1540,7 +1540,7 @@ write.csv2(s, "survey_prepared.csv", row.names=FALSE)
 
 fit_housing <- read.csv("../model_reforms_data/prediction housing expenditures.csv")
 
-# Preparation for Figures 1 and 2: importation of distribution calculated (for objective) or smoothed (for subjective) in python
+# Preparation for Figures 1 and 2: importation of distribution calculated (for objective) or smoothed (for subjective) in standardize_data_bdf_ptc.py
 objective_gains <- read.csv2("df_objective_gains.csv") 
 subjective_gains <- read.csv2("df_subjective_gains.csv")
 objective_gains_inelastic <- read.csv2("df_objective_gains_inelastic.csv")
