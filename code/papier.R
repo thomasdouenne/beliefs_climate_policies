@@ -28,13 +28,13 @@ summary(lm(gain ~ duree, data=s, weights = s$weight))
 wtd.mean(sa$test_qualite!='Un peu', weights = sa$weight) # 9% in original sample
 wtd.mean(s$test_qualite!='Un peu', weights = s$weight) # 0 in final sample
 # Bad quality
-sum(s$taille_menage > 12) # 10
+sum(s$taille_menage > 12) # 10 before we capped it
 sum(s$mauvaise_qualite > 0) # 273 mauvaise_qualite: Dummy for an aberrant answer to: revenu, taille_menage, nb_14_et_plus, km, conso, surface or generation_CC
 # mauvaise_qualite uncorrelated with preferences
 summary(lm(taxe_approbation!='Non' ~ mauvaise_qualite, data=s, weights = s$weight))
 summary(lm(gagnant_categorie!='Perdant' ~ mauvaise_qualite, data=s, weights = s$weight))
 summary(lm(gain ~ mauvaise_qualite, data=s, weights = s$weight))
-s$taille_menage[s$taille_menage > 12] # most look like zipcode
+s$taille_menage[s$taille_menage > 12] # most look like zipcode, but we capped it since
 
 ## 2.2  French households surveys
 # cf. python files
@@ -50,11 +50,21 @@ decrit(s$gain, weights = s$weight) # -89 instead of +24
 # Objective winning category: cf. consistency_belief_losses.py for weighted results
 decrit(objective_gains$transport > 0)
 decrit(objective_gains$housing > 0)
-decrit(objective_gains$all > 0)
+decrit(objective_gains$all > 0, weights = objective_gains$weight)
 # Subjective winning category
 decrit(s$gagnant_categorie, weights = s$weight) # 14.0% think they win (21.7% unaffected)
 decrit(s$gagnant_fuel_categorie, weights = s$weight) # 15.5% think they win (21.8% unaffected)
 decrit(s$gagnant_chauffage_categorie, weights = s$weight) # 17.0% think they win (30.0% unaffected)
+
+# TODO: check ça ordi adrien, mettre dans papier
+decrit(s$gagnant_categorie, weights = s$weight) # 64/22/14 +1/0/-1
+decrit(s$simule_gagnant, weights = s$weight)
+decrit(n(s$gain) - s$simule_gain, weights = s$weight) # mean -126, median -116
+decrit(s$simule_gain > s$gain, weights = s$weight) # 89%
+decrit(s$simule_gain - s$gain > 50, weights = s$weight) # 75%
+decrit(s$simule_gain_inelastique - s$gain > 0, weights = s$weight) # 77%
+decrit(s$simule_gain_inelastique - s$gain > 50, weights = s$weight) # 61%
+decrit(s$simule_gain_inelastique - n(s$gain), weights = s$weight) # mean 75, median 80
 
 # Figure 1: PDF of subjective vs. objective gain
 mar_old <- par()$mar
@@ -102,18 +112,19 @@ par(mar = mar_old, cex = cex_old)
 # Heterogeneity in bias
 reg_bias <- lm((simule_gain - gain > 50) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes, data=s, weights=s$weight)
 summary(reg_bias) # R^2: 0.03 (la moitié due aux gilets jaunes)
-formula_bias <- (simule_gain - gain > 50) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes
-logit_bias <- glm(formula_bias, family = binomial(link='logit'), data=s)
+logit_bias <- glm((simule_gain - gain > 50) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes, family = binomial(link='logit'), data=s)
 summary(logit_bias)
 logit_bias_margins <- logitmfx(formula_bias, s, atmean=FALSE)$mfxest
 logit_bias_margins # TODO: add logit in Table
 
-Table_heterogenous_bias <- stargazer(reg_bias, #
-     title="Determinants of bias in subjective gains", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
-     covariate.labels = c("Constant", "Sex: Female", "Diploma: Bachelor or above", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"), 
+Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, #
+     title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
+     covariate.labels = c("Constant", "Sex: Female", "Diploma: Bachelor or above", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"),
      dep.var.labels = c("Estimated bias per C.U. ($\\widehat{\\gamma}-g$) > 50"), dep.var.caption = "", header = FALSE,
      omit = c("Gauche_droite", "taille_agglo", "revenu"),
-     add.lines = list(c("Controls: Size of town, political leaning, income", "\\checkmark  ")),
+     coef = list(NULL, logit_bias_margins[,1]), 
+     se = list(NULL, logit_bias_margins[,2]),
+     add.lines = list(c("Controls: Size of town, political leaning, income", "\\checkmark", "\\checkmark")),
      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
 
@@ -122,7 +133,7 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 ## 3.2 Robustness to assumptions on elasticities
 # Households perceived elasticities
 decrit(s$Elasticite_fuel, weights = s$weight) # -0.43 mean perceived gasoline elasticity of French people
-decrit(s$Elasticite_fuel_perso, weights = s$weight * s$depense_carburants) # -0.41 perceived own gasoline elasticity (weighted by share in aggregate spending: only 'mean' is meaningful)
+decrit(s$Elasticite_fuel_perso, weights = s$weight * s$depense_carburants) # -0.36 perceived own gasoline elasticity (weighted by share in aggregate spending: only 'mean' is meaningful)
 decrit(s$Elasticite_chauffage, weights = s$weight) # -0.41 mean perceived housing elasticity of French people
 decrit(s$Elasticite_chauffage_perso, weights = s$weight * s$depense_chauffage) # -0.33 perceived own housing elasticity (weighted by share in aggregate spending: only 'mean' is meaningful)
 # 71% (resp. 80%) think they are strictly more contrained than average for fuel (resp. housing)
