@@ -1120,7 +1120,7 @@ convert_s <- function() {
   label(s$gain_partielle) <<- "gain_partielle: Catégorie de gain-perte de pouvoir d'achat par UC, suite à hausse taxe partielle (chauffage ou fuel) compensée, dans [-6;5] (seuils: -160/-110/-70/-40/-15/0/10/20/30/40) (gain_fuel/chauffage)"
 
   s$Elasticite_chauffage <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_chauffage))))
-  s$Elasticite_chauffage <<- (s$Elasticite_chauffage==0)*1.5 + (s$Elasticite_chauffage==3)*6.5 + (s$Elasticite_chauffage>3)*(s$Elasticite_chauffage + 5) # Take the average of thresholds, take 40% for >30%
+  s$Elasticite_chauffage <<- (s$Elasticite_chauffage==0)*1.5 + (s$Elasticite_chauffage==3)*6.5 + (s$Elasticite_chauffage>3)*(s$Elasticite_chauffage + 5) + 5*(s$Elasticite_chauffage==30) # Take the average of thresholds, take 40% for >30%
   s$Elasticite_chauffage <<- - round(s$Elasticite_chauffage / 30, 2) # converts into elasticity
   label(s$Elasticite_chauffage) <<- "Elasticite_chauffage: Élasticité-prix des dépenses de chauffage des Français, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 30%)"
 
@@ -1130,7 +1130,7 @@ convert_s <- function() {
   label(s$Elasticite_chauffage_perso) <<- "Elasticite_chauffage_perso: Élasticité-prix des dépenses de chauffage du ménage, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 30%)"
 
   s$Elasticite_fuel <<- as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$elasticite_fuel))))
-  s$Elasticite_fuel <<- (s$Elasticite_fuel==0)*1.5 + (s$Elasticite_fuel==3)*6.5 + (s$Elasticite_fuel>3)*(s$Elasticite_fuel + 5) # Take the average of thresholds, take 40% for >30%
+  s$Elasticite_fuel <<- (s$Elasticite_fuel==0)*1.5 + (s$Elasticite_fuel==3)*6.5 + (s$Elasticite_fuel>3)*(s$Elasticite_fuel + 5) + 5*(s$Elasticite_fuel==30) # Take the average of thresholds, take 40% for >30%
   s$Elasticite_fuel <<- - round(s$Elasticite_fuel / 30, 2) # converts into elasticity
   label(s$Elasticite_fuel) <<- "Elasticite_fuel: Élasticité-prix des dépenses de carburants des Français, calculée en prenant la valeur moyenne des intervalles proposées (seuils à 0/3/10/20/30% pour une hausse de 0.5€/L)"
 
