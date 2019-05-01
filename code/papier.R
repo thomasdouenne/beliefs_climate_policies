@@ -56,7 +56,6 @@ decrit(s$gagnant_categorie, weights = s$weight) # 14.0% think they win (21.7% un
 decrit(s$gagnant_fuel_categorie, weights = s$weight) # 15.5% think they win (21.8% unaffected)
 decrit(s$gagnant_chauffage_categorie, weights = s$weight) # 17.0% think they win (30.0% unaffected)
 
-# TODO: check ça ordi adrien, mettre dans papier
 decrit(s$gagnant_categorie, weights = s$weight) # 64/22/14 +1/0/-1
 decrit(s$simule_gagnant, weights = s$weight)
 decrit(n(s$gain) - s$simule_gain, weights = s$weight) # mean -126, median -116
