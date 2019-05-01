@@ -1849,6 +1849,29 @@ table_prog_non <- stargazer(ols_prog2, probit_prog2, ols_prog0, nols_prog2, pols
       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog_non")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', table_prog_non, fixed=TRUE), fixed=TRUE), collapse=' ')
 
+# (4) OLS simple: progressivite is yes
+ols_prog4 <- lm(tax_acceptance ~ (progressivite == 'Oui'), weights=s$weight, data=s)
+summary(ols_prog4)
+
+# (5) OLS simples: approve
+ols_prog5 <- lm(tax_approval ~ progressif, weights=s$weight, data=s)
+summary(ols_prog5)
+
+# (4) OLS with controls: progressivite is yes
+formula_ols_prog4 <- as.formula(paste("tax_acceptance ~ (progressivite == 'Oui') + ", paste(variables_reg_prog, collapse=' + ')))
+ols_prog4 <- lm(formula_ols_prog4, weights=s$weight, data=s)
+summary(ols_prog4)
+
+# (5) OLS with controls: approve
+formula_ols_prog5 <- as.formula(paste("tax_approval ~ progressif + ", paste(variables_reg_prog, collapse=' + ')))
+ols_prog5 <- lm(formula_ols_prog5, weights=s$weight, data=s)
+summary(ols_prog5)
+
+# (6) OLS with controls: progressivite is yes / approve
+formula_ols_prog6 <- as.formula(paste("tax_approval ~ (progressivite == 'Oui') + ", paste(variables_reg_prog, collapse=' + ')))
+ols_prog6 <- lm(formula_ols_prog6, weights=s$weight, data=s)
+summary(ols_prog6)
+
 
 ##### 5.4 All effects #####
 variables_reg_all <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo)
@@ -1912,6 +1935,66 @@ TableXIII <- stargazer(ols_all1, ols_all2, logit_all3, ols_all4, ols_all5, logit
                     add.lines = list(c("Controls: Incomes, socio-demographics", "\\checkmark ", "", "\\checkmark  ", "\\checkmark", "", "\\checkmark")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:all_effects")
 write_clip(gsub("logistic", "logit", gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXIII, fixed=TRUE), fixed=TRUE)), collapse=' ')
+variables_reg_all <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo)
+variables_reg_all <- variables_reg_all[!(variables_reg_all %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
+# With all exogenous variables, we obtain the same result
+# variables_reg_all <- c("Revenu2", "Revenu_conjoint2", "Simule_gain2", variables_exogenes[!(variables_exogenes %in% c("age_50_64", "age_65_plus", "Transports_travail_commun", "Transports_travail_actif", "gaz", "fioul", "hausse_chauffage", 
+#       "hausse_depenses", "Simule_gain", "simule_gain", "elasticite_partielle", "elasticite_partielle_perso", "score_ges", "score_climate_call", "enfant_CC_pour_lui", "enfant_CC_pour_CC"))])
+
+s$gagnant <- s$gagnant_categorie=='Gagnant'
+s$gagnant_NSP <- s$gagnant_categorie=='Non affecté'
+s$non_perdant <- s$gagnant_categorie!='Perdant'
+s$taxe_efficace_oui <- s$taxe_efficace=='Oui'
+s$taxe_efficace_NSP <- s$taxe_efficace=='NSP'
+s$taxe_efficace_not_no <- s$taxe_efficace!='Non'
+s$progressif <- s$progressivite=='Oui'
+s$progressif_NSP <- s$progressivite=='NSP'
+s$progressif_not_no <- s$progressivite!='Non'
+formula_all_acc_wo_PNR <- as.formula(paste("tax_acceptance ~ non_perdant + taxe_efficace_not_no + progressif_not_no + non_perdant * taxe_efficace_not_no * progressif_not_no +", paste(variables_reg_all, collapse = ' + '))) 
+formula_all_acc_wo_interaction <- as.formula(paste("tax_acceptance ~ non_perdant + taxe_efficace_not_no + progressif_not_no + gagnant_NSP + taxe_efficace_NSP + progressif_NSP +",paste(variables_reg_all, collapse = ' + '))) 
+formula_all_acc <- as.formula(paste("tax_acceptance ~ non_perdant + taxe_efficace_not_no + progressif_not_no + gagnant_NSP + taxe_efficace_NSP + progressif_NSP + non_perdant * taxe_efficace_not_no * progressif_not_no +",paste(variables_reg_all, collapse = ' + '))) 
+formula_all_app <- as.formula(paste("tax_approval ~ non_perdant + taxe_efficace_not_no + progressif_not_no + gagnant_NSP + taxe_efficace_NSP + progressif_NSP + non_perdant * taxe_efficace_not_no * progressif_not_no +", paste(variables_reg_all, collapse = ' + '))) 
+
+# (1) OLS Acceptance with controls and without PNR
+ols_all1 <- lm(formula_all_acc_wo_PNR, data=s, weights = s$weight)
+summary(ols_all1)
+
+# (2) OLS Acceptance with controls
+ols_all2 <- lm(formula_all_acc, data=s, weights = s$weight)
+summary(ols_all2)
+
+# (3) OLS Acceptance without controls
+ols_all3 <- lm(tax_acceptance ~ non_perdant + taxe_efficace_not_no + progressif_not_no + gagnant_NSP + taxe_efficace_NSP + progressif_NSP + non_perdant * taxe_efficace_not_no * progressif_not_no, data=s, weights = s$weight)
+summary(ols_all3)
+
+# (4) Logit Acceptance with controls
+logit_all4 <- glm(formula_all_acc, family = binomial(link='logit'), data=s[s$region!='autre',])
+summary(logit_all4)
+logit_all4_margins <- logitmfx(data=s, formula=logit_all4, atmean=FALSE)$mfxest
+logit_all4_margins
+
+# (5) OLS Approval with controls
+ols_all5 <- lm(formula_all_app, data=s, weights = s$weight)
+summary(ols_all5)
+
+# (6) OLS Approval without interaction
+ols_all6 <- lm(formula_all_acc_wo_interaction, data=s, weights = s$weight)
+summary(ols_all6)
+
+# Results
+all_effects <- stargazer(ols_all1, ols_all2, ols_all3, logit_all4, ols_all5,
+                         title="Effects of three motives on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                         covariate.labels = c("Constant", "Believes does not lose ($G>0$)", "Environmental effectiveness: `Not no' ($EE>0$)", "Progressivity: `Not no' ($P>0$)",
+                                              "Believes unaffected ($\\dot{G}=0$)", "Environmental effectiveness: `PNR' ($\\dot{EE}=0$)", "Progressivity: `PNR' ($\\dot{P}=0$)",
+                                              "$(G>0) \\times (EE>0)$", "$(G>0) \\times (P>0)$", "$(EE>0) \\times (P>0)$", "$(G>0) \\times (EE>0) \\times (P>0)$"),
+                         dep.var.labels = c("Acceptance", "Approval"), 
+                         dep.var.caption = c("Tax and dividend"), header = FALSE,
+                         keep = c("Constant", "gagnant", "efficace", "progressif", "perdant"),
+                         coef = list(NULL, NULL, NULL, logit_all4_margins[,1], NULL), 
+                         se = list(NULL, NULL, NULL, logit_all4_margins[,2], NULL),
+                         add.lines = list(c("Controls: Incomes, socio-demographics", "\\checkmark ", "\\checkmark  ", "", "\\checkmark  ", "\\checkmark")),
+                         no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:all_effects")
+write_clip(gsub("logistic", "logit", gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', all_effects, fixed=TRUE), fixed=TRUE)), collapse=' ')
 
 
 ##### Graphiques RDD #####
