@@ -346,6 +346,14 @@ s$non_perdant <- tsls1_si1$fitted.values
 tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2, data=s, weights = s$weight)
 summary(tsls2_si1)
 
+# tsls1_si1bis <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
+#                   I(traite_cible*traite_cible_conjoint) + categorie_cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2), data=s, weights = s$weight)
+# summary(tsls1_si1bis)
+# s$non_perdant <- tsls1_si1$fitted.values
+# # 50 p.p.***
+# tsls2_si1bis <- lm(taxe_cible_approbation!='Non' ~ non_perdant + categorie_cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2, data=s, weights = s$weight)
+# summary(tsls2_si1bis)
+
 # Alternative specifications for robustness checks
 # (2) With many controls 
 variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "I(hausse_depenses_interaction/uc)", "taxe_efficace", variables_demo, variables_politiques) # 
@@ -380,7 +388,7 @@ tsls1_si5 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_
 summary(tsls1_si5)
 s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si5$fitted.values
 # 43 p.p. ***
-tsls2_si5 <- lm(taxe_feedback_approbation!='Non' ~ non_perdant+ Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+tsls2_si5 <- lm(taxe_feedback_approbation!='Non' ~ non_perdant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(tsls2_si5)
 
 # (6) IV Feedback
@@ -397,35 +405,35 @@ summary(tsls2_si6)
 
 
 # Results - TODO: include 6th specification
-TableV <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, # tsls2_si4: Unrecognized object type
+TableV <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_si6, # tsls2_si4: Unrecognized object type
                     title="Effect of self-interest on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                     covariate.labels = c("Believes does not lose", "Initial tax Acceptance ($A^I$)", "",  "Environmentally effective: `Yes'"),
                     dep.var.labels = c("Targeted Acceptance ($A^T$)", "Feedback Acceptance ($A^F$)"), dep.var.caption = "", header = FALSE,
                     keep = c("non_perdant", "tax_acceptance"),
-                    coef = list(NULL, NULL, NULL, logit_si4_margins[,1], NULL), 
-                    se = list(NULL, NULL, NULL, logit_si4_margins[,2], NULL),
+                    coef = list(NULL, NULL, NULL, logit_si4_margins[,1], NULL, NULL), 
+                    se = list(NULL, NULL, NULL, logit_si4_margins[,2], NULL, NULL),
                     add.lines = list(
                       # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
-                      c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark"),
-                      c("Controls: Estimated gain ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark"),
-                      c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", ""),
-                      c("Controls: Socio-demo, politics, effective ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark  ")),
+                      c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "", "\\checkmark"),
+                      c("Controls: Estimated gain ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark", "\\checkmark"),
+                      c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", ""),
+                      c("Controls: Socio-demo, politics, effective ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", "\\checkmark  ")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
-write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS}", "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\textit{IV}", 
+write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\multicolumn{2}{c}{\\textit{OLS}}", "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\multicolumn{2}{c}{\\textit{IV}}", 
                gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. }\\end{table}', 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableV, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
 
-TableXI <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5,
+TableXI <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                     title="First stage regressions results for self-interest", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                     covariate.labels = c("Constant", "Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
-                                         "$T_1 \\times T_2$", "Simulated winner ($\\widehat{\\Gamma}$)",
-                                         "Initial tax Acceptance ($A^I$)"),
+                                         "$T_1 \\times T_2$",
+                                         "Initial tax Acceptance ($A^I$)", "Simulated winner ($\\widehat{\\Gamma}$)"),
                     dep.var.labels = c("Targeted tax ($G^T$)", "After feedback ($G^F$)"), dep.var.caption = "Believes does not lose", header = FALSE,
                     keep = c("Constant", "traite", "acceptance", "simule_gagnant"),
-                    add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", " \\checkmark"),
-                                  c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark"),
-                                  c("Controls: Target of the tax", " \\checkmark", " \\checkmark", " "),
-                                  c("Controls: Socio-demo, politics, effective", "", " \\checkmark", " \\checkmark")),
+                    add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", "", " \\checkmark"),
+                                  c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark ", " \\checkmark"),
+                                  c("Controls: Target of the tax", " \\checkmark", "\\checkmark", " ", " "),
+                                  c("Controls: Socio-demo, politics, effective", "", " \\checkmark", "", " \\checkmark")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXI, fixed=TRUE), fixed=TRUE), collapse=' ')
 

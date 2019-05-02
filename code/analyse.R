@@ -49,6 +49,17 @@ summary(lm(taxe_approbation!='Non' ~ mauvaise_qualite, data=s, weights = s$weigh
 summary(lm(gagnant_categorie!='Perdant' ~ mauvaise_qualite, data=s, weights = s$weight))
 summary(lm(gain ~ mauvaise_qualite, data=s, weights = s$weight))
 
+# Weak instrument for the IV acceptance ~ taxe_efficace but gives similar 58 p.p.
+mean(s$duree_info > 180) # 3%
+summary(lm(pmin(180, pmax(duree_info_PM, duree_info_CC_PM, na.rm=T)) ~ (info_CC==1), data=s, weights=s$weight)) # 22'' reading PM when CC before, 31'' otherwise
+summary(lm(pmin(180, pmax(duree_info_CC, duree_info_CC_PM, na.rm=T)) ~ (info_PM==1), data=s, weights=s$weight)) # 32'' reading CC
+tsls1_ee1bis <- lm(taxe_efficace!='Non' ~ apres_modifs + pmin(180, duree_info) * info_CC * info_PM, data=s, weights=s$weight) # I(info_CC==1 | info_PM==1) + I(info_PM==0 & info_CC==1) + I(info_PM==1 & info_CC==0)
+summary(tsls1_ee1bis)
+s$taxe_efficace.hat <- tsls1_ee1bis$fitted.values
+tsls2_ee1bis <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
+summary(tsls2_ee1bis)
+summary(lm(tax_acceptance ~ pmin(180, duree_info) * info_CC * info_PM, data=s, weights=s$weight))
+
 
 ##### Caractéristiques énergétiques #####
 decrit(s$surface, weights = s$weight) # 120
@@ -538,8 +549,12 @@ summary(lm(variation ~ categorie, data=dep)) # answers are not random, i.e. aver
 
 ##### Miscellanous #####
 decrit(s$rattrapage_diesel, miss = T, weights = s$weight)
+decrit(s$rattrapage_diesel[s$diesel==T], miss = T, weights = s$weight[s$diesel==T])
+decrit(s$rattrapage_diesel[s$diesel!=T], miss = T, weights = s$weight[s$diesel!=T])
+decrit(s$rattrapage_diesel[s$essence==T], miss = T, weights = s$weight[s$essence==T])
+decrit(s$rattrapage_diesel[s$diesel!=T & s$essence!=T], miss = T, weights = s$weight[s$diesel!=T & s$essence!=T])
 decrit(s$hausse_diesel, weights = s$weight) 
-summary(lm((rattrapage_diesel!='Non') ~ (diesel==TRUE), data=s, weights = s$weight))
+summary(lm((rattrapage_diesel!='Non') ~ diesel + essence, data=s, weights = s$weight))
 for (j in names(s)) if (grepl('gilets_jaunes', j)) print(decrit(s[[j]], weights=s$weight))
 
 
