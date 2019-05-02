@@ -380,6 +380,33 @@ wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage_max, weights=s$we
 summary(lm(Elasticite_fuel_perso ~ (taille_agglo == 'rural') + (taille_agglo == '-20k') + (taille_agglo == '20-100k') + (taille_agglo == '+100k'), data=s, subset=variante_partielle=='f', weights = s$weight))
 summary(lm(Elasticite_fuel_perso ~ Revenu, data=s, subset=variante_partielle=='f', weights = s$weight))
 
+# Link with taxe_efficace - Logit:
+formula_c <- taxe_efficace!='Non' ~ Elasticite_chauffage
+logit_elas_c <- glm(formula_c, family = binomial(link='logit'), data=s)
+summary(logit_elas_c)
+logit_elas_c_margins <- logitmfx(formula_c, s, atmean=FALSE)$mfxest
+logit_elas_c_margins
+
+formula_f <- taxe_efficace!='Non' ~ Elasticite_fuel
+logit_elas_f <- glm(formula_f, family = binomial(link='logit'), data=s)
+summary(logit_elas_f)
+logit_elas_f_margins <- logitmfx(formula_f, s, atmean=FALSE)$mfxest
+logit_elas_f_margins
+
+formula_c_controls <- as.formula(paste("taxe_efficace!='Non' ~ Elasticite_chauffage + ", paste(variables_reg_elast, collapse=' + ')))
+logit_elas_c_controls <- glm(formula_c_controls, family = binomial(link='logit'), data=s)
+summary(logit_elas_c_controls)
+logit_elas_c_margins_controls <- logitmfx(formula_c_controls, s, atmean=FALSE)$mfxest
+logit_elas_c_margins_controls
+
+formula_f_controls <- as.formula(paste("taxe_efficace!='Non' ~ Elasticite_fuel + ", paste(variables_reg_elast, collapse=' + ')))
+logit_elas_f_controls <- glm(formula_f_controls, family = binomial(link='logit'), data=s)
+summary(logit_elas_f_controls)
+logit_elas_f_margins_controls <- logitmfx(formula_f_controls, s, atmean=FALSE)$mfxest
+logit_elas_f_margins_controls
+
+
+
 ##### Ciblage #####
 decrit(s$categorie_cible, weights = s$weight)
 decrit(s$taxe_cible_approbation, weights = s$weight)
