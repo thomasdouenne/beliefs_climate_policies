@@ -97,7 +97,7 @@ def regress_ols_housing_expenditures_increase(df_hh):
     print 'proportion with zero housing expenditure increase:', np.round(sum(df_hh['housing_expenditures_increase'] == 0)/len(df_hh['housing_expenditures_increase']), 3)
 #    print prediction_intervals    
     
-    pd.DataFrame({'obj': df_hh['housing_expenditures_increase'], 'fit':prediction_intervals['mean'], 'nb_adultes': df_hh['nb_beneficiaries']}).to_csv('prediction housing expenditures.csv')
+    pd.DataFrame({'obj': df_hh['housing_expenditures_increase'], 'fit':prediction_intervals['mean'], 'nb_adultes': df_hh['nb_beneficiaries'], 'uc': df_hh['consumption_units']}).to_csv('prediction housing expenditures.csv')
 
 #    import statsmodels.api as sm
 #    import matplotlib.pyplot as plt

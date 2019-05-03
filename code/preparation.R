@@ -1538,9 +1538,28 @@ write.csv2(s, "survey_prepared.csv", row.names=FALSE)
 # length(which(n(sid$duree) > 7*60))
 # decrit(sid$test_qualite)
 
-fit_housing <- read.csv("../model_reforms_data/prediction housing expenditures.csv")
-
-# Preparation for Figures 1 and 2: importation of distribution calculated (for objective) or smoothed (for subjective) in standardize_data_bdf_ptc.py
+fit_housing <- read.csv("../model_reforms_data/prediction housing expenditures.csv") # specification (1), élasticité 0.15
+fit_housing$vrai_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$obj
+fit_housing$estimation_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$fit
+fit_housing$gain <- fit_housing$vrai_gain_chauffage / fit_housing$uc
+fit_housing$predicted_gain <- (16.1 + fit_housing$estimation_gain_chauffage) / fit_housing$uc
+fit_housing$error <- (fit_housing$vrai_gain_chauffage > 0) != (16.1 + fit_housing$estimation_gain_chauffage > 0)
+fit_housing <- fit_housing[order(fit_housing$predicted_gain, decreasing=T),]
+fit_housing_2 <- read.csv("../model_reforms_data/prediction housing expenditures (2).csv") # specification (2), élasticité 0.2
+fit_housing_2$vrai_gain_chauffage <- 50 * pmin(2, fit_housing_2$nb_adultes) - fit_housing_2$obj
+fit_housing_2$estimation_gain_chauffage <- 50 * pmin(2, fit_housing_2$nb_adultes) - fit_housing_2$fit
+fit_housing_2$error <- (fit_housing_2$vrai_gain_chauffage > 0) != (16.1 + fit_housing_2$estimation_gain_chauffage > 0)
+fit_housing_2$gain <- fit_housing_2$vrai_gain_chauffage / fit_housing_2$uc
+fit_housing_2$predicted_gain <- fit_housing_2$estimation_gain_chauffage / fit_housing_2$uc
+fit_housing_2 <- fit_housing_2[order(fit_housing_2$predicted_gain, decreasing=T),]
+fit <- read.csv("../model_reforms_data/prediction expenditures.csv") # specification (1), élasticité 0.15, + 16.1 dans predicted_winner
+fit$gain <- (110 * fit$nb_beneficiaries - fit$total_expenditures_increase) / fit$consumption_units
+fit$predicted_gain <- (16.1 + 110 * fit$nb_beneficiaries - fit$predicted_total_expenditures_increase) / fit$consumption_units
+fit_2 <- read.csv("../model_reforms_data/prediction expenditures (2).csv") # specification (2), élasticité 0.2, + 9.1 dans predicted_winner
+fit_2$gain <- (110 * fit_2$nb_beneficiaries - fit_2$total_expenditures_increase) / fit_2$consumption_units
+fit_2$predicted_gain <- (16.1 + 110 * fit_2$nb_beneficiaries - fit_2$predicted_total_expenditures_increase) / fit_2$consumption_units
+ 
+  # Preparation for Figures 1 and 2: importation of distribution calculated (for objective) or smoothed (for subjective) in standardize_data_bdf_ptc.py
 objective_gains <- read.csv2("df_objective_gains.csv") 
 subjective_gains <- read.csv2("df_subjective_gains.csv")
 objective_gains_inelastic <- read.csv2("df_objective_gains_inelastic.csv")

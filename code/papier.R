@@ -109,24 +109,37 @@ axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd
 par(mar = mar_old, cex = cex_old)
 
 # Heterogeneity in bias
-reg_bias <- lm((simule_gain - gain > 50) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes, data=s, weights=s$weight)
-summary(reg_bias) # R^2: 0.03 (la moitié due aux gilets jaunes)
-logit_bias <- glm((simule_gain - gain > 50) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes, family = binomial(link='logit'), data=s)
+ggplot(data=fit, aes(x=gain)) + theme_bw() + geom_smooth(method = "auto", aes(y=predicted_winner), se=F) + ylim(c(0,1)) + 
+  xlab("Objective gain per consumption unit (density in black)") + ylab("Probability of predicting gain (in blue)") + xlim(c(-250, 200)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='grey')
+mean(fit$mistake[fit$gain > 110]) # 1%
+mean(fit$mistake[fit$gain > 105 & fit$gain < 115]) # 1.2%
+# mean(fit$gain > 105 & fit$gain < 115) # 1%
+# mean(fit$predicted_gain - fit$gain > 110) # 2%
+wtd.mean(s$simule_gain - s$gain > 110, weights = s$weight) # 52%
+# prediction_gain <- lm(gain ~ predicted_gain, data=fit)
+# summary(prediction_gain)
+# predicted_gain <- predict(prediction_gain, interval='predict', level=0.95)
+# mean(predicted_gain[,3] - predicted_gain[,2]) / 2 # 107: half-length of 90% Confidence Interval
+
+# TODO: plus de contrôles ?
+formula_bias <- as.formula("(simule_gain - gain > 110) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes")
+reg_bias <- lm(formula_bias, data=s, weights=s$weight)
+summary(reg_bias) # R^2: 0.04 (la moitié due aux gilets jaunes)
+logit_bias <- glm(formula_bias, family = binomial(link='logit'), data=s)
 summary(logit_bias)
 logit_bias_margins <- logitmfx(formula_bias, s, atmean=FALSE)$mfxest
-logit_bias_margins # TODO: add logit in Table
+logit_bias_margins
 
 Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, #
-     title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
-     covariate.labels = c("Constant", "Sex: Female", "Diploma: Bachelor or above", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"),
-     dep.var.labels = c("Estimated bias per C.U. ($\\widehat{\\gamma}-g$) > 50"), dep.var.caption = "", header = FALSE,
-     omit = c("Gauche_droite", "taille_agglo", "revenu"),
+     title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
+     covariate.labels = c("Constant", "Sex: Female", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"),
+     dep.var.labels = c("Estimated bias per C.U. ($\\widehat{\\gamma}-g$) > 110"), dep.var.caption = "", header = FALSE,
+     omit = c("Gauche_droite", "taille_agglo", "revenu", "Diplome"),
      coef = list(NULL, logit_bias_margins[,1]), 
      se = list(NULL, logit_bias_margins[,2]),
      add.lines = list(c("Controls: Size of town, political leaning, income", "\\checkmark", "\\checkmark")),
      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
-
 
 
 ## 3.2 Robustness to assumptions on elasticities
@@ -135,29 +148,39 @@ decrit(s$Elasticite_fuel, weights = s$weight) # -0.43 mean perceived gasoline el
 decrit(s$Elasticite_fuel_perso, weights = s$weight * s$depense_carburants) # -0.36 perceived own gasoline elasticity (weighted by share in aggregate spending: only 'mean' is meaningful)
 decrit(s$Elasticite_chauffage, weights = s$weight) # -0.41 mean perceived housing elasticity of French people
 decrit(s$Elasticite_chauffage_perso, weights = s$weight * s$depense_chauffage) # -0.33 perceived own housing elasticity (weighted by share in aggregate spending: only 'mean' is meaningful)
-# 71% (resp. 80%) think they are strictly more contrained than average for fuel (resp. housing)
-wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel, weights=s$weight, na.rm = T) # 71%
-wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage, weights=s$weight, na.rm = T) # 80%
-# Objective proportion of HH with higher expenditure increase in transport: 59% / housing: 67%. cf. consistency_belief_losses.py 
-# Objective proportion of winners in the totally inelastic case: 53%. cf. consistency_belief_losses.py (after replacing elasticities to 0 in gain_losses_data.py)
-wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 45%
-wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 53%
-wtd.mean(s$Elasticite_fuel_perso >= s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 78%
-wtd.mean(s$Elasticite_chauffage_perso >= s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 82%
-wtd.mean(s$Elasticite_fuel_perso == s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 33%
-wtd.mean(s$Elasticite_chauffage_perso == s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 29%
-wtd.mean(s$Elasticite_fuel_perso == -0.17 & s$Elasticite_fuel == -0.05, weights = s$weight) # 3%
-wtd.mean(s$Elasticite_chauffage_perso == -0.17 & s$Elasticite_chauffage == -0.05, weights = s$weight) # 2%
-decrit(s$elasticite_chauffage_perso, weights = s$weight) # 24% contraints
-decrit(s$elasticite_fuel_perso, weights = s$weight) # 34% contraints
-# more feel more constrained than average among users, i.e. those who do not consume think more that others do not consume
-wtd.mean((s$Elasticite_fuel_perso - s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)))[!grepl("déjà", s$elasticite_fuel_perso)] > 0, weights=s$weight[!grepl("déjà", s$elasticite_fuel_perso)], na.rm = T) # 64%
-wtd.mean((s$Elasticite_chauffage_perso - s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)))[!grepl("déjà", s$elasticite_chauffage_perso)] > 0, weights=s$weight[!grepl("déjà", s$elasticite_chauffage_perso)], na.rm = T) # 68%
-
+decrit(s$elasticite_fuel_perso, weights = s$weight)
+decrit(s$elasticite_chauffage_perso, weights = s$weight) 
 # Reasons for lack of elasticity (constraint vs absence of consumption)
 wtd.mean((s$elasticite_chauffage_perso == '0% - Je n\'en consomme déjà pas') / (s$Elasticite_chauffage_perso == 0), weights=s$weight, na.rm = T) # 61%
 wtd.mean((s$elasticite_fuel_perso == '0% - Je suis contraint sur tous mes déplacements') / (s$Elasticite_fuel_perso == 0), weights=s$weight, na.rm = T) # 64%
+# Below are non weighted results for the share of winners in the inelastic case. For the weighted results, see consistency_beliefs_losses.py (setting elasticities to 0 in gains_losses_data.py)
+mean(objective_gains_inelastic$all > 0)
+mean(objective_gains_inelastic$transport > 0)
+mean(objective_gains_inelastic$housing > 0)
+wtd.mean((s$Elasticite_chauffage <= -0.5)[s$taxe_efficace=='Non'], weights = s$weight[s$taxe_efficace=='Non']) # 45%
+wtd.mean((s$Elasticite_fuel <= -0.5)[s$taxe_efficace=='Non'], weights = s$weight[s$taxe_efficace=='Non']) # 43%
 
+# wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 45%
+# wtd.mean(s$Elasticite_fuel_perso == s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 33%
+# wtd.mean((s$Elasticite_fuel_perso > s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)))[s$nb_vehicules > 0], weights=s$weight[s$nb_vehicules > 0], na.rm = T) # 45%
+# mean(fit$transport_tax_increase < mean(fit$transport_tax_increase)) # 59% consume less fuel than average
+# # 71% (resp. 80%) think they are strictly more contrained than average for fuel (resp. housing)
+# wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel, weights=s$weight, na.rm = T) # 71%
+# wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage, weights=s$weight, na.rm = T) # 80%
+# # Objective proportion of HH with higher expenditure increase in transport: 59% / housing: 67%. cf. consistency_belief_losses.py 
+# # Objective proportion of winners in the totally inelastic case: 53%. cf. consistency_belief_losses.py (after replacing elasticities to 0 in gain_losses_data.py)
+# wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 53%
+# wtd.mean(s$Elasticite_fuel_perso >= s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 78%
+# wtd.mean(s$Elasticite_chauffage_perso >= s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 82%
+# wtd.mean(s$Elasticite_fuel_perso == s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 33%
+# wtd.mean(s$Elasticite_chauffage_perso == s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)), weights=s$weight, na.rm = T) # 29%
+# wtd.mean(s$Elasticite_fuel_perso == -0.17 & s$Elasticite_fuel == -0.05, weights = s$weight) # 3%
+# wtd.mean(s$Elasticite_chauffage_perso == -0.17 & s$Elasticite_chauffage == -0.05, weights = s$weight) # 2%
+# decrit(s$elasticite_chauffage_perso, weights = s$weight) # 24% contraints
+# decrit(s$elasticite_fuel_perso, weights = s$weight) # 34% contraints
+# # more feel more constrained than average among users, i.e. those who do not consume think more that others do not consume
+# wtd.mean((s$Elasticite_fuel_perso - s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)))[!grepl("déjà", s$elasticite_fuel_perso)] > 0, weights=s$weight[!grepl("déjà", s$elasticite_fuel_perso)], na.rm = T) # 64%
+# wtd.mean((s$Elasticite_chauffage_perso - s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)))[!grepl("déjà", s$elasticite_chauffage_perso)] > 0, weights=s$weight[!grepl("déjà", s$elasticite_chauffage_perso)], na.rm = T) # 68%
 
 ## 3.3 Perception on other tax’ properties
 # Environmental effectiveness: Table IX
@@ -346,14 +369,6 @@ s$non_perdant <- tsls1_si1$fitted.values
 tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2, data=s, weights = s$weight)
 summary(tsls2_si1)
 
-# tsls1_si1bis <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
-#                   I(traite_cible*traite_cible_conjoint) + categorie_cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2), data=s, weights = s$weight)
-# summary(tsls1_si1bis)
-# s$non_perdant <- tsls1_si1$fitted.values
-# # 50 p.p.***
-# tsls2_si1bis <- lm(taxe_cible_approbation!='Non' ~ non_perdant + categorie_cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2, data=s, weights = s$weight)
-# summary(tsls2_si1bis)
-
 # Alternative specifications for robustness checks
 # (2) With many controls 
 variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "I(hausse_depenses_interaction/uc)", "taxe_efficace", variables_demo, variables_politiques) # 
@@ -383,57 +398,48 @@ summary(logit_si4)
 logit_si4_margins <- logitmfx(formula_tsls2_si2, s, atmean=FALSE)$mfxest
 logit_si4_margins
 
-# (5) IV Feedback - without controls
-tsls1_si5 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+# (5) IV Feedback
+formula_tsls1_si5 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
+                                         paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1_si5 <- lm(formula_tsls1_si5, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
 summary(tsls1_si5)
 s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si5$fitted.values
 # 43 p.p. ***
-tsls2_si5 <- lm(taxe_feedback_approbation!='Non' ~ non_perdant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+formula_tsls2_si5 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
+                                      paste(variables_reg_self_interest, collapse = ' + ')))
+tsls2_si5 <- lm(formula_tsls2_si5, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(tsls2_si5)
 
-# (6) IV Feedback
-formula_tsls1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                         paste(variables_reg_self_interest, collapse = ' + ')))
-tsls1_si6 <- lm(formula_tsls1_si6, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
-summary(tsls1_si6)
-s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si6$fitted.values
-# 43 p.p. ***
-formula_tsls2_si6 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                      paste(variables_reg_self_interest, collapse = ' + ')))
-tsls2_si6 <- lm(formula_tsls2_si6, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
-summary(tsls2_si6)
-
-
-# Results - TODO: include 6th specification
-TableV <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_si6, # tsls2_si4: Unrecognized object type
+# Results
+TableV <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, # tsls2_si4: Unrecognized object type
                     title="Effect of self-interest on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                     covariate.labels = c("Believes does not lose", "Initial tax Acceptance ($A^I$)", "",  "Environmentally effective: `Yes'"),
                     dep.var.labels = c("Targeted Acceptance ($A^T$)", "Feedback Acceptance ($A^F$)"), dep.var.caption = "", header = FALSE,
                     keep = c("non_perdant", "tax_acceptance"),
-                    coef = list(NULL, NULL, NULL, logit_si4_margins[,1], NULL, NULL), 
-                    se = list(NULL, NULL, NULL, logit_si4_margins[,2], NULL, NULL),
+                    coef = list(NULL, NULL, NULL, logit_si4_margins[,1], NULL), 
+                    se = list(NULL, NULL, NULL, logit_si4_margins[,2], NULL),
                     add.lines = list(
                       # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
-                      c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "", "\\checkmark"),
-                      c("Controls: Estimated gain ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark", "\\checkmark"),
-                      c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", ""),
-                      c("Controls: Socio-demo, politics, effective ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", "\\checkmark  ")),
+                      c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark"),
+                      c("Controls: Estimated gain ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark"),
+                      c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", ""),
+                      c("Controls: Socio-demo, political leaning ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark  ")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
-write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\multicolumn{2}{c}{\\textit{OLS}}", "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\multicolumn{2}{c}{\\textit{IV}}", 
+write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS}", "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\textit{IV}", 
                gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. }\\end{table}', 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableV, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
 
-TableXI <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
+TableXI <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5,
                     title="First stage regressions results for self-interest", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                     covariate.labels = c("Constant", "Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
-                                         "$T_1 \\times T_2$",
-                                         "Initial tax Acceptance ($A^I$)", "Simulated winner ($\\widehat{\\Gamma}$)"),
+                                         "$T_1 \\times T_2$", "Simulated winner ($\\widehat{\\Gamma}$)",
+                                         "Initial tax Acceptance ($A^I$)"),
                     dep.var.labels = c("Targeted tax ($G^T$)", "After feedback ($G^F$)"), dep.var.caption = "Believes does not lose", header = FALSE,
                     keep = c("Constant", "traite", "acceptance", "simule_gagnant"),
-                    add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", "", " \\checkmark"),
-                                  c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark ", " \\checkmark"),
-                                  c("Controls: Target of the tax", " \\checkmark", "\\checkmark", " ", " "),
-                                  c("Controls: Socio-demo, politics, effective", "", " \\checkmark", "", " \\checkmark")),
+                    add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", " \\checkmark"),
+                                  c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark"),
+                                  c("Controls: Target of the tax", " \\checkmark", " \\checkmark", " "),
+                                  c("Controls: Socio-demo, political leaning", "", " \\checkmark", " \\checkmark")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXI, fixed=TRUE), fixed=TRUE), collapse=' ')
 

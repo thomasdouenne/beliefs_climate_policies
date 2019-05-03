@@ -71,3 +71,4 @@ if __name__ == "__main__":
         df_estimation['housing_expenditures_increase_to_impute'] = df_estimation['housing_expenditures_increase']
         df_estimation.to_csv('df_donor_enl.csv', sep = ';')
         df_hh.to_csv('df_receiver_bdf.csv', sep = ';')
+        df_hh.to_csv('prediction expenditures (1).csv')

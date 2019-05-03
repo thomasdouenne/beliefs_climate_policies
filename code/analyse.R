@@ -164,10 +164,10 @@ decrit(s$gain > s$simule_gain_interaction, weights = s$weight)
 decrit(s$gain > s$simule_gain_inelastique, weights = s$weight)
 decrit(s$gain > s$simule_gain_elast_perso, weights = s$weight)
 # TODO: pourquoi si peu d'erreur pour les gains négatifs ? parce qu'on utilise la spécification (1): on a la bonne courbe en prenant la spécification (2)
-fit_housing$vrai_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$obj
-fit_housing$estimation_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$fit
 ggplot(data=fit_housing, aes(x=vrai_gain_chauffage)) + 
-  geom_smooth(method = "auto", aes(y=1*(estimation_gain_chauffage > 0))) + ylim(c(0,1)) + xlab("Objective gain without fuel (density in black)") + ylab("P(gain - (hausse_carburants-60) > 0) i.e. proba gain") + xlim(c(-200, 120)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
+  geom_smooth(method = "auto", se=F, aes(y=1*(estimation_gain_chauffage > 0))) + ylim(c(0,1)) + xlab("Objective gain without fuel (density in black)") + ylab("P(gain - (hausse_carburants-60) > 0) i.e. proba gain") + xlim(c(-200, 120)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
+ggplot(data=fit_housing, aes(x=gain)) + 
+  geom_smooth(method = "auto", se=F, aes(y=1*(predicted_gain > 0))) + ylim(c(0,1)) + xlab("Objective gain per consumption unit, without fuel (density in black)") + ylab("P(gain - (hausse_carburants-60) > 0) i.e. proba gain") + xlim(c(-150, 100)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
 # ggplot(data=fit_housing, aes(x=obj)) + geom_smooth(aes(y=1*(fit < 110)), method = "glm", method.args = list(family = "binomial")) + ylim(c(0,1)) + xlab("Objective housing expenditure increase (density in black)") + ylab("P(hausse_chauffage_interaction < 110) i.e. proba gain") + xlim(c(0, 500)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=110, col='red')
 # length(which(fit_housing$obj > 50 & fit_housing$obj < 200))/length(fit_housing$obj) # 25%
 # length(which(fit_housing$obj > 75 & fit_housing$obj < 170))/length(fit_housing$obj) # 15%
@@ -177,7 +177,132 @@ sum(s$weight[s$simule_gain_interaction > -50 & s$simule_gain_interaction < 50])/
 ggplot(data=s, aes(x=hausse_carburants)) + geom_density() + xlim(c(0, 300))
 ggplot(data=s, aes(x=simule_gain_interaction)) + geom_density() + xlim(c(-200, 300))
 ggplot(data=s, aes(x=60 * pmin(2, nb_adultes) - hausse_carburants)) + geom_density() + xlim(c(-100, 200))
+mean(fit_housing_2$estimation_gain_chauffage[fit_housing_2$vrai_gain_chauffage < 0] > 0) # 7%
+fit_housing_2$vrai_gain_chauffage <- 50 * pmin(2, fit_housing_2$nb_adultes) - fit_housing_2$obj
+fit_housing_2$estimation_gain_chauffage <- 50 * pmin(2, fit_housing_2$nb_adultes) - fit_housing_2$fit
+ggplot(data=fit_housing_2, aes(x=vrai_gain_chauffage)) + 
+  geom_smooth(method = "auto", aes(y=1*(estimation_gain_chauffage > 0))) + ylim(c(0,1)) + xlab("Objective gain without fuel (density in black)") + ylab("P(gain - (hausse_carburants-60) > 0) i.e. proba gain") + xlim(c(-200, 120)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
+ggplot(data=fit, aes(x=gain)) + 
+  geom_smooth(method = "auto", aes(y=predicted_winner), se=F) + ylim(c(0,1)) + xlab("Objective gain (density in black)") + ylab("Probability of predicting gain") + xlim(c(-400, 240)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
+mean(fit$gain > -100 & fit$gain < 100) # 53% de chances d'avoir une proba entre 0.1 et 0.9
+mean(fit$gain > -30 & fit$gain < 50) # 22% de chances d'avoir une proba entre 0.25 et 0.75
+sum(s$weight[s$simule_gain_interaction > -50 & s$simule_gain_interaction < 50])/sum(s$weight) # 21%
+sum(s$weight[s$simule_gain_interaction > -30 & s$simule_gain_interaction < 50])/sum(s$weight) # 21%
+mean(fit$predicted_winner[fit$winner==0] == 1)
+mean(fit$predicted_winner[fit$winner==1] == 0)
+mean(fit$predicted_winner[fit$gain < -50]) # 10%
+mean(fit$predicted_winner[fit$gain > 50]==0) # 10%
+mean(fit$predicted_winner[fit$gain < -45 & fit$gain > -55]) # 18%
+mean(fit$predicted_winner[fit$gain < 55 & fit$gain > 45]==0) # 25%
+mean(fit$gain < -45 & fit$gain > -55) # 2%
+mean(fit$gain < 55 & fit$gain > 45) # 4%
+mean(fit$gain < -50 | fit$gain > 50) # 74%
+mean(fit$predicted_winner[fit$gain < -60 & fit$gain > -70]) # 16.7%
+mean(fit$gain < -60 & fit$gain > -70) # 2%
+mean(fit$predicted_winner[fit$gain < 95 & fit$gain > 85]==0) # 16.6%
+mean(fit$gain < 95 & fit$gain > 85) # 3.4%
+mean(fit$predicted_winner[fit$gain < -65]) # 9%
+mean(fit$predicted_winner[fit$gain > 90]==0) # 5%
+mean(fit$gain < -65 | fit$gain > 90) # 56%
+fit_2$gain <- 110 * fit_2$nb_beneficiaries - fit_2$total_expenditures_increase
+ggplot(data=fit_2, aes(x=gain)) + 
+  geom_smooth(method = "auto", aes(y=predicted_winner), se=F) + ylim(c(0,1)) + xlab("Objective gain (density in black)") + ylab("P(gain > 0) i.e. proba gain") + xlim(c(-400, 240)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='red')
+prediction_gain <- lm(gain ~ predicted_gain, data=fit)
+summary(prediction_gain)
+predicted_gain <- predict(prediction_gain, interval='predict', level=0.9)
+mean(predicted_gain[,3] - predicted_gain[,2]) / 2 # 130: demi-largeur de l'intervalle de confiance à 90%
+predicted_gain <- predict(prediction_gain, interval='predict', level=0.834)
+mean(predicted_gain[,3] - predicted_gain[,2]) / 2 # 110: demi-largeur de l'intervalle de confiance à 83.4%
+plot(fit$predicted_gain, fit$gain, cex=0.1, xlim=c(-400,240), ylim=c(-400, 240), col='blue')
+lines(c(-400, 240), c(-400, 240), col='green', type='l', lwd=2)
+lines(fit$predicted_gain[1:100], predicted_gain[1:100,1], xlim=c(-400,240), ylim=c(-400, 240), type='l', col='red', lwd=2)
+lines(fit$predicted_gain[1:100], predicted_gain[1:100,2], type='l', lwd=2)
+lines(fit$predicted_gain[1:100], predicted_gain[1:100,3], type='l', lwd=2)
 
+prediction_gain <- lm(gain ~ predicted_gain, data=fit_housing)
+summary(prediction_gain)
+predicted_gain_housing <- predict(prediction_gain, interval='predict', level=0.9)
+mean(predicted_gain_housing[,3] - predicted_gain_housing[,2]) / 2 # 92: demi-largeur de l'intervalle de confiance à 90%
+predicted_gain_housing <- predict(prediction_gain, interval='predict', level=0.63)
+mean(predicted_gain_housing[,3] - predicted_gain_housing[,2]) / 2 # 50: demi-largeur de l'intervalle de confiance à 63%
+predicted_gain_housing <- predict(prediction_gain, interval='predict', level=0.834)
+mean(predicted_gain_housing[,3] - predicted_gain_housing[,2]) / 2 # 77: demi-largeur de l'intervalle de confiance à 83.4%
+plot(fit_housing$predicted_gain, fit_housing$gain, cex=0.1, xlim=c(-200,110), ylim=c(-400, 60), col='blue')
+lines(c(-400, 240), c(-400, 240), col='green', type='l', lwd=2)
+lines(fit_housing$predicted_gain[c(1,nrow(fit_housing))], predicted_gain_housing[c(1,nrow(fit_housing)),1], xlim=c(-200,60), ylim=c(-400, 110), type='l', col='red', lwd=2)
+lines(fit_housing$predicted_gain[c(1,nrow(fit_housing))], predicted_gain_housing[c(1,nrow(fit_housing)),2], type='l', lwd=2)
+lines(fit_housing$predicted_gain[c(1,nrow(fit_housing))], predicted_gain_housing[c(1,nrow(fit_housing)),3], type='l', lwd=2)
+grid() + abline(h=0, v=0)
+
+prediction_gain <- lm(gain ~ predicted_gain, data=fit_housing_2)
+summary(prediction_gain)
+predicted_gain_housing <- predict(prediction_gain, interval='predict', level=0.9)
+mean(predicted_gain_housing[,3] - predicted_gain_housing[,2]) / 2 # 80: demi-largeur de l'intervalle de confiance à 90%
+predicted_gain_housing <- predict(prediction_gain, interval='predict', level=0.834)
+mean(predicted_gain_housing[,3] - predicted_gain_housing[,2]) / 2 # 68: demi-largeur de l'intervalle de confiance à 83.4%
+plot(fit_housing_2$predicted_gain, fit_housing_2$gain, cex=0.1, xlim=c(-200,110), ylim=c(-400, 60), col='blue')
+lines(c(-400, 240), c(-400, 240), col='green', type='l', lwd=2)
+lines(fit_housing_2$predicted_gain[c(1,nrow(fit_housing_2))], predicted_gain_housing[c(1,nrow(fit_housing_2)),1], xlim=c(-200,60), ylim=c(-400, 110), type='l', col='red', lwd=2)
+lines(fit_housing_2$predicted_gain[c(1,nrow(fit_housing_2))], predicted_gain_housing[c(1,nrow(fit_housing_2)),2], type='l', lwd=2)
+lines(fit_housing_2$predicted_gain[c(1,nrow(fit_housing_2))], predicted_gain_housing[c(1,nrow(fit_housing_2)),3], type='l', lwd=2)
+grid() + abline(h=0, v=0)
+
+prediction_gain_chauffage <- lm(vrai_gain_chauffage ~ estimation_gain_chauffage, data=fit_housing)
+summary(prediction_gain_chauffage)
+predicted_gain_chauffage <- predict(prediction_gain_chauffage, interval='predict', level=0.9)
+mean(predicted_gain_chauffage[,3] - predicted_gain_chauffage[,2]) / 2 # 133: demi-largeur de l'intervalle de confiance à 90%
+predicted_gain_chauffage <- predict(prediction_gain_chauffage, interval='predict', level=0.834)
+mean(predicted_gain_chauffage[,3] - predicted_gain_chauffage[,2]) / 2 # 112: demi-largeur de l'intervalle de confiance à 83.4%
+plot(fit_housing$vrai_gain_chauffage, fit_housing$estimation_gain_chauffage, cex=0.1, xlim=c(-400, 110), ylim=c(-250,110), col='blue')
+lines(c(-400, 240), c(-400, 240), col='green', type='l', lwd=2)
+lines(predicted_gain_chauffage[c(1,nrow(fit_housing)),1], fit_housing$estimation_gain_chauffage[c(1,nrow(fit_housing))], xlim=c(-400, 110), ylim=c(-250,110), type='l', col='red', lwd=2)
+lines(16.1 + predicted_gain_chauffage[c(1,nrow(fit_housing)),1], fit_housing$estimation_gain_chauffage[c(1,nrow(fit_housing))], xlim=c(-400, 110), ylim=c(-250,110), type='l', col='red', lwd=2, lty=2)
+lines(predicted_gain_chauffage[c(1,nrow(fit_housing)),2], fit_housing$estimation_gain_chauffage[c(1,nrow(fit_housing))], type='l', lwd=2)
+lines(predicted_gain_chauffage[c(1,nrow(fit_housing)),3], fit_housing$estimation_gain_chauffage[c(1,nrow(fit_housing))], type='l', lwd=2)
+grid() + abline(h=0, v=0)
+
+fit_housing_2 <- fit_housing_2[order(fit_housing_2$estimation_gain_chauffage, decreasing=T),]
+prediction_gain_chauffage <- lm(vrai_gain_chauffage ~ estimation_gain_chauffage, data=fit_housing_2)
+summary(prediction_gain_chauffage)
+predicted_gain_chauffage <- predict(prediction_gain_chauffage, interval='predict', level=0.9)
+mean(predicted_gain_chauffage[,3] - predicted_gain_chauffage[,2]) / 2 # 124: demi-largeur de l'intervalle de confiance à 90%
+predicted_gain_chauffage <- predict(prediction_gain_chauffage, interval='predict', level=0.834)
+mean(predicted_gain_chauffage[,3] - predicted_gain_chauffage[,2]) / 2 # 105: demi-largeur de l'intervalle de confiance à 83.4%
+plot(fit_housing_2$vrai_gain_chauffage, fit_housing_2$estimation_gain_chauffage, cex=0.1, xlim=c(-400, 110), ylim=c(-250,110), col='blue')
+lines(c(-400, 240), c(-400, 240), col='green', type='l', lwd=2)
+lines(predicted_gain_chauffage[c(1,nrow(fit_housing_2)),1], fit_housing_2$estimation_gain_chauffage[c(1,nrow(fit_housing_2))], xlim=c(-400, 110), ylim=c(-250,110), type='l', col='red', lwd=2)
+lines(predicted_gain_chauffage[c(1,nrow(fit_housing_2)),2], fit_housing_2$estimation_gain_chauffage[c(1,nrow(fit_housing_2))], type='l', lwd=2)
+lines(predicted_gain_chauffage[c(1,nrow(fit_housing_2)),3], fit_housing_2$estimation_gain_chauffage[c(1,nrow(fit_housing_2))], type='l', lwd=2)
+grid() + abline(h=0, v=0)
+
+mean(fit$mistake[fit$gain > 50]) # 7%
+mean(fit$mistake[fit$gain > 65]) # 5%
+mean(fit$mistake[fit$gain > 100]) # 1.8%
+mean(fit$mistake[fit$gain > 110]) # 1%
+mean(fit$mistake[fit$gain > 105 & fit$gain < 115]) # 1.2%
+mean(fit$gain > 105 & fit$gain < 115) # 1%
+mean(fit$mistake[fit$gain > 60 & fit$gain < 70]) # 14%
+mean(fit$gain > 60 & fit$gain < 70) # 6%
+mean(fit$mistake[fit$gain > 97 & fit$gain < 103]) # 5%
+mean(fit$gain > 97 & fit$gain < 103) # 2.4%
+mean(fit$mistake[fit$gain > 45 & fit$gain < 55]) # 16.4%
+mean(fit$mistake[fit$predicted_gain - fit$gain > 60 & fit$predicted_gain - fit$gain < 70]) # 25%
+mean(fit$mistake[fit$predicted_gain - fit$gain > 60 & fit$predicted_gain - fit$gain < 70]) # 25%
+mean(fit_housing$error[fit_housing$predicted_gain - fit_housing$gain > 50]) # 6%
+mean(fit_housing$error[fit_housing$predicted_gain - fit_housing$gain > 0]) # 4%
+mean(fit_housing$error[fit_housing$gain > 50]) # 5%
+mean(fit$mistake[fit$gain > 50]) # 7%
+mean(fit_housing$error[fit_housing$predicted_gain > 50]) # 0
+mean(fit$mistake[fit$predicted_gain > 50]) # 1%
+mean(fit$mistake[fit$predicted_gain < -50]) # 1%
+mean(fit$mistake)
+wtd.mean(s$gagnant_categorie=='Gagnant' & s$simule_gagnant==0) # 1.8%
+wtd.mean(s$gagnant_categorie=='Gagnant' & s$simule_gain < -50) # 0.8%
+wtd.mean(s$simule_gain - s$gain > 50) # 75%
+wtd.mean(s$simule_gain - s$gain > 65) # 70%
+wtd.mean(s$simule_gain - s$gain > 110) # 53%
+wtd.mean(s$simule_gain - s$gain > 160) # 33%
+decrit(s$simule_gain - s$gain, weights = s$weight)
 
 ##### Approbation #####
 decrit(s$taxe_approbation, miss=T, weights=s$weight) # 10% Dur !!!
