@@ -112,7 +112,7 @@ par(mar = mar_old, cex = cex_old)
 
 # Heterogeneity in bias
 ggplot(data=fit, aes(x=gain)) + theme_bw() + geom_smooth(method = "auto", aes(y=predicted_winner), se=F) + ylim(c(0,1)) + 
-  xlab("Objective gain per consumption unit (density in black)") + ylab("Probability of predicting gain (in blue)") + xlim(c(-250, 200)) + geom_density(aes(y=..scaled..)) + geom_vline(xintercept=0, col='grey')
+  xlab("Objective gain per consumption unit (density in black)") + ylab("Probability of predicting gain (in blue)") + xlim(c(-250, 200)) + geom_density(aes(y=..scaled..), bw=30) + geom_vline(xintercept=0, col='grey')
 mean(fit$mistake[fit$gain > 110]) # 1%
 mean(fit$mistake[fit$gain > 105 & fit$gain < 115]) # 1.2%
 # mean(fit$gain > 105 & fit$gain < 115) # 1%
@@ -124,7 +124,7 @@ wtd.mean(s$simule_gain - s$gain > 110, weights = s$weight) # 52%
 # mean(predicted_gain[,3] - predicted_gain[,2]) / 2 # 107: half-length of 90% Confidence Interval
 
 # TODO: plus de contrôles ?
-formula_bias <- as.formula("(simule_gain - gain > 110) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes")
+formula_bias <- as.formula(paste("(simule_gain - gain > 110) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo, collapse=' + ')))
 reg_bias <- lm(formula_bias, data=s, weights=s$weight)
 summary(reg_bias) # R^2: 0.04 (la moitié due aux gilets jaunes)
 logit_bias <- glm(formula_bias, family = binomial(link='logit'), data=s)
@@ -136,10 +136,10 @@ Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, #
      title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
      covariate.labels = c("Constant", "Sex: Female", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"),
      dep.var.labels = c("Estimated bias per C.U. ($\\widehat{\\gamma}-g$) > 110"), dep.var.caption = "", header = FALSE,
-     omit = c("Gauche_droite", "taille_agglo", "revenu", "Diplome"),
+     keep = c("Constant", "Gilets_jaunes", "^uc", "Féminin", "ecologiste"),
      coef = list(NULL, logit_bias_margins[,1]), 
      se = list(NULL, logit_bias_margins[,2]),
-     add.lines = list(c("Controls: Size of town, political leaning, income", "\\checkmark", "\\checkmark")),
+     add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark")),
      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
 

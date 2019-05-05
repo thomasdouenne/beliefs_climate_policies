@@ -54,7 +54,7 @@ except:
 """ Choose which function to perform """ # True to compute and display results, False otherwise
 plot_step_distribution = False
 plot_kde = False
-save_kde_data = False
+save_kde_data = True
 test_imputation_methods = False # The two methods provide quite similar results
 regress = False
 number_winners = True
