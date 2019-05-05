@@ -60,9 +60,11 @@ decrit(s$gagnant_categorie, weights = s$weight) # 64/22/14 +1/0/-1
 decrit(s$simule_gagnant, weights = s$weight)
 decrit(n(s$gain) - s$simule_gain, weights = s$weight) # mean -126, median -116
 decrit(s$simule_gain > s$gain, weights = s$weight) # 89%
-decrit(s$simule_gain - s$gain > 50, weights = s$weight) # 75%
+# decrit(s$simule_gain - s$gain > 50, weights = s$weight) # 75%
+decrit(s$simule_gain - s$gain > 110, weights = s$weight) # 53%
 decrit(s$simule_gain_inelastique - s$gain > 0, weights = s$weight) # 77%
-decrit(s$simule_gain_inelastique - s$gain > 50, weights = s$weight) # 61%
+# decrit(s$simule_gain_inelastique - s$gain > 50, weights = s$weight) # 61%
+decrit(s$simule_gain_inelastique - s$gain > 110, weights = s$weight) # 37%
 decrit(s$simule_gain_inelastique - n(s$gain), weights = s$weight) # mean 75, median 80
 
 # Figure 1: PDF of subjective vs. objective gain
