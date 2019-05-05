@@ -131,15 +131,18 @@ logit_bias <- glm(formula_bias, family = binomial(link='logit'), data=s)
 summary(logit_bias)
 logit_bias_margins <- logitmfx(formula_bias, s, atmean=FALSE)$mfxest
 logit_bias_margins
+formula_bias_bis <- as.formula(paste("(simule_gain - gain > 110) ~ taxe_approbation + (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo, collapse=' + ')))
+reg_bias_bis <- lm(formula_bias_bis, data=s, weights=s$weight)
+summary(reg_bias_bis) # R^2: 0.04 (la moitié due aux gilets jaunes)
 
-Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, #
+Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
      title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
-     covariate.labels = c("Constant", "Sex: Female", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"),
+     covariate.labels = c("Constant", "Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"),
      dep.var.labels = c("Estimated bias per C.U. ($\\widehat{\\gamma}-g$) > 110"), dep.var.caption = "", header = FALSE,
-     keep = c("Constant", "Gilets_jaunes", "^uc", "Féminin", "ecologiste"),
-     coef = list(NULL, logit_bias_margins[,1]), 
-     se = list(NULL, logit_bias_margins[,2]),
-     add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark")),
+     keep = c("Constant", "taxe_approbation", "Gilets_jaunes", "^uc", "Féminin", "ecologiste"),
+     coef = list(NULL, logit_bias_margins[,1], NULL),
+     se = list(NULL, logit_bias_margins[,2], NULL),
+     add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark", "\\checkmark")),
      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
 
@@ -666,7 +669,7 @@ summary(iv2_si5)
 
 # (6) Feedback: Approval ~ not lose
 formula_iv1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                         paste(variables_reg_self_interest, collapse = ' + ')))
+                                         paste(variables_reg_self_interest, collapsetaxe = ' + ')))
 iv1_si6 <- lm(formula_iv1_si6, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
 summary(iv1_si6)
 s$non_perdant[s$variante_taxe_info=='f'] <- iv1_si6$fitted.values
