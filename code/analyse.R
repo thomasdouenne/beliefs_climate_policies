@@ -322,6 +322,10 @@ decrit(s$taxe_feedback_approbation[s$gagnant_feedback_categorie=='Gagnant'], mis
 decrit(s$taxe_feedback_approbation[s$gagnant_categorie!='Gagnant' & s$gagnant_feedback_categorie=='Gagnant'], miss=T) 
 # 48% de ceux qu'on fait changer d'avis approuvent
 
+# Approbation des répondants biaisés
+summary(lm(taxe_approbation != 'Non'~ (simule_gain - gain > 110) + simule_gagnant + simule_gain, data=s, subset=(gagnant_categorie == 'Perdant'), weights = s$weight))
+summary(lm(taxe_approbation != 'Non'~ I((simule_gain - gain)/100) + simule_gagnant + simule_gain, data=s, subset=(gagnant_categorie == 'Perdant'), weights = s$weight))
+
 
 ##### Approbation: Model Selection #####
 # Other method of model selection exists (like forward/backward stepwise selection), but seem less reliable as they do not
