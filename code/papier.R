@@ -61,7 +61,7 @@ decrit(s$simule_gagnant, weights = s$weight)
 decrit(n(s$gain) - s$simule_gain, weights = s$weight) # mean -126, median -116
 decrit(s$simule_gain > s$gain, weights = s$weight) # 89%
 # decrit(s$simule_gain - s$gain > 50, weights = s$weight) # 75%
-decrit(s$simule_gain - s$gain > 110, weights = s$weight) # 53%
+decrit(s$biais_sur, weights = s$weight) # 53%
 decrit(s$simule_gain_inelastique - s$gain > 0, weights = s$weight) # 77%
 # decrit(s$simule_gain_inelastique - s$gain > 50, weights = s$weight) # 61%
 decrit(s$simule_gain_inelastique - s$gain > 110, weights = s$weight) # 37%
@@ -373,6 +373,7 @@ summary(logit_ee1)
 logit_ee1_margins <- logitmfx(data=s, formula=logit_ee1, atmean=FALSE)$mfxest
 logit_ee1_margins
 
+
 # 4.3 Beliefs over progressivity
 ols_prog_1 <- lm(progressivite!='Non' ~ info_progressivite, data=s, weights=s$weight)
 summary(ols_prog_1)
@@ -483,6 +484,13 @@ tsls2_ee1 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
 summary(tsls2_ee1)
 summary(lm(tax_acceptance ~ info_CC * info_PM, data=s, weights=s$weight)) # info_CC is a good instrument
 
+# (1bis) 2SLS both instruments, control by gagnant_categorie because it's correlated with instrument: 59 p.p.*
+tsls1_ee1 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + gagnant_categorie, data=s, weights=s$weight) 
+summary(tsls1_ee1)
+s$taxe_efficace.hat <- tsls1_ee1$fitted.values
+tsls2_ee1 <- lm(tax_acceptance ~ taxe_efficace.hat + gagnant_categorie, data=s, weights=s$weight)
+summary(tsls2_ee1)
+
 # Alternative specifications for robustness checks
 # (2) 2SLS both instruments, with controls: 56 p.p.*
 variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
@@ -495,6 +503,12 @@ s$taxe_efficace.hat <- fitted.values(tsls1_ee2)
 formula2_ee2 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ",paste(variables_reg_ee, collapse = ' + ')))
 tsls2_ee2 <- lm(formula2_ee2, data=s, weights=s$weight)
 summary(tsls2_ee2)
+
+# # (2bis) 2SLS both instruments, with controls and interaction
+# formula_ee2_interaction <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + ", 
+#                                       paste(c("Revenu", "Revenu2"), collapse = ' + info_CC * info_PM * '), sep='info_CC * info_PM * '))
+# tsls1_ee2_formula_ee2_interaction <- lm(formula_ee2_interaction, data=s, weights = s$weight, na.action='na.exclude')
+# summary(tsls1_ee2_formula_ee2_interaction)
 
 # (3) OLS with controls:
 # 42 p.p.
@@ -568,7 +582,7 @@ anova(ols_ee_sans_interaction, ols_ee) # We almost reject that interactions term
 
 ## 5.3 Progressivity
 # Identification challenge and strategies
-
+# TODO: interagir progressivité avec revenu, politique
 variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
 variables_reg_prog <- variables_reg_prog[!(variables_reg_prog %in% 
     c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
