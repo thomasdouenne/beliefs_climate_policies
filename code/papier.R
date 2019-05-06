@@ -289,6 +289,13 @@ n = sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==0,]$weight)
 binconf(x = x, n = n)
 
 
+# Conservative updating overall
+x = sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==1 & s$gagnant_feedback_categorie == 'Gagnant',]$weight) + sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==0 & s$gagnant_feedback_categorie == 'Perdant',]$weight)
+n = sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==1,]$weight) + sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==0,]$weight)
+binconf(x = x, n = n)
+
+
+
 # Conservative updating
 decrit(s$feedback_infirme_large, weights = s$weight) # 70%
 decrit(s$update_correct[s$feedback_infirme_large==T], weights = s$weight[s$feedback_infirme_large==T]) # 18%
@@ -336,20 +343,8 @@ summary(covariates_update_correct_bis)
 #           add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark"), 
 #                              c("Includes controls", "", "\\checkmark", "", "\\checkmark", "\\checkmark")),
 #           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
-asymmetric_simple <- stargazer(base_winner, covariates_update_correct,
-                               title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                               covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)",
-                                                    "Retired", "Active", "Student", "Yellow vests: PNR", "Yellow vests: understands", "Yellow vests: supports", "Yellow vests: is part"),
-                               dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, 
-                               keep = c('Constant', '.*Gagnant.*', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
-                               order = c('Constant', '.*Gagnant.*', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
-                               add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark"), 
-                                                c("Includes controls", "", "\\checkmark")),
-                               no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
-write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow vests: opposes} }  \\end{table} ', 
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple, fixed=TRUE), fixed=TRUE), collapse=' ')
 
-asymmetric_simple_bis <- stargazer(base_winner, covariates_update_correct, covariates_update_correct_bis,
+asymmetric_simple <- stargazer(base_winner, covariates_update_correct, covariates_update_correct_bis,
                                title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                                covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
                                                     "Retired", "Active", "Student", "Yellow vests: PNR", "Yellow vests: understands", "Yellow vests: supports", "Yellow vests: is part"),
@@ -360,7 +355,7 @@ asymmetric_simple_bis <- stargazer(base_winner, covariates_update_correct, covar
                                                 c("Includes controls", "", "\\checkmark", "\\checkmark")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
 write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow vests: opposes} }  \\end{table} ', 
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple_bis, fixed=TRUE), fixed=TRUE), collapse=' ')
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
 # 4.2 Beliefs over environmental effectiveness: cf. 5.2, other variables than taxe_efficace are not correlated with our information
