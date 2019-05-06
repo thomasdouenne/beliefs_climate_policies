@@ -231,16 +231,24 @@ crosstab_simule_gagnant <- crosstab(s$winning_category[s$simule_gagnant==1], s$w
                                     s$weight[s$simule_gagnant==1], # dnn=c(expression('Winning category,'~bold(Before)~feedback), ''),
                                     prop.r=T, sort=2:1, cex.axis=0.9) # sort=2:1, dir=c("h", "v"), inv.x=T, inv.y=T, color = FALSE # see mosaicplot
 crosstab_simule_gagnant
-plot(crosstab_simule_gagnant, sort=2:1, cex.axis=0.9, ylab = expression('Winning category,'~bold(Before)~feedback), xlab=NA)
-mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
+# crosstab_gagnant <- crosstab(s$winning_category[s$simule_gagnant==1], rep("", length(which(s$simule_gagnant==1))), 
+#                              s$weight[s$simule_gagnant==1], prop.r=T, sort=2:1, cex.axis=0.9, 
+#                              ylab = expression('Winning category, '~bold(Before)~feedback), xlab=NA, col='white')
+# text(cex=1, x=0.5, y=c(0.3, 0.7, 0.9), c("Loser: 60%", "Unaffected: 16%", "Winner: 14%"), xpd=TRUE)
+# mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
+# plot(crosstab_simule_gagnant, sort=2:1, cex.axis=0.9, ylab = expression('Winning category, '~bold(Before)~feedback), xlab=NA)
+# mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
+# text(cex=1, x=c(0.08, 0.115, 0.39, 0.24, 0.53, 0.84, 0.65, 0.92, 0.95), y=c(0.3, 0.7, 0.9, 0.3, 0.7, 0.9, 0.3, 0.7, 0.9), c("12%", "22%", "79%", "18%", "63%", "13%", "70%", "15%", "8%"), xpd=TRUE)
 # (b) losers
 decrit(s$gagnant_categorie[s$simule_gagnant==0], weights = s$weight[s$simule_gagnant==0])
 decrit(s$gagnant_feedback_categorie[s$simule_gagnant==0], weights = s$weight[s$simule_gagnant==0])
 crosstab_simule_perdant <- crosstab(s$winning_category[s$simule_gagnant==0], s$winning_feedback_category[s$simule_gagnant==0], 
-                                    s$weight[s$simule_gagnant==0], # dnn=c(expression('Winning category,'~bold(Before)~feedback), ''),
+                                    s$weight[s$simule_gagnant==0], # dnn=c(expression('Winning category, '~bold(Before)~feedback), ''),
                                     prop.r=T, sort=2:1, cex.axis=0.9) # sort=2:1, dir=c("h", "v"), inv.x=T, inv.y=T, color = FALSE # see mosaicplot
-plot(crosstab_simule_perdant, sort=2:1, cex.axis=0.9, ylab = expression('Winning category,'~bold(Before)~feedback), xlab=NA)
-mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
+crosstab_simule_perdant
+# plot(crosstab_simule_perdant, sort=2:1, cex.axis=0.9, ylab = expression('Winning category, '~bold(Before)~feedback), xlab=NA)
+# mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
+# text(cex=1, x=c(0.025, 0.05, 0.08, 0.075, 0.30, 0.21, 0.53, 0.74, 0.60), y=c(0.38, 0.83, 0.95, 0.38, 0.83, 0.95, 0.38, 0.83, 0.95), c("1%", "5%", "16%", "5%", "50%", "3%", "94%", "15%", "7%"), xpd=TRUE)
 par(mar = mar_old, cex = cex_old)
 
 ## Use binomial law to compute confidence intervals around share of respondents
@@ -610,7 +618,7 @@ crosstab_simule_perdant
 ## B.2 Environmental effectiveness: Table X
 TableX 
 
-##### Apendix C. Estimation pf acceptation motives #####
+##### Apendix C. Estimation of acceptation motives #####
 ## C.1 Two stage least squares: first stage results
 TableXI
 TableXII
