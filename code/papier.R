@@ -319,6 +319,13 @@ formula_update <- as.formula(paste("update_correct ~ ", paste(variables_update, 
 covariates_update_correct <- lm(formula_update, subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(covariates_update_correct)
 
+variables_update_bis <- c("niveau_vie", "(gagnant_categorie=='Gagnant')", "taxe_approbation", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, variables_politiques, "Gilets_jaunes", "score_ges") # 
+variables_update_bis <- variables_update_bis[!(variables_update_bis %in% c("revenu", "rev_tot", "age", "age_65_plus", "taille_agglo", "statut_emploi"))]
+formula_update_bis <- as.formula(paste("update_correct ~ ", paste(variables_update_bis, collapse=' + ')))
+covariates_update_correct_bis <- lm(formula_update_bis, subset = feedback_infirme_large==T, data=s, weights = s$weight)
+summary(covariates_update_correct_bis)
+
+
 # asymmetric_simple <- stargazer(base_winner, controled_winner, base_feedback_winner, controled_feedback_winner, covariates_update_correct,
 #           title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
 #           covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Winner, after feedback ($\\dot{G}^F$)",
@@ -341,6 +348,20 @@ asymmetric_simple <- stargazer(base_winner, covariates_update_correct,
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
 write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow vests: opposes} }  \\end{table} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+asymmetric_simple_bis <- stargazer(base_winner, covariates_update_correct, covariates_update_correct_bis,
+                               title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                               covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
+                                                    "Retired", "Active", "Student", "Yellow vests: PNR", "Yellow vests: understands", "Yellow vests: supports", "Yellow vests: is part"),
+                               dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, 
+                               keep = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
+                               order = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
+                               add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark"), 
+                                                c("Includes controls", "", "\\checkmark", "\\checkmark")),
+                               no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
+write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow vests: opposes} }  \\end{table} ', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple_bis, fixed=TRUE), fixed=TRUE), collapse=' ')
+
 
 # 4.2 Beliefs over environmental effectiveness: cf. 5.2, other variables than taxe_efficace are not correlated with our information
 # (1bis) logit 1st stage
@@ -580,10 +601,10 @@ summary(ols_prog4)
 
 TableVII <- stargazer(ols_prog1, ols_prog2, logit_prog3, ols_prog4,
                             title="Effect of beliefs over progressivity on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                            covariate.labels = c("Progressivity: not `No' ($P>0$)",
+                            covariate.labels = c("Progressivity: not `No' $(P>0)$", "Believes does not lose $(G>0)$", "Effective: not No $(EE>0)$", "$(G>0) \\times (EE>0)$",
                                                  "Interaction: not lose $(P>0) \\times (G>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "$(P>0) \\times (G>0) \\times (EE>0)$", "Progressivity: `Yes' ($\\dot{P}>0$)"), # "Constant",
-                            dep.var.labels = c("Tax Acceptance ($A^I$)", "Tax Approval ($\\dot{A^I}$)"), dep.var.caption = "", header = FALSE,
-                            keep = c("progressi"), # "Constant"
+                            dep.var.labels = c("Tax Acceptance ($A^I$)", "Tax Approval ($\\dot{A^I}$)"), dep.var.caption = "", header = FALSE, 
+                            keep = c("progressi", "gagnant_categorie", 'taxe_efficace'), # "Constant"
                             coef = list(NULL, NULL, logit_prog3_margins[,1], NULL),
                             se = list(NULL, NULL, logit_prog3_margins[,2], NULL),
                             add.lines = list(c("Controls: Socio-demo, energy, G, EE, $G \\times EE$", "\\checkmark ", " ", "", "")), 
