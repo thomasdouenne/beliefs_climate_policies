@@ -2303,6 +2303,48 @@ summary(lm(taxe_efficace!='Non' ~ apres_modifs * Gauche_droite + info_CC * Gauch
 
 summary(lm(taxe_efficace!='Non' ~ apres_modifs * (Diplome>4) + apres_modifs * sexe, data=s, weights = s$weight))
 
+summary(lm(progressivite!='Non' ~ info_CC * info_PM, data=s, weights = s$weight))
+summary(lm(taxe_approbation!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight))
+summary(lm(taxe_approbation!='Non' ~ info_CC, data=s, weights = s$weight))
+# pb avec l'exclusion restriction!
+summary(lm(gagnant_categorie!='Perdant' ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight))
+summary(lm(gagnant_categorie!='Perdant' ~ info_PM, data=s, weights = s$weight))
+summary(lm(gagnant_categorie=='Gagnant' ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight))
+summary(lm(benefices_CC==T ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight))
+summary(lm(problemes_inefficace==T ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight))
+
+
+##### Effets de l'info progressivité #####
+summary(lm(gagnant_categorie=='Gagnant' ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(gagnant_categorie!='Perdant' ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_gagnant_pauvres==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_gagnant_riches==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_gagnant_personne==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_gagnant_citadins==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_gagnant_moyennes==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_gagnant_certains==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_perdant_pauvres==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_perdant_riches==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_perdant_personne==T ~ info_progressivite * biais_sur, data=s, weights = s$weight)) # -0.01 * prog + 0.02 . interaction
+summary(lm(taxe_perdant_personne==T ~ info_progressivite * biais_sur * apres_modifs, data=s, weights = s$weight)) # seul prog:biais n'a pas d'effet
+summary(lm(taxe_perdant_ruraux==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(taxe_perdant_moyennes==T ~ info_progressivite * biais_sur, data=s, weights = s$weight)) # 0.07** prog - 0.06 . interaction
+summary(lm(taxe_perdant_moyennes==T ~ info_progressivite * biais_sur * apres_modifs, data=s, weights = s$weight)) # ...
+summary(lm(taxe_perdant_certains==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+# benefices/problems présenté avant info : les corrélations sont l'effet de la seconde moitié de l'échantillon
+summary(lm(benefices_pauvres==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(benefices_revenu==T ~ info_progressivite * revenu, data=s, weights = s$weight)) 
+summary(lm(benefices_revenu==T ~ info_progressivite * biais_sur, data=s, weights = s$weight)) # 0.03 . interaction
+summary(lm(benefices_revenu==T ~ info_progressivite * biais_sur * apres_modifs, data=s, weights = s$weight)) # 0
+summary(lm(problemes_ruraux==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(problemes_revenu==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(problemes_pauvres==T ~ info_progressivite * biais_sur, data=s, weights = s$weight)) # -0.04 . prog + 0.08 * interaction
+summary(lm(problemes_pauvres==T ~ info_progressivite * biais_sur * apres_modifs, data=s, weights = s$weight)) # -0.04 . prog + 0.08 * interaction
+summary(lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, weights=s$weight)) # -0.11 * prog:biais
+summary(lm(progressivite!='Non' ~ info_progressivite * Gauche_droite + info_progressivite * Gilets_jaunes, data=s, weights=s$weight)) 
+summary(lm(progressivite!='Non' ~ info_progressivite * gauche_droite + info_progressivite * gilets_jaunes, data=s, weights=s$weight)) # -.003 . prog:gilets_jaunes
+summary(lm(progressivite!='Non' ~ info_progressivite * gauche_droite + info_progressivite * gilets_jaunes + info_progressivite * biais_sur, data=s, weights=s$weight)) # some corr but is it meaningful?
+
 
 ##### ON SUBSAMPLE OF BIAS > 110 #####
 # Those who are very biased present very similar results than whole sample, except for progressivity: they turn to think the tax is regressive when we tell them it's not

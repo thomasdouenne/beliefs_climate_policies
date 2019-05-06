@@ -1409,6 +1409,8 @@ convert_s <- function() {
   s$Simule_gain2 <<- s$simule_gain^2/1e6
   s$Simule_gain_cible <<- s$simule_gain_cible/1e3
   s$Simule_gain_cible2 <<- s$simule_gain_cible/1e6
+  s$biais_sur <<- s$simule_gain - s$gain > 110
+  label(s$biais_sur) <<- "biais_sur: Certitude à 99% que le gain subjectif du répondant est biaisé à la baisse: simule_gain - gain > 110"
   
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
   # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
