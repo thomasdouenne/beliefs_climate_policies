@@ -2182,19 +2182,23 @@ par(mar=c(4.1, 4.1, 1.1, 1.1))
 # RDD All incomes TODO: add confidence interval
 plot(c(0, 780), rep(ci_mean_cible_acceptance[1,1], 2), type='l', col = 'cyan', lwd=2,
      xlab="Income of respondent (€/month)", ylab="Average Targeted Tax Acceptance", xlim=c(500, 2000), ylim=c(0.2, 0.55), xaxt='n')
-lines(c(780, 1140), rep(ci_mean_cible_acceptance[1,2], 2), type='l', col = 'deepskyblue3', lwd=2)
-lines(c(1140, 1430), rep(ci_mean_cible_acceptance[1,3], 2), type='l', col = 'blue', lwd=2)
-lines(c(1430, 1670), rep(ci_mean_cible_acceptance[1,4], 2), type='l', col = 'black', lwd=2)
 lines(c(780, 1140), rep(ci_mean_cible_acceptance[1,5], 2), type='l', col = 'cyan', lwd=2, lty=2)
+lines(c(780, 1140), rep(ci_mean_cible_acceptance[1,2], 2), type='l', col = 'deepskyblue3', lwd=2)
 lines(c(1140, 1430), rep(ci_mean_cible_acceptance[1,6], 2), type='l', col = 'deepskyblue3', lwd=2, lty=2)
+lines(c(1140, 1430), rep(ci_mean_cible_acceptance[1,3], 2), type='l', col = 'blue', lwd=2)
 lines(c(1430, 1670), rep(ci_mean_cible_acceptance[1,7], 2), type='l', col = 'blue', lwd=2, lty=2)
+lines(c(1430, 1670), rep(ci_mean_cible_acceptance[1,4], 2), type='l', col = 'black', lwd=2)
 lines(c(1670, 2220), rep(ci_mean_cible_acceptance[1,8], 2), type='l', col = 'black', lwd=2, lty=2)
 plotCI(x=c((c(500, deciles[c(1:3,1:4)]) + c(deciles[c(1:4,2:4)], 2000))/2) + c(rep(-30,4), rep(30,4)), 
        y=ci_mean_cible_acceptance[1,], li=ci_mean_cible_acceptance[2,], ui=ci_mean_cible_acceptance[3,], add=T,
        col=c('cyan', 'deepskyblue3', 'blue', 'black', 'cyan', 'deepskyblue3', 'blue', 'black'), lwd=0.7, pch=NA)
+grid() + abline(v = c(780), lwd=0.5) + axis(1, at=c(780, 1140))
+axis(1, at=c(1430)) +  abline(v = c(1140), lwd=0.5) 
+axis(1, at=c(1670)) +  abline(v = c(1430), lwd=0.5) 
+axis(1, at=c(500, 2000)) +  abline(v = c(1670), lwd=0.5) 
 axis(1, at=c(500, 780, 1140, 1430, 1670, 2000))
-grid() + abline(v = c(780, 1140, 1430, 1670), lwd=0.5)
-legend("topright", lwd=2, lty=c(1,2), col=c("blue"), title.col = "black", legend=c("Transfer to respondent", "No transfer")) # , text.col = c("blue")
+grid() + abline(v = c(780, 1140, 1430, 1670), lwd=0.5) 
+legend("topright", lwd=2, lty=c(1,2), col=c("black"), title.col = "black", legend=c("Eligible to payment", "Not eligible")) # , text.col = c("blue")
 
 # All stacked
 plot(c(0, 1), rep(wtd.mean((s$taxe_cible_approbation!='Non')[s$revenu < 780 & s$traite_cible==T], weights=s$weight[s$revenu < 780 & s$traite_cible==T]), 2), type='l', col = 'cyan', lwd=2,
