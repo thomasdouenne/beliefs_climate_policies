@@ -2350,6 +2350,7 @@ summary(lm(progressivite!='Non' ~ info_progressivite * gauche_droite + info_prog
 # Those who are very biased present very similar results than whole sample, except for progressivity: they turn to think the tax is regressive when we tell them it's not
 # Those who have large absolute gains have similar results, though smaller coef for SI-RDD because the compliers of LATE for are more biased and have lower acceptance anyway
 ss <- s[s$simule_gain - s$gain > 110,]
+ss <- s[abs(s$simule_gain - s$gain) > 110,]
 ss <- s[abs(s$simule_gain) > 90,]
 wtd.mean(ss$simule_gain_inelastique < ss$gain, ss$weight) # Less than 1% of those with a bias > 110 have a higher subjective gain with inelastic good specification
 wtd.mean(abs(s$simule_gain) > 90, s$weight) # 37% have absolute gain higher than 90, meaning that there is 95% our prediction is correct (93% at the margin)
@@ -2769,3 +2770,18 @@ TableVII <- stargazer(ols_prog1, ols_prog2, logit_prog3, ols_prog4,
                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. } \\end{table} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+##### Interaction âge - gagnant #####
+# Les pauvres sont plus jeunes que la moyenne, et ils pourraient s'opposer à la taxe en prévision qu'ils deviendront riches plus tard. 
+# résultat : les jeunes gagnants approuvent plus que les vieux gagnants... sauf pour les transferts ciblés !
+summary(lm(tax_acceptance ~ as.factor(age), data=s, subset=gagnant_categorie=='Gagnant' & progressivite=='Oui', weights=s$weight))
+summary(lm(tax_acceptance ~ as.factor(age), data=s, subset=gagnant_feedback_categorie=='Gagnant' & progressivite=='Oui', weights=s$weight))
+summary(lm(tax_acceptance ~ as.factor(age), data=s, subset=gagnant_categorie=='Gagnant', weights=s$weight))
+summary(lm(tax_acceptance ~ as.factor(age), data=s, subset=gagnant_feedback_categorie=='Gagnant', weights=s$weight))
+summary(lm(tax_acceptance ~ as.factor(age), data=s, subset=gagnant_categorie=='Perdant' & simule_gain - gain > 110, weights=s$weight))
+summary(lm(tax_acceptance ~ as.factor(age), data=s, subset=gagnant_categorie=='Gagnant' & simule_gain - gain > 110, weights=s$weight))
+summary(lm(taxe_cible_approbation!='Non' ~ as.factor(age), data=s, subset=gagnant_cible_categorie=='Gagnant', weights=s$weight))
+summary(lm(taxe_cible_approbation!='Non' ~ age, data=s, subset=gagnant_cible_categorie=='Gagnant', weights=s$weight))
+summary(lm(taxe_cible_approbation!='Non' ~ as.factor(age) * (gagnant_cible_categorie=='Gagnant'), data=s, weights=s$weight))
+summary(lm(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie=='Gagnant'), data=s, weights=s$weight))
