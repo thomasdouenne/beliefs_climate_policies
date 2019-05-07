@@ -137,7 +137,7 @@ summary(reg_bias_bis) # R^2: 0.04 (la moitié due aux gilets jaunes)
 
 Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
      title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
-     covariate.labels = c("Constant", "Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist","Consumption Units (C.U.)", "Yellow vests: PNR","Yellow vests: understands","Yellow vests: supports", "Yellow vests: is part"),
+     covariate.labels = c("Constant", "Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist","Consumption Units (C.U.)", "Yellow Vests: PNR","Yellow Vests: understands","Yellow Vests: supports", "Yellow Vests: is part"),
      dep.var.labels = c("Estimated bias per C.U. ($\\widehat{\\gamma}-g$) > 110"), dep.var.caption = "", header = FALSE,
      keep = c("Constant", "taxe_approbation", "Gilets_jaunes", "^uc", "Féminin", "ecologiste"),
      coef = list(NULL, logit_bias_margins[,1], NULL),
@@ -302,6 +302,58 @@ x = sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==1 & s$gagnant_feedback
 n = sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==1,]$weight) + sum(s[s$variante_taxe_info == 'f' & s$simule_gagnant==0,]$weight)
 binconf(x = x, n = n)
 
+## Robustess test on respondents with high gain or loss:
+## Use binomial law to compute confidence intervals around share of respondents
+ss <- s[abs(s$simule_gain) > 110,]
+decrit(ss$gagnant_categorie, weights= ss$weight)
+decrit(ss$simule_gagnant, weights= ss$weight)
+# Simulés gagnants :
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Gagnant' & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Gagnant',]$weight)
+binconf(x = x, n = n)
+
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Non affecté' & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Non affecté',]$weight)
+binconf(x = x, n = n)
+
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Perdant' & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Perdant',]$weight)
+binconf(x = x, n = n)
+
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie != 'Non affecté' & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie != 'Non affecté',]$weight)
+binconf(x = x, n = n)
+
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1,]$weight)
+binconf(x = x, n = n)
+
+# Simulés perdants :
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Gagnant' & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Gagnant',]$weight)
+binconf(x = x, n = n)
+
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Non affecté' & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Non affecté',]$weight)
+binconf(x = x, n = n)
+
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Perdant' & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Perdant',]$weight)
+binconf(x = x, n = n)
+
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie != 'Non affecté' & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie != 'Non affecté',]$weight)
+binconf(x = x, n = n)
+
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0,]$weight)
+binconf(x = x, n = n)
+
+
+# Conservative updating overall
+x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_feedback_categorie == 'Gagnant',]$weight) + sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
+n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1,]$weight) + sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0,]$weight)
+binconf(x = x, n = n)
 
 
 # Conservative updating
@@ -344,7 +396,7 @@ summary(covariates_update_correct_bis)
 # asymmetric_simple <- stargazer(base_winner, controled_winner, base_feedback_winner, controled_feedback_winner, covariates_update_correct,
 #           title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
 #           covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Winner, after feedback ($\\dot{G}^F$)",
-#                                "Retired", "Active", "Student", "Yellow vests: PNR", "Yellow vests: understands", "Yellow vests: supports", "Yellow vests: is part"),
+#                                "Retired", "Active", "Student", "Yellow Vests: PNR", "Yellow Vests: understands", "Yellow Vests: supports", "Yellow Vests: is part"),
 #           dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, 
 #           keep = c('Constant', '.*Gagnant.*', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
 #           order = c('Constant', '.*Gagnant.*', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
@@ -355,14 +407,14 @@ summary(covariates_update_correct_bis)
 asymmetric_simple <- stargazer(base_winner, covariates_update_correct, covariates_update_correct_bis,
                                title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                                covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
-                                                    "Retired", "Active", "Student", "Yellow vests: PNR", "Yellow vests: understands", "Yellow vests: supports", "Yellow vests: is part"),
+                                                    "Retired", "Active", "Student", "Yellow Vests: PNR", "Yellow Vests: understands", "Yellow Vests: supports", "Yellow Vests: is part"),
                                dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, 
                                keep = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
                                order = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
                                add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark"), 
                                                 c("Includes controls", "", "\\checkmark", "\\checkmark")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
-write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow vests: opposes} }  \\end{table} ', 
+write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes} }  \\end{table} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
@@ -380,6 +432,10 @@ ols_prog_1 <- lm(progressivite!='Non' ~ info_progressivite, data=s, weights=s$we
 summary(ols_prog_1)
 ols_prog_2 <- lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, weights=s$weight)
 summary(ols_prog_2)
+ols_prog_3 <- lm(progressivite!='Non' ~ info_progressivite * (gilets_jaunes>0) + info_progressivite * (gagnant_feedback_categorie == 'Perdant') + info_progressivite * (Diplome>4) + info_progressivite * biais_sur + info_progressivite * (taxe_approbation == 'Non'), data=s, weights=s$weight)
+summary(ols_prog_3)
+ols_prog_4 <- lm(progressivite!='Non' ~ info_progressivite * (gagnant_categorie == 'Perdant') + info_progressivite * (taxe_efficace == 'Non'), data=s, weights=s$weight)
+summary(ols_prog_4)
 
 prog <- stargazer(ols_prog_1, ols_prog_2, title="Effect of information on perceived progressivity", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                                covariate.labels = c("Constant", "Information on progressivity ($Z_P$)", "Large bias $(\\left|\\widehat{\\gamma}-g\\right|>110)$",
