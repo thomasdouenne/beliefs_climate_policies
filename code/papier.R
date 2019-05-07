@@ -124,21 +124,23 @@ wtd.mean(s$simule_gain - s$gain > 110, weights = s$weight) # 52%
 # mean(predicted_gain[,3] - predicted_gain[,2]) / 2 # 107: half-length of 90% Confidence Interval
 
 # TODO: plus de contrôles ?
-formula_bias <- as.formula(paste("(simule_gain - gain > 110) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo, collapse=' + ')))
+variables_demo_bias <- variables_demo
+variables_demo_bias <- variables_demo_bias[!(variables_demo_bias %in% c("sexe", "age_50_64", "age_65_plus", "taille_agglo"))]
+formula_bias <- as.formula(paste("(simule_gain - gain > 110) ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
 reg_bias <- lm(formula_bias, data=s, weights=s$weight)
 summary(reg_bias) # R^2: 0.04 (la moitié due aux gilets jaunes)
 logit_bias <- glm(formula_bias, family = binomial(link='logit'), data=s)
 summary(logit_bias)
 logit_bias_margins <- logitmfx(formula_bias, s, atmean=FALSE)$mfxest
 logit_bias_margins
-formula_bias_bis <- as.formula(paste("(simule_gain - gain > 110) ~ taxe_approbation + (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo, collapse=' + ')))
+formula_bias_bis <- as.formula(paste("(simule_gain - gain > 110) ~ taxe_approbation + (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
 reg_bias_bis <- lm(formula_bias_bis, data=s, weights=s$weight)
 summary(reg_bias_bis) # R^2: 0.04 (la moitié due aux gilets jaunes)
 
 Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
      title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
      covariate.labels = c("Constant", "Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist","Consumption Units (C.U.)", "Yellow Vests: PNR","Yellow Vests: understands","Yellow Vests: supports", "Yellow Vests: is part"),
-     dep.var.labels = c("Estimated bias per C.U. ($\\widehat{\\gamma}-g$) > 110"), dep.var.caption = "", header = FALSE,
+     dep.var.labels = c("Large bias ($\\left|\\widehat{\\gamma}-g\\right| > 110$)"), dep.var.caption = "", header = FALSE,
      keep = c("Constant", "taxe_approbation", "Gilets_jaunes", "^uc", "Féminin", "ecologiste"),
      coef = list(NULL, logit_bias_margins[,1], NULL),
      se = list(NULL, logit_bias_margins[,2], NULL),
@@ -208,7 +210,7 @@ TableX <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls, #  elas_
                     covariate.labels = c("Price elasticity: Housing", "Price elasticity: Transports", "Income","Size of town", "Age","Domestic fuel", "Natural gas", "Diesel"), 
                     dep.var.labels = c("Environmental effectiveness: not `No'"), dep.var.caption = "", header = FALSE,
                     keep = c("Elasticite"),
-                    add.lines = list(c("Controls: Socio-demographics, incomes, energy", "", "", "\\checkmark  ", "\\checkmark")),
+                    add.lines = list(c("Controls: Socio-demographics, energy", "", "", "\\checkmark  ", "\\checkmark")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableX, fixed=TRUE), fixed=TRUE), collapse=' ')
 
@@ -427,20 +429,23 @@ logit_ee1_margins
 
 
 # 4.3 Beliefs over progressivity
+s$inactif <- s$statut_emploi %in% c("inactif", "au chômage")
 cor(s$info_progressivite, (s$progressivite!='Non'), use='complete.obs') # -0.006
 ols_prog_1 <- lm(progressivite!='Non' ~ info_progressivite, data=s, weights=s$weight)
 summary(ols_prog_1)
 ols_prog_2 <- lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, weights=s$weight)
 summary(ols_prog_2)
-ols_prog_3 <- lm(progressivite!='Non' ~ info_progressivite * (gilets_jaunes>0) + info_progressivite * (gagnant_feedback_categorie == 'Perdant') + info_progressivite * (Diplome>4) + info_progressivite * biais_sur + info_progressivite * (taxe_approbation == 'Non'), data=s, weights=s$weight)
+ols_prog_3 <- lm(progressivite!='Non' ~  info_progressivite * biais_sur + info_progressivite * Gauche_droite + info_progressivite * revenu + info_progressivite * taille_agglo + info_progressivite * taille_menage + info_progressivite * age + info_progressivite * Gilets_jaunes + info_progressivite * sexe + info_progressivite * inactif + info_progressivite * (Diplome>4), data=s, weights=s$weight)
 summary(ols_prog_3)
-ols_prog_4 <- lm(progressivite!='Non' ~ info_progressivite * (gagnant_categorie == 'Perdant') + info_progressivite * (taxe_efficace == 'Non'), data=s, weights=s$weight)
-summary(ols_prog_4)
 
-prog <- stargazer(ols_prog_1, ols_prog_2, title="Effect of information on perceived progressivity", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+prog <- stargazer(ols_prog_1, ols_prog_2, ols_prog_3, title="Effect of information on perceived progressivity", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                                covariate.labels = c("Constant", "Information on progressivity ($Z_P$)", "Large bias $(\\left|\\widehat{\\gamma}-g\\right|>110)$",
-                                                    "Interaction $Z_P \\times (\\left|\\widehat{\\gamma}-g\\right|>110)$"),
-                               dep.var.labels = "Progressivity: not No ($P>0$)", dep.var.caption = "", header = FALSE, 
+                                                  "Interaction $Z_P \\times (\\left|\\widehat{\\gamma}-g\\right|>110)$"),
+                               omit = c("Diplome", "sexe", "age", "inactif", "Gilets_jaunes", "Gauche_droite", "revenu", "taille_menage", "taille_agglo"),             
+                  #keep = c(1, 2, 3, 20),
+                  # keep = c("progressivite\\Z", "biais_sur", "Constant"), perl=T,
+                               dep.var.labels = "Progressivity: not No ($P>0$)", dep.var.caption = "", header = FALSE,
+                               add.lines = list(c("Controls: Socio-demo, politics ", "", "", "\\checkmark ")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog")
 write_clip(gsub('\\end{table}', ' } \\end{table} ', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', prog, fixed=TRUE), fixed=TRUE), collapse=' ')
 
@@ -612,7 +617,7 @@ TableVI <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls2_
                      coef = list(NULL, NULL, NULL, logit_ee4_margins[,1], NULL, NULL), 
                      se = list(NULL, NULL, NULL, logit_ee4_margins[,2], NULL, NULL),
                      add.lines = list(c("Instruments: info E.E., C.C. \\& P.M. ", "\\checkmark ", "\\checkmark ", "", " ", "\\checkmark ", "\\checkmark"),
-                       c("Controls: Socio-demographics ", "", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "", "")), 
+                       c("Controls: Socio-demographics, G ", "", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "", "")), 
                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
                "\\textit{IV} & \\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
