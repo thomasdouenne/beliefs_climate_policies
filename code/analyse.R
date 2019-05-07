@@ -2046,6 +2046,52 @@ formula_ols_prog6 <- as.formula(paste("tax_approval ~ (progressivite == 'Oui') +
 ols_prog6 <- lm(formula_ols_prog6, weights=s$weight, data=ss)
 summary(ols_prog6)
 
+variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
+variables_reg_prog <- variables_reg_prog[!(variables_reg_prog %in% 
+    c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
+
+summary(lm(as.formula(paste("progressif ~ ", paste(variables_reg_prog, collapse=' + '))), weights=s$weight, data=s))
+variables_correlees_prog <- c("Revenu", "Revenu2", "gagnant_categorie", "taxe_efficace", "sexe", "diplome4", "surface")
+
+s$progressif <- s$progressivite!='Non'
+# (1) OLS with controls and interactions: effect only when interacted (with 101 control variables and no interaction: 27 p.p.***)
+formula_ols_prog1 <- as.formula(paste("tax_acceptance ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+   " + (gagnant_categorie!='Perdant') * (taxe_efficace!='Non') * progressif")))
+ols_prog1 <- lm(formula_ols_prog1, weights=s$weight, data=s)
+summary(ols_prog1)
+
+# (1bis) OLS with controls and interactions: effect only when interacted (with 101 control variables and no interaction: 27 p.p.***)
+formula_ols_prog1bis <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+   " + (gagnant_info_categorie!='Perdant') * (taxe_efficace!='Non') * progressif + progressif*revenu"))) #  + taxe_approbation: no dramatic difference /  + (gagnant_info_categorie!='Perdant') * revenu * progressif: no effect
+ols_prog1bis <- lm(formula_ols_prog1bis, weights=s$weight, data=s)
+summary(ols_prog1bis) # sum of all effects True: 0.826. P+G: 0.675; P+EE: 0.611 ; G+EE: 0.494.
+
+# (2) OLS simple: 38 p.p.***
+ols_prog2 <- lm(tax_acceptance ~ progressif, weights=s$weight, data=s)
+summary(ols_prog2)
+
+# (3) Logit with controls and interaction: pareil
+logit_prog3 <- glm(tax_acceptance ~ progressif, family = binomial(link='logit'), data=s)
+summary(logit_prog3)
+logit_prog3_margins <- logitmfx(logit_prog3, data=s, atmean=FALSE)$mfxest
+logit_prog3_margins
+
+# (4) OLS simple: progressivite is yes / approve
+ols_prog4 <- lm(tax_approval ~ (progressivite == 'Oui'), weights=s$weight, data=s)
+summary(ols_prog4)
+TableVII <- stargazer(ols_prog1, ols_prog2, logit_prog3, ols_prog4,
+                            title="Effect of beliefs over progressivity on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                            covariate.labels = c("Progressivity: not `No' $(P>0)$", "Believes does not lose $(G>0)$", "Effective: not No $(EE>0)$", "$(G>0) \\times (EE>0)$",
+                                                 "Interaction: not lose $(P>0) \\times (G>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "$(P>0) \\times (G>0) \\times (EE>0)$", "Progressivity: `Yes' ($\\dot{P}>0$)"), # "Constant",
+                            dep.var.labels = c("Tax Acceptance ($A^I$)", "Tax Approval ($\\dot{A^I}$)"), dep.var.caption = "", header = FALSE,
+                            keep = c("progressi", "gagnant_categorie", 'taxe_efficace'), # "Constant"
+                            coef = list(NULL, NULL, logit_prog3_margins[,1], NULL),
+                            se = list(NULL, NULL, logit_prog3_margins[,2], NULL),
+                            add.lines = list(c("Controls: Socio-demo, energy", "\\checkmark ", " ", "", "")),
+                            no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. } \\end{table} ',
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
+
 
 ##### 5.4 All effects #####
 variables_reg_all <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo)

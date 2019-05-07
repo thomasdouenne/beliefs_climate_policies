@@ -650,7 +650,6 @@ anova(ols_ee_sans_interaction, ols_ee) # We almost reject that interactions term
 
 ## 5.3 Progressivity
 # Identification challenge and strategies
-# TODO: interagir progressivité avec revenu, politique
 variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
 variables_reg_prog <- variables_reg_prog[!(variables_reg_prog %in% 
     c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
@@ -659,88 +658,57 @@ summary(lm(as.formula(paste("progressif ~ ", paste(variables_reg_prog, collapse=
 variables_correlees_prog <- c("Revenu", "Revenu2", "gagnant_categorie", "taxe_efficace", "sexe", "diplome4", "surface")
 
 s$progressif <- s$progressivite!='Non'
+s$effective <- s$taxe_efficace!='Non'
+s$gagnant_info <- s$gagnant_info_categorie!='Perdant'
 # (1) OLS with controls and interactions: effect only when interacted (with 101 control variables and no interaction: 27 p.p.***)
-formula_ols_prog1 <- as.formula(paste("tax_acceptance ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
-   " + (gagnant_categorie!='Perdant') * (taxe_efficace!='Non') * progressif")))
+formula_ols_prog1 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), " + gagnant_info * effective * progressif")))
 ols_prog1 <- lm(formula_ols_prog1, weights=s$weight, data=s)
-summary(ols_prog1)
+summary(ols_prog1) # sum of all effects True: 0.826. P+G: 0.675; P+EE: 0.611 ; G+EE: 0.494.
 
-# (1bis) OLS with controls and interactions: effect only when interacted (with 101 control variables and no interaction: 27 p.p.***)
-formula_ols_prog1bis <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
-   " + (gagnant_info_categorie!='Perdant') * (taxe_efficace!='Non') * progressif"))) #  + taxe_approbation: no dramatic difference /  + (gagnant_info_categorie!='Perdant') * revenu * progressif: no effect
-ols_prog1bis <- lm(formula_ols_prog1bis, weights=s$weight, data=s)
-summary(ols_prog1bis) # sum of all effects True: 0.826. P+G: 0.675; P+EE: 0.611 ; G+EE: 0.494.
-
-# # (1bis) OLS with controls: 27 p.p.*** (same result with 101 control variables)
-# formula_ols_prog1bis <- as.formula(paste("tax_acceptance ~ progressif + ", paste(variables_reg_prog, collapse=' + ')))
-# ols_prog1bis <- lm(formula_ols_prog1bis, weights=s$weight, data=s)
-# summary(ols_prog1bis)
-
-# (2) OLS simple: 38 p.p.***
-ols_prog2 <- lm(tax_acceptance ~ progressif, weights=s$weight, data=s)
+# (2) OLS with controls and all interactions
+formula_ols_prog2 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+   " + gagnant_info * effective * progressif + progressif * Revenu "))) # No effect from prog*gauche_droite/gilets_jaunes + progressif * gauche_droite + progressif * gilets_jaunes
+ols_prog2 <- lm(formula_ols_prog2, weights=s$weight, data=s)
 summary(ols_prog2)
 
-# (2bis) OLS simple: 38 p.p.***
-ols_prog2bis <- lm(taxe_info_approbation!='Non' ~ progressif, weights=s$weight, data=s)
-summary(ols_prog2bis)
+# (3) OLS simple: 38 p.p.***
+ols_prog3 <- lm(taxe_info_approbation!='Non' ~ progressif, weights=s$weight, data=s)
+summary(ols_prog3)
 
-# (3) Logit with controls and interaction: pareil
-logit_prog3 <- glm(tax_acceptance ~ progressif, family = binomial(link='logit'), data=s)
-summary(logit_prog3)
-logit_prog3_margins <- logitmfx(logit_prog3, data=s, atmean=FALSE)$mfxest
-logit_prog3_margins
+# (4) logit simple
+logit_prog4 <- glm(taxe_info_approbation!='Non' ~ progressif, family = binomial(link='logit'), data=s)
+summary(logit_prog4)
+logit_prog4_margins <- logitmfx(logit_prog4, data=s, atmean=FALSE)$mfxest
+logit_prog4_margins
 
-# (3bis) Logit with controls and interaction: pareil
-logit_prog3bis <- glm(taxe_info_approbation!='Non' ~ progressif, family = binomial(link='logit'), data=s)
-summary(logit_prog3bis)
-logit_prog3bis_margins <- logitmfx(logit_prog3bis, data=s, atmean=FALSE)$mfxest
-logit_prog3bis_margins
+s$progressif <- s$progressivite=='Oui'
+s$effective <- s$taxe_efficace=='Oui'
+s$gagnant_info <- s$gagnant_info_categorie=='Gagnant'
+# (5) YES OLS with controls and all interactions
+formula_ols_prog5 <- as.formula(paste("taxe_info_approbation=='Oui' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+   " + gagnant_info * effective * progressif + progressif * Revenu"))) #  + taxe_approbation: no dramatic difference /  + (gagnant_info_categorie!='Perdant') * revenu * progressif: no effect
+ols_prog5 <- lm(formula_ols_prog5, weights=s$weight, data=s)
+summary(ols_prog5) # sum of all effects True:  P+G: ; P+EE:  ; G+EE: 
 
-# (4) OLS simple: progressivite is yes / approve
-ols_prog4 <- lm(tax_approval ~ (progressivite == 'Oui'), weights=s$weight, data=s)
-summary(ols_prog4)
+# (6) YES OLS simple
+ols_prog6 <- lm(taxe_info_approbation=='Oui' ~ progressif, weights=s$weight, data=s)
+summary(ols_prog6)
 
-# (4bis) OLS simple: progressivite is yes / approve
-ols_prog4bis <- lm(taxe_info_approbation=='Oui' ~ (progressivite == 'Oui'), weights=s$weight, data=s)
-summary(ols_prog4bis)
-
-TableVII <- stargazer(ols_prog1, ols_prog2, logit_prog3, ols_prog4,
-                            title="Effect of beliefs over progressivity on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                            covariate.labels = c("Progressivity: not `No' $(P>0)$", "Believes does not lose $(G>0)$", "Effective: not No $(EE>0)$", "$(G>0) \\times (EE>0)$",
-                                                 "Interaction: not lose $(P>0) \\times (G>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "$(P>0) \\times (G>0) \\times (EE>0)$", "Progressivity: `Yes' ($\\dot{P}>0$)"), # "Constant",
-                            dep.var.labels = c("Tax Acceptance ($A^I$)", "Tax Approval ($\\dot{A^I}$)"), dep.var.caption = "", header = FALSE,
-                            keep = c("progressi", "gagnant_categorie", 'taxe_efficace'), # "Constant"
-                            coef = list(NULL, NULL, logit_prog3_margins[,1], NULL),
-                            se = list(NULL, NULL, logit_prog3_margins[,2], NULL),
-                            add.lines = list(c("Controls: Socio-demo, energy", "\\checkmark ", " ", "", "")),
+TableVII <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, ols_prog6,
+                            title="Effect of beliefs over progressivity on acceptance. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, where strict dummies do not cover `PNR' or `Unaffected' answers.", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                            covariate.labels = c("Progressivity $(P>0)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G>0)$", "Effective $(EE>0)$", "$(G>0) \\times (EE>0)$",
+                                                 "Interaction: winner $(P>0) \\times (G>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "Interaction: income $(P>0) \\times I$", "$(P>0) \\times (G>0) \\times (EE>0)$"), # "Constant",
+                            dep.var.labels = c("Acceptance ($A^I$) on \\textit{not `No'}", "Approval ($\\dot{A^I}$) on \\textit{`Yes'}"), dep.var.caption = "", header = FALSE,
+                            keep = c("progressi", "gagnant", 'effective', 'Revenu$'), # "Constant"
+                            coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
+                            se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
+                            add.lines = list(c("Controls: Socio-demo, energy", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. } \\end{table} ',
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
-TableVII <- stargazer(ols_prog1bis, ols_prog2bis, logit_prog3bis, ols_prog4bis,
-                      title="Effect of beliefs over progressivity on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                      covariate.labels = c("Progressivity: not `No' $(P>0)$", "Believes does not lose $(G>0)$", "Effective: not No $(EE>0)$", "$(G>0) \\times (EE>0)$",
-                                           "Interaction: not lose $(P>0) \\times (G>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "$(P>0) \\times (G>0) \\times (EE>0)$", "Progressivity: `Yes' ($\\dot{P}>0$)"), # "Constant",
-                      dep.var.labels = c("Tax Acceptance ($A^P$)", "Tax Approval ($\\dot{A^P}$)"), dep.var.caption = "", header = FALSE, 
-                      keep = c("progressi", "gagnant_info_categorie", 'taxe_efficace'), # "Constant"
-                      coef = list(NULL, NULL, logit_prog3_margins[,1], NULL),
-                      se = list(NULL, NULL, logit_prog3_margins[,2], NULL),
-                      add.lines = list(c("Controls: Socio-demo, energy", "\\checkmark ", " ", "", "")), 
-                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. } \\end{table} ', 
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
-
-reg_gagnant_prog_rev <- lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight)
-summary(reg_gagnant_prog_rev)
-
-TableVII <- stargazer(reg_gagnant_prog_rev,
-                      title="Effect of perceived progressivity on winning category, depending on income", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                      covariate.labels = c("Constant", "Progressivity: not `No' $(P>0)$", "Income ($I$, in k\\euro{}/month)", "Interaction: $(P>0) \\times I$"),
-                      dep.var.labels = c("Believes does not lose"), dep.var.caption = "", header = FALSE, 
-                      # keep = c("Constant", "progressi", 'evenu'), # "Constant"
-                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. } \\end{table} ', 
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
+# reg_gagnant_prog_rev <- lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight)
+# summary(reg_gagnant_prog_rev)
 
 
 ##### Appendix A. Raw data #####
