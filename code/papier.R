@@ -375,11 +375,18 @@ logit_ee1_margins
 
 
 # 4.3 Beliefs over progressivity
+cor(s$info_progressivite, (s$progressivite!='Non'), use='complete.obs') # -0.006
 ols_prog_1 <- lm(progressivite!='Non' ~ info_progressivite, data=s, weights=s$weight)
 summary(ols_prog_1)
-ols_prog_2 <- lm(gagnant_info_categorie!='Perdant' ~ info_progressivite * revenu + info_progressivite * rev_tot + info_progressivite * I(rev_tot^2), data=s, weights=s$weight)
+ols_prog_2 <- lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, weights=s$weight)
 summary(ols_prog_2)
-cor(s$info_progressivite, (s$progressivite!='Non'), use='complete.obs') # -0.006
+
+prog <- stargazer(ols_prog_1, ols_prog_2, title="Effect of information on perceived progressivity", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                               covariate.labels = c("Constant", "Information on progressivity ($Z_P$)", "Large bias $(\\left|\\widehat{\\gamma}-g\\right|>110)$",
+                                                    "Interaction $Z_P \\times (\\left|\\widehat{\\gamma}-g\\right|>110)$"),
+                               dep.var.labels = "Progressivity: not No ($P>0$)", dep.var.caption = "", header = FALSE, 
+                               no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog")
+write_clip(gsub('\\end{table}', ' } \\end{table} ', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', prog, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
 ##### 5 Motives for acceptance #####

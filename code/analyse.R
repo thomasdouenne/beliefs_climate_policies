@@ -2335,8 +2335,8 @@ summary(lm(taxe_perdant_certains==T ~ info_progressivite * biais_sur, data=s, we
 summary(lm(benefices_pauvres==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
 summary(lm(benefices_revenu==T ~ info_progressivite * revenu, data=s, weights = s$weight)) 
 summary(lm(benefices_revenu==T ~ info_progressivite * biais_sur, data=s, weights = s$weight)) # 0.03 . interaction
-summary(lm(benefices_revenu==T ~ info_progressivite * biais_sur * apres_modifs, data=s, weights = s$weight)) # 0
-summary(lm(problemes_ruraux==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
+summary(lm(benefices_revenu==T ~ info_progressivite * biais_sur * apres_modifs, data=s, weights = s$weight)) # 0.05 . interaction BIZARRE
+summary(lm(problemes_ruraux==T ~ info_progressivite * biais_sur, data=s, weights = s$weight)) # .05 .
 summary(lm(problemes_revenu==T ~ info_progressivite * biais_sur, data=s, weights = s$weight))
 summary(lm(problemes_pauvres==T ~ info_progressivite * biais_sur, data=s, weights = s$weight)) # -0.04 . prog + 0.08 * interaction
 summary(lm(problemes_pauvres==T ~ info_progressivite * biais_sur * apres_modifs, data=s, weights = s$weight)) # -0.04 . prog + 0.08 * interaction
@@ -2344,7 +2344,14 @@ summary(lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, weight
 summary(lm(progressivite!='Non' ~ info_progressivite * Gauche_droite + info_progressivite * Gilets_jaunes, data=s, weights=s$weight)) 
 summary(lm(progressivite!='Non' ~ info_progressivite * gauche_droite + info_progressivite * gilets_jaunes, data=s, weights=s$weight)) # -.003 . prog:gilets_jaunes
 summary(lm(progressivite!='Non' ~ info_progressivite * gauche_droite + info_progressivite * gilets_jaunes + info_progressivite * biais_sur, data=s, weights=s$weight)) # some corr but is it meaningful?
-
+summary(lm(gagnant_info_categorie!='Perdant' ~ info_progressivite, data=s, weights=s$weight))
+summary(lm(gagnant_info_categorie!='Perdant' ~ info_progressivite + apres_modifs, data=s, weights=s$weight))
+summary(lm(gagnant_info_categorie!='Perdant' ~ info_progressivite * revenu, data=s, weights=s$weight))
+summary(lm(gagnant_info_categorie!='Perdant' ~ info_progressivite * revenu + info_progressivite * rev_tot + info_progressivite * I(rev_tot^2), data=s, weights=s$weight))
+# summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu + (progressivite!='Non') * Revenu_conjoint + (progressivite!='Non') * Revenu2, data=s, weights=s$weight))
+# summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu + (progressivite!='Non') * Revenu_conjoint, data=s, weights=s$weight))
+# summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight))
+# summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non'), data=s, weights=s$weight))
 
 ##### ON SUBSAMPLE OF BIAS > 110 #####
 # Those who are very biased present very similar results than whole sample, except for progressivity: they turn to think the tax is regressive when we tell them it's not
