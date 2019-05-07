@@ -1009,7 +1009,7 @@ convert_s <- function() {
   temp <- Label(s$interet_politique)
   s$interet_politique <<- 1*(s$interet_politique=='Un peu') + 2*(s$interet_politique=='Beaucoup')
   s$interet_politique <<- as.item(s$interet_politique, labels=structure(c(0:2), names=c('Presque pas', 'Un peu', 'Beaucoup')), annotation=temp)
-
+# TODO: pb missing
   s$gilets_jaunes[s$gilets_jaunes_NSP==T] <<- -99
   s$gilets_jaunes[s$gilets_jaunes_compris==T] <<- 0 # total à 115%
   s$gilets_jaunes[s$gilets_jaunes_oppose==T] <<- -1 # 2 oppose et soutien en même temps

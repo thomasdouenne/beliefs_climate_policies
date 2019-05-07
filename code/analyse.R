@@ -2521,63 +2521,6 @@ plot(crosstab_simule_perdant, sort=2:1, cex.axis=0.9, ylab = expression('Winning
 mtext(side=3, expression('Winning category,'~bold(After)~feedback), line=0.8, cex = 1.2)
 par(mar = mar_old, cex = cex_old)
 
-ss <- s[abs(s$simule_gain - s$gain) > 110,]
-decrit((ss$simule_gain > ss$gain), weights=ss$weight)
-
-summary(lm(taxe_cible_approbation!='Non' ~ as.factor(age) * (gagnant_cible_categorie=='Gagnant'), data=s, weights=s$weight))
-
-## Use binomial law to compute confidence intervals around share of respondents
-decrit(ss$gagnant_categorie, weights= ss$weight)
-decrit(ss$simule_gagnant, weights= ss$weight)
-# Simulés gagnants :
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Gagnant' & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Gagnant',]$weight)
-binconf(x = x, n = n)
-
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Non affecté' & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Non affecté',]$weight)
-binconf(x = x, n = n)
-
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Perdant' & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie == 'Perdant',]$weight)
-binconf(x = x, n = n)
-
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie != 'Non affecté' & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_categorie != 'Non affecté',]$weight)
-binconf(x = x, n = n)
-
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_feedback_categorie == 'Gagnant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1,]$weight)
-binconf(x = x, n = n)
-
-# Simulés perdants :
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Gagnant' & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Gagnant',]$weight)
-binconf(x = x, n = n)
-
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Non affecté' & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Non affecté',]$weight)
-binconf(x = x, n = n)
-
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Perdant' & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie == 'Perdant',]$weight)
-binconf(x = x, n = n)
-
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie != 'Non affecté' & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_categorie != 'Non affecté',]$weight)
-binconf(x = x, n = n)
-
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0,]$weight)
-binconf(x = x, n = n)
-
-
-# Conservative updating overall
-x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1 & ss$gagnant_feedback_categorie == 'Gagnant',]$weight) + sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_feedback_categorie == 'Perdant',]$weight)
-n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==1,]$weight) + sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0,]$weight)
-binconf(x = x, n = n)
-
-
 # Conservative updating: update less correctly
 decrit(ss$feedback_infirme_large, weights = ss$weight) # 70%
 decrit(ss$update_correct[ss$feedback_infirme_large==T], weights = ss$weight[ss$feedback_infirme_large==T]) # 18%
