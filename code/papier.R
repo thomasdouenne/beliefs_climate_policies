@@ -382,8 +382,8 @@ ols_prog_2 <- lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, 
 summary(ols_prog_2)
 
 prog <- stargazer(ols_prog_1, ols_prog_2, title="Effect of information on perceived progressivity", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                               covariate.labels = c("Constant", "Information on progressivity ($Z_P$)", "Large bias $(\\left|\\widehat{\\gamma}-g\\right|>110)$",
-                                                    "Interaction $Z_P \\times (\\left|\\widehat{\\gamma}-g\\right|>110)$"),
+                               covariate.labels = c("Constant", "Information on progressivity ($Z_P$)", "Large bias $(|\\widehat{\\gamma}-g|>110)$",
+                                                    "Interaction $Z_P \\times (|\\widehat{\\gamma}-g|>110)$"),
                                dep.var.labels = "Progressivity: not No ($P>0$)", dep.var.caption = "", header = FALSE, 
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog")
 write_clip(gsub('\\end{table}', ' } \\end{table} ', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', prog, fixed=TRUE), fixed=TRUE), collapse=' ')
@@ -600,9 +600,15 @@ variables_correlees_prog <- c("Revenu", "Revenu2", "gagnant_categorie", "taxe_ef
 s$progressif <- s$progressivite!='Non'
 # (1) OLS with controls and interactions: effect only when interacted (with 101 control variables and no interaction: 27 p.p.***)
 formula_ols_prog1 <- as.formula(paste("tax_acceptance ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
-   paste(c("(taxe_efficace!='Non')", "(gagnant_categorie!='Perdant')"), collapse=' + progressif * '), sep=" + (gagnant_categorie!='Perdant') * (taxe_efficace!='Non') * progressif + progressif * ")))
+   " + (gagnant_categorie!='Perdant') * (taxe_efficace!='Non') * progressif")))
 ols_prog1 <- lm(formula_ols_prog1, weights=s$weight, data=s)
 summary(ols_prog1)
+
+# (1bis) OLS with controls and interactions: effect only when interacted (with 101 control variables and no interaction: 27 p.p.***)
+formula_ols_prog1bis <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+   " + (gagnant_info_categorie!='Perdant') * (taxe_efficace!='Non') * progressif"))) #  + taxe_approbation: no dramatic difference /  + (gagnant_info_categorie!='Perdant') * revenu * progressif: no effect
+ols_prog1bis <- lm(formula_ols_prog1bis, weights=s$weight, data=s)
+summary(ols_prog1bis) # sum of all effects True: 0.826. P+G: 0.675; P+EE: 0.611 ; G+EE: 0.494.
 
 # # (1bis) OLS with controls: 27 p.p.*** (same result with 101 control variables)
 # formula_ols_prog1bis <- as.formula(paste("tax_acceptance ~ progressif + ", paste(variables_reg_prog, collapse=' + ')))
@@ -613,27 +619,66 @@ summary(ols_prog1)
 ols_prog2 <- lm(tax_acceptance ~ progressif, weights=s$weight, data=s)
 summary(ols_prog2)
 
+# (2bis) OLS simple: 38 p.p.***
+ols_prog2bis <- lm(taxe_info_approbation!='Non' ~ progressif, weights=s$weight, data=s)
+summary(ols_prog2bis)
+
 # (3) Logit with controls and interaction: pareil
 logit_prog3 <- glm(tax_acceptance ~ progressif, family = binomial(link='logit'), data=s)
 summary(logit_prog3)
 logit_prog3_margins <- logitmfx(logit_prog3, data=s, atmean=FALSE)$mfxest
 logit_prog3_margins
 
+# (3bis) Logit with controls and interaction: pareil
+logit_prog3bis <- glm(taxe_info_approbation!='Non' ~ progressif, family = binomial(link='logit'), data=s)
+summary(logit_prog3bis)
+logit_prog3bis_margins <- logitmfx(logit_prog3bis, data=s, atmean=FALSE)$mfxest
+logit_prog3bis_margins
+
 # (4) OLS simple: progressivite is yes / approve
 ols_prog4 <- lm(tax_approval ~ (progressivite == 'Oui'), weights=s$weight, data=s)
 summary(ols_prog4)
+
+# (4bis) OLS simple: progressivite is yes / approve
+ols_prog4bis <- lm(taxe_info_approbation=='Oui' ~ (progressivite == 'Oui'), weights=s$weight, data=s)
+summary(ols_prog4bis)
 
 TableVII <- stargazer(ols_prog1, ols_prog2, logit_prog3, ols_prog4,
                             title="Effect of beliefs over progressivity on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                             covariate.labels = c("Progressivity: not `No' $(P>0)$", "Believes does not lose $(G>0)$", "Effective: not No $(EE>0)$", "$(G>0) \\times (EE>0)$",
                                                  "Interaction: not lose $(P>0) \\times (G>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "$(P>0) \\times (G>0) \\times (EE>0)$", "Progressivity: `Yes' ($\\dot{P}>0$)"), # "Constant",
-                            dep.var.labels = c("Tax Acceptance ($A^I$)", "Tax Approval ($\\dot{A^I}$)"), dep.var.caption = "", header = FALSE, 
+                            dep.var.labels = c("Tax Acceptance ($A^I$)", "Tax Approval ($\\dot{A^I}$)"), dep.var.caption = "", header = FALSE,
                             keep = c("progressi", "gagnant_categorie", 'taxe_efficace'), # "Constant"
                             coef = list(NULL, NULL, logit_prog3_margins[,1], NULL),
                             se = list(NULL, NULL, logit_prog3_margins[,2], NULL),
-                            add.lines = list(c("Controls: Socio-demo, energy, G, EE, $G \\times EE$", "\\checkmark ", " ", "", "")), 
+                            add.lines = list(c("Controls: Socio-demo, energy", "\\checkmark ", " ", "", "")),
                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. } \\end{table} ',
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+TableVII <- stargazer(ols_prog1bis, ols_prog2bis, logit_prog3bis, ols_prog4bis,
+                      title="Effect of beliefs over progressivity on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                      covariate.labels = c("Progressivity: not `No' $(P>0)$", "Believes does not lose $(G>0)$", "Effective: not No $(EE>0)$", "$(G>0) \\times (EE>0)$",
+                                           "Interaction: not lose $(P>0) \\times (G>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "$(P>0) \\times (G>0) \\times (EE>0)$", "Progressivity: `Yes' ($\\dot{P}>0$)"), # "Constant",
+                      dep.var.labels = c("Tax Acceptance ($A^P$)", "Tax Approval ($\\dot{A^P}$)"), dep.var.caption = "", header = FALSE, 
+                      keep = c("progressi", "gagnant_info_categorie", 'taxe_efficace'), # "Constant"
+                      coef = list(NULL, NULL, logit_prog3_margins[,1], NULL),
+                      se = list(NULL, NULL, logit_prog3_margins[,2], NULL),
+                      add.lines = list(c("Controls: Socio-demo, energy", "\\checkmark ", " ", "", "")), 
+                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. } \\end{table} ', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+reg_gagnant_prog_rev <- lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight)
+summary(reg_gagnant_prog_rev)
+
+TableVII <- stargazer(reg_gagnant_prog_rev,
+                      title="Effect of perceived progressivity on winning category, depending on income", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                      covariate.labels = c("Constant", "Progressivity: not `No' $(P>0)$", "Income ($I$, in k\\euro{}/month)", "Interaction: $(P>0) \\times I$"),
+                      dep.var.labels = c("Believes does not lose"), dep.var.caption = "", header = FALSE, 
+                      # keep = c("Constant", "progressi", 'evenu'), # "Constant"
+                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. } \\end{table} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 

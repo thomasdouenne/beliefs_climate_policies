@@ -2350,8 +2350,14 @@ summary(lm(gagnant_info_categorie!='Perdant' ~ info_progressivite * revenu, data
 summary(lm(gagnant_info_categorie!='Perdant' ~ info_progressivite * revenu + info_progressivite * rev_tot + info_progressivite * I(rev_tot^2), data=s, weights=s$weight))
 # summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu + (progressivite!='Non') * Revenu_conjoint + (progressivite!='Non') * Revenu2, data=s, weights=s$weight))
 # summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu + (progressivite!='Non') * Revenu_conjoint, data=s, weights=s$weight))
-# summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight))
+summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight))
 # summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non'), data=s, weights=s$weight))
+summary(lm(gagnant_info_categorie!='Perdant' ~ (progressivite=='Oui') * Revenu, data=s, weights=s$weight))
+summary(lm(gagnant_info_categorie=='Gagnant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight)) # interaction -.03*
+summary(lm(gagnant_info_categorie=='Gagnant' ~ (progressivite=='Oui') * Revenu, data=s, weights=s$weight)) # interaction -.07***
+summary(lm(gagnant_info_categorie=='Gagnant' ~ progressivite * Revenu, data=s, weights=s$weight)) # interaction Oui -.07***
+summary(lm(gagnant_info_categorie!='Perdant' ~ progressivite * Revenu, data=s, weights=s$weight)) # interaction NSP .09***
+
 
 ##### ON SUBSAMPLE OF BIAS > 110 #####
 # Those who are very biased present very similar results than whole sample, except for progressivity: they turn to think the tax is regressive when we tell them it's not
