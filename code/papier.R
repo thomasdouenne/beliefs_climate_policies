@@ -561,6 +561,8 @@ summary(tsls2_ee1)
 
 # Alternative specifications for robustness checks
 # (2) 2SLS both instruments, with controls: 56 p.p.*
+s$prog_na <- s$progressivite
+s$prog_na[is.na(s$progressivite)] <- "NA"
 variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
 variables_reg_ee <- variables_reg_ee[!(variables_reg_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 formula_ee2 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + ", 
@@ -671,9 +673,19 @@ formula_ols_prog2 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif
 ols_prog2 <- lm(formula_ols_prog2, weights=s$weight, data=s)
 summary(ols_prog2)
 
-# (3) OLS simple: 38 p.p.***
+# (2bis) initial OLS with controls and all interactions
+formula_ols_prog2bis <- as.formula(paste("tax_acceptance ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+   " + (gagnant_categorie!='Perdant') * effective * progressif + progressif * Revenu "))) # No effect from prog*gauche_droite/gilets_jaunes + progressif * gauche_droite + progressif * gilets_jaunes
+ols_prog2bis <- lm(formula_ols_prog2bis, weights=s$weight, data=s)
+summary(ols_prog2bis)
+
+# (3) OLS simple: 56 p.p.***
 ols_prog3 <- lm(taxe_info_approbation!='Non' ~ progressif, weights=s$weight, data=s)
 summary(ols_prog3)
+
+# (3bis) initial OLS simple: 38 p.p.***
+ols_prog3bis <- lm(tax_acceptance ~ progressif, weights=s$weight, data=s)
+summary(ols_prog3bis)
 
 # (4) logit simple
 logit_prog4 <- glm(taxe_info_approbation!='Non' ~ progressif, family = binomial(link='logit'), data=s)
@@ -688,7 +700,7 @@ s$gagnant_info <- s$gagnant_info_categorie=='Gagnant'
 formula_ols_prog5 <- as.formula(paste("taxe_info_approbation=='Oui' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
    " + gagnant_info * effective * progressif + progressif * Revenu"))) #  + taxe_approbation: no dramatic difference /  + (gagnant_info_categorie!='Perdant') * revenu * progressif: no effect
 ols_prog5 <- lm(formula_ols_prog5, weights=s$weight, data=s)
-summary(ols_prog5) # sum of all effects True:  P+G: ; P+EE:  ; G+EE: 
+summary(ols_prog5) # sum of all effects True: 0.947. P+G: 0.609; P+EE: 0.735; G+EE: 0.517
 
 # (6) YES OLS simple
 ols_prog6 <- lm(taxe_info_approbation=='Oui' ~ progressif, weights=s$weight, data=s)
@@ -696,9 +708,9 @@ summary(ols_prog6)
 
 TableVII <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, ols_prog6,
                             title="Effect of beliefs over progressivity on acceptance. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, where strict dummies do not cover `PNR' or `Unaffected' answers.", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                            covariate.labels = c("Progressivity $(P>0)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G>0)$", "Effective $(EE>0)$", "$(G>0) \\times (EE>0)$",
-                                                 "Interaction: winner $(P>0) \\times (G>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "Interaction: income $(P>0) \\times I$", "$(P>0) \\times (G>0) \\times (EE>0)$"), # "Constant",
-                            dep.var.labels = c("Acceptance ($A^I$) on \\textit{not `No'}", "Approval ($\\dot{A^I}$) on \\textit{`Yes'}"), dep.var.caption = "", header = FALSE,
+                            covariate.labels = c("Progressivity $(P>0)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G^P>0)$", "Effective $(EE>0)$", "$(G^P>0) \\times (EE>0)$",
+                                                 "Interaction: winner $(P>0) \\times (G^P>0)$", "Interaction: effective $(P>0) \\times (EE>0)$", "Interaction: income $(P>0) \\times I$", "$(P>0) \\times (G^P>0) \\times (EE>0)$"), # "Constant",
+                            dep.var.labels = c("Acceptance ($A^P$) on \\textit{not `No'}", "Approval ($\\dot{A^P}$) on \\textit{`Yes'}"), dep.var.caption = "", header = FALSE,
                             keep = c("progressi", "gagnant", 'effective', 'Revenu$'), # "Constant"
                             coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
                             se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
