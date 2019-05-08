@@ -3,6 +3,10 @@ load(".RData")
 
 # TODO: check nb_adultes et nb_beneficiaires for simule_gain
 
+##### 1 Introduction #####
+decrit(s$simule_gain > s$gain, weights = s$weight) # 89%
+
+
 ##### 2 Data #####
 ## 2.1 Survey "Beliefs climate policies"
 # 2.1.1 Table I: Sample Characteristics
@@ -41,16 +45,16 @@ s$taille_menage[s$taille_menage > 12] # most look like zipcode, but we capped it
 
 
 ##### 3 Perceptions #####
-## 3.1 Impact on purchasing power
+## 3.1.1 Impact on purchasing power
 # Over-estimation of policy costs TODO: correct figures in paper
 # Subjective losses
 decrit(s$gain_fuel, weights = s$weight) # mean -61 instead of +18
 decrit(s$gain_chauffage, weights = s$weight) # -43 instead of +6
 decrit(s$gain, weights = s$weight) # -89 instead of +24
 # Objective winning category: cf. consistency_belief_losses.py for weighted results
-decrit(objective_gains$transport > 0)
-decrit(objective_gains$housing > 0)
-decrit(objective_gains$all > 0, weights = objective_gains$weight)
+decrit(objective_gains$transport > 0) # 0.736
+decrit(objective_gains$housing > 0) # 0.6749
+decrit(objective_gains$all > 0, weights = objective_gains$weight) # 0.703
 # Subjective winning category
 decrit(s$gagnant_categorie, weights = s$weight) # 14.0% think they win (21.7% unaffected)
 decrit(s$gagnant_fuel_categorie, weights = s$weight) # 15.5% think they win (21.8% unaffected)
@@ -94,7 +98,7 @@ axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.
 # (b) housing
 cdf_housing <- Ecdf(objective_gains$housing)
 cdf_housing_inelastic <- Ecdf(objective_gains_inelastic$housing)
-plot(Ecdf(s$gain_chauffage), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+plot(Ecdf(s$gain_chauffage), type="s", lwd=2, col="red", xlim=c(-250, 90), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
 lines(cdf_housing$x, cdf_housing$y, lwd=2, col="blue")
 lines(cdf_housing_inelastic$x, cdf_housing_inelastic$y, lwd=2, lty=2, col="blue")
 abline(v=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.7))
@@ -102,7 +106,7 @@ axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.
 # (c) both combined 
 cdf_all <- Ecdf(objective_gains$all)
 cdf_all_inelastic <- Ecdf(objective_gains_inelastic$all)
-plot(Ecdf(s$gain), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+plot(Ecdf(s$gain), type="s", lwd=2, col="red", xlim=c(-400, 180), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
 lines(cdf_all$x, cdf_all$y, lwd=2, col="blue")
 lines(cdf_all_inelastic$x, cdf_all_inelastic$y, lwd=2, lty=2, col="blue")
 abline(v=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), lty=3, col=rgb(1,0,0,0.7))
@@ -149,7 +153,7 @@ Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
-## 3.2 Robustness to assumptions on elasticities
+## 3.1.2 Robustness to assumptions on elasticities
 # Households perceived elasticities
 decrit(s$Elasticite_fuel, weights = s$weight) # -0.43 mean perceived gasoline elasticity of French people
 decrit(s$Elasticite_fuel_perso, weights = s$weight * s$depense_carburants) # -0.36 perceived own gasoline elasticity (weighted by share in aggregate spending: only 'mean' is meaningful)
@@ -189,8 +193,11 @@ wtd.mean((s$Elasticite_fuel <= -0.5)[s$taxe_efficace=='Non'], weights = s$weight
 # wtd.mean((s$Elasticite_fuel_perso - s$Elasticite_fuel + 0.05 * (s$Elasticite_fuel %in% c(-0.22, -0.05)))[!grepl("déjà", s$elasticite_fuel_perso)] > 0, weights=s$weight[!grepl("déjà", s$elasticite_fuel_perso)], na.rm = T) # 64%
 # wtd.mean((s$Elasticite_chauffage_perso - s$Elasticite_chauffage + 0.05 * (s$Elasticite_chauffage %in% c(-0.22, -0.05)))[!grepl("déjà", s$elasticite_chauffage_perso)] > 0, weights=s$weight[!grepl("déjà", s$elasticite_chauffage_perso)], na.rm = T) # 68%
 
-## 3.3 Perception on other tax’ properties
-# Environmental effectiveness: Table IX
+# TODO: revenu_conjoint => insérer nb_adultes==1 dans chaque régression
+## 3.2 Environmental effectiveness
+# cf. Table IX
+wtd.mean((s$Elasticite_chauffage[s$taxe_efficace=='Non']<= -0.5), weights = s$weight[s$taxe_efficace=='Non'], na.rm=T)
+wtd.mean((s$Elasticite_fuel[s$taxe_efficace=='Non']<= -0.5), weights = s$weight[s$taxe_efficace=='Non'], na.rm=T)
 decrit(s$taxe_efficace, weights = s$weight, miss = T) # 16.6% vs. 65.9%
 variables_reg_elast <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
 variables_reg_elast <- variables_reg_elast[!(variables_reg_elast %in%
@@ -214,7 +221,7 @@ TableX <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls, #  elas_
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableX, fixed=TRUE), fixed=TRUE), collapse=' ')
 
-# Progressivity
+## 3.3 Progressivity
 decrit(s$progressivite, weights = s$weight) # 19.4% vs. 59.5%
 
 
@@ -560,7 +567,7 @@ tsls2_ee1 <- lm(tax_acceptance ~ taxe_efficace.hat + gagnant_categorie, data=s, 
 summary(tsls2_ee1)
 
 # Alternative specifications for robustness checks
-# (2) 2SLS both instruments, with controls: 56 p.p.*
+# (2) 2SLS both instruments, with controls: 56 p.p.* % We do not control for progressivity: as most of the people who did not answer the question were in the second half of the survey, the absence of response is too correlated with our instrument Z_EE (apres_modifs) which bias the results.
 s$prog_na <- s$progressivite
 s$prog_na[is.na(s$progressivite)] <- "NA"
 variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)

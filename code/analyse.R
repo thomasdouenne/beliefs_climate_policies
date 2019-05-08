@@ -1309,6 +1309,48 @@ decrit(s$update_correct_large | s$gagnant_feedback_pas_faux, weights = s$weight)
 
 
 ##### Graph distributions subjective/objective gains #####
+par(mar = c(2.1, 4.1, 1.1, 0.1), cex=1.5)
+# (a) transport
+cdf_transport <- Ecdf(objective_gains$transport)
+cdf_transport_inelastic <- Ecdf(objective_gains_inelastic$transport)
+cdf_transport_estimated <- Ecdf((60 * pmin(2, s$nb_adultes) - s$hausse_carburants)/ s$uc)
+plot(Ecdf(s$gain_fuel), type="s", lwd=2, col="red", xlim=c(-250, 70), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+plot(Ecdf(s$gain_fuel), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_transport$x, cdf_transport$y, lwd=2, col="blue")
+lines(cdf_transport_inelastic$x, cdf_transport_inelastic$y, lwd=2, lty=2, col="blue")
+lines(cdf_transport_estimated$x, cdf_transport_estimated$y, lwd=2, col="purple")
+abline(v = c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.7))
+axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
+# (b) housing
+cdf_housing <- Ecdf(objective_gains$housing)
+cdf_housing_inelastic <- Ecdf(objective_gains_inelastic$housing)
+cdf_housing_estimated_interaction <- Ecdf((50 * pmin(2, s$nb_adultes) - s$hausse_chauffage_interaction_inelastique/0.8) / s$uc)
+cdf_housing_estimated <- Ecdf((50 * pmin(2, s$nb_adultes) - s$hausse_chauffage) / s$uc)
+plot(Ecdf(s$gain_chauffage), type="s", lwd=2, col="red", xlim=c(-250, 90), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+# plot(Ecdf(s$gain_chauffage), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_housing$x, cdf_housing$y, lwd=2, col="blue")
+lines(cdf_housing_inelastic$x, cdf_housing_inelastic$y, lwd=2, lty=2, col="blue")
+lines(cdf_housing_estimated$x, cdf_housing_estimated$y, lwd=2, col="purple")
+lines(cdf_housing_estimated_interaction$x, cdf_housing_estimated_interaction$y, lwd=2, lty=2, col="purple")
+abline(v=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.7))
+axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
+# (c) both combined 
+cdf_all <- Ecdf(objective_gains$all)
+cdf_all_inelastic <- Ecdf(objective_gains_inelastic$all)
+cdf_all_estimated <- Ecdf(s$simule_gain)
+cdf_all_estimated_interaction <- Ecdf(s$simule_gain_interaction)
+plot(Ecdf(s$gain), type="s", lwd=2, col="red", xlim=c(-400, 180), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+# plot(Ecdf(s$gain), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_all$x, cdf_all$y, lwd=2, col="blue")
+lines(cdf_all_inelastic$x, cdf_all_inelastic$y, lwd=2, lty=2, col="blue")
+lines(cdf_all_estimated$x, cdf_all_estimated$y, lwd=2, col="purple")
+lines(cdf_all_estimated_interaction$x, cdf_all_estimated_interaction$y, lwd=2, lty=2, col="purple")
+abline(v=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), lty=3, col=rgb(1,0,0,0.7))
+axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
+# restore graphical parameters
+par(mar = mar_old, cex = cex_old)
+
+#### old:
 mar_old <- par()$mar
 cex_old <- par()$cex
 par(mar = c(2.1, 4.1, 1.1, 0.1), cex=1.5)
