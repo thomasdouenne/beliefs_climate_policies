@@ -659,7 +659,7 @@ summary(ols_ee)
 ols_ee_sans_interaction <- lm(as.formula(paste("taxe_efficace!='Non' ~ apres_modifs * info_CC * info_PM +", paste(c("Gilets_jaunes", "revenu", "Gauche_droite", "taille_agglo", "ecologiste", "sexe", "(Diplome>4)", "statut_emploi"), 
                                                                collapse=' + '))), weights=s$weight, data=s)
 summary(ols_ee_sans_interaction)
-anova(ols_ee_sans_interaction, ols_ee) # We almost reject that interactions terms have no effect: compliers are a bit different from others
+anova(ols_ee_sans_interaction, ols_ee) # We reject at 6% that interactions terms have no effect: compliers are a bit different from others
 
 
 ## 5.3 Progressivity
@@ -739,29 +739,47 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Not
 
 
 ##### Appendix A. Raw data #####
-## A.1 Perception of net gains
-## A.2 Estimation for feedback
-# A.2.2: cf. test_predictions_ols_regression_with_transports.py and regression_feedback.py
-# A.2.3: cf. test_predictions_binary_models.py (and regression_feedback.py)
+# cf. quotas.xls for objective data (from INSEE)
+decrit(s$sexe)
+decrit(s$age)
+decrit(s$csp)
+decrit(s$diplome4)
+decrit(s$taille_agglo)
+decrit(s$region)
 
-## A.3 Distributive effects
+# for objective data, see python (BdF), preparation.R (ERFS, cf. wtd.mean(db$nb_adultes, db$wprm)) and for domestic fuel: https://www.lesechos.fr/industrie-services/energie-environnement/le-chauffage-au-fioul-devient-de-plus-en-plus-cher-147372
+decrit(s$taille_menage)
+decrit(s$nb_adultes)
+decrit(s$chauffage)
+decrit(s$surface)
+decrit(s$km)
+decrit(s$conso)
+
+
+##### Appendix B. Estimation for feedback #####
+## B.2 Predicting gains and losses
+# Table: cf. test_predictions_ols_regression_with_transports.py and regression_feedback.py
+# Figure: cf. test_predictions_binary_models.py (and regression_feedback.py)
+
+## B.3 Distributive effects
 # TODO: reference to python file
 
 
-##### Appendix B. Perceptions #####
-## B.1 Self-interest: Tables VII and VIII
+##### Appendix C. Beliefs' persistence #####
+## C.1 Self-interest: Tables VII and VIII
 crosstab_simule_gagnant
 crosstab_simule_perdant
 
-## B.2 Environmental effectiveness: Table X
-TableX 
+## C.2 Environmental effectiveness: Table X
+TableX # TODO: renumber Tables
 
-##### Apendix C. Estimation of acceptation motives #####
-## C.1 Two stage least squares: first stage results
+
+##### Apendix D. Estimation of acceptation motives #####
+## D.1 Two stage least squares: first stage results
 TableXI
 TableXII
 
-## C.2 Additional specifications
+## D.2 Additional specifications
 # (1) Target: Acceptance ~ win 
 iv1_si1 <- lm(gagnant_cible_categorie=='Gagnant' ~ traite_cible + traite_cible_conjoint + 
                   I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + (nb_adultes==1), data=s, weights = s$weight)

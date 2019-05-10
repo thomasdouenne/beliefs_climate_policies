@@ -91,13 +91,13 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # irft4 <- read.dta13("fpr_irf14e14t4.dta")
 # menage <- read.dta13("fpr_menage_2014.dta")
 # menage$presta_sociales <- menage$prest_fam_petite_enfance + menage$prest_fam_autres + menage$prest_precarite_rsa + menage$m_rsa_actm + menage$prest_precarite_hand + menage$prest_precarite_vieil + menage$prest_logement + menage$ppe
-# irft4 <- irft4[,which(is.element(colnames(irft4),c("noindiv", "noiprm", "nbinde", "nbenf18", "ag", "mchoe", "ancinatm")))]
+# irft4 <- irft4[,which(is.element(colnames(irft4),c("noindiv", "noiprm", "nbinde", "nbenfa18", "ag", "mchoe", "ancinatm")))]
 # menage <- menage[,which(is.element(colnames(menage),c("ident14", "revdispm","impots" ,"revdecm", "nivviem", "presta_sociales", "revenu_ajuste", "rev_cat_net", "wpri")))]
 # # Prestas aux parents, i.e. aux deux adultes les plus âgés du ménage
 # temp <- merge(indiv, irft4, by="noindiv")
 # db <- merge(temp, menage, by="ident14")
 # names(db)[1] <- "group"
-# names(db)[28] <- "age"
+# names(db)[29] <- "age"
 # db$age <- as.numeric(db$age)
 # temp <- aggregate(age ~ group, db, function(vec) {
 #   if (length(vec) >= 2) return(max(vec[-which.max(vec)]))
@@ -151,10 +151,12 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # share_70_ <- length(which(db$revtot_i_par >= 2095*12 & db$revenu_conjoint >= 2095*12 & !is.na(db$revtot_i_par) & db$age > 17))/length(which(!is.na(db$revtot_i_par) & db$age > 17))
 # sum(c(share__20, share_20_30, share_30_40, share_40_50, share_50_70, share_70_))
 # expected_target_proportions <- share_70_ / 4 + c('20' = share__20 + share_20_30/2, '30' = share_20_30/2 + share_30_40/2, '40' = share_30_40/2 + share_40_50/2, '50' = share_40_50/2 + share_50_70)
-# round(expected_target_proportions, 3) 
+# round(expected_target_proportions, 3)
 # # decrit(s$cible) # incredibly close!
 # # shares <- c('_20' = share__20, '20_30'=share_20_30, '30_40'=share_30_40, '40_50'=share_40_50, '50_70'=share_50_70, '70_'=share_70_)
 # # decrit(s$categorie_cible)
+# wtd.mean(db$nb_adultes, db$wprm) # 2.033
+# # wtd.mean(s$nb_adultes, s$weight) # 1.933
 # 
 # rm(db, temp, irft4, menage, indiv)
 # setwd(wd)
