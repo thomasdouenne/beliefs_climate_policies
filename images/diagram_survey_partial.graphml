@@ -13,9 +13,8 @@
   <key attr.name="description" attr.type="string" for="edge" id="d9"/>
   <key for="edge" id="d10" yfiles.type="edgegraphics"/>
   <graph edgedefault="directed" id="G">
-    <data key="d0"/>
+    <data key="d0" xml:space="preserve"/>
     <node id="n0">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-552.3000000000002" y="-247.7000000000001"/>
@@ -27,7 +26,6 @@
       </data>
     </node>
     <node id="n1">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-552.3000000000002" y="-206.20000000000022"/>
@@ -39,7 +37,6 @@
       </data>
     </node>
     <node id="n2">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-552.3000000000002" y="-164.70000000000033"/>
@@ -51,7 +48,6 @@
       </data>
     </node>
     <node id="n3">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-552.3000000000002" y="-123.20000000000044"/>
@@ -63,7 +59,6 @@
       </data>
     </node>
     <node id="n4">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="89.0" x="-432.0000000000002" y="-198.5000000000001"/>
@@ -75,7 +70,6 @@
       </data>
     </node>
     <node id="n5">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="48.25000000000003" width="97.80000000000001" x="-163.25000000000023" y="-204.9750000000003"/>
@@ -87,7 +81,6 @@
       </data>
     </node>
     <node id="n6">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-260.7000000000002" y="-172.70000000000033"/>
@@ -99,7 +92,6 @@
       </data>
     </node>
     <node id="n7">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="30.0" width="61.0" x="-260.7000000000002" y="-219.00000000000023"/>
@@ -111,20 +103,18 @@
       </data>
     </node>
     <node id="n8">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="46.89999999999989" width="89.0" x="-9.000000000000398" y="-204.30000000000024"/>
           <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="node_size" bottomInset="0" configuration="CroppingLabel" fontFamily="Calibri" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="46.89999999999989" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="10" verticalTextPosition="bottom" visible="true" width="89.0" x="0.0" xml:space="preserve" y="-2.8421709430404007E-14">Tax &amp; Dividend
-ex ante<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+Initial<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:Shape type="rectangle"/>
         </y:ShapeNode>
       </data>
     </node>
     <node id="n9">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="61.4999999999996" width="89.0" x="-148.8500000000003" y="-29.35000000000022"/>
@@ -137,7 +127,6 @@ Tax &amp; Dividend after knowledge<y:LabelModel><y:SmartNodeLabelModel distance=
       </data>
     </node>
     <node id="n10">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="3.0" width="3.0" x="-15.100000000000023" y="-4.100000000000421"/>
@@ -156,7 +145,6 @@ Tax &amp; Dividend after knowledge<y:LabelModel><y:SmartNodeLabelModel distance=
       </data>
     </node>
     <node id="n11">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="37.39999999999938"/>
@@ -169,7 +157,6 @@ Progressivity</y:NodeLabel>
       </data>
     </node>
     <node id="n12">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="-16.30000000000001"/>
@@ -181,7 +168,6 @@ Progressivity</y:NodeLabel>
       </data>
     </node>
     <node id="n13">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="89.0" x="-9.000000000000398" y="-72.60000000000022"/>
@@ -193,7 +179,6 @@ Progressivity</y:NodeLabel>
       </data>
     </node>
     <node id="n14">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="54.80000000000001" width="89.0" x="-432.0000000000002" y="-33.10000000000002"/>
@@ -206,7 +191,6 @@ Tax &amp; Targeted Dividend<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/>
       </data>
     </node>
     <node id="n15">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="89.0" x="-274.7000000000003" y="37.39999999999938"/>
@@ -218,7 +202,6 @@ Tax &amp; Targeted Dividend<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/>
       </data>
     </node>
     <node id="n16">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="89.0" x="-274.7000000000003" y="-17.60000000000042"/>
@@ -230,7 +213,6 @@ Tax &amp; Targeted Dividend<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/>
       </data>
     </node>
     <node id="n17">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="38.0" width="97.80000000000001" x="-279.10000000000025" y="-72.60000000000022"/>
@@ -243,7 +225,6 @@ targeted<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:M
       </data>
     </node>
     <node id="n18">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="47.099999999999596" width="89.0" x="-552.3000000000002" y="-29.249999999999815"/>
@@ -256,7 +237,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </node>
     <edge id="e0" source="n0" target="n4">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="30.5" sy="0.0" tx="-44.5" ty="0.0"/>
@@ -267,7 +247,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e1" source="n3" target="n4">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="30.5" sy="0.0" tx="-44.5" ty="0.0"/>
@@ -278,7 +257,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e2" source="n2" target="n4">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="30.5" sy="0.0" tx="-44.5" ty="0.0"/>
@@ -289,7 +267,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e3" source="n1" target="n4">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="30.5" sy="0.0" tx="-44.5" ty="0.0"/>
@@ -300,7 +277,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e4" source="n4" target="n7">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="44.5" sy="0.0" tx="-29.799999999999784" ty="0.0"/>
@@ -311,7 +287,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e5" source="n4" target="n6">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="44.5" sy="0.0" tx="0.0" ty="0.0"/>
@@ -322,7 +297,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e6" source="n8" target="n13">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="44.5" ty="0.0">
@@ -336,7 +310,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e7" source="n8" target="n12">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
@@ -351,7 +324,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e8" source="n8" target="n11">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="44.5" ty="0.0">
@@ -366,7 +338,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e9" source="n13" target="n9">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="-44.5" sy="0.0" tx="44.5" ty="0.0"/>
@@ -377,7 +348,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e10" source="n12" target="n9">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="-44.5" sy="0.0" tx="44.5" ty="0.0"/>
@@ -388,7 +358,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e11" source="n11" target="n9">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="-44.5" sy="0.0" tx="44.5" ty="0.0"/>
@@ -399,7 +368,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e12" source="n9" target="n17">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="48.900000000000006" ty="0.0"/>
@@ -410,7 +378,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e13" source="n9" target="n16">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -421,7 +388,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e14" source="n9" target="n15">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="44.5" ty="0.0"/>
@@ -432,7 +398,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e15" source="n15" target="n14">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="44.5" ty="0.0"/>
@@ -443,7 +408,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e16" source="n16" target="n14">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="44.5" ty="0.0"/>
@@ -454,7 +418,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e17" source="n17" target="n14">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="44.5" ty="0.0"/>
@@ -465,7 +428,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e18" source="n5" target="n8">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -476,7 +438,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e19" source="n7" target="n5">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="-48.900000000000006" ty="0.0"/>
@@ -487,7 +448,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e20" source="n14" target="n18">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="40.120000000000175" ty="0.0"/>
@@ -498,7 +458,6 @@ Other questions<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelMod
       </data>
     </edge>
     <edge id="e21" source="n6" target="n5">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="-48.900000000000006" ty="0.0"/>
