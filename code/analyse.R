@@ -947,6 +947,11 @@ gagnant_f.hat <- fitted.values(tsls_rdd_feedback_D)
 # +47%***
 summary(lm((taxe_feedback_approbation != 'Non') ~ gagnant_f.hat + taxe_approbation + simule_gain + I(simule_gain^2), data=s, weights = s$weight))
 
+# OLS with controls
+feed_ols <- as.formula(paste("taxe_feedback_approbation!='Non' ~ (gagnant_info_categorie!='Perdant') + gagnant_categorie + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
+                                      paste(variables_reg_self_interest, collapse = ' + ')))
+summary(lm(feed_ols, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f']))
+
 
 ##### Régressions: persistance des croyances #####
 # TODO!: Etudier les gens gagnant en pouvoir d'achat mais perdant en utilit? (en prenant une ?lasticit? nulle)
