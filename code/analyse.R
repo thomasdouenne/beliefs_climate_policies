@@ -2891,3 +2891,46 @@ summary(lm(taxe_cible_approbation!='Non' ~ as.factor(age), data=s, subset=gagnan
 summary(lm(taxe_cible_approbation!='Non' ~ age, data=s, subset=gagnant_cible_categorie=='Gagnant', weights=s$weight))
 summary(lm(taxe_cible_approbation!='Non' ~ as.factor(age) * (gagnant_cible_categorie=='Gagnant'), data=s, weights=s$weight))
 summary(lm(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie=='Gagnant'), data=s, weights=s$weight))
+
+
+##### Willingness-To-Pay ~ 60€ #####
+ggplot(data=s[s$taxe_efficace!='Non',], aes(x=gain)) + geom_smooth(method = "auto", aes(y=1*(tax_acceptance))) + ylim(c(0,1)) +
+   xlab("Subjective gain, among non believers in ineffectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw()
+ggplot(data=s[s$taxe_efficace=='Oui',], aes(x=gain)) + geom_smooth(method = "auto", aes(y=1*(tax_acceptance))) + ylim(c(0,1)) +
+   xlab("Subjective gain, among believers in effectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw()
+ggplot(data=s, aes(x=gain)) + geom_smooth(method = "auto", aes(y=1*(tax_acceptance))) + ylim(c(0,1)) +
+   xlab("Subjective gain") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw()
+
+
+##### Variance explained (McFadden PseudoR2) #####
+# 0.25 when priming is most salient
+logit_si <- glm(taxe_info_approbation!='Non' ~ gagnant_info_categorie, data=s, family = "binomial")
+PseudoR2(logit_si) # 0.25
+logit_ee <- glm(taxe_approbation!='Non' ~ taxe_efficace, data=s, family = "binomial")
+PseudoR2(logit_ee) # 0.24
+logit_p <- glm(taxe_info_approbation!='Non' ~ progressivite, data=s, subset = !is.na(progressivite), family = "binomial")
+PseudoR2(logit_p) # 0.25
+
+# 0.14-0.17 when priming is not salient
+logit_si <- glm(taxe_approbation!='Non' ~ gagnant_categorie, data=s, family = "binomial")
+PseudoR2(logit_si) # 0.15
+logit_ee <- glm(taxe_info_approbation!='Non' ~ taxe_efficace, data=s, family = "binomial")
+PseudoR2(logit_ee) # 0.17
+logit_p <- glm(taxe_approbation!='Non' ~ progressivite, data=s, subset = !is.na(progressivite), family = "binomial")
+PseudoR2(logit_p) # 0.14
+
+logit_si <- glm(taxe_info_approbation!='Non' ~ gagnant_info_categorie, data=s, family = "binomial")
+PseudoR2(logit_si) # 0.25
+logit_ee <- glm(taxe_approbation!='Non' ~ taxe_efficace, data=s, family = "binomial")
+PseudoR2(logit_ee) # 0.24
+logit_p <- glm(taxe_info_approbation!='Non' ~ progressivite, data=s, subset = !is.na(progressivite), family = "binomial")
+PseudoR2(logit_p) # 0.25
+
+# R^2
+summary(lm(taxe_approbation!='Non' ~ gagnant_categorie, data=s, weights = s$weight)) # 0.18
+summary(lm(taxe_info_approbation!='Non' ~ taxe_efficace, data=s, weights = s$weight))  # 0.22
+summary(lm(taxe_approbation!='Non' ~ progressivite, data=s, subset = !is.na(progressivite), weights = s$weight)) # 0.17
+
+summary(lm(taxe_info_approbation!='Non' ~ gagnant_info_categorie, data=s, weights = s$weight)) # 0.32
+summary(lm(taxe_approbation!='Non' ~ taxe_efficace, data=s, weights = s$weight)) # 0.29
+summary(lm(taxe_info_approbation!='Non' ~ progressivite, data=s, subset = !is.na(progressivite), weights = s$weight)) # 0.32
