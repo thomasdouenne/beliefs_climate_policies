@@ -752,8 +752,21 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Not
 # reg_gagnant_prog_rev <- lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight)
 # summary(reg_gagnant_prog_rev)
 
-# Average effect of Progressivity, other things equal
-0.171 + 0.320 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.272 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) - 0.432 * wtd.mean(s$taxe_efficace!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# Average effect of Progressivity, other things equal: 0.307
+0.171 + 0.320 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.272 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) - 0.433 * wtd.mean(s$taxe_efficace!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# # of winning: 0.303
+# 0.183 + 0.144 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) + 0.320 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 0.433 * wtd.mean(s$taxe_efficace!='Non' & s$progressivite!='Non', weights = s$weight)
+# # of effectiveness: 0.264
+# 0.167 + 0.144 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.272 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 0.433 * wtd.mean(s$progressivite!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# # of winning + progressivity: 0.552
+# 0.171 + 0.183 + 0.144 + (0.320 + 0.272 - 0.433) * wtd.mean(s$taxe_efficace!='Non', weights = s$weight)
+# # of effective + progressivity: 0.623
+# 0.171 + 0.167 + 0.272 + (0.320 + 0.144 - 0.433) * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# # of winning + effective: 0.487
+# 0.167 + 0.183 + 0.144 + (0.144 + 0.272 - 0.433) * wtd.mean(s$progressivite!='Non', weights = s$weight)
+# 0.167 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) # 0.057
+# 0.183 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) # 0.078
+# 0.171 * wtd.mean(s$progressivite!='Non', weights = s$weight) # 0.069
 
 
 ##### Appendix A. Raw data #####

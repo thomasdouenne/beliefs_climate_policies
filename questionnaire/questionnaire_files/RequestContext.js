@@ -1,0 +1,136 @@
+
+window.Qualtrics=window.Qualtrics||{};window.Qualtrics.RequestContext={getActiveSurveyId:function()
+{return this._storage.get('ActiveSurveyID');},getPreviousActiveSurveyId:function()
+{return this._storage.get('PreviousActiveSurveyID');},getSectionState:function()
+{return this._storage.get('SuperSection');},getNavigationSuperSection:function()
+{return this._storage.get('SuperSection');},getNavigationSection:function()
+{return this._storage.get('Section');},getNavigationSubSection:function(section)
+{return this._storage.get('SubSection/'+section);},getNavigationSubSubSection:function()
+{return this._storage.get('SubSubSection');},getActiveLibraryId:function()
+{return this._storage.get('ActiveLibrary/LibraryID');},getActiveReportId:function()
+{return this._storage.get('Reporting/ActiveReportID');},getLastNavigationSection:function(superSection)
+{return this._storage.get('LastNavigationSection/'+superSection);},getCurrentCreative:function()
+{return this._storage.get('CurrentCreative');},getCurrentIntercept:function()
+{return this._storage.get('CurrentIntercept');},getCurrentZone:function()
+{return this._storage.get('CurrentZone');},getActiveThreeSixtyId:function()
+{return this._storage.get('ActiveThreeSixtyID');},getCurrentPulseId:function()
+{return this._storage.get('CurrentPulseID');},getActiveSubjectId:function()
+{return this._storage.get('ActiveSubjectID');},getActiveScoringCategory:function()
+{return this._storage.get('ActiveScoringCategory');},setActiveSurveyId:function(surveyId)
+{this._storage.set('ActiveSurveyID',surveyId);},setSectionState:function(stateData)
+{this._storage.set('SectionState',stateData);},setPreviousActiveSurveyId:function(surveyId)
+{this._storage.set('PreviousActiveSurveyID',surveyId);},setNavigationSuperSection:function(superSection)
+{this._storage.set('SuperSection',superSection);},setNavigationSection:function(section)
+{this._storage.set('Section',section);},setNavigationSubSection:function(section,subSection)
+{this._storage.set('SubSection/'+section,subSection);},setNavigationSubSubSection:function(subSubSection)
+{this._storage.set('SubSubSection',subSubSection);},setActiveLibraryId:function(libraryId)
+{this._storage.set('ActiveLibrary/LibraryID',libraryId);},setActiveReportId:function(reportId)
+{this._storage.set('Reporting/ActiveReportID',reportId);},setLastNavigationSection:function(superSection,section)
+{this._storage.set('LastNavigationSection/'+superSection,section);},setCurrentCreative:function(creativeId)
+{return this._storage.set('CurrentCreative',creativeId);},setCurrentIntercept:function(interceptId)
+{return this._storage.set('CurrentIntercept',interceptId);},setCurrentZone:function(zoneId)
+{return this._storage.set('CurrentZone',zoneId);},setActiveThreeSixtyId:function(threeSixtyId)
+{return this._storage.set('ActiveThreeSixtyID',threeSixtyId);},setCurrentPulseId:function(pulseId)
+{return this._storage.set('CurrentPulseID',pulseId);},setActiveSubjectId:function(subjectId)
+{return this._storage.set('ActiveSubjectID',subjectId);},setActiveScoringCategory:function(category)
+{return this._storage.set('ActiveScoringCategory',category);},clearActiveSurveyId:function()
+{this._storage.clear('ActiveSurveyID');},clearSectionState:function()
+{this._storage.clear('SectionState');},clearPreviousActiveSurveyId:function()
+{this._storage.clear('PreviousActiveSurveyID');},clearNavigationSection:function()
+{this._storage.clear('Section');},clearNavigationSubSection:function(section)
+{this._storage.clear('SubSection/'+section);},clearNavigationSubSubSection:function()
+{this._storage.clear('SubSubSection');},clearActiveLibraryId:function()
+{this._storage.clear('ActiveLibrary/LibraryID');},clearActiveReportId:function()
+{this._storage.clear('Reporting/ActiveReportID');},clearCurrentCreative:function()
+{return this._storage.clear('CurrentCreative');},clearCurrentIntercept:function()
+{return this._storage.clear('CurrentIntercept');},clearCurrentZone:function()
+{return this._storage.clear('CurrentZone');},clearActiveThreeSixtyId:function()
+{return this._storage.clear('ActiveThreeSixtyID');},clearCurrentPulseId:function()
+{return this._storage.clear('CurrentPulseID');},clearActiveSubjectId:function()
+{return this._storage.clear('ActiveSubjectID');},clearActiveScoringCategory:function()
+{return this._storage.clear('ActiveScoringCategory');},erase:function()
+{return this._storage.erase();}};window.Qualtrics.RequestContext._storage={get:function(key)
+{var c=this._getClientCookie();var s=this._getServerCookie();var cCounter=c&&c.hasOwnProperty(key)&&c[key].length==2&&c[key][1]||0;var sCounter=s&&s.hasOwnProperty(key)&&s[key].length==2&&s[key][1]||0;if(c.hasOwnProperty(key)&&cCounter>=sCounter)
+{return c[key][0];}
+else if(s.hasOwnProperty(key))
+{return s[key][0];}},set:function(key,value)
+{var nextCounter=this._getNextCounterForKey(key);var c=this._getClientCookie();c[key]=[value,nextCounter];this._commitCookieData(c);},clear:function(key)
+{var nextCounter=this._getNextCounterForKey(key);var c=this._getClientCookie();c[key]=[null,nextCounter];this._commitCookieData(c);},erase:function()
+{var c=this._getClientCookie();var s=this._getServerCookie();var allKeys=Object.keys(c).concat(Object.keys(s));for(i=0;i<allKeys.length;i++)
+{var k=allKeys[i];c[k]=[null,this._getNextCounterForKey(k,c,s)];}
+this._commitCookieData(c);},_rawClientCookieString:null,_rawServerCookieString:null,_clientValues:{},_serverValues:{},_SERVER_COOKIE_NAME:'ReqCtxS',_CLIENT_COOKIE_NAME:'ReqCtxC',_getClientCookie:function()
+{if(!this._isCacheValid(this._CLIENT_COOKIE_NAME,this._rawClientCookieString))
+{this._rawClientCookieString=this._getRawCookieString(this._CLIENT_COOKIE_NAME);this._clientValues=this._unmarshalCookieData(this._rawClientCookieString)||{};}
+return this._clientValues;},_getServerCookie:function()
+{if(!this._isCacheValid(this._SERVER_COOKIE_NAME,this._rawServerCookieString))
+{this._rawServerCookieString=this._getRawCookieString(this._SERVER_COOKIE_NAME);this._serverValues=this._unmarshalCookieData(this._rawServerCookieString)||{};}
+return this._serverValues;},_isCacheValid:function(cookieName,cachedValueString)
+{if(cachedValueString==null)
+return false;return(document.cookie.lastIndexOf(cookieName+'='+cachedValueString)!=-1);},_getRawCookieString:function(name)
+{var cookieParts=document.cookie.split('; ');for(i=0;i<cookieParts.length;i++)
+{if(cookieParts[i].lastIndexOf(name+"=",0)===0)
+{return cookieParts[i].substr(name.length+1);}}
+return null;},_commitCookieData:function(data){this._rawClientCookieString=this._marshalCookieData(data);var cookieNameAndValue=this._CLIENT_COOKIE_NAME+"="+this._rawClientCookieString;document.cookie=cookieNameAndValue+"; path=/; secure; samesite=strict;";},_unmarshalCookieData:function(str)
+{if(!str)
+{return{};}
+try
+{var uriDecoded=decodeURIComponent(str);var base64decoded=atob(uriDecoded);var jsonParsed=JSON.parse(base64decoded);return jsonParsed;}
+catch(e)
+{console.error('Error unmarshalling RequestContext cookie! rawValue: '+str);return{};}},_marshalCookieData:function(data)
+{try
+{var jsonStr=JSON.stringify(data);var base64encoded=btoa(jsonStr);var uriEncoded=encodeURIComponent(base64encoded);return uriEncoded;}
+catch(e)
+{console.error('Error marshalling RequestContext cookie!');return null;}},_getNextCounterForKey:function(key,clientCookieObj,serverCookieObj)
+{var c=clientCookieObj||this._getClientCookie();var s=serverCookieObj||this._getServerCookie();var cCounter=c&&c.hasOwnProperty(key)&&c[key].length==2&&c[key][1]||0;var sCounter=s&&s.hasOwnProperty(key)&&s[key].length==2&&s[key][1]||0;return Math.max(cCounter,sCounter)+1;},printCookiesToConsole:function(client,server)
+{var str="";if(client!==false)
+str+="CLIENT:\n"+JSON.stringify(this._getClientCookie(),null,'  ')+"\n\n";if(server!==false)
+str+="SERVER:\n"+JSON.stringify(this._getServerCookie(),null,'  ')+"\n\n";console.log(str);}};window.URLTools={getAjaxURL:function(action,opt_product,opt_paramsObject)
+{return URLTools._getAjaxURL(action,'Ajax',opt_product,opt_paramsObject);},getCleanAjaxURL:function(action,opt_product,opt_paramsObject)
+{return URLTools._getAjaxURL(action,'CleanAjax',opt_product,opt_paramsObject);},getLongAjaxURL:function(action,opt_product,opt_paramsObject)
+{return URLTools._getAjaxURL(action,'LongAjax',opt_product,opt_paramsObject);},_getAjaxURL:function(action,type,opt_product,opt_paramsObject)
+{if(!action)
+{console.error('No action provided!');return;}
+if(!opt_product)
+opt_product=URLTools.getProduct();var url='/'+opt_product+'/'+URLTools._getPageSection();var subSection=URLTools._getPageSubSection();if(subSection)
+url+='/'+subSection;url+='/'+type+'/'+action+URLTools._createParamsURL(opt_paramsObject);return url;},_getPageSection:function()
+{var pageSection=window.Qualtrics.RequestContext.getNavigationSection();if(window.NavigationService&&window.NavigationService.activeSection)
+{pageSection=window.NavigationService.activeSection;}
+if(!pageSection)
+throw new Error('page section not available');return pageSection;},_getPageSubSection:function()
+{var pageSection=window.Qualtrics.RequestContext.getNavigationSection();var subSection=window.Qualtrics.RequestContext.getNavigationSubSection(pageSection);if(!subSection)
+return'';return subSection;},getProduct:function()
+{var product=window.location.pathname.split('/')[1];product=product.replace('_rel','');if(product=='WRQualtricsControlPanel'||product=='ControlPanel'||product=='CP'||product.toLowerCase()=='q'||product=='WRSupport')
+return'Q';else if(product=='WRQualtrics360'||product=='360'||product=='ee'||product.toLowerCase()=='ex')
+return'EX';else if(product=='WRQualtricsSiteIntercept'||product=='SiteIntercept'||product=='SI'||product.toLowerCase()=='dx')
+return'DX';else if(product=='WRQualtricsContacts'||product=='Contacts'||product.toLowerCase()=='iqd')
+return'IQD';else return'Q';},changePage:function(section,opt_subSection,opt_subSubSection,opt_paramsObject,opt_product)
+{if(!section)
+{throw new Error('No section provided!');}
+if(!opt_product)
+opt_product=URLTools.getProduct();Qualtrics.RequestContext.setNavigationSection(section);var url='/'+opt_product+'/'+section;if(opt_subSection){Qualtrics.RequestContext.setNavigationSubSection(section,opt_subSection);url+='/'+opt_subSection;}
+if(opt_subSubSection){Qualtrics.RequestContext.setNavigationSubSubSection(opt_subSubSection);url+='/'+opt_subSubSection;}
+url+=URLTools._createParamsURL(opt_paramsObject);window.location=url;},_createParamsURL:function(paramsObject)
+{if(!paramsObject)
+paramsObject={};if(Object.keys(paramsObject).length===0){return'';}
+return'?'+Object.keys(paramsObject).map(function(key){return encodeURIComponent(key)+'='+encodeURIComponent(paramsObject[key]);}).join('&');},post:function(clientAction,section,subSection,subSubSection,repeatable,dontChangeAction,options,asyncSavePage,paramsObject)
+{if(Qualtrics.savePage)
+{Qualtrics.savePage(asyncSavePage);Event.stopObserving(window,'unload',Qualtrics.savePageOnUnload);}
+if(subSection===undefined)
+{subSection='';}
+if(subSubSection===undefined)
+{subSubSection='';}
+var page=$('Page');page.ClientAction.value=clientAction;page.Section.value=section;page.SubSection.value=subSection;page.SubSubSection.value=subSubSection;if((typeof(repeatable)=='string'&&repeatable=='true')||(typeof(repeatable)!='string'&&repeatable))
+{page.Repeatable.value='1';}
+if(options&&page.PageActionOptions)
+{page.PageActionOptions.value=options;}
+if(!dontChangeAction)
+page.action='/'+URLTools.getProduct()+'/'+URLTools._getPageSection()+'/Post/'+clientAction+URLTools._createParamsURL(paramsObject);submitForm(page);page.ClientAction.value='';return false;},getContextParameters:function()
+{var surveyId=Qualtrics.RequestContext.getActiveSurveyId();var reportId=Qualtrics.RequestContext.getActiveReportId();var libraryId=Qualtrics.RequestContext.getActiveLibraryId();var ret={};if(surveyId)
+{ret['ContextSurveyID']=surveyId;}
+if(reportId)
+{ret['ContextReportID']=reportId;}
+if(libraryId)
+{ret['ContextLibraryID']=libraryId;}
+return ret;},postContext:function(clientAction,paramsObject)
+{URLTools.post(clientAction,undefined,undefined,undefined,false,false,undefined,undefined,paramsObject);},isNewURL:function()
+{var pathname=window.location.pathname;var product=URLTools.getProduct();return pathname=='/'+product||pathname.indexOf(product+'/')==1;}};
