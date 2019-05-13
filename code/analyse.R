@@ -2894,12 +2894,21 @@ summary(lm(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie=='Gagnant'),
 
 
 ##### Willingness-To-Pay ~ 60€ #####
-ggplot(data=s[s$taxe_efficace!='Non',], aes(x=gain)) + geom_smooth(method = "auto", aes(y=1*(tax_acceptance))) + ylim(c(0,1)) +
-   xlab("Subjective gain, among non believers in ineffectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw()
+ggplot() + geom_smooth(data=s[s$taxe_efficace!='Non',], method = "auto", aes(x=gain, y=1*(tax_acceptance), col=" Effective: not `No'")) + ylim(c(0,1)) +
+   xlab("Subjective gain, among non believers in ineffectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + #geom_vline(xintercept=-66, col='red') +
+  geom_smooth(data=s, method = "auto", aes(x=gain, y=1*(tax_acceptance), col=' All            ')) + ylim(c(0,1)) +
+  xlab("Subjective gain") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + theme(legend.position="top", legend.title=element_blank())
+ma <- loess(tax_acceptance ~ gain, data=s, subset=taxe_efficace!='Non', weights=s$weight)
+map <- predict(ma)[order(predict(ma))]
+predict(ma, -57) # but from the graph, the intersection with 50% is at -66
+
 ggplot(data=s[s$taxe_efficace=='Oui',], aes(x=gain)) + geom_smooth(method = "auto", aes(y=1*(tax_acceptance))) + ylim(c(0,1)) +
    xlab("Subjective gain, among believers in effectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw()
-ggplot(data=s, aes(x=gain)) + geom_smooth(method = "auto", aes(y=1*(tax_acceptance))) + ylim(c(0,1)) +
-   xlab("Subjective gain") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw()
+
+summary(lm(as.formula(paste("tax_acceptance ~ (taxe_efficace!='Non') + gain * progressivite + ", paste(c(variables_demo, variables_energie, variables_politiques), collapse=' + '))), data=s, weights=s$weight))
+0.4243/7.392e-4
+0.3721/1.276e-3
+summary(lm(tax_acceptance ~ (taxe_efficace!='Non') + gain, data=s, weights=s$weight))
 
 
 ##### Variance explained (McFadden PseudoR2) #####
@@ -2926,6 +2935,9 @@ PseudoR2(logit_ee) # 0.24
 logit_p <- glm(taxe_info_approbation!='Non' ~ progressivite, data=s, subset = !is.na(progressivite), family = "binomial")
 PseudoR2(logit_p) # 0.25
 
+logit_sd <- glm(as.formula(paste("taxe_info_approbation!='Non' ~ ", paste(c(variables_demo, variables_energie), collapse=' + '))), data=s, subset = !is.na(progressivite), family = "binomial")
+PseudoR2(logit_sd) # 0.10
+
 # R^2
 summary(lm(taxe_approbation!='Non' ~ gagnant_categorie, data=s, weights = s$weight)) # 0.18
 summary(lm(taxe_info_approbation!='Non' ~ taxe_efficace, data=s, weights = s$weight))  # 0.22
@@ -2934,3 +2946,6 @@ summary(lm(taxe_approbation!='Non' ~ progressivite, data=s, subset = !is.na(prog
 summary(lm(taxe_info_approbation!='Non' ~ gagnant_info_categorie, data=s, weights = s$weight)) # 0.32
 summary(lm(taxe_approbation!='Non' ~ taxe_efficace, data=s, weights = s$weight)) # 0.29
 summary(lm(taxe_info_approbation!='Non' ~ progressivite, data=s, subset = !is.na(progressivite), weights = s$weight)) # 0.32
+
+# R^2: 0.09, adj R^2: 0.13
+summary(lm(as.formula(paste("taxe_info_approbation!='Non' ~ ", paste(c(variables_demo, variables_energie), collapse=' + '))), data=s, subset = !is.na(progressivite), family = "binomial"))
