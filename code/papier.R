@@ -607,6 +607,8 @@ summary(tsls2_ee2)
 s$prog_not_no <- (s$prog_na == 'Oui' | s$prog_na == 'NSP') # Attention à ne pas inclure les NA
 # (3) OLS with controls:
 # 42 p.p.
+s$prog_na <- s$progressivite
+s$prog_na[is.na(s$progressivite)] <- "NA"
 s$taxe_efficace.hat <- n(s$taxe_efficace!='Non')
 formula_ee3 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + prog_not_no + (prog_na == 'NA') + ", paste(variables_reg_ee, collapse = ' + '))) # 
 ols_ee3 <- lm(formula_ee3, data=s, weights = s$weight)
