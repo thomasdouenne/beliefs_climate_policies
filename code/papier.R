@@ -76,41 +76,41 @@ mar_old <- par()$mar
 cex_old <- par()$cex
 par(mar = c(2.1, 4.1, 1.1, 0.1), cex=1.5)
 # (a) transport
-plot(density(objective_gains$transport, bw=30), xlim=c(-400, 200), lwd=2, col="blue", xlab="", main="") + grid()
-lines(density(subjective_gains$transport, bw=30), xlim=c(-400, 200), lwd=2, col="red")
+plot(density(objective_gains$transport, bw=30), xlim=c(-400, 200), lwd=2, col="darkblue", xlab="", main="") + grid()
+lines(density(subjective_gains$transport, bw=30), xlim=c(-400, 200), lwd=2, col="orange")
 # (b) housing
-plot(density(objective_gains$housing, bw=30), xlim=c(-400, 200), lwd=2, col="blue", xlab="", main="") + grid()
-lines(density(subjective_gains$housing, bw=30), xlim=c(-400, 200), lwd=2, col="red")
+plot(density(objective_gains$housing, bw=30), xlim=c(-400, 200), lwd=2, col="darkblue", xlab="", main="") + grid()
+lines(density(subjective_gains$housing, bw=30), xlim=c(-400, 200), lwd=2, col="orange")
 # (c) both combined 
-plot(density(objective_gains$all, bw=30), xlim=c(-400, 200), lwd=2, col="blue", xlab="", main="") + grid()
-lines(density(subjective_gains$all, bw=30), xlim=c(-400, 200), lwd=2, col="red")
+plot(density(objective_gains$all, bw=30), xlim=c(-400, 200), lwd=2, col="darkblue", xlab="", main="") + grid()
+lines(density(subjective_gains$all, bw=30), xlim=c(-400, 200), lwd=2, col="orange")
 
 # Figure 2: CDF of subjective vs. objective gain (including in the inelastic case)
 par(mar = c(2.1, 4.1, 1.1, 0.1), cex=1.5)
 # (a) transport
 cdf_transport <- Ecdf(objective_gains$transport)
 cdf_transport_inelastic <- Ecdf(objective_gains_inelastic$transport)
-plot(Ecdf(s$gain_fuel), type="s", lwd=2, col="red", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
-lines(cdf_transport$x, cdf_transport$y, lwd=2, col="blue")
-lines(cdf_transport_inelastic$x, cdf_transport_inelastic$y, lwd=2, lty=2, col="blue")
-abline(v = c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.7))
-axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
+plot(Ecdf(s$gain_fuel), type="s", lwd=2, col="orange", xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_transport$x, cdf_transport$y, lwd=2, col="darkblue")
+lines(cdf_transport_inelastic$x, cdf_transport_inelastic$y, lwd=2, lty=2, col="darkblue")
+abline(v = c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,165/255,0,1))
+axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="orange", cex.axis=0.9)
 # (b) housing
 cdf_housing <- Ecdf(objective_gains$housing)
 cdf_housing_inelastic <- Ecdf(objective_gains_inelastic$housing)
-plot(Ecdf(s$gain_chauffage), type="s", lwd=2, col="red", xlim=c(-250, 90), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
-lines(cdf_housing$x, cdf_housing$y, lwd=2, col="blue")
-lines(cdf_housing_inelastic$x, cdf_housing_inelastic$y, lwd=2, lty=2, col="blue")
-abline(v=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col=rgb(1,0,0,0.7))
-axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
+plot(Ecdf(s$gain_chauffage), type="s", lwd=2, col="orange", xlim=c(-250, 90), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_housing$x, cdf_housing$y, lwd=2, col="darkblue")
+lines(cdf_housing_inelastic$x, cdf_housing_inelastic$y, lwd=2, lty=2, col="darkblue")
+abline(v=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), lty=3, col="orange") # rgb(1,0,0,0.7)
+axis(3, at=c(-190, -110, -70, -40, -15, 0, 10, 20, 30, 40), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="orange", cex.axis=0.9)
 # (c) both combined 
 cdf_all <- Ecdf(objective_gains$all)
 cdf_all_inelastic <- Ecdf(objective_gains_inelastic$all)
-plot(Ecdf(s$gain), type="s", lwd=2, col="red", xlim=c(-400, 180), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
-lines(cdf_all$x, cdf_all$y, lwd=2, col="blue")
-lines(cdf_all_inelastic$x, cdf_all_inelastic$y, lwd=2, lty=2, col="blue")
-abline(v=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), lty=3, col=rgb(1,0,0,0.7))
-axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="red", cex.axis=0.9)
+plot(Ecdf(s$gain), type="s", lwd=2, col="orange", xlim=c(-400, 180), xlab="", main="", ylab=expression("Proportion "<=" x")) + grid()
+lines(cdf_all$x, cdf_all$y, lwd=2, col="darkblue")
+lines(cdf_all_inelastic$x, cdf_all_inelastic$y, lwd=2, lty=2, col="darkblue")
+abline(v=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), lty=3, col="orange")
+axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd.ticks = 0, padj=1.5, col.axis="orange", cex.axis=0.9)
 # restore graphical parameters
 par(mar = mar_old, cex = cex_old)
 
@@ -791,6 +791,15 @@ approval_correct_beliefs <- wtd.mean(s$taxe_info_approbation=='Oui', weights = s
 approval_correct_beliefs
 # Results are very close to the cumulative effect of the three motives:
 0.228 + 0.703 * 0.303 + 0.244 + 0.703 * 0.126 + 0.703 * 0.098 + 0.281 - 0.703 * 0.314
+
+
+## 5.4 Complementarity between motives
+# 5.4.2 Willingness-to-pay
+ggplot() + geom_smooth(data=s[s$taxe_efficace!='Non',], method = "auto", aes(x=gain, y=1*(tax_acceptance), col=" Effective: not `No'")) + ylim(c(0,1)) +
+   xlab("Subjective gain, among non believers in ineffectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + #geom_vline(xintercept=-66, col='red') +
+  geom_smooth(data=s, method = "auto", aes(x=gain, y=1*(tax_acceptance), col=' All            ')) + ylim(c(0,1)) +
+  xlab("Subjective gain") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + theme(legend.position="top", ) + # legend.position="top", 
+  scale_color_manual(name="Among:", values=c(" Effective: not `No'"="#000000", ' All            '="#99CCDD"))
 
 
 ##### Appendix A. Raw data #####
