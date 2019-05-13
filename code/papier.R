@@ -591,8 +591,6 @@ summary(tsls2_ee1bis)
 
 # Alternative specifications for robustness checks
 # (2) 2SLS both instruments, with controls: 56 p.p.* % We do not control for progressivity: as most of the people who did not answer the question were in the second half of the survey, the absence of response is too correlated with our instrument Z_E (apres_modifs) which bias the results.
-s$prog_na <- s$progressivite
-s$prog_na[is.na(s$progressivite)] <- "NA"
 variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
 variables_reg_ee <- variables_reg_ee[!(variables_reg_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 formula_ee2 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + ", 
@@ -610,10 +608,13 @@ summary(tsls2_ee2)
 # tsls1_ee2_formula_ee2_interaction <- lm(formula_ee2_interaction, data=s, weights = s$weight, na.action='na.exclude')
 # summary(tsls1_ee2_formula_ee2_interaction)
 
+s$prog_na <- s$progressivite
+s$prog_na[is.na(s$prog_na)] <- "NA"
+s$prog_not_no <- (s$prog_na == 'Oui' | s$prog_na == 'NSP') # Attention à ne pas inclure les NA
 # (3) OLS with controls:
 # 42 p.p.
 s$taxe_efficace.hat <- n(s$taxe_efficace!='Non')
-formula_ee3 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ", paste(variables_reg_ee, collapse = ' + '))) # 
+formula_ee3 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + prog_not_no + (prog_na == 'NA') + ", paste(variables_reg_ee, collapse = ' + '))) # 
 ols_ee3 <- lm(formula_ee3, data=s, weights = s$weight)
 summary(ols_ee3)
 
@@ -649,7 +650,7 @@ TableVI <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls2_
                      coef = list(NULL, NULL, NULL, logit_ee4_margins[,1], NULL, NULL), 
                      se = list(NULL, NULL, NULL, logit_ee4_margins[,2], NULL, NULL),
                      add.lines = list(c("Instruments: info E.E., C.C. \\& P.M. ", "\\checkmark ", "\\checkmark ", "", " ", "\\checkmark ", "\\checkmark"),
-                       c("Controls: Socio-demographics, G ", "", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "", "")), 
+                       c("Controls: Socio-demo, other motives ", "", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "", "")), 
                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
                "\\textit{IV} & \\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
@@ -682,58 +683,50 @@ anova(ols_ee_sans_interaction, ols_ee) # We reject at 6% that interactions terms
 
 ## 5.3 Progressivity
 # Identification challenge and strategies
-variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
+variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", variables_demo)
 variables_reg_prog <- variables_reg_prog[!(variables_reg_prog %in% 
     c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
 
 summary(lm(as.formula(paste("progressif ~ ", paste(variables_reg_prog, collapse=' + '))), weights=s$weight, data=s))
 variables_correlees_prog <- c("Revenu", "Revenu2", "gagnant_categorie", "taxe_efficace", "sexe", "diplome4", "surface")
 
-s$progressif <- s$progressivite!='Non'
+s$prog_na <- s$progressivite
+s$prog_na[is.na(s$prog_na)] <- "NA"
+s$progressif <- (s$prog_na == 'Oui' | s$prog_na == 'NSP') # Attention à ne pas inclure les NA
 s$effective <- s$taxe_efficace!='Non'
 s$gagnant_info <- s$gagnant_info_categorie!='Perdant'
-# (1) OLS with controls and interactions: effect only when interacted (with 101 control variables and no interaction: 27 p.p.***)
-formula_ols_prog1 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), " + gagnant_info * effective * progressif")))
+# (1) OLS with controls and interactions
+formula_ols_prog1 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), " + gagnant_info * effective * progressif + (prog_na == 'NA')")))
 ols_prog1 <- lm(formula_ols_prog1, weights=s$weight, data=s)
-summary(ols_prog1) # sum of all effects True: 0.824. P+G: 0.674; P+E: 0.610 ; G+E: 0.494.
+summary(ols_prog1) # sum of all effects True: all :0.879. P+G: 0.727. P+E:0.692. G+E: 0.637
 
 # (2) OLS with controls and all interactions
 formula_ols_prog2 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
-   " + gagnant_info * effective * progressif + progressif * Revenu "))) # No effect from prog*gauche_droite/gilets_jaunes + progressif * gauche_droite + progressif * gilets_jaunes
+   " + gagnant_info * effective * progressif + progressif * Revenu + (prog_na == 'NA') "))) # No effect from prog*gauche_droite/gilets_jaunes + progressif * gauche_droite + progressif * gilets_jaunes
 ols_prog2 <- lm(formula_ols_prog2, weights=s$weight, data=s)
 summary(ols_prog2)
 
-# (2bis) initial OLS with controls and all interactions
-formula_ols_prog2bis <- as.formula(paste("tax_acceptance ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
-   " + (gagnant_categorie!='Perdant') * effective * progressif + progressif * Revenu "))) # No effect from prog*gauche_droite/gilets_jaunes + progressif * gauche_droite + progressif * gilets_jaunes
-ols_prog2bis <- lm(formula_ols_prog2bis, weights=s$weight, data=s)
-summary(ols_prog2bis)
-
 # (3) OLS simple: 56 p.p.***
-ols_prog3 <- lm(taxe_info_approbation!='Non' ~ progressif, weights=s$weight, data=s)
+ols_prog3 <- lm(taxe_info_approbation!='Non' ~ progressif + (prog_na == 'NA'), weights=s$weight, data=s)
 summary(ols_prog3)
 
-# (3bis) initial OLS simple: 38 p.p.***
-ols_prog3bis <- lm(tax_acceptance ~ progressif, weights=s$weight, data=s)
-summary(ols_prog3bis)
-
 # (4) logit simple
-logit_prog4 <- glm(taxe_info_approbation!='Non' ~ progressif, family = binomial(link='logit'), data=s)
+logit_prog4 <- glm(taxe_info_approbation!='Non' ~ progressif + (prog_na == 'NA'), family = binomial(link='logit'), data=s)
 summary(logit_prog4)
 logit_prog4_margins <- logitmfx(logit_prog4, data=s, atmean=FALSE)$mfxest
 logit_prog4_margins
 
-s$progressif <- s$progressivite=='Oui'
+s$progressif <- (s$prog_na == 'Oui')
 s$effective <- s$taxe_efficace=='Oui'
 s$gagnant_info <- s$gagnant_info_categorie=='Gagnant'
 # (5) YES OLS with controls and all interactions
 formula_ols_prog5 <- as.formula(paste("taxe_info_approbation=='Oui' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
-   " + gagnant_info * effective * progressif + progressif * Revenu"))) #  + taxe_approbation: no dramatic difference /  + (gagnant_info_categorie!='Perdant') * revenu * progressif: no effect
+   " + gagnant_info * effective * progressif + progressif * Revenu + (prog_na == 'NA')"))) #  + taxe_approbation: no dramatic difference /  + (gagnant_info_categorie!='Perdant') * revenu * progressif: no effect
 ols_prog5 <- lm(formula_ols_prog5, weights=s$weight, data=s)
-summary(ols_prog5) # sum of all effects True: 0.946. P+G~ 0.609; P+E~ 0.735; G+E~ 0.517
+summary(ols_prog5) # sum of all effects True: all :0.935. P+G: 0.599. P+E:0.709. G+E: 0.673
 
 # (6) YES OLS simple
-ols_prog6 <- lm(taxe_info_approbation=='Oui' ~ progressif, weights=s$weight, data=s)
+ols_prog6 <- lm(taxe_info_approbation=='Oui' ~ progressif + (prog_na == 'NA'), weights=s$weight, data=s)
 summary(ols_prog6)
 
 TableVII <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, ols_prog6,
@@ -744,7 +737,7 @@ TableVII <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, o
                             keep = c("progressi", "gagnant", 'effective', 'Revenu$'), # "Constant"
                             coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
                             se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
-                            add.lines = list(c("Controls: Socio-demo, energy", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
+                            add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. } \\end{table} ',
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
