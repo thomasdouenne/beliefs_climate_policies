@@ -745,6 +745,40 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Not
 # reg_gagnant_prog_rev <- lm(gagnant_info_categorie!='Perdant' ~ (progressivite!='Non') * Revenu, data=s, weights=s$weight)
 # summary(reg_gagnant_prog_rev)
 
+# Average effect of Progressivity (Not no for acceptance), other things equal: 0.274
+0.223 + 0.183 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.172 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) - 0.400 * wtd.mean(s$taxe_efficace!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# of winning: 0.395
+0.332 + 0.127 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) + 0.183 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 0.400 * wtd.mean(s$taxe_efficace!='Non' & s$progressivite!='Non', weights = s$weight)
+# of effectiveness: 0.313
+0.258 + 0.127 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.172 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 0.400 * wtd.mean(s$progressivite!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# of winning + progressivity: 0.704
+0.223 + 0.332 + 0.183 + (0.127 + 0.172 - 0.400) * wtd.mean(s$taxe_efficace!='Non', weights = s$weight)
+# of effective + progressivity: 0.615
+0.223 + 0.258 + 0.172 + (0.183 + 0.127 - 0.400) * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# of winning + effective: 0.699
+0.332 + 0.258 + 0.127 + (0.183 + 0.172 - 0.400) * wtd.mean(s$progressivite!='Non', weights = s$weight)
+# Of everything: 0.895
+0.223 + 0.332 + 0.258 + 0.127 + 0.183 + 0.172 - 0.400
+
+# Average effect of Progressivity (Yes for approval), other things equal: 0.298
+0.228 + 0.098 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.281 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) - 0.314 * wtd.mean(s$taxe_efficace!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# of winning: 0.343
+0.303 + 0.126 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) + 0.098 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 0.314 * wtd.mean(s$taxe_efficace!='Non' & s$progressivite!='Non', weights = s$weight)
+# of effectiveness: 0.357
+0.244 + 0.126 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.281 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 0.314 * wtd.mean(s$progressivite!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# of winning + progressivity: 0.661
+0.228 + 0.303 + 0.098 + (0.126 + 0.281 - 0.314) * wtd.mean(s$taxe_efficace!='Non', weights = s$weight)
+# of effective + progressivity: 0.715
+0.228 + 0.244 + 0.281 + (0.098 + 0.126 - 0.314) * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# of winning + effective: 0.699
+0.303 + 0.244 + 0.126 + (0.098 + 0.281 - 0.314) * wtd.mean(s$progressivite!='Non', weights = s$weight)
+# Of everything: 0.966
+0.228 + 0.303 + 0.244 + 0.126 + 0.098 + 0.281 - 0.314
+
+# Approval for fully corrected beliefs and 70.3% of winners:
+0.228 + 0.703 * 0.303 + 0.244 + 0.703 * 0.126 + 0.703 * 0.098 + 0.281 - 0.703 * 0.314
+
+# Old :
 # Average effect of Progressivity, other things equal: 0.307
 0.171 + 0.320 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.272 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) - 0.433 * wtd.mean(s$taxe_efficace!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
 # # of winning: 0.303
