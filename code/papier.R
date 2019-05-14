@@ -874,39 +874,27 @@ iv2_si3 <- lm(taxe_cible_approbation=='Oui' ~ non_perdant + cible + Revenu + Rev
 summary(iv2_si3)
 
 # (4) Feedback: Acceptance ~ win
-formula_iv1_si4 <- as.formula(paste("gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                         paste(variables_reg_self_interest, collapse = ' + ')))
-iv1_si4 <- lm(formula_iv1_si4, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+iv1_si4 <- lm(gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
 summary(iv1_si4)
 s$gagnant[s$variante_taxe_info=='f'] <- iv1_si4$fitted.values
-# 43 p.p. ***
-formula_iv2_si4 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                      paste(variables_reg_self_interest, collapse = ' + ')))
-iv2_si4 <- lm(formula_iv2_si4, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+# 50 p.p.***
+iv2_si4 <- lm(taxe_feedback_approbation!='Non' ~ gagnant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(iv2_si4)
 
 # (5) Feedback: Approval ~ win
-formula_iv1_si5 <- as.formula(paste("gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                         paste(variables_reg_self_interest, collapse = ' + ')))
-iv1_si5 <- lm(formula_iv1_si5, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+iv1_si5 <- lm(gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
 summary(iv1_si5)
 s$gagnant[s$variante_taxe_info=='f'] <- iv1_si5$fitted.values
-# 43 p.p. ***
-formula_iv2_si5 <- as.formula(paste("taxe_feedback_approbation=='Oui' ~ gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                      paste(variables_reg_self_interest, collapse = ' + ')))
-iv2_si5 <- lm(formula_iv2_si5, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+# 50 p.p.***
+iv2_si5 <- lm(taxe_feedback_approbation=='Oui' ~ gagnant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(iv2_si5)
 
 # (6) Feedback: Approval ~ not lose
-formula_iv1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                         paste(variables_reg_self_interest, collapse = ' + ')))
-iv1_si6 <- lm(formula_iv1_si6, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+iv1_si6 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
 summary(iv1_si6)
 s$non_perdant[s$variante_taxe_info=='f'] <- iv1_si6$fitted.values
-# 43 p.p. ***
-formula_iv2_si6 <- as.formula(paste("taxe_feedback_approbation=='Oui' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace +", 
-                                      paste(variables_reg_self_interest, collapse = ' + ')))
-iv2_si6 <- lm(formula_iv2_si6, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+# 50 p.p.***
+iv2_si6 <- lm(taxe_feedback_approbation=='Oui' ~ non_perdant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(iv2_si6)
 
 # Results
