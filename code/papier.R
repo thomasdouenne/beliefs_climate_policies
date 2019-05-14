@@ -480,11 +480,13 @@ tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + R
 summary(tsls2_si1)
 
 # Alternative specifications for robustness checks
+s$prog_na <- s$progressivite
+s$prog_na[is.na(s$prog_na)] <- "NA"
 # (2) With many controls 
-variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "I(hausse_depenses_interaction/uc)", "taxe_efficace", variables_demo, variables_politiques) # 
+variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "prog_na", "taxe_efficace", "(nb_adultes==1)", "I(hausse_depenses_interaction/uc)", variables_demo) # 
 variables_reg_self_interest <- variables_reg_self_interest[!(variables_reg_self_interest %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
-    I(traite_cible*traite_cible_conjoint) + cible + tax_acceptance +  (taxe_approbation=='NSP') +", paste(variables_reg_self_interest, collapse = ' + ')))
+    I(traite_cible*traite_cible_conjoint) + cible + tax_acceptance +  (taxe_approbation=='NSP') + ", paste(variables_reg_self_interest, collapse = ' + ')))
 tsls1_si2 <- lm(formula_tsls1_si2, data=s, weights = s$weight)
 summary(tsls1_si2)
 s$non_perdant <- tsls1_si2$fitted.values
@@ -495,17 +497,19 @@ tsls2_si2 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
 summary(tsls2_si2)
 
 # (3) Simple OLS (same results and same distinction as before for 'bis' or not)
+formula_ols_si3  <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + tax_acceptance + I(taxe_approbation=='NSP') + prog_na + taxe_efficace +", 
+                                      paste(variables_reg_self_interest, collapse = ' + '))) # 
 s$non_perdant <- n(s$gagnant_cible_categorie!='Perdant')
-ols_si3 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
+ols_si3 <- lm(formula_ols_si3, data=s, weights = s$weight)
 summary(ols_si3)
 
 # (4) Simple Logit: 53 p.p.***
 s$non_perdant <- n(s$gagnant_cible_categorie!='Perdant')
 # Warning when weighting: it relates to number of trials and not to survey weights. 
 # TODO: use svyglm to weight correctly cf. https://stats.stackexchange.com/questions/57107/use-of-weights-in-svyglm-vs-glm
-logit_si4 <- glm(formula_tsls2_si2, family = binomial(link='logit'), data=s)
+logit_si4 <- glm(formula_ols_si3, family = binomial(link='logit'), data=s)
 summary(logit_si4)
-logit_si4_margins <- logitmfx(formula_tsls2_si2, s, atmean=FALSE)$mfxest
+logit_si4_margins <- logitmfx(formula_ols_si3, s, atmean=FALSE)$mfxest
 logit_si4_margins
 
 # (5) IV Feedback
@@ -516,25 +520,14 @@ s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si5$fitted.values
 tsls2_si5 <- lm(taxe_feedback_approbation!='Non' ~ non_perdant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight)
 summary(tsls2_si5)
 
-formula_tsls1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2 + ", 
-                                      paste(variables_reg_self_interest, collapse = ' + ')))
-tsls1_si6 <- lm(formula_tsls1_si6, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
-summary(tsls1_si6)
-s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si6$fitted.values
-# 43 p.p. ***
-formula_tsls2_si6 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace + (nb_adultes==1) +", 
-                                      paste(variables_reg_self_interest, collapse = ' + ')))
-tsls2_si5 <- lm(formula_tsls2_si5, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
-summary(tsls2_si5)
-
 # (6) IV Feedback with controls
-formula_tsls1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace + (nb_adultes==1) + ", 
+formula_tsls1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + (nb_adultes==1) + prog_na + taxe_efficace +", 
                                          paste(variables_reg_self_interest, collapse = ' + ')))
 tsls1_si6 <- lm(formula_tsls1_si6, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
 summary(tsls1_si6)
 s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si6$fitted.values
 # 43 p.p. ***
-formula_tsls2_si6 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + taxe_efficace + (nb_adultes==1) +", 
+formula_tsls2_si6 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + (nb_adultes==1) + prog_na + taxe_efficace +", 
                                       paste(variables_reg_self_interest, collapse = ' + ')))
 tsls2_si6 <- lm(formula_tsls2_si6, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(tsls2_si6)
@@ -552,7 +545,7 @@ TableV <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_s
                       c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", " ", "\\checkmark"),
                       c("Controls: Estimated gain ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark", "\\checkmark"),
                       c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", ""),
-                      c("Controls: Socio-demo, political leaning ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", "\\checkmark  ")),
+                      c("Controls: Socio-demo, other motives ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", "\\checkmark  ")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\multicolumn{2}{c}{\\textit{OLS}}", "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\multicolumn{2}{c}{\\textit{IV}}", 
                gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. }\\end{table}', 
@@ -567,9 +560,12 @@ TableXI <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                     add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", "", " \\checkmark"),
                                   c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
                                   c("Controls: Target of the tax", " \\checkmark", " \\checkmark", " ", " "),
-                                  c("Controls: Socio-demo, political leaning", "", " \\checkmark", " ", " \\checkmark")),
+                                  c("Controls: Socio-demo, other motives", "", " \\checkmark", " ", " \\checkmark")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXI, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+# Z test (cf. https://stats.stackexchange.com/questions/93540/testing-equality-of-coefficients-from-two-different-regressions)
+(0.571-0.517)/(0.092^2+0.170^2)^0.5 # 0.28: not significantly different
 
 
 ## 5.2 Environmental effectiveness
@@ -582,12 +578,12 @@ tsls2_ee1 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
 summary(tsls2_ee1)
 summary(lm(tax_acceptance ~ info_CC * info_PM, data=s, weights=s$weight)) # info_CC is a good instrument
 
-# (1bis) 2SLS both instruments, control by gagnant_categorie because it's correlated with instrument: 59 p.p.*
-tsls1_ee1bis <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + gagnant_categorie, data=s, weights=s$weight)
-summary(tsls1_ee1bis)
-s$taxe_efficace.hat <- tsls1_ee1bis$fitted.values
-tsls2_ee1bis <- lm(tax_acceptance ~ taxe_efficace.hat + gagnant_categorie, data=s, weights=s$weight)
-summary(tsls2_ee1bis)
+# # (1bis) 2SLS both instruments, control by gagnant_categorie because it's correlated with instrument: 59 p.p.*
+# tsls1_ee1bis <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + gagnant_categorie, data=s, weights=s$weight)
+# summary(tsls1_ee1bis)
+# s$taxe_efficace.hat <- tsls1_ee1bis$fitted.values
+# tsls2_ee1bis <- lm(tax_acceptance ~ taxe_efficace.hat + gagnant_categorie, data=s, weights=s$weight)
+# summary(tsls2_ee1bis)
 
 # Alternative specifications for robustness checks
 # (2) 2SLS both instruments, with controls: 56 p.p.* % We do not control for progressivity: as most of the people who did not answer the question were in the second half of the survey, the absence of response is too correlated with our instrument Z_E (apres_modifs) which bias the results.
@@ -598,7 +594,7 @@ formula_ee2 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC *
 tsls1_ee2 <- lm(formula_ee2, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee2)
 s$taxe_efficace.hat <- fitted.values(tsls1_ee2)
-formula2_ee2 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ",paste(variables_reg_ee, collapse = ' + ')))
+formula2_ee2 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ", paste(variables_reg_ee, collapse = ' + ')))
 tsls2_ee2 <- lm(formula2_ee2, data=s, weights=s$weight)
 summary(tsls2_ee2)
 
@@ -608,13 +604,9 @@ summary(tsls2_ee2)
 # tsls1_ee2_formula_ee2_interaction <- lm(formula_ee2_interaction, data=s, weights = s$weight, na.action='na.exclude')
 # summary(tsls1_ee2_formula_ee2_interaction)
 
-s$prog_na <- s$progressivite
-s$prog_na[is.na(s$prog_na)] <- "NA"
 s$prog_not_no <- (s$prog_na == 'Oui' | s$prog_na == 'NSP') # Attention à ne pas inclure les NA
 # (3) OLS with controls:
 # 42 p.p.
-s$prog_na <- s$progressivite
-s$prog_na[is.na(s$progressivite)] <- "NA"
 s$taxe_efficace.hat <- n(s$taxe_efficace!='Non')
 formula_ee3 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + prog_not_no + (prog_na == 'NA') + ", paste(variables_reg_ee, collapse = ' + '))) # 
 ols_ee3 <- lm(formula_ee3, data=s, weights = s$weight)
