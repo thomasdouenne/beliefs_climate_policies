@@ -462,6 +462,7 @@ sum(sum_sq_average) # should = 1 (if it's not, probably because one variable is 
 
 
 ##### Logit Approbation #####
+# to weight correctly, use svyglm, cf. https://stats.stackexchange.com/questions/57107/use-of-weights-in-svyglm-vs-glm
 # All variables we can think of (TODO: complete the list)
 logit_all <- glm((taxe_approbation!='Non') ~ revenu + rev_tot + hausse_carburants + hausse_chauffage + score_climate_call + score_ges
               + Gauche_droite + emission_cible + effets_CC + ecologiste + conservateur + liberal + humaniste + patriote + apolitique
