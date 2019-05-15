@@ -3112,3 +3112,16 @@ approval_correct_beliefs <- wtd.mean(s$taxe_info_approbation=='Oui', weights = s
 )
 approval_correct_beliefs
 
+# 5.2 Who is convinced in our LATE: Correlates of sensitivity to information on beliefs over effectiveness
+s$info_ee <- 1*(s$apres_modifs==T) + (s$info_CC==1) + (s$info_PM==1)
+ols_ee <- lm(as.formula(paste("taxe_efficace!='Non' ~ ", paste(paste(c("Gilets_jaunes", "revenu", "Gauche_droite", "taille_agglo", "ecologiste", "sexe", "(Diplome>4)", "statut_emploi"), 
+                                                                     collapse=' + apres_modifs * '), paste(c("Gilets_jaunes", "revenu", "Gauche_droite", "taille_agglo", "ecologiste", "sexe", "(Diplome>4)", "statut_emploi"), 
+                                                                                                           collapse=' + info_CC * info_PM * '), sep=' + '))), weights=s$weight, data=s)
+summary(ols_ee)
+ols_ee_sans_interaction <- lm(as.formula(paste("taxe_efficace!='Non' ~ apres_modifs * info_CC * info_PM +", 
+                                               paste(c("Gilets_jaunes", "revenu", "Gauche_droite", "taille_agglo", "ecologiste", "sexe", "(Diplome>4)", "statut_emploi"), collapse=' + '))), weights=s$weight, data=s)
+summary(ols_ee_sans_interaction)
+anova(ols_ee_sans_interaction, ols_ee) # We reject at 6% that interactions terms have no effect: compliers are a bit different from others
+
+summary(lm(as.formula(paste("progressif ~ ", paste(variables_reg_prog, collapse=' + '))), weights=s$weight, data=s))
+variables_correlees_prog <- c("Revenu", "Revenu2", "gagnant_categorie", "taxe_efficace", "sexe", "diplome4", "surface")
