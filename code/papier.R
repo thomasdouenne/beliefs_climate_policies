@@ -35,7 +35,9 @@ summary(lm(gain ~ mauvaise_qualite, data=s, weights = s$weight))
 s$taille_menage[s$taille_menage > 12] # most look like zipcode, but we capped it since
 
 ## 2.2  French households surveys
-# cf. python files TODO
+# Matching BdF/ENTD : Cf. repository Github openfisca_france_indirect_taxation\build_survey_data\matching_bdf_entd : all files
+# Data preparation: cf. prepare_dataset.py
+# Computation of net gains: cf. define_tax_incidence_data.py and gain_losses_data.py
 
 
 ##### 3 Perceptions #####
@@ -854,7 +856,7 @@ decrit(s$conso)
 # Figure: cf. test_predictions_binary_models.py (and regression_feedback.py)
 
 ## B.3 Distributive effects
-# TODO: reference to python file
+# Figure: cf. consistency_belief_losses.py (function compute_effort_rate_decile() defined in standardize_data_bdf_ptc.py)
 
 
 ##### Appendix C. Beliefs' persistence #####
