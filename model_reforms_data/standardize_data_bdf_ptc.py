@@ -238,8 +238,8 @@ def compute_effort_rate_decile(df_bdf, energy): # ATTENTION : Problème avec les
         columns = ['average_cost_{}'.format(energy), 'average_fiscal_cost_{}'.format(energy), 'effort_rate_{}'.format(energy), 'effort_rate_fiscal_{}'.format(energy)])
     for i in range(1,11):
         df_to_plot['average_cost_{}'.format(energy)][i] = (
-            (df_bdf.query('income_decile == {}'.format(i))['gain_net_numeric_uc_{}'.format(energy)] * df_bdf.query('income_decile == {}'.format(i))['weight']).sum() /
-            df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
+            (df_bdf.query('income_decile == {}'.format(i))['gain_net_numeric_uc_{}'.format(energy)] * \
+                   df_bdf.query('income_decile == {}'.format(i))['weight']).sum() / df_bdf.query('income_decile == {}'.format(i))['weight'].sum()
                 )
         df_to_plot['average_fiscal_cost_{}'.format(energy)][i] = (
             (df_bdf.query('income_decile == {}'.format(i))['gain_fiscal_net_numeric_uc_{}'.format(energy)] * df_bdf.query('income_decile == {}'.format(i))['weight']).sum() /

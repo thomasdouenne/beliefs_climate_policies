@@ -57,8 +57,8 @@ plot_kde = False
 save_kde_data = True
 test_imputation_methods = False # The two methods provide quite similar results
 regress = False
-number_winners = True
-effort_rate = False
+number_winners = False
+effort_rate = True
 prop_constrained = False
 
 
