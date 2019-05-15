@@ -113,7 +113,7 @@ axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd
 # restore graphical parameters
 par(mar = mar_old, cex = cex_old)
 
-# table III: Heterogeneity in bias
+# TableIII: Heterogeneity in bias
 mean(abs(fit$predicted_gain - fit$gain) > 110) # 5%
 wtd.mean(abs(s$simule_gain - s$gain) > 110, weights = s$weight) # 55%
 
@@ -284,7 +284,7 @@ x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_feed
 n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0,]$weight)
 binconf(x = x, n = n) # 83.0%
 
-# Table V: Determinants of correct revision
+# TableV: Determinants of correct revision
 # Those who think they win update more correctly when they should update
 base_winner <- lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(base_winner)
@@ -438,7 +438,7 @@ TableVI <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_
                       # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
                       c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", " ", "\\checkmark"),
                       c("Controls: Estimated gain ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark", "\\checkmark"),
-                      c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", ""),
+                      c("Controls: Target of the tax, single ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", ""),
                       c("Controls: Socio-demo, other motives ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", "\\checkmark  ")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\multicolumn{2}{c}{\\textit{OLS}}", 
@@ -455,7 +455,7 @@ TableXVII <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                     keep = c("Constant", "traite", "acceptance", "simule_gagnant"),
                     add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", "", " \\checkmark"),
                                   c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
-                                  c("Controls: Target of the tax", " \\checkmark", " \\checkmark", " ", " "),
+                                  c("Controls: Target of the tax, single", " \\checkmark", " \\checkmark", " ", " "),
                                   c("Controls: Socio-demo, other motives", "", " \\checkmark", " ", " \\checkmark")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVII, fixed=TRUE), fixed=TRUE), collapse=' ')
