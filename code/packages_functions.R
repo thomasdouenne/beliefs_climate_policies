@@ -48,6 +48,10 @@ package("ergm") # wtd.median
 package("mfx")
 package("margins")
 package("plotrix")
+package("grDevices")
+package("colorspace")
+package("RColorBrewer")
+package("colorRamps")
 # package("doMC") # for parallel computing, does not work on Windows
 
 # Fs <- function(QID) { s[QID][[1]] }
@@ -234,6 +238,7 @@ oui_non <- function(vars, file, labels = vars, data = s, display_value = T, weig
   # api_create(bars, filename=file, sharing="public")
   return(bars) # bugs most often than not
 }
+# TODO: mettre en option sort et color dans oui_non
 data5 <- function(vars, data=s, miss=T, weights=T) {
   matrice <- c()
   colors <-  c(rainbow(4, end=4/15), "forestgreen") # c("red", "orange", "yellow", "green", "darkgreen") # rainbow(5, end=1/3)
@@ -262,14 +267,53 @@ data1 <- function(vars, data=m, weights=T) {
   }
   return( matrix(res, ncol=length(vars)) )
 }
+dataN <- function(var, data=s, miss=T, weights = T, return = "", fr=T) {
+  mat <- c()
+  if (is.character(data[[var]]) | is.numeric(data[[var]])) v <- as.factor(as.factor(data[[var]]))
+  else v <- data[[var]]
+  if (is.null(annotation(v))) levels <- levels(v)
+  else levels <- labels(v)@.Data
+  levels <- levels[!(levels %in% c("NSP"))]
+  for (val in levels) {
+    if (weights) mat <- c(mat, sum(data[['weight']][which(v==val)])/sum(data[['weight']][!is.missing(v)]))
+    else mat <- c(mat, length(which(v)==val)/length(which(!is.missing(v)))) }
+  if (miss) {
+    if (is.null(annotation(v))) {
+      if (weights) mat <- c(mat, sum(data[['weight']][which(is.na(v))])/sum(data[['weight']][!is.missing(v)]))
+      else mat <- c(mat, length(which(is.na(v)))/length(which(!is.missing(v))))
+    } else  {
+      if (weights) mat <- c(mat, sum(data[['weight']][which(is.missing(v) & !is.na(v))])/sum(data[['weight']][!is.missing(v)]))
+      else mat <- c(mat, length(which(is.missing(v) & !is.na(v)))/length(which(!is.missing(v)))) } }
+  if ((return == "levels") & miss & fr) return(c(levels, 'NSP'))
+  else if ((return == "levels") & miss & (!(fr))) return(c(levels, 'PNR'))
+  else if ((return == "levels") & (!(miss))) return(levels)
+  else return(matrix(mat, ncol=1))
+}
 color5 <- c(rainbow(4, end=4/15)[1:3], "#00FF00", "#228B22") # the last two are: green, forestgreen
+color <- function(v, grey=FALSE, grey_replaces_last = T, rev_color = FALSE) {
+  if (length(v) > 1) n <- length(v)
+  else n <- v # cf. http://research.stowers.org/mcm/efg/R/Color/Chart/ColorChart.pdf
+  if (grey & grey_replaces_last) n <- n-1
+  if (n == 1) cols <- c("#66B3B3") # "brown": #A52A2A Presentation Teal: #008096 (title) #1A8C8C (dark) #66B3B3 #99CCCC (light)
+  else if (n == 2) cols <- c("#90EE90", "#DDA0DD") # c("lightgreen", "plum") 
+  else if (n == 3) cols <- color5[c(1,3,5)]
+  else if (n == 4) cols <- c(rainbow(4, end=4/15)[1:3], "#228B22")
+  else if (n == 5) cols <- c(rainbow(4, end=4/15)[1:3], "#00FF00", "#228B22") # the last two are: green, forestgreen
+  else if (n == 6) cols <- rainbow(6)
+  else if (n == 7) cols <- c("#000000", rainbow(7)[c(1:3,5:7)])
+  else cols <- rainbow(n) # diverge_hcl green2red brewer.pal(n, Spectral/RdBu...)  https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/colorPaletteCheatsheet.pdf
+  if (rev_color) cols <- rev(cols)
+  if (grey) return(c(cols, "#D3D3D3")) # lightgrey
+  else return(cols)
+}
 # accord5 <- c("Pas du tout d'accord", "Pas vraiment d'accord", "Indifférent-e", "Assez d'accord", "Tout à fait d'accord")
 oui_non5 <- c("Non, pas du tout", "Non, pas vraiment", "Indifférent-e/NSP", "Oui, plutôt", "Oui, tout à fait")
 yes_no5 <- c("Not at all", "Not really", "Indifferent/PNR", "Rather yes", "Yes, completely")
 # agree5 <- c("Strongly disagree", "Disagree", "Indifferent", "Agree", "Strongly agree")
 # evol5 <- c("Baisser fortement", "Baisser légèrement", "Maintenir au niveau", "Augmenter légèrement", "Augmenter fortement")
 # evolve5 <- c("Strongly decrease", "Slightly decrease", "Maintain", "Slightly increase", "Strongly increase")
-barres <- function(data, file, title="", labels, color, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE) {
+barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE) {
+  if (length(color)==0) color <- color(data[,1], nsp, rev_color = rev_color)
   margin_t <- 0
   if (title!="") { margin_t <- 100 }
   if (grepl("<br>", title)) { margin_t <- 150 }
@@ -283,7 +327,7 @@ barres <- function(data, file, title="", labels, color, hover=legend, nsp=TRUE, 
   # if (max(nchar(labels)) > 60) { legendSize <- 7 }
   if (max(nchar(labels)) > 50) { # 70
     legendSize <- 11 
-    legendY = 1.2
+    legendY = 1.2 # TODO: nchar avec une variable
     legendX=1
     margin_t = 170
   }
@@ -434,7 +478,7 @@ Crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
   stopifnot(as.integer(dec.places) == dec.places, dec.places > -1)
   #type: see next section of code
   stopifnot(is.character(style))    
-  stopifnot(is.logical(percentages))
+  stopifnot(is.logical(percetnages))
   stopifnot(is.logical(addmargins))
   stopifnot(is.logical(subtotals))
   stopifnot(n.vars>=1)
