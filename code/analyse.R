@@ -594,17 +594,24 @@ summary(lm((enfant_CC=='Oui') ~ sexe, data=ss))
 
 
 ##### Connaissances et opinions CC #####
-decrit(s$ges_avion, weights = s$weight) # 47%
-decrit(s$ges_boeuf, weights = s$weight) # 47%
-decrit(s$ges_nucleaire, weights = s$weight) # 48%
-decrit(s$ges_co2, weights = s$weight) # 81%
-decrit(s$ges_ch4, weights = s$weight) # 48%
-decrit(s$ges_o2, weights = s$weight) # 6%
-decrit(s$ges_pm, weights = s$weight) # 58%
-decrit(s$score_polluants, weights = s$weight)
-decrit(s$score_climate_call, weights = s$weight)
+decrit(s$ges_avion, weights = s$weight) # 59%
+decrit(s$ges_boeuf, weights = s$weight) # 46%
+decrit(s$ges_nucleaire, weights = s$weight) # 50%
+decrit(s$score_climate_call, weights = s$weight) # médiane à 2/3
+s$nb_coches_climate_call <- (s$ges_avion==T) + (s$ges_boeuf==T) + (s$ges_nucleaire==T)
+decrit(s$nb_coches_climate_call, weights = s$weight) # médiane à 1/3
+decrit(s$ges_CO2, weights = s$weight) # 77%
+decrit(s$ges_CH4, weights = s$weight) # 48%
+decrit(s$ges_O2, weights = s$weight) # 4%
+decrit(s$ges_pm, weights = s$weight) # 61%
+decrit(s$score_ges, weights = s$weight) # médiane à 3/4
+s$nb_coches_ges <- (s$ges_CO2==T) + (s$ges_CH4==T) + (s$ges_O2==T) + (s$ges_pm==T)
+decrit(s$nb_coches_ges, weights = s$weight) # médiane à 2/4
 decrit(s$emission_cible, weights = s$weight) # 5
-decrit(s$cause_CC, miss=T, weights = s$weight)
+decrit(s$cause_CC, miss=T, weights = s$weight) # 72% anthropic, 20% natural, 3% doesn't exist
+decrit(s$parle_CC, weights = s$weight) # 3 tiers
+decrit(s$effets_CC, weights = s$weight) # 20% cataclysmiques; 31% désastreux, 38% graves
+decrit(s$region_CC, weights = s$weight) # 65% autant, 29% Inde, 6% UE
 
 
 ##### Orientation politiques #####
