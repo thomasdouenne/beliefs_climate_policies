@@ -613,6 +613,21 @@ decrit(s$parle_CC, weights = s$weight) # 3 tiers
 decrit(s$effets_CC, weights = s$weight) # 20% cataclysmiques; 31% désastreux, 38% graves
 decrit(s$region_CC, weights = s$weight) # 65% autant, 29% Inde, 6% UE
 
+# Graphs correct/false
+s$ges_correct_avion <- (s$ges_avion == TRUE)
+s$ges_correct_boeuf <- (s$ges_boeuf == TRUE)
+s$ges_correct_nucleaire <- (s$ges_nucleaire == FALSE)
+s$ges_correct_CO2 <- (s$ges_CO2 == TRUE)
+s$ges_correct_CH4 <- (s$ges_CH4 == TRUE)
+s$ges_correct_O2 <- (s$ges_O2 == FALSE)
+s$ges_correct_pm <- (s$ges_pm == FALSE)
+
+ges_climate_call <-  names(s)[which(grepl("ges_correct", names(s)))]
+#ges_climate_call <- ges_climate_call[!(ges_climate_call %in% c("peages_urbains", "score_ges"))]
+labels_ges_climate_call <- c("Plane", "Beaf", "Nuclear", "CO2", "CH4", "O2", "PM")
+oui_non(margin_l=100, ges_climate_call, NSP=FALSE, en=TRUE, "questions_ges", labels_ges_climate_call)
+
+
 # Responsables CC
 variables_responsable <- names(s)[which(grepl("responsable_CC", names(s)))]
 labels_responsable <- c()
