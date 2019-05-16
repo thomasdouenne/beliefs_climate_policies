@@ -621,56 +621,28 @@ s$ges_correct_CO2 <- (s$ges_CO2 == TRUE)
 s$ges_correct_CH4 <- (s$ges_CH4 == TRUE)
 s$ges_correct_O2 <- (s$ges_O2 == FALSE)
 s$ges_correct_pm <- (s$ges_pm == FALSE)
+ges_climate_call <- rev(paste("ges_correct", c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm"), sep="_")) # names(s)[which(grepl("ges_correct", names(s)))]
+labels_ges_climate_call <- rev(c("Plane", "Nuclear", "Beaf", "O<sub>2</sub>", "CO<sub>2</sub>", "CH<sub>4</sub>", "Particulates")) # labels_ges_climate_call <- c("Plane", "Beaf", "Nuclear", "CO<sub>2</sub>", "CH<sub>4</sub>", "O<sub>2</sub>", "PM") 
+oui_non(margin_l=20, ges_climate_call, NSP=FALSE, en=TRUE, labels = labels_ges_climate_call, sort=FALSE)
+oui_non(margin_l=20, ges_climate_call, NSP=FALSE, en=FALSE, labels = rev(c("Avion", "Nucléaire", "Bœuf", "O<sub>2</sub>", "CO<sub>2</sub>", "CH<sub>4</sub>", "Particules fines")), sort=FALSE)
+
+barres(file="CC_responsable", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_responsable, hover=labels_responsable)
+barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations"), hover=labels_responsable)
 barres(file="CC_effects", title="", data=dataN("effets_CC"), nsp=T, sort=T, rev_color=T, legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "NSP"), labels=c("Consequences of CC"))
 barres(file="CC_cause", title="", data=dataN("cause_CC"), nsp=T, sort=T, rev_color=T, legend = c("Anthropic", "Natural", "Does not exist", "NSP"), labels=c("Cause of CC"))
 barres(file="CC_effets", title="", data=dataN("effets_CC"), nsp=T, sort=T, rev_color=T, legend = dataN("effets_CC", return="levels"), labels=c("Conséquences du CC"))
 barres(file="CC_cause_fr", title="", data=dataN("cause_CC"), nsp=T, sort=T, rev_color=T, legend = dataN("cause_CC", return="levels"), labels=c("Cause du CC"))
 s$region_CC <- as.factor(s$region_CC)
-s$region_CC <- relevel(s$region_CC, "L'Union Européenne")
+s$region_CC <- relevel(relevel(s$region_CC, "Autant dans les deux"), "L'Inde")
 barres(file="CC_region", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, rev_color=T, legend = c("European Union", "As much in both", "India", "NSP"), labels=c("Region with biggest consequences of CC"))
 barres(file="CC_région", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, rev_color=T, legend = dataN("region_CC", return="levels"), labels=c("Région aux plus grandes conséquences du CC"))
-barres(file="CC_target_emission", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), legend = dataN("emission_cible", return="levels"), labels=c("Emission compatible with +2°C (tCO2e/yr p.c.)")) # <sub>2</sub> TODO: legend html plotly
-barres(file="CC_émission_cible", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), legend = dataN("emission_cible", return="levels"), labels=c("Émission compatible avec +2°C (tCO2e/an p.c.)")) # <sub>2</sub> TODO: legend html plotly
+barres(file="CC_target_emission", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), legend = dataN("emission_cible", return="levels"), labels=c("Emission compatible with +2°C (tCO<sub>2</sub>e/yr p.c.)")) # <sub>2</sub> TODO: legend html plotly
+barres(file="CC_émission_cible", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), legend = dataN("emission_cible", return="levels"), labels=c("Émission compatible avec +2°C (tCO<sub>2</sub>e/an p.c.)")) 
 barres(file="CC_talks", title="", data=dataN("parle_CC"), nsp=T, sort=T, legend = c("Almost never", "Several times per year", "Several times per month", "PNR"), labels=c("Talks about CC...")) 
-barres(file="CC_parle", title="", data=dataN("parle_CC"), nsp=T, sort=T, legend = dataN("parle_CC", return="levels"), labels=c("Parle du CC...")) # <sub>2</sub> TODO: legend html plotly
+barres(file="CC_parle", title="", data=dataN("parle_CC"), nsp=T, sort=T, legend = dataN("parle_CC", return="levels"), labels=c("Parle du CC...")) 
 barres(file="CC_generation_min", title="", data=dataN("generation_CC_min"), nsp=T, sort=T, legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c("First generation of French severely affected by CC (born in...)"))
-barres(file="CC_génération_min", title="", data=dataN("generation_CC_min"), nsp=T, sort=T, legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c("Première génération de Français gravement affectée par le CC (née en...)"))
-barres(file="CC_effects", title="", data=dataN("effets_CC"), nsp=T, sort=T, rev_color=T, legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "NSP"), labels=c("Consequences of CC"))
-barres(file="CC_cause", title="", data=dataN("cause_CC"), nsp=T, sort=T, rev_color=T, legend = c("Anthropic", "Natural", "Does not exist", "NSP"), labels=c("Cause of CC"))
-barres(file="CC_effets", title="", data=dataN("effets_CC"), nsp=T, sort=T, rev_color=T, legend = dataN("effets_CC", return="levels"), labels=c("Conséquences du CC"))
-barres(file="CC_cause_fr", title="", data=dataN("cause_CC"), nsp=T, sort=T, rev_color=T, legend = dataN("cause_CC", return="levels"), labels=c("Cause du CC"))
-s$region_CC <- as.factor(s$region_CC)
-s$region_CC <- relevel(s$region_CC, "L'Union Européenne")
-barres(file="CC_region", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, rev_color=T, legend = c("European Union", "As much in both", "India", "NSP"), labels=c("Region with biggest consequences of CC"))
-barres(file="CC_région", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, rev_color=T, legend = dataN("region_CC", return="levels"), labels=c("Région aux plus grandes conséquences du CC"))
-barres(file="CC_target_emission", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), legend = dataN("emission_cible", return="levels"), labels=c("Emission compatible with +2°C (tCO2e/yr p.c.)")) # <sub>2</sub> TODO: legend html plotly
-barres(file="CC_émission_cible", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), legend = dataN("emission_cible", return="levels"), labels=c("Émission compatible avec +2°C (tCO2e/an p.c.)")) # <sub>2</sub> TODO: legend html plotly
-barres(file="CC_talks", title="", data=dataN("parle_CC"), nsp=T, sort=T, legend = c("Almost never", "Several times per year", "Several times per month", "PNR"), labels=c("Talks about CC...")) 
-barres(file="CC_parle", title="", data=dataN("parle_CC"), nsp=T, sort=T, legend = dataN("parle_CC", return="levels"), labels=c("Parle du CC...")) # <sub>2</sub> TODO: legend html plotly
-barres(file="CC_generation_min", title="", data=dataN("generation_CC_min"), nsp=T, sort=T, legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c("First generation of French severely affected by CC (born in...)"))
-barres(file="CC_génération_min", title="", data=dataN("generation_CC_min"), nsp=T, sort=T, legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c("Première génération de Français gravement affectée par le CC (née en...)"))
+barres(file="CC_génération_min", title="", data=dataN("generation_CC_min"), nsp=T, sort=T, legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c("Première génération de Français <br>gravement affectée par le CC (née en...)"))
 
-ges_climate_call <-  names(s)[which(grepl("ges_correct", names(s)))]
-#ges_climate_call <- ges_climate_call[!(ges_climate_call %in% c("peages_urbains", "score_ges"))]
-labels_ges_climate_call <- c("Plane", "Beaf", "Nuclear", "CO2", "CH4", "O2", "PM")
-oui_non(margin_l=100, ges_climate_call, NSP=FALSE, en=TRUE, "questions_ges", labels_ges_climate_call)
-
-
-# Responsables CC
-variables_responsable <- names(s)[which(grepl("responsable_CC", names(s)))]
-labels_responsable <- c()
-values_responsable <- c()
-for (v in variables_responsable[1:(length(variables_responsable))]) {
-  labels_responsable <- c("Chacun d'entre nous", "Les plus riches", "Les gouvernements", "Certains pays étrangers", "Les générations passées", "Des causes naturelles")
-  values_responsable <- c(values_responsable, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
-
-barres_responsable <- barres(file="responsable_CC", title="<b>Responsables du changement climatique</b><br>(choix multiples)", data=matrix(values_responsable, ncol=length(values_responsable)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_responsable, hover=labels_responsable, legend="empty")
-barres_responsable
-
-
-dataN("effets_CC")
-
-dataN("effets_CC")
 
 ##### Orientation politiques #####
 decrit(s$gauche_droite, weights = s$weight, miss=T)
