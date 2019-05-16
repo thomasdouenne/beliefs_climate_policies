@@ -103,7 +103,7 @@ def prepare_dataset():
     df_hh['domestic_fuel_expenditures'] = (6040.0 / 4710) * df_hh['domestic_fuel_expenditures']
     df_hh['natural_gas_expenditures'] = (12987.0 / 12560) * df_hh['natural_gas_expenditures']
     
-    # Inflate quantity data to represent 2018 as closely as possible
+    # Inflate quantity data to represent 2018 as closely as possible (unused as quantities are later derived from prices and expenditures)
     df_hh['diesel_quantity'] = 1 * df_hh['diesel_quantity']
     df_hh['gasoline_quantity'] = 1 * df_hh['gasoline_quantity']
     df_hh['domestic_fuel_quantity'] = 1 * df_hh['domestic_fuel_quantity']

@@ -449,10 +449,11 @@ gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standar
 
 TableXVII <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                     title="First stage regressions results for self-interest", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                    covariate.labels = c("Constant", "Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
+                    covariate.labels = c("Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
                                          "$T_1 \\times T_2$", "Initial tax Acceptance ($A^I$)", "Simulated winner ($\\widehat{\\Gamma}$)"),
                     dep.var.labels = c("Targeted tax ($G^T$)", "After feedback ($G^F$)"), dep.var.caption = "Believes does not lose", header = FALSE,
-                    keep = c("Constant", "traite", "acceptance", "simule_gagnant"),
+                    column.labels = c("(1)", "(2)", "(5)", "(6)"), model.numbers = FALSE,
+                    keep = c("traite", "acceptance", "simule_gagnant"),
                     add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", "", " \\checkmark"),
                                   c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
                                   c("Controls: Target of the tax, single", " \\checkmark", " \\checkmark", " ", " "),
@@ -540,10 +541,10 @@ write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\text
 TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                       title="First stage regressions results for environmental effectiveness", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                       # "Info on Climate Change and/or on Particulates", "Info on Climate Change only", "Info on Particulates only"
-                      covariate.labels = c("Constant", "Info on Environmental Effectiveness ($Z_{E}$)",  
+                      covariate.labels = c("Info on Environmental Effectiveness ($Z_{E}$)",  
                                            "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
                       dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
-                      keep = c("Constant", "info", "apres_modifs"), 
+                      keep = c("info", "apres_modifs"), 
                       column.labels = c("(1, 6)", "(2)", "(5)"), model.numbers = FALSE,
                       add.lines = list(c("Controls ", "", "\\checkmark ", "")), 
                       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
