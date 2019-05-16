@@ -613,6 +613,17 @@ decrit(s$parle_CC, weights = s$weight) # 3 tiers
 decrit(s$effets_CC, weights = s$weight) # 20% cataclysmiques; 31% désastreux, 38% graves
 decrit(s$region_CC, weights = s$weight) # 65% autant, 29% Inde, 6% UE
 
+# Responsables CC
+variables_responsable <- names(s)[which(grepl("responsable_CC", names(s)))]
+labels_responsable <- c()
+values_responsable <- c()
+for (v in variables_responsable[1:(length(variables_responsable))]) {
+  labels_responsable <- c("Chacun d'entre nous", "Les plus riches", "Les gouvernements", "Certains pays étrangers", "Les générations passées", "Des causes naturelles")
+  values_responsable <- c(values_responsable, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
+
+barres_responsable <- barres(file="responsable_CC", title="<b>Responsables du changement climatique</b><br>(choix multiples)", data=matrix(values_responsable, ncol=length(values_responsable)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_responsable, hover=labels_responsable, legend="empty")
+barres_responsable
+
 
 ##### Orientation politiques #####
 decrit(s$gauche_droite, weights = s$weight, miss=T)
