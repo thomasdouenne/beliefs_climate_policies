@@ -296,8 +296,8 @@ color <- function(v, grey=FALSE, grey_replaces_last = T, rev_color = FALSE) {
   else if (length(v) > 1) n <- length(v)
   else n <- v # cf. http://research.stowers.org/mcm/efg/R/Color/Chart/ColorChart.pdf
   if (grey & grey_replaces_last & n > 1) n <- n-1
-  if (n == 1) cols <- c("#1A8C8C") # "brown": #A52A2A Presentation Teal: #008096 (title) #1A8C8C (dark) #66B3B3 #99CCCC (light)
-  else if (n == 2) cols <- c("#1A8C8C", "#A52A2A") # c("lightgreen", "plum") = c("#90EE90", "#DDA0DD")
+  if (n == 1) cols <- c("#66B3B3") # "brown": #A52A2A Presentation Teal: #008096 (title) #1A8C8C (dark) #66B3B3 #99CCCC (light)
+  else if (n == 2) cols <- c("#66B3B3", "#A52A2A") # c("lightgreen", "plum") = c("#90EE90", "#DDA0DD")
   else if (n == 3) cols <- color5[c(1,3,5)]
   else if (n == 4) cols <- c(rainbow(4, end=4/15)[1:3], "#228B22")
   else if (n == 5) cols <- c(rainbow(4, end=4/15)[1:3], "#00FF00", "#228B22") # the last two are: green, forestgreen
