@@ -26,13 +26,26 @@ decrit(s$ges_O2, weights = s$weight) # 4%
 decrit(s$ges_pm, weights = s$weight) # 61%
 
 decrit(s$emission_cible, weights = s$weight) # 5
-
 decrit(s$cause_CC, miss=T, weights = s$weight) # 72% anthropic, 20% natural, 3% doesn't exist
 decrit(s$region_CC, weights = s$weight) # 65% autant, 29% Inde, 6% UE
 decrit(s$generation_CC_min, weights = s$weight) #1960-2050: 11%-27%-43%-19%
 
+ges_climate_call <- rev(paste("ges_correct", c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm"), sep="_")) 
+labels_ges_climate_call <- rev(c("Plane", "Nuclear", "Beaf", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
+oui_non(margin_l=20, ges_climate_call, NSP=FALSE, en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE)
+barres(file="CC_target_emission", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), 
+       legend = dataN("emission_cible", return="levels"), labels=c("Emission compatible with +2°C (tCO<sub>2</sub>e/yr p.c.)")) 
+barres(file="CC_cause", title="", data=dataN("cause_CC"), nsp=T, sort=T, legend = c("Anthropic", "Natural", "Does not exist", "NSP"), labels=c("Cause of CC"))
+barres(file="CC_generation_min", title="", rev_color = T, data=dataN("generation_CC_min"), nsp=T, sort=T, 
+       legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c("First generation of French severely affected by CC (born in...)"))
+s$region_CC <- as.factor(s$region_CC)
+s$region_CC <- relevel(relevel(s$region_CC, "Autant dans les deux"), "L'Inde")
+barres(file="CC_region", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, 
+       legend = c("India", "As much in both", "European Union", "NSP"), labels=c("Region with biggest consequences of CC"))
+
 
 ## 3.2 Opinions
+# TODO: ecologiste
 decrit(s$parle_CC, miss=T, weights = s$weight) # 3 tiers
 decrit(s$effets_CC, miss=T, weights = s$weight) # 20% cataclysmiques; 31% désastreux, 38% graves
 decrit(s$responsable_CC_chacun, miss=T, weights = s$weight) # 63%
@@ -44,6 +57,12 @@ decrit(s$responsable_CC_passe, miss=T, weights = s$weight) # 21%
 
 labels_resp <- c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations")
 barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_resp, hover=labels_resp)
+barres(file="CC_effects", title="", thin=T, data=dataN("effets_CC"), nsp=T, sort=T, 
+       legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "NSP"), labels=c("Consequences of CC"))
+s$parle_CC <- as.factor(s$parle_CC)
+s$parle_CC <- relevel(relevel(s$parle_CC, "Plusieurs fois par an"), "Plusieurs fois par mois")
+barres(file="CC_talks", title="", data=dataN("parle_CC"), nsp=T, sort=T, 
+       legend = c("Several times per month", "Several times per year", "Almost never", "PNR"), labels=c("Talks about CC...")) 
 
 
 ##### 4. Attitudes over Carbon Tax and Dividend #####
@@ -61,13 +80,32 @@ decrit(s$benefices_circulation, weights=s$weight) # 10%
 decrit(s$benefices_revenu, weights=s$weight) # 8%
 decrit(s$benefices_autre_choix, weights=s$weight) # 5%
 
-#TODO: correct benefice_autre dans preparation.R
+print(s$benefices_autre[!is.na(s$benefices_autre)])
+# aucun: ................
+# inéquité: ...............
+# modifications structurelles: ............
+# diesel, kerosène: ...........
+# déficit: .........
+# état prend argent: ..................
+# pépites : "maléfique" "Aucunement bénéfique sauf pour contrer ceux qui utilisent leur véhicule alors qu'ils peuvent faire autrement" 
+# "aucune prime de nous sera versé. ce n est que  du blabla de la part du gouvernement" "brassage"
+# "elle est bénéfique pour le gouvernement qui n'investirait pas la TOTALITE des ressources budgétaires supplémentaires"
+# "Globalement l'ensemble des mesures et le reversement d'une \"compensation\" ne recouvrerait pas la différence de prix sur l'année. 
+#     Je  parle de l'ensemble des augmentations ainsi que les augmentation forcément induites et répercutées sur l'ensemble des produits de consommations..." 
+# "vos donnees sont erronees" "On est toujours perdant" "je ne pourrai plus me chauffer tout simplement"
+# "Je ne vois pas en quoi nous prendre de l'argent pour nous le redonner, changerait quelque chose à notre manière de polluer."
+# "J' ai deja réduit au maximum mes consommations d' énergie mais néanmoins  je paye toujours plus" Problème : "Pour la paix sociale"
+# "il faut taxer les nouveaux véicule a l'achats et de fasson significative et pas apré leurs mise en services!"
+# "Ce projet a entrainé un fort mécontentement; je ne le soutiens pas car je le juge absurde."
+print(s$problemes_autre[!is.na(s$problemes_autre)])
+
 variables_benefits <- names(s)[which(grepl("benefice", names(s)))[which(grepl("problemes", names(s)))>300]]
 variables_benefits <- variables_benefits[!(variables_benefits %in% c("nb_benefices", "benefices_autre"))]
-labels_benefits <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces congestion", "Increases my purchasing power", "Increases purchasing power of the poorest",
+labels_benefits <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces congestion", "Increases my purchasing power", 
+                     "Increases purchasing power of the poorest",
                       "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
 barres(file="CC_benefits", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits)
-
+# pb 35% NSP
 
 ## 4.3 Perceived problems
 decrit(s$problemes_ruraux, weights=s$weight) # 47%
@@ -87,9 +125,45 @@ labels_problems <- c("Is ineffective to reduce pollution", "Alternatives are ins
 barres(file="CC_problems", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems)
 
 
-##### 5. Attitudes over Other Policies #####
+## 4.4 Perceived elasticities
+s$elast_chauffage_perso <- factor(s$elasticite_chauffage_perso, levels(as.factor(s$elasticite_chauffage_perso))[c(1,6:2)])
+s$elast_fuel_perso <- factor(s$elasticite_fuel_perso, levels(as.factor(s$elasticite_fuel_perso))[c(1,6:2)])
+s$elast_chauffage_perso <- revalue(s$elast_chauffage_perso, c("+ de 30% - Je changerais largement ma consommation"="> 30%", 
+          "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 10%"="0 to 10%", 
+          "0% - Je ne la réduirais pas"="0%: won't reduce", "0% - Je n'en consomme déjà pas"="0%: don't consume"))
+# s$elast_fuel_perso <- revalue(s$elast_fuel_perso, c("+ de 30% - Je changerais largement mes habitudes de déplacement"="> 30%", 
+#           "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 10%"="0 to 10%", 
+#           "0% - Je suis contraint sur tous mes déplacements"="0%: won't reduce", "0% - Je n'en consomme déjà presque pas"="0%: don't consume"))
+barres(file="elasticities_perso", thin=T, title="", data=dataKN(c("elast_chauffage_perso", "elast_fuel_perso"), miss=FALSE), 
+       nsp=FALSE, labels=c("Own: Housing", "Own: Transport"), legend = dataN("elast_chauffage_perso", return="legend"))
+s$elast_chauffage <- factor(s$elasticite_chauffage, levels(as.factor(s$elasticite_chauffage))[c(1,4,3,5,2)])
+s$elast_fuel <- factor(s$elasticite_fuel, levels(as.factor(s$elasticite_fuel))[c(1,4,3,5,2)])
+s$elast_chauffage <- revalue(s$elast_chauffage, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", 
+                                "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
+# s$elast_fuel <- revalue(s$elast_fuel, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
+barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elasticite_chauffage", "elasticite_fuel"), miss=FALSE), 
+       nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport"), legend = dataN("elast_chauffage", return="legend"))
+barres(file="elasticities", title="", data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE), 
+       nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport", "Own: Housing", "Own: Transport"), 
+       legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE))
 
-### 5.1 Other instruments
+
+##### 5. Attitudes over Other Policies #####
+## 5.1 Other instruments
+labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
+                 "stricter standards on pollution from new vehicles", "stricter standards on pollution during roadworthiness tests", 
+        "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
+barres(file="environmental_policies", title="", 
+       data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+18)], miss=FALSE), nsp=FALSE, sort=T, legend = c(yes_no5), labels=labels_environmental_policies)
+# TODO: white space title, inverse left-right, taxation du disel / gaz de schiste 
+
+## 5.2 Preferred revenue recycling
+labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", 
+                          "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
+            "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
+labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
+barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
+       sort=T, legend = c(yes_no5), labels=labels_tax_condition)
 
 ## Favored environmental policies
 

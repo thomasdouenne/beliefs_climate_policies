@@ -910,7 +910,7 @@ convert_s <- function() {
  # TODO: as.item region_CC, gagnant_fuel_categorie, gagnant_chauffage_categorie, gagnant_categorie, gagnant_feedback_categorie, gagnant_progressif_categorie, gagnant_cible_categorie?  
 
   for (j in names(s)) {
-    if (j!="peages_urbains" & grepl('_perdant_|_gagnant_|benefices_|problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p|ecologiste|conservateur|liberal|patriote|humaniste|apolitique', j)) {
+    if (j!="peages_urbains" & grepl('_perdant_|_gagnant_|benefices_|problemes_|ges_|responsable_|generation_CC|enfant_CC_pour|changer_|gilets_jaunes_|apres_modif|aide_non_|aide_2p|ecologiste|conservateur|liberal|patriote|humaniste|apolitique', j) & !(j %in% c('benefices_autre_f', 'benefices_autre_p', 'problemes_autre_p', 'problemes_autre_f'))) {
       s[[j]][s[[j]]!=""] <<- TRUE
       s[[j]][is.na(s[[j]])] <<- FALSE
     }

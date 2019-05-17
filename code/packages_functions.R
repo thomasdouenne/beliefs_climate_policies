@@ -161,16 +161,22 @@ oui_non <- function(vars, file, labels = vars, data = s, display_value = T, sort
   o <- round(100 * oui / (oui + non))
   n <- round(100 * non / (oui + non))
   
-  if (en) {
+  if (en==T) {
     hover_oui <- paste('Yes<br>', oui, '% of answers<br>', o, '% of expressed answers')
     hover_non <- paste('No<br>', non, '% of answers<br>',n, '% of expressed answers')
     hover_nsp <- paste('PNR<br>', true_nsp, '% of answers')  
     Text <- c("Yes", "No", "PNR")      }
-  else {
+  else if (en==FALSE) {
     hover_oui <- paste('Oui<br>', oui, '% des réponses<br>', o, '% des réponses exprimées')
     hover_non <- paste('Non<br>', non, '% des réponses<br>',n, '% des réponses exprimées')
     hover_nsp <- paste('NSP<br>', true_nsp, '% des réponses')  
     Text <- c("Oui", "Non", "NSP") }
+  else {
+    hover_oui <- paste('Oui<br>', oui, '% des réponses<br>', o, '% des réponses exprimées')
+    hover_non <- paste('Non<br>', non, '% des réponses<br>',n, '% des réponses exprimées')
+    hover_nsp <- paste('NSP<br>', true_nsp, '% des réponses')  
+    Text <- en
+    if (length(Text ==2)) Text <- c(Text, 'PNR')}
   if (display_value) {
     hover_oui <- paste(oui, '%')
     hover_non <- paste(non, '%')
@@ -285,25 +291,32 @@ dataN <- function(var, data=s, miss=T, weights = T, return = "", fr=T) {
     } else  {
       if (weights) mat <- c(mat, sum(data[['weight']][which(is.missing(v) & !is.na(v))])/sum(data[['weight']][!is.missing(v)]))
       else mat <- c(mat, length(which(is.missing(v) & !is.na(v)))/length(which(!is.missing(v)))) } }
-  if ((return == "levels") & miss & fr) return(c(levels, 'NSP'))
-  else if ((return == "levels") & miss & (!(fr))) return(c(levels, 'PNR'))
-  else if ((return == "levels") & (!(miss))) return(levels)
+  if ((return %in% c("levels", "legend")) & miss & fr) return(c(levels, 'NSP'))
+  else if ((return %in% c("levels", "legend")) & miss & (!(fr))) return(c(levels, 'PNR'))
+  else if ((return %in% c("levels", "legend")) & (!(miss))) return(levels)
   else return(matrix(mat, ncol=1))
 }
+dataKN <- function(vars, data=s, miss=T, weights = T, return = "", fr=T) {
+  res <- c()
+  for (var in vars) res <- c(res, dataN(var, data, miss, weights, return, fr))
+  return(matrix(res, ncol=length(vars)))
+}
 color5 <- c(rainbow(4, end=4/15)[1:3], "#00FF00", "#228B22") # the last two are: green, forestgreen
-color <- function(v, grey=FALSE, grey_replaces_last = T, rev_color = FALSE) {
+color <- function(v, grey=FALSE, grey_replaces_last = T, rev_color = FALSE, theme='RdBu') {
   if (is.matrix(v)) n <- nrow(v)
   else if (length(v) > 1) n <- length(v)
   else n <- v # cf. http://research.stowers.org/mcm/efg/R/Color/Chart/ColorChart.pdf
   if (grey & grey_replaces_last & n > 1) n <- n-1
-  if (n == 1) cols <- c("#66B3B3") # "brown": #A52A2A Presentation Teal: #008096 (title) #1A8C8C (dark) #66B3B3 #99CCCC (light)
-  else if (n == 2) cols <- c("#66B3B3", "#A52A2A") # c("lightgreen", "plum") = c("#90EE90", "#DDA0DD")
-  else if (n == 3) cols <- color5[c(1,3,5)]
-  else if (n == 4) cols <- c(rainbow(4, end=4/15)[1:3], "#228B22")
-  else if (n == 5) cols <- c(rainbow(4, end=4/15)[1:3], "#00FF00", "#228B22") # the last two are: green, forestgreen
-  else if (n == 6) cols <- rainbow(6)
-  else if (n == 7) cols <- c("#000000", rainbow(7)[c(1:3,5:7)])
-  else cols <- rainbow(n) # diverge_hcl green2red brewer.pal(n, Spectral/RdBu...)  https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/colorPaletteCheatsheet.pdf
+  if (theme=='rainbow') {
+    if (n == 1) cols <- c("#66B3B3") # "brown": #A52A2A Presentation Teal: #008096 (title) #1A8C8C (dark) #66B3B3 #99CCCC (light)
+    else if (n == 2) cols <- c("#66B3B3", "#A52A2A") # c("lightgreen", "plum") = c("#90EE90", "#DDA0DD")
+    else if (n == 3) cols <- color5[c(1,3,5)]
+    else if (n == 4) cols <- c(rainbow(4, end=4/15)[1:3], "#228B22")
+    else if (n == 5) cols <- c(rainbow(4, end=4/15)[1:3], "#00FF00", "#228B22") # the last two are: green, forestgreen
+    else if (n == 6) cols <- rainbow(6)
+    else if (n == 7) cols <- c("#000000", rainbow(7)[c(1:3,5:7)])
+    else cols <- rainbow(n) # diverge_hcl green2red brewer.pal(n, Spectral/RdBu...)  https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/colorPaletteCheatsheet.pdf
+  } else cols <- rev(brewer.pal(n, theme))
   if (rev_color) cols <- rev(cols)
   if (grey & n > 1) return(c(cols, "#D3D3D3")) # lightgrey
   else return(cols)
@@ -314,13 +327,13 @@ yes_no5 <- c("Not at all", "Not really", "Indifferent/PNR", "Rather yes", "Yes, 
 # agree5 <- c("Strongly disagree", "Disagree", "Indifferent", "Agree", "Strongly agree")
 # evol5 <- c("Baisser fortement", "Baisser légèrement", "Maintenir au niveau", "Augmenter légèrement", "Augmenter fortement")
 # evolve5 <- c("Strongly decrease", "Slightly decrease", "Maintain", "Slightly increase", "Strongly increase")
-barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE, display_values=T) {
+barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE, display_values=T, thin=FALSE) {
   if (length(color)==0) color <- color(data, nsp, rev_color = rev_color)
-  margin_t <- 0 + 25
+  margin_t <- 0 + 25*(!(thin))
   if (title!="") { margin_t <- 100 }
   if (grepl("<br>", title)) { margin_t <- 150 }
   legendSize <- 13 # 10
-  legendY <- 1.1 + 0
+  legendY <- 1.1 + 0.3*thin
   legendX <- 0.2 
   # legendFont <- 'Open Sans'
   if (is.na(margin_l)) { margin_l <- 4.7*max(nchar(labels)/(1 + str_count(labels, '<br>'))) }
@@ -329,12 +342,12 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
   # if (max(nchar(labels)) > 60) { legendSize <- 7 }
   if (max(nchar(labels)) > 50) { # 70
     legendSize <- 13 # 11
-    legendY = 1.2 + 0
+    legendY = 1.2 + 0.3*thin
     legendX= 0 # 1
     if (ncol(data)>1) margin_t = 170
   }
   if (!showLegend) { margin_t <- max(0, margin_t - 70) }
-  if (ncol(data)==1) legendY = 1.5 + 0
+  if (ncol(data)==1) legendY = 1.5 + 0.3*thin
   if (sort) {
     agree <- c()
     if (nrow(data)==5 | nrow(data)==6) { for (i in 1:length(labels)) { agree <- c(agree, data[4, i] + data[5, i]) } }
@@ -363,7 +376,7 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
       }
       for (j in 1:length(labels)) {
         hovers <- c(hovers, paste(hover[length(hover)], '<br>', round(100*data[length(hover), j]/(1+data[length(hover), j])), '% des réponses<br>') )
-          values <- c(values, paste(round(100*data[i, j]), '%', sep=''))
+          values <- c(values, paste(round(100*data[length(hover), j]/(1+data[length(hover), j])), '%', sep=''))
       }
     }
     else {
@@ -414,7 +427,7 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
     titlefont = list(color='black'),
     font = list(color='black', size=legendSize-1),
     # paper_bgcolor = 'rgb(248, 248, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
-    margin = list(l = margin_l, r = margin_r, t = margin_t, b = 21, autoexpand=FALSE), # , autoexpand=FALSE removes useless margin at bottom but creates bug with legend
+    margin = list(l = margin_l, r = margin_r, t = margin_t, b = 21, autoexpand = thin), # , autoexpand=FALSE removes useless margin at bottom but creates bug with legend
     # margin = list(b = 20, t = margin_t),
     legend = list(orientation='h', y=legendY, x=legendX, traceorder='normal', font=list(size=legendSize, color='black')), # family='Balto',  , family=legendFont
     showlegend = showLegend) %>%
