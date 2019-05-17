@@ -2,14 +2,18 @@
 decrit(s$schiste_approbation)
 decrit(s$schiste_approbation, miss=T)
 decrit(s$schiste_traite)
-decrit(s$schiste_avantage)
-decrit(s$schiste_CC)
+decrit(s$schiste_avantage, miss=T)
+decrit(s$schiste_CC, miss=T)
 
 
 ### Simples OLS ###
-summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==0), data=s, weights = s$weight)) # Encore rien de trÃ¨s significatif
-summary(lm((schiste_avantage=='Cela permettrait de créer des emplois et dynamiser les départements concernés') ~ (schiste_traite==1), data=s, subset=schiste_approbation=='Oui' & schiste_avantage !='Aucune de ces deux raisons', weights = s$weight))
-summary(lm((schiste_CC=='Elle est valable : toute baisse des émissions va dans la bonne direction') ~ (schiste_traite==1), data=s, subset=schiste_approbation=='Oui' & schiste_CC !='NSP (Ne sait pas, ne se prononce pas)', weights = s$weight))
+summary(lm((schiste_approbation=='Non') ~ (schiste_traite==1) + variables_demo, data=s, weights = s$weight)) # Rejet plus fort lorsque traité (sans variables de contrôle)
+summary(lm((schiste_avantage=='Cela permettrait de créer des emplois et dynamiser les départements concernés') ~ (schiste_traite==1), data=s, subset=schiste_approbation!='Non', weights = s$weight))
+summary(lm((schiste_avantage=='Cela permettrait de limiter le changement climatique') ~ (schiste_traite==1), data=s, subset=schiste_approbation!='Non', weights = s$weight))
+summary(lm((schiste_CC=='valable') ~ (schiste_traite==1), data=s, subset=schiste_approbation=='Oui' & schiste_CC !='NSP (Ne sait pas, ne se prononce pas)', weights = s$weight))
+
+formula_schiste_approbation <- as.formula(paste("schiste_approbation=='Non' ~ (schiste_traite==1) + ", paste(variables_demo, collapse = ' + ')))
+summary(lm(formula_schiste_approbation, data=s, weights = s$weight))
 
 
 ### Logit ###

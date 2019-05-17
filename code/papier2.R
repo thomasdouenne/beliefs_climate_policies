@@ -109,3 +109,47 @@ barres_problemes
 
 ##### 5. Attitudes over Other Policies #####
 
+### 5.1 Other instruments
+
+## Favored environmental policies
+
+## Diesel taxation
+decrit(s$rattrapage_diesel, miss=T) # 59% non, 29% oui
+
+variables_diesel <- c("Revenu", "score_ges", "score_climate_call", variables_demo, variables_energie) # 
+variables_diesel <- variables_diesel[!(variables_diesel %in% c("revenu", "rev_tot", "age", "age_65_plus",
+                                    names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
+                                    names(s)[which(grepl("hausse_", names(s)))]))]
+formula_diesel <- as.formula(paste("rattrapage_diesel!='Non' ~ ",
+                                                paste(variables_diesel, collapse = ' + ')))
+summary(lm(formula_diesel, data=s, weights = s$weight)) # Strongest determinant: use of Diesel / Scores ges and CC also matter
+logit_diesel <- glm(formula_diesel, family = binomial(link='logit'), data=s)
+summary(logit_diesel)
+logit_diesel_margins <- logitmfx(formula_diesel, s, atmean=FALSE)$mfxest
+logit_diesel_margins
+
+oui_non(margin_l=10, c("rattrapage_diesel"), NSP=TRUE, en=TRUE, labels = rev(c("Favorable to catch-up diesel taxes")), sort=FALSE)
+
+## Shale gas
+# Approbation :
+decrit(s$schiste_approbation, miss=T) # 59% non, 17% oui
+decrit(s$schiste_traite) # 59% traités
+decrit(s$schiste_avantage, miss=T) # 56% aucun, 26% emplois, 18% CC
+decrit(s$schiste_CC, miss=T) # 44% malvenue, 25% valable
+
+summary(lm((schiste_approbation!='Non') ~ (schiste_traite==1), data=s, weights = s$weight)) # - 3.9 p.p. acceptance when treated
+variables_reg_schiste <- c("Revenu", "score_ges", "score_climate_call", variables_demo) # 
+variables_reg_schiste <- variables_reg_schiste[!(variables_reg_schiste %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
+formula_schiste_approbation <- as.formula(paste("schiste_approbation!='Non' ~ (schiste_traite==1) + ",
+                                                paste(variables_reg_schiste, collapse = ' + ')))
+summary(lm(formula_schiste_approbation, data=s, weights = s$weight)) # - 5.1 p.p. acceptance when treated / Scores, Sex and Education matter
+logit_schiste_approbation <- glm(formula_schiste_approbation, family = binomial(link='logit'), data=s)
+summary(logit_schiste_approbation)
+logit_schiste_approbation_margins <- logitmfx(formula_schiste_approbation, s, atmean=FALSE)$mfxest
+logit_schiste_approbation_margins # -5.7 p.p. with logit
+summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights = s$weight)) # Not significant for approval
+
+oui_non(margin_l=10, c("schiste_approbation"), NSP=TRUE, en=TRUE, labels = rev(c("Favorable to shale gas extraction")), sort=FALSE)
+
+
+## 5.2 Other revenue recycling
