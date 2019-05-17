@@ -42,18 +42,8 @@ decrit(s$responsable_CC_riches, miss=T, weights = s$weight) # 25%
 decrit(s$responsable_CC_nature, miss=T, weights = s$weight) # 23%
 decrit(s$responsable_CC_passe, miss=T, weights = s$weight) # 21%
 
-variables_responsable <- names(s)[which(grepl("responsable_CC", names(s)))]
-labels_responsable <- c()
-values_responsable <- c()
-for (v in variables_responsable[1:(length(variables_responsable))]) {
-  labels_responsable <- c("Each of us", "The richest", "Governments", "Some foreign countries", "Past generations", "Natural causes")
-  values_responsable <- c(values_responsable, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
-
-barres_responsable <- barres(file="responsable_CC", title="", data=matrix(values_responsable, ncol=length(values_responsable)), sort=T, color=c("#66B3B3"), showLegend=FALSE, labels=labels_responsable, hover=labels_responsable, legend="empty")
-barres_responsable
-#TODO: add % value at the end of each row + cut top space
-
-
+labels_resp <- c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations")
+barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_resp, hover=labels_resp)
 
 
 ##### 4. Attitudes over Carbon Tax and Dividend #####
@@ -71,17 +61,13 @@ decrit(s$benefices_circulation, weights=s$weight) # 10%
 decrit(s$benefices_revenu, weights=s$weight) # 8%
 decrit(s$benefices_autre_choix, weights=s$weight) # 5%
 
-variables_benefices <- names(s)[which(grepl("benefice", names(s)))[which(grepl("problemes", names(s)))>300]]
-variables_benefices <- variables_benefices[!(variables_benefices %in% c("nb_benefices", "benefices_autre"))]
-labels_benefices <- c()
-values_benefices <- c()
-for (v in variables_benefices[1:(length(variables_benefices))]) {
-  labels_benefices <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces congestion", "Increases my purchasing power", "Increases purchasing power of the poorest",
-                       "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
-  values_benefices <- c(values_benefices, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
-barres_benefices <- barres(file="benefices", title="", data=matrix(values_benefices, ncol=length(values_benefices)), sort=T, color=c("#66B3B3"), showLegend=FALSE, labels=labels_benefices, hover=labels_benefices, legend="empty")
-barres_benefices
 #TODO: correct benefice_autre dans preparation.R
+variables_benefits <- names(s)[which(grepl("benefice", names(s)))[which(grepl("problemes", names(s)))>300]]
+variables_benefits <- variables_benefits[!(variables_benefits %in% c("nb_benefices", "benefices_autre"))]
+labels_benefits <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces congestion", "Increases my purchasing power", "Increases purchasing power of the poorest",
+                      "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
+barres(file="CC_benefits", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits)
+
 
 ## 4.3 Perceived problems
 decrit(s$problemes_ruraux, weights=s$weight) # 47%
@@ -94,17 +80,11 @@ decrit(s$problemes_economie, weights=s$weight) # 14%
 decrit(s$problemes_aucun, weights=s$weight) # 9%
 decrit(s$problemes_autre_choix, weights=s$weight) # 2%
 
-variables_problemes <- names(s)[which(grepl("problemes", names(s)))[which(grepl("problemes", names(s)))>300]]
-variables_problemes <- variables_problemes[!(variables_problemes %in% c("nb_problemes", "problemes_autre"))]
-labels_problemes <- c()
-values_problemes <- c()
-for (v in variables_problemes[1:(length(variables_problemes))]) {
-  labels_problemes <- c("Is ineffective to reduce pollution", "Alternatives are insufficient or too expensive", "Penalizes rural households", "Decreases my purchaisng power",
-                        "Penalizes the poorest", "Hurts the economy", "Is a pretext to increase taxes", "None of these reasons", "Other reasons")
-  values_problemes <- c(values_problemes, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
-barres_problemes <- barres(file="problemes", title="", data=matrix(values_problemes, ncol=length(values_problemes)), sort=T, color=c("#66B3B3"), showLegend=FALSE, labels=labels_problemes, hover=labels_problemes, legend="empty")
-barres_problemes
-
+variables_problems <- names(s)[which(grepl("problemes", names(s)))]
+variables_problems <- variables_problems[!(variables_problems %in% c("nb_problemes", "problemes_autre"))]
+labels_problems <- c("Is ineffective to reduce pollution", "Alternatives are insufficient or too expensive", "Penalizes rural households", "Decreases my purchaisng power",
+                      "Penalizes the poorest", "Hurts the economy", "Is a pretext to increase taxes", "None of these reasons", "Other reasons")
+barres(file="CC_problems", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems)
 
 
 ##### 5. Attitudes over Other Policies #####

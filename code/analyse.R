@@ -626,7 +626,7 @@ labels_ges_climate_call <- rev(c("Plane", "Nuclear", "Beaf", "O<sub>2</sub>", "C
 oui_non(margin_l=20, ges_climate_call, NSP=FALSE, en=TRUE, labels = labels_ges_climate_call, sort=FALSE)
 oui_non(margin_l=20, ges_climate_call, NSP=FALSE, en=FALSE, labels = rev(c("Avion", "Nucléaire", "Bœuf", "O<sub>2</sub>", "CO<sub>2</sub>", "CH<sub>4</sub>", "Particules fines")), sort=FALSE)
 
-barres(file="CC_responsable", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_responsable, hover=labels_responsable)
+barres(file="CC_responsable", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=c("Chacun d'entre nous", "Les gouvernements", "Certains pays étrangers", "Les plus riches", "Des causes naturelles", "Les générations passées"), hover=labels_responsable)
 barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations"), hover=labels_responsable)
 barres(file="CC_effects", title="", data=dataN("effets_CC"), nsp=T, sort=T, rev_color=T, legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "NSP"), labels=c("Consequences of CC"))
 barres(file="CC_cause", title="", data=dataN("cause_CC"), nsp=T, sort=T, rev_color=T, legend = c("Anthropic", "Natural", "Does not exist", "NSP"), labels=c("Cause of CC"))
@@ -755,12 +755,12 @@ variables_benefices <- names(s)[which(grepl("benefice", names(s)))[which(grepl("
 variables_problemes <- names(s)[which(grepl("problemes", names(s)))[which(grepl("problemes", names(s)))>300]]
 labels_benefices <- c()
 values_benefices <- c()
-for (v in variables_benefices[1:(length(variables_benefices)-2)]) {
+for (v in variables_benefices[2:(length(variables_benefices)-2)]) {
   labels_benefices <- c(labels_benefices, gsub(" - .*", "", gsub(".*: ", "", Label(s[[v]]))))
   values_benefices <- c(values_benefices, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
 labels_problemes <- c()
 values_problemes <- c()
-for (v in variables_problemes[1:(length(variables_problemes)-2)]) {
+for (v in variables_problemes[2:(length(variables_problemes)-2)]) {
   labels_problemes <- c(labels_problemes, gsub(" - .*", "", gsub(".*: ", "", Label(s[[v]]))))
   values_problemes <- c(values_problemes, sum(s$weight[which(s[[v]]==T)])/sum(s$weight)) }
 
@@ -769,16 +769,17 @@ for (v in variables_problemes[1:(length(variables_problemes)-2)]) {
 
 # TODO: utiliser nb_bénéfices / problèmes cochés, voire l'influence des traitements
 
-barres_benefices <- barres(file="benefices", title="<b>Bénéfices d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_benefices, ncol=length(values_benefices)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_benefices, hover=labels_benefices, legend="empty")
-barres_problemes <- barres(file="problemes", title="<b>Problèmes d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_problemes, ncol=length(values_problemes)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_problemes, hover=labels_problemes, legend="empty")
-barres_benefices
-barres_problemes
+barres(file="benefices", title="<b>Bénéfices d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_benefices, ncol=length(values_benefices)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_benefices, hover=labels_benefices, legend="empty")
+barres(file="problemes", title="<b>Problèmes d'une taxe carbone compensée</b><br>(choix multiples)", data=matrix(values_problemes, ncol=length(values_problemes)), sort=T, color=c("brown"), showLegend=FALSE, labels=labels_problemes, hover=labels_problemes, legend="empty")
 # orca(barres_problemes, "../images/problemes.png")
 # orca(barres_benefices, "../images/benefices.png")
 
 # plot(1:3,1:3)
 # dev.copy(png, filename="../images/test.png") # plot from R (not from plotly)
 # dev.off()
+labels_benefices <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces congestion", "Increases my purchasing power", "Increases purchasing power of the poorest",
+                      "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
+barres(file="CC_benefits", title="", data=data1(variables_benefices), sort=T, showLegend=FALSE, labels=labels_benefices, hover=labels_benefices)
 
 
 ##### Perdants/Gagnants #####
