@@ -895,17 +895,16 @@ convert_s <- function() {
                 labels = structure(c("","Non","NSP","Oui"), names = c("NA","Non","NSP","Oui")), 
                 missing.values = c("","NSP"), annotation=attr(s[j][[1]], "label"))
   }
-  
+
   for (j in c("mode_chauffage", "chauffage", "parle_CC", "cause_CC", "effets_CC", "transports_frequence",
               "schiste_CC", "transports_avis", "transports_travail_actif", "transports_travail_commun"
-              # "perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage", "interet_politique",
+              # "perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage" , "interet_politique",
               )) {
     if (j %in% c("mode_chauffage", "chauffage", "schiste_CC", "cause_CC")) s[capitalize(j)] <<- s[j][[1]]
     # s[j][[1]] <<- as.item(as.character(s[j][[1]]),
     #             labels = structure(levels(factor(s[j][[1]])), names = levels(factor(s[j][[1]]))),
     #             missing.values = c("NSP", ""), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
-    s[j][[1]] <<- as.item(as.factor(s[j][[1]]),
-                          missing.values = c("NSP", ""), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
+    s[j][[1]] <<- as.item(as.factor(s[j][[1]]), missing.values = c("NSP", ""), annotation=paste(attr(s[j][[1]], "label"), "(char)")) # TODO: pb with numbers=T
   }
  # TODO: as.item region_CC, gagnant_fuel_categorie, gagnant_chauffage_categorie, gagnant_categorie, gagnant_feedback_categorie, gagnant_progressif_categorie, gagnant_cible_categorie?  
 
@@ -914,15 +913,6 @@ convert_s <- function() {
       s[[j]][s[[j]]!=""] <<- TRUE
       s[[j]][is.na(s[[j]])] <<- FALSE
     }
-  }
-
-  for (k in c("perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage")) {
-    temp <-  2 * (s[[k]]=="Oui, beaucoup plus") + (s[[k]]=="Oui, un peu plus") - (s[[k]]=="Non, un peu moins") - 2 * (s[[k]]=="Non, beaucoup moins")
-    temp[s[[k]]=="NSP"] <- -99
-    s[[k]] <<- as.item(temp, missing.values = c("NSP"), labels = structure(c(-2:2, -99),
-                          names = c("Beaucoup moins","Un peu moins","= Moyenne","Un peu plus","Beaucoup plus", "NSP")),
-                          # names = c("Non, beaucoup moins","Non, un peu moins","Autant que la moyenne","Oui, un peu plus","Oui, beaucoup plus")),
-                        annotation=Label(s[[k]]))
   }
 
   for (k in c(132:140,142:149)) {
@@ -1012,15 +1002,14 @@ convert_s <- function() {
   temp <- Label(s$interet_politique)
   s$interet_politique <<- 1*(s$interet_politique=='Un peu') + 2*(s$interet_politique=='Beaucoup')
   s$interet_politique <<- as.item(s$interet_politique, labels=structure(c(0:2), names=c('Presque pas', 'Un peu', 'Beaucoup')), annotation=temp)
-# TODO: pb missing
-  s$gilets_jaunes[s$gilets_jaunes_NSP==T] <<- -99
+
+  s$gilets_jaunes[s$gilets_jaunes_NSP==T] <<- -0.1
   s$gilets_jaunes[s$gilets_jaunes_compris==T] <<- 0 # total à 115%
   s$gilets_jaunes[s$gilets_jaunes_oppose==T] <<- -1 # 2 oppose et soutien en même temps
   s$gilets_jaunes[s$gilets_jaunes_soutien==T] <<- 1
   s$gilets_jaunes[s$gilets_jaunes_dedans==T] <<- 2
-  label(s$gilets_jaunes) <<- "gilets_jaunes: -1: s'oppose / 0: comprend sans soutenir ni s'opposer / 1: soutient / 2: fait partie des gilets jaunes (gilets_jaunes_compris/oppose/soutien/dedans/NSP)" 
-  s$gilets_jaunes <<- as.item(n(s$gilets_jaunes), labels = structure(c(-99,-1:2), missing.values=-99, names=c('NSP', 'oppose', 'comprend', 'soutient', 'est_dedans')), 
-                             annotation=attr(s$gilets_jaunes, "label"))
+  s$gilets_jaunes <<- as.item(s$gilets_jaunes, missing.values=-0.1, labels = structure(c(-0.1,-1:2), names=c('NSP', 'oppose', 'comprend', 'soutient', 'est_dedans')),
+                             annotation="gilets_jaunes: -1: s'oppose / 0: comprend sans soutenir ni s'opposer / 1: soutient / 2: fait partie des gilets jaunes (gilets_jaunes_compris/oppose/soutien/dedans/NSP)" )
   s$Gilets_jaunes <<- as.factor(s$gilets_jaunes)
   s$Gilets_jaunes <<- relevel(s$Gilets_jaunes, 'oppose')
   
@@ -1072,7 +1061,15 @@ convert_s <- function() {
   s$perte_relative_partielle[s$variante_partielle=='c'] <<- s$perte_relative_chauffage[s$variante_partielle=='c']
   s$perte_relative_partielle[s$variante_partielle=='f'] <<- s$perte_relative_fuel[s$variante_partielle=='f']
   label(s$perte_relative_partielle) <<- "perte_relative_partielle: Une hausse des taxes sur variante_partielle (chauffage ou fuel) ferait perdre plus à votre ménage que la moyenne (Oui, beaucoup/un peu plus/Autant que la moyenne/Non, un peu/beaucoup moins/NSP) - Q155, 162"
-
+  for (k in c("perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage", "perte_relative_partielle")) {
+    s[[k]] <<- as.item(as.factor(s[[k]]), missing.values = c("NSP", ""), annotation=paste(attr(s[[k]], "label"), "(char)"))
+    temp <-  2 * (s[[k]]=="Oui, beaucoup plus") + (s[[k]]=="Oui, un peu plus") - (s[[k]]=="Non, un peu moins") - 2 * (s[[k]]=="Non, beaucoup moins") - 0.1 * (s[[k]]=="NSP")
+    s[[k]] <<- as.item(temp, missing.values = -0.1, labels = structure(c(-2:2, -0.1),
+                          names = c("Beaucoup moins","Un peu moins","= Moyenne","Un peu plus","Beaucoup plus", "NSP")),
+                          # names = c("Non, beaucoup moins","Non, un peu moins","Autant que la moyenne","Oui, un peu plus","Oui, beaucoup plus")),
+                        annotation=Label(s[[k]]))
+  }
+  
     # s$gain_fuel <- NA
   s$gain_fuel[s$gagnant_fuel_categorie=='Non affecté' & s$variante_partielle=='f'] <<- 0
   s$gain_fuel[s$gagnant_fuel_categorie=='Gagnant' & s$variante_partielle=='f'] <<- 1 + as.numeric(gsub("\\D*", "", sub("\\sà.*", "", sub("\\D*", "", s$gain_taxe_fuel_hausse[s$gagnant_fuel_categorie=='Gagnant' & s$variante_partielle=='f']))))/25

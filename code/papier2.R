@@ -7,6 +7,7 @@
 source("packages_functions.R")
 load(".RData")
 
+# /!\ for numerical items with NSP, subset=!is.missing() in regressions (parle_CC, transports_..., gilets_jaunes, perte_relative_...)
 
 ##### 2. Survey and data #####
 
