@@ -114,6 +114,13 @@ axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd
 # restore graphical parameters
 par(mar = mar_old, cex = cex_old)
 
+## Relative gain in partial reforms
+decrit(s$perte_relative_chauffage, weights = s$weight) # 15 / 54%
+decrit(s$perte_relative_fuel, weights = s$weight) # 10 / 56%
+decrit(s$perte_relative_tva, weights = s$weight) # / 60%
+decrit(s$perte_relative_partielle, weights = s$weight)
+decrit(s$perte_relative_chauffage[s$fioul == 0 & s$gaz == 0], weights = s$weight[s$fioul == 0 & s$gaz == 0])
+
 # TableIII: Heterogeneity in bias
 mean(abs(fit$predicted_gain - fit$gain) > 110) # 5%
 wtd.mean(abs(s$simule_gain - s$gain) > 110, weights = s$weight) # 55%

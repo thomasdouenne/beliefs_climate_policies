@@ -54,6 +54,7 @@ decrit(s$responsable_CC_etranger, miss=T, weights = s$weight) # 42%
 decrit(s$responsable_CC_riches, miss=T, weights = s$weight) # 25%
 decrit(s$responsable_CC_nature, miss=T, weights = s$weight) # 23%
 decrit(s$responsable_CC_passe, miss=T, weights = s$weight) # 21%
+decrit(s$ecologiste, miss=T, weights = s$weight)
 
 labels_resp <- c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations")
 barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_resp, hover=labels_resp)
@@ -154,16 +155,17 @@ labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red
                  "stricter standards on pollution from new vehicles", "stricter standards on pollution during roadworthiness tests", 
         "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
 barres(file="environmental_policies", title="", 
-       data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+18)], miss=FALSE), nsp=FALSE, sort=T, legend = c(yes_no5), labels=labels_environmental_policies)
-# TODO: white space title, inverse left-right, taxation du disel / gaz de schiste 
+       data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], miss=FALSE, rev=T), nsp=FALSE, sort=T, legend = rev(yes_no5), labels=labels_environmental_policies)
 
 ## 5.2 Preferred revenue recycling
 labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", 
                           "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
             "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
 labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
-barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
-       sort=T, legend = c(yes_no5), labels=labels_tax_condition)
+barres(file="tax_condition_val", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE, rev=T), nsp=FALSE, 
+       sort=T, thin=T, legend = rev(yes_no5), labels=labels_tax_condition)
+barres(file="tax_condition_valr", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
+       sort=T, legend = c(yes_no5), rev_color=T, labels=labels_tax_condition)
 
 ## Favored environmental policies
 
@@ -182,7 +184,7 @@ summary(logit_diesel)
 logit_diesel_margins <- logitmfx(formula_diesel, s, atmean=FALSE)$mfxest
 logit_diesel_margins
 
-oui_non(margin_l=10, c("rattrapage_diesel"), NSP=TRUE, en=TRUE, labels = rev(c("Favorable to catch-up diesel taxes")), sort=FALSE)
+barres(file="diesel_catch_up_val", dataKN(c("rattrapage_diesel")), nsp=TRUE, legend=c("Yes", "No", "PNR"), color=, labels = c("Favorable to catch-up diesel taxes"))
 
 ## Shale gas
 # Approbation :
@@ -203,7 +205,7 @@ logit_schiste_approbation_margins <- logitmfx(formula_schiste_approbation, s, at
 logit_schiste_approbation_margins # -5.7 p.p. with logit
 summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights = s$weight)) # Not significant for approval
 
-oui_non(margin_l=10, c("schiste_approbation"), NSP=TRUE, en=TRUE, labels = rev(c("Favorable to shale gas extraction")), sort=FALSE)
+barres(file="shale_val", dataKN(c("schiste_approbation")), nsp=TRUE, legend=c("Yes", "No", "PNR"), color=, labels = c("Favorable to shale gas extraction"))
 
 
 ## 5.2 Other revenue recycling

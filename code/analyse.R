@@ -73,6 +73,12 @@ decrit(s$nb_vehicules, weights = s$weight)
 decrit(s$perte_relative_tva, weights = s$weight)
 decrit(s$perte_relative_fuel, weights = s$weight)
 decrit(s$perte_relative_chauffage, weights = s$weight) # proportions similaires pour les 3, environ 60% pensent perdre plus que la moyenne
+summary(lm((perte_relative_partielle==-2) ~ variante_partielle, data=s, weights = s$weight))
+cor(s$perte_relative_partielle, s$gain)
+cor(s$perte_relative_partielle, 1*(s$gagnant_categorie=='Gagnant')-1*(s$gagnant_categorie=='Perdant'))
+decrit(s$gagnant_categorie[s$perte_relative_partielle<0], weights = s$weight[s$perte_relative_partielle<0])
+decrit(s$gagnant_categorie[s$perte_relative_partielle>0], weights = s$weight[s$perte_relative_partielle>0])
+decrit(s$gagnant_categorie, weights = s$weight)
 temp1 <- temp2 <- s[,c("perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage", "perte_relative_partielle", "variante_partielle", "weight")]
 temp1$perte <- temp1$perte_relative_tva
 temp1$variante_perte <- "tva"
@@ -719,7 +725,7 @@ dep$categorie <- relevel(as.factor(dep$categorie), "infrastructures")
 summary(lm(variation ~ categorie, data=dep)) # answers are not random, i.e. average depends significantly on category
 
 
-##### Miscellanous #####
+##### Rattrapage diesel #####
 decrit(s$rattrapage_diesel, miss = T, weights = s$weight)
 decrit(s$rattrapage_diesel[s$diesel==T], miss = T, weights = s$weight[s$diesel==T])
 decrit(s$rattrapage_diesel[s$diesel!=T], miss = T, weights = s$weight[s$diesel!=T])
@@ -728,6 +734,8 @@ decrit(s$rattrapage_diesel[s$diesel!=T & s$essence!=T], miss = T, weights = s$we
 decrit(s$hausse_diesel, weights = s$weight) 
 summary(lm((rattrapage_diesel!='Non') ~ diesel + essence, data=s, weights = s$weight))
 for (j in names(s)) if (grepl('gilets_jaunes', j)) print(decrit(s[[j]], weights=s$weight))
+oui_non(c("rattrapage_diesel"), NSP=TRUE, en=TRUE, labels = rev(c("Favorable to catch-up diesel taxes")), sort=FALSE)
+barres(file="diesel_catch_up_val", dataKN(c("rattrapage_diesel")), nsp=TRUE, legend=c("Yes", "No", "PNR"), color=, labels = c("Favorable to catch-up diesel taxes"))
 
 
 ##### Approbation politiques environnementales #####
