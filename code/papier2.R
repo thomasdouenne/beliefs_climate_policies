@@ -229,3 +229,49 @@ labels_tax_condition <- c("a payment for the 50% poorest French people<br> (thos
 labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
 barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
        sort=T, legend = c(yes_no5), labels=labels_tax_condition)
+
+##### 6. Determinants
+
+## 6.1 Attitudes over CC
+# Variables cibles : causes, conséquences, connaissances (score ges + climate call), ?
+summary(lm((s$cause_CC=='anthropique') ~ Revenu, data=s)) # Pas significatif
+summary(lm((s$cause_CC=='anthropique') ~ sexe, data=s)) # Pas significatif
+summary(lm((s$cause_CC=='anthropique') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : env +8.5 p.p.
+summary(lm((s$cause_CC=='anthropique') ~ Gilets_jaunes, data=s)) # -10 p.p. soutient / -20 p.p. est dedans
+summary(lm((s$cause_CC=='anthropique') ~ Gauche_droite, data=s)) # -18 p.p. droite / -21 p.p. ext-droite / -12 p.p. indeter / -9 p.p. centre
+
+summary(lm((s$effets_CC > 2) ~ Revenu, data=s)) # Pas significatif
+summary(lm((s$effets_CC > 2) ~ sexe, data=s)) # Pas significatif
+summary(lm((s$effets_CC > 2) ~ as.factor(taille_agglo), data=s)) # Peu significatif (grandes villes + 6.7 p.p.)
+summary(lm((s$effets_CC > 2) ~ Gilets_jaunes, data=s)) # -5.6 p.p. soutient / -7.8 p.p. est dedans
+summary(lm((s$effets_CC > 2) ~ Gauche_droite, data=s)) # -19 p.p. droite / -16 p.p. ext-droite / -11 p.p. indeter
+
+variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", variables_demo, variables_politiques, variables_energie) # 
+variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "age", "age_65_plus",
+                                                               names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
+                                                               names(s)[which(grepl("hausse_", names(s)))]))]
+formula_determinants_cause <- as.formula(paste("cause_CC=='anthropique' ~ ",
+                                                paste(variables_determinants, collapse = ' + ')))
+summary(lm(formula_determinants_cause, data=s, weights = s$weight))
+
+formula_determinants_effets <- as.formula(paste("effets_CC > 2 ~ ",
+                                               paste(variables_determinants, collapse = ' + ')))
+summary(lm(formula_determinants_effets, data=s, weights = s$weight))
+
+formula_determinants_score <- as.formula(paste("(score_ges + score_climate_call) ~ ",
+                                               paste(variables_determinants, collapse = ' + ')))
+summary(lm(formula_determinants_score, data=s, weights = s$weight))
+
+
+## 6.2 Attitudes over policies
+# Variables cibles : taxe_approbation, Nb >= plutôt oui dans la matrice ?
+summary(lm((s$taxe_approbation=='Oui') ~ Revenu, data=s)) # 0.7 p.p. (très faible)
+summary(lm((s$taxe_approbation=='Oui') ~ sexe, data=s)) # 3.5 p.p.
+summary(lm((s$taxe_approbation=='Oui') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : +8.5 p.p.
+summary(lm((s$taxe_approbation=='Oui') ~ Gilets_jaunes, data=s)) # -15 p.p. soutient / -14 p.p. est dedans
+summary(lm((s$taxe_approbation=='Oui') ~ Gauche_droite, data=s)) # pas significtaif (centre .)
+
+formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ",
+                                               paste(variables_determinants, collapse = ' + ')))
+summary(lm(formula_determinants_taxe_approbation, data=s, weights = s$weight))
+
