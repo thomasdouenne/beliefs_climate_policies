@@ -299,15 +299,15 @@ summary(base_winner)
 s$retraites <- s$statut_emploi == 'retraité·e'
 s$actifs <- s$statut_emploi %in% c("autre actif", "CDD", "CDI", "fonctionnaire", "intérimaire ou contrat précaire")
 s$etudiants <- s$statut_emploi == 'étudiant·e'
-variables_update <- c("niveau_vie", "(gagnant_categorie=='Gagnant')", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, 
-                      variables_politiques, "Gilets_jaunes", "score_ges") # 
+variables_update <- c("revenu", "(gagnant_categorie=='Gagnant')", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, 
+                      variables_politiques, "Gilets_jaunes") # 
 variables_update <- variables_update[!(variables_update %in% c("revenu", "rev_tot", "age", "age_65_plus", "taille_agglo", "statut_emploi"))]
 formula_update <- as.formula(paste("update_correct ~ ", paste(variables_update, collapse=' + ')))
 covariates_update_correct <- lm(formula_update, subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(covariates_update_correct)
 
-variables_update_bis <- c("niveau_vie", "(gagnant_categorie=='Gagnant')", "taxe_approbation", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", 
-                          variables_demo, variables_politiques, "Gilets_jaunes", "score_ges") # 
+variables_update_bis <- c("revenu", "(gagnant_categorie=='Gagnant')", "taxe_approbation", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", 
+                          variables_demo, variables_politiques, "Gilets_jaunes") # 
 variables_update_bis <- variables_update_bis[!(variables_update_bis %in% c("revenu", "rev_tot", "age", "age_65_plus", "taille_agglo", "statut_emploi"))]
 formula_update_bis <- as.formula(paste("update_correct ~ ", paste(variables_update_bis, collapse=' + ')))
 covariates_update_correct_bis <- lm(formula_update_bis, subset = feedback_infirme_large==T, data=s, weights = s$weight)
@@ -351,15 +351,17 @@ ols_prog_1 <- lm(progressivite!='Non' ~ info_progressivite, data=s, weights=s$we
 summary(ols_prog_1)
 ols_prog_2 <- lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, weights=s$weight)
 summary(ols_prog_2)
-ols_prog_3 <- lm(progressivite!='Non' ~  info_progressivite * biais_sur + info_progressivite * Gauche_droite + info_progressivite * revenu + info_progressivite * taille_agglo + 
+formula_ols_prog_3 <- as.formula(paste("progressivite!='Non' ~  info_progressivite * biais_sur + info_progressivite * revenu + info_progressivite * taille_agglo + 
                    info_progressivite * taille_menage + info_progressivite * age + info_progressivite * Gilets_jaunes + info_progressivite * sexe + info_progressivite * inactif + 
-                   info_progressivite * (Diplome>4), data=s, weights=s$weight)
+                   info_progressivite * (Diplome>4) + ", paste(c(variables_demo, variables_politiques), collapse = '+ ')))
+ols_prog_3 <- lm(formula_ols_prog_3, data=s, weights=s$weight)
 summary(ols_prog_3)
 
 prog <- stargazer(ols_prog_1, ols_prog_2, ols_prog_3, title="Effect of information on perceived progressivity", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                                covariate.labels = c("Constant", "Information on progressivity ($Z_P$)", "Large bias $(\\left|\\widehat{\\gamma}-g\\right|>110)$",
                                                   "Interaction $Z_P \\times (\\left|\\widehat{\\gamma}-g\\right|>110)$"),
-                               omit = c("Diplome", "sexe", "age", "inactif", "Gilets_jaunes", "Gauche_droite", "revenu", "taille_menage", "taille_agglo"),             
+                               omit = c("Diplome", "sexe", "age", "inactif", "Gilets_jaunes", "Gauche_droite", "liberal", "humaniste", "conservateur",
+                                        "patriote", "apolitique", "ecologiste", "interet_politique", "revenu", "taille_menage", "taille_agglo"),             
                                dep.var.labels = "Progressivity: not No ($P$)", dep.var.caption = "", header = FALSE,
                                add.lines = list(c("Controls: Socio-demo, politics ", "", "", "\\checkmark ")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog")
