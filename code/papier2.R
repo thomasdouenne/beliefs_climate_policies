@@ -45,7 +45,7 @@ barres(file="CC_region", title="", data=dataN("region_CC", miss=FALSE), nsp=FALS
 
 
 ## 3.2 Opinions
-# TODO: ecologiste
+decrit(s$ecologiste, weights=s$weight) # 15% écologistes
 decrit(s$parle_CC, miss=T, weights = s$weight) # 3 tiers
 decrit(s$effets_CC, miss=T, weights = s$weight) # 20% cataclysmiques; 31% désastreux, 38% graves
 decrit(s$responsable_CC_chacun, miss=T, weights = s$weight) # 63%
@@ -64,6 +64,30 @@ s$parle_CC <- relevel(relevel(s$parle_CC, "Plusieurs fois par an"), "Plusieurs f
 barres(file="CC_talks", title="", data=dataN("parle_CC"), nsp=T, sort=T, 
        legend = c("Several times per month", "Several times per year", "Almost never", "PNR"), labels=c("Talks about CC...")) 
 
+## 3.3 Reaction needed
+decrit(s$mode_vie_ecolo, miss=T, weights = s$weight) # 65%
+decrit(s$enfant_CC, weights = s$weight) # 20% oui
+decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui']) # 37%
+decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui']) # 86%
+summary(lm((enfant_CC=='Oui') ~ sexe, data=s)) #V -3.4 p.p.
+
+decrit(s$changer_si_tous, weights=s$weight) # 47%
+decrit(s$changer_si_moyens, weights=s$weight) # 45%
+decrit(s$changer_si_politiques, weights=s$weight) # 43%
+decrit(s$changer_deja_fait, weights=s$weight) # 23%
+decrit(s$changer_essaie, weights=s$weight) # 15%
+decrit(s$changer_non_negation, weights=s$weight) # 5%
+decrit(s$changer_non_riches, weights=s$weight) # 5%
+decrit(s$changer_non_interet, weights=s$weight) # 2%
+
+variables_changer <- names(s)[which(grepl("changer", names(s)))]
+labels_changer <- c("Yes, if policies were going in this direction", "Yes, if I had the financial means", "Yes, if everyone was doing the same",
+                     "No, only the richest must change it", "No, it is against my personal interest", "No, because CC is not a real problem",
+                     "No, I already adopted a sustainable way of life", "I try but I have difficulties changing my habits")
+barres(file="changer_si_non", title="", data=data1(variables_changer), sort=T, showLegend=FALSE, labels=labels_changer, hover=labels_changer)
+
+decrit((s$emission_cible[s$changer_deja_fait==T] >= 3), weights = s$weight[s$changer_deja_fait==T]) # 79%
+decrit((s$emission_cible[s$changer_deja_fait==F] >= 3), weights=s$weight[s$changer_deja_fait==F]) # 85%
 
 ##### 4. Attitudes over Carbon Tax and Dividend #####
 
@@ -146,10 +170,13 @@ barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elasticite_chau
 barres(file="elasticities", title="", data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE), 
        nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport", "Own: Housing", "Own: Transport"), 
        legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE))
+#TODO: peut-être enlever la gradation du bas
 
 
 ##### 5. Attitudes over Other Policies #####
 ## 5.1 Other instruments
+
+# Favored environmental policies
 labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
                  "stricter standards on pollution from new vehicles", "stricter standards on pollution during roadworthiness tests", 
         "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
@@ -157,25 +184,15 @@ barres(file="environmental_policies", title="",
        data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+18)], miss=FALSE), nsp=FALSE, sort=T, legend = c(yes_no5), labels=labels_environmental_policies)
 # TODO: white space title, inverse left-right, taxation du disel / gaz de schiste 
 
-## 5.2 Preferred revenue recycling
-labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", 
-                          "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
-            "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
-labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
-barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
-       sort=T, legend = c(yes_no5), labels=labels_tax_condition)
-
-## Favored environmental policies
-
-## Diesel taxation
+# Diesel taxation
 decrit(s$rattrapage_diesel, miss=T) # 59% non, 29% oui
 
 variables_diesel <- c("Revenu", "score_ges", "score_climate_call", variables_demo, variables_energie) # 
 variables_diesel <- variables_diesel[!(variables_diesel %in% c("revenu", "rev_tot", "age", "age_65_plus",
-                                    names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
-                                    names(s)[which(grepl("hausse_", names(s)))]))]
+                                                               names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
+                                                               names(s)[which(grepl("hausse_", names(s)))]))]
 formula_diesel <- as.formula(paste("rattrapage_diesel!='Non' ~ ",
-                                                paste(variables_diesel, collapse = ' + ')))
+                                   paste(variables_diesel, collapse = ' + ')))
 summary(lm(formula_diesel, data=s, weights = s$weight)) # Strongest determinant: use of Diesel / Scores ges and CC also matter
 logit_diesel <- glm(formula_diesel, family = binomial(link='logit'), data=s)
 summary(logit_diesel)
@@ -184,8 +201,7 @@ logit_diesel_margins
 
 oui_non(margin_l=10, c("rattrapage_diesel"), NSP=TRUE, en=TRUE, labels = rev(c("Favorable to catch-up diesel taxes")), sort=FALSE)
 
-## Shale gas
-# Approbation :
+# Shale gas
 decrit(s$schiste_approbation, miss=T) # 59% non, 17% oui
 decrit(s$schiste_traite) # 59% traités
 decrit(s$schiste_avantage, miss=T) # 56% aucun, 26% emplois, 18% CC
@@ -206,4 +222,10 @@ summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights =
 oui_non(margin_l=10, c("schiste_approbation"), NSP=TRUE, en=TRUE, labels = rev(c("Favorable to shale gas extraction")), sort=FALSE)
 
 
-## 5.2 Other revenue recycling
+## 5.2 Preferred revenue recycling
+labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", 
+                          "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
+            "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
+labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
+barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
+       sort=T, legend = c(yes_no5), labels=labels_tax_condition)
