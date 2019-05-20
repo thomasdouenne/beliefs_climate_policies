@@ -246,7 +246,7 @@ oui_non <- function(vars, file, labels = vars, data = s, display_value = T, sort
   # api_create(bars, filename=file, sharing="public")
   return(bars) # bugs most often than not
 }
-data5 <- function(vars, data=s, miss=T, weights=T) {
+data5 <- function(vars, data=s, miss=T, weights=T, rev=FALSE) {
   matrice <- c()
   colors <-  c(rainbow(4, end=4/15), "forestgreen") # c("red", "orange", "yellow", "green", "darkgreen") # rainbow(5, end=1/3)
   for (var in vars) {
@@ -263,7 +263,9 @@ data5 <- function(vars, data=s, miss=T, weights=T) {
       if (weights) { mat <- c(sum(data[['weight']][which(n(data[[var]])==-2)])/sum(data[['weight']][!is.missing(n(data[[var]]))]), sum(data[['weight']][which(n(data[[var]])==-1)])/sum(data[['weight']][!is.missing(n(data[[var]]))]), sum(data[['weight']][which(n(data[[var]])==0)])/sum(data[['weight']][!is.missing(n(data[[var]]))]), sum(data[['weight']][which(n(data[[var]])==1)])/sum(data[['weight']][!is.missing(n(data[[var]]))]), sum(data[['weight']][which(n(data[[var]])==2)])/sum(data[['weight']][!is.missing(n(data[[var]]))])) } }
     matrice <- c(matrice, mat) }
   matrice <- matrix(c(matrice), ncol=length(vars))
-  return(matrice)
+  if (rev & !(miss)) return(matrice[5:1,])
+  else if (rev & miss) return(matrice[c(5:1,6),])
+  else return(matrice)
   # return(as.data.frame(matrice))
 }
 data1 <- function(vars, data=s, weights=T) {
@@ -316,7 +318,10 @@ color <- function(v, grey=FALSE, grey_replaces_last = T, rev_color = FALSE, them
     else if (n == 6) cols <- rainbow(6)
     else if (n == 7) cols <- c("#000000", rainbow(7)[c(1:3,5:7)])
     else cols <- rainbow(n) # diverge_hcl green2red brewer.pal(n, Spectral/RdBu...)  https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/colorPaletteCheatsheet.pdf
-  } else cols <- rev(brewer.pal(n, theme))
+  } else {
+    cols <- rev(brewer.pal(n, theme))
+    if (n == 1) cols <- cols[1]
+    if (n == 2) cols <- cols[c(1,3)] }
   if (rev_color) cols <- rev(cols)
   if (grey & n > 1) return(c(cols, "#D3D3D3")) # lightgrey
   else return(cols)
@@ -327,13 +332,13 @@ yes_no5 <- c("Not at all", "Not really", "Indifferent/PNR", "Rather yes", "Yes, 
 # agree5 <- c("Strongly disagree", "Disagree", "Indifferent", "Agree", "Strongly agree")
 # evol5 <- c("Baisser fortement", "Baisser légèrement", "Maintenir au niveau", "Augmenter légèrement", "Augmenter fortement")
 # evolve5 <- c("Strongly decrease", "Slightly decrease", "Maintain", "Slightly increase", "Strongly increase")
-barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE, display_values=T, thin=FALSE) {
+barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE, display_values=T, thin=FALSE, legend_x=NA) {
   if (length(color)==0) color <- color(data, nsp, rev_color = rev_color)
   margin_t <- 0 + 25*(!(thin))
   if (title!="") { margin_t <- 100 }
   if (grepl("<br>", title)) { margin_t <- 150 }
   legendSize <- 13 # 10
-  legendY <- 1.1 + 0.3*thin
+  legendY <- 1.1 
   legendX <- 0.2 
   # legendFont <- 'Open Sans'
   if (is.na(margin_l)) { margin_l <- 4.7*max(nchar(labels)/(1 + str_count(labels, '<br>'))) }
@@ -341,11 +346,12 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
   # if (max(nchar(labels)) > 50) { legendSize <- 8 }
   # if (max(nchar(labels)) > 60) { legendSize <- 7 }
   if (max(nchar(labels)) > 50) { # 70
-    legendSize <- 13 # 11
-    legendY = 1.2 + 0.3*thin
-    legendX= 0 # 1
-    if (ncol(data)>1) margin_t = 170
+    # legendSize <- 13 # 11
+    # legendY = 1.2
+    legendX= -0.2 # 1
+    # if (ncol(data)>1) margin_t = 170
   }
+  if (!is.na(legend_x)) legendX <- legend_x
   if (!showLegend) { margin_t <- max(0, margin_t - 70) }
   if (ncol(data)==1) legendY = 1.5 + 0.3*thin
   if (sort) {
@@ -430,14 +436,22 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
     margin = list(l = margin_l, r = margin_r, t = margin_t, b = 21, autoexpand = thin), # , autoexpand=FALSE removes useless margin at bottom but creates bug with legend
     # margin = list(b = 20, t = margin_t),
     legend = list(orientation='h', y=legendY, x=legendX, traceorder='normal', font=list(size=legendSize, color='black')), # family='Balto',  , family=legendFont
-    showlegend = showLegend) %>%
+    showlegend = (showLegend & (!("Yes" %in% legend) & !("Oui" %in% legend)))) %>%
     
     # labeling the y-axis
     add_annotations(xref = 'paper', yref = 'y', x = 0.14, y = labels,
                     xanchor = 'right',
                     text = labels,
                     font = list(family = 'Arial', size = 14, color = 'black'),
-                    showarrow = FALSE, align = 'right') # %>%  
+                    showarrow = FALSE, align = 'right') # %>% 
+    # Legend in the Yes/No case
+    if (("Yes" %in% legend) | ("Oui" %in% legend)) { 
+      bars <- bars %>% add_annotations(xref = 'x', yref = 'paper',
+                    x = c(0.1, 0.9, 1.1),
+                    y = 1.5,
+                    text = legend,
+                    font = list(family = 'Arial', size = 16, color = 'black'),
+                    showarrow = FALSE) } # %>%
   # print(nrow(data))
   # print(nrow(hovers))
   # print(ncol(hovers))

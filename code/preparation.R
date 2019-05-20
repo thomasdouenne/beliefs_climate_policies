@@ -918,8 +918,9 @@ convert_s <- function() {
 
   for (k in c("perte_relative_tva", "perte_relative_fuel", "perte_relative_chauffage")) {
     temp <-  2 * (s[[k]]=="Oui, beaucoup plus") + (s[[k]]=="Oui, un peu plus") - (s[[k]]=="Non, un peu moins") - 2 * (s[[k]]=="Non, beaucoup moins")
-    s[[k]] <<- as.item(temp, labels = structure(c(-2:2),
-                          names = c("Beaucoup moins","Un peu moins","= Moyenne","Un peu plus","Beaucoup plus")),
+    temp[s[[k]]=="NSP"] <- -99
+    s[[k]] <<- as.item(temp, missing.values = c("NSP"), labels = structure(c(-2:2, -99),
+                          names = c("Beaucoup moins","Un peu moins","= Moyenne","Un peu plus","Beaucoup plus", "NSP")),
                           # names = c("Non, beaucoup moins","Non, un peu moins","Autant que la moyenne","Oui, un peu plus","Oui, beaucoup plus")),
                         annotation=Label(s[[k]]))
   }
