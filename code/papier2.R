@@ -246,7 +246,6 @@ barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_p
 ##### 6. Determinants
 
 ## 6.1 Attitudes over CC
-# Variables cibles : causes, conséquences, connaissances (score ges + climate call), ?
 summary(lm((s$cause_CC=='anthropique') ~ Revenu, data=s)) # Pas significatif
 summary(lm((s$cause_CC=='anthropique') ~ sexe, data=s)) # Pas significatif
 summary(lm((s$cause_CC=='anthropique') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : env +8.5 p.p.
@@ -259,8 +258,8 @@ summary(lm((s$effets_CC > 2) ~ as.factor(taille_agglo), data=s)) # Peu significa
 summary(lm((s$effets_CC > 2) ~ Gilets_jaunes, data=s)) # -5.6 p.p. soutient / -7.8 p.p. est dedans
 summary(lm((s$effets_CC > 2) ~ Gauche_droite, data=s)) # -19 p.p. droite / -16 p.p. ext-droite / -11 p.p. indeter
 
-variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", variables_demo, variables_politiques, variables_energie) # 
-variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "age", "age_65_plus",
+variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie) # 
+variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_65_plus",
                                                                names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
                                                                names(s)[which(grepl("hausse_", names(s)))]))]
 formula_determinants_cause <- as.formula(paste("cause_CC=='anthropique' ~ ",
@@ -271,13 +270,12 @@ formula_determinants_effets <- as.formula(paste("effets_CC > 2 ~ ",
                                                paste(variables_determinants, collapse = ' + ')))
 summary(lm(formula_determinants_effets, data=s, weights = s$weight))
 
-formula_determinants_score <- as.formula(paste("(score_ges + score_climate_call) ~ ",
+formula_determinants_score <- as.formula(paste("(score_ges + score_climate_call)/7 ~ ",
                                                paste(variables_determinants, collapse = ' + ')))
 summary(lm(formula_determinants_score, data=s, weights = s$weight))
 
 
 ## 6.2 Attitudes over policies
-# Variables cibles : taxe_approbation, Nb >= plutôt oui dans la matrice ?
 summary(lm((s$taxe_approbation=='Oui') ~ Revenu, data=s)) # 0.7 p.p. (très faible)
 summary(lm((s$taxe_approbation=='Oui') ~ sexe, data=s)) # 3.5 p.p.
 summary(lm((s$taxe_approbation=='Oui') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : +8.5 p.p.
@@ -288,3 +286,16 @@ formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='No
                                                paste(variables_determinants, collapse = ' + ')))
 summary(lm(formula_determinants_taxe_approbation, data=s, weights = s$weight))
 
+formula_determinants_mode_vie_ecolo <- as.formula(paste("mode_vie_ecolo=='Oui' ~ ",
+                                                          paste(variables_determinants, collapse = ' + ')))
+summary(lm(formula_determinants_mode_vie_ecolo, data=s, weights = s$weight))
+
+s$nb_politiques_env <- 0
+for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <- 1 + s$nb_politiques_env[s[[v]]>0]
+formula_determinants_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ",
+                                                        paste(variables_determinants, collapse = ' + ')))
+summary(lm(formula_determinants_politiques_env, data=s, weights = s$weight))
+
+formula_determinants_politiques_env <- as.formula(paste("taxe_kerosene ~ ",
+                                                        paste(variables_determinants, collapse = ' + ')))
+summary(lm(formula_determinants_politiques_env, data=s, weights = s$weight))
