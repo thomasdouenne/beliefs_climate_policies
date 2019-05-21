@@ -278,6 +278,8 @@ summary(effects_logit)
 effects_logit_margins <- logitmfx(formula_determinants_effects, s, atmean=FALSE)$mfxest
 effects_logit_margins
 
+decrit(s$score_ges + s$score_climate_call, weights = s$weight) # variance: 2.08 < mean: 4.15
+wtd.var(s$score_ges + s$score_climate_call, weights = s$weight) 
 s$score <- (s$score_ges + s$score_climate_call)/7
 formula_determinants_score <- as.formula(paste("score ~ ", paste(variables_determinants, collapse = ' + ')))
 ges_ols <- lm(formula_determinants_score, data=s, weights = s$weight)

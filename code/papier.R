@@ -412,7 +412,7 @@ summary(ols_si3)
 s$non_perdant <- as.numeric(s$gagnant_cible_categorie!='Perdant')
 # Warning when weighting: it relates to number of trials and not to survey weights. 
 logit_si4 <- glm(formula_ols_si3, family = binomial(link='logit'), data=s)
-summary(logit_si4)
+summary(logit_si4) # TODO: Hauck-Donner effect, run logitsf https://prezi.com/di_n0_npv27n/hauck-donner-effect-and-instability-in-estimation-of-logisti/
 logit_si4_margins <- logitmfx(formula_ols_si3, s, atmean=FALSE)$mfxest
 logit_si4_margins
 
@@ -512,7 +512,7 @@ summary(ols_ee3)
 # (4) Logit
 # 37 p.p. ***
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace!='Non')
-logit_ee4 <- glm(formula_ee3, family = binomial(link='logit'), data=s)
+logit_ee4 <- glm(formula_ee3, family = binomial(link='logit'), data=s) # TODO: Hauck-Donner effect, run logitsf. For a test run anova.glm, not Wald 
 summary(logit_ee4)
 logit_ee4_margins <- logitmfx(data=s, formula=logit_ee4, atmean=FALSE)$mfxest
 logit_ee4_margins
