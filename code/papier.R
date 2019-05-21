@@ -468,7 +468,7 @@ TableXVII <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                                   c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
                                   c("Controls: Target of the tax, single", " \\checkmark", " \\checkmark", " ", " "),
                                   c("Controls: Socio-demo, other motives", "", " \\checkmark", " ", " \\checkmark")),
-                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
+                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "ser"), label="first_stage_private_benefits")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Z test (cf. https://stats.stackexchange.com/questions/93540/testing-equality-of-coefficients-from-two-different-regressions)
@@ -477,28 +477,28 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 
 ## 5.2 Environmental effectiveness
 # Main identification strategy
-# (1) 2SLS both instruments, no controls: 52 p.p.*
-tsls1_ee1 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight) # I(info_CC==1 | info_PM==1) + I(info_PM==0 & info_CC==1) + I(info_PM==1 & info_CC==0)
-summary(tsls1_ee1)
-s$taxe_efficace.hat <- tsls1_ee1$fitted.values
-tsls2_ee1 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
-summary(tsls2_ee1)
-summary(lm(tax_acceptance ~ info_CC * info_PM, data=s, weights=s$weight)) # info_CC is a good instrument
-
 # Alternative specifications for robustness checks
-# (2) 2SLS both instruments, with controls: 45 p.p.** We do not control for progressivity: 
+# (1) 2SLS both instruments, with controls: 45 p.p.** We do not control for progressivity: 
 #     as most of the people who did not answer the question were in the second half of the survey, 
 #     the absence of response is too correlated with our instrument Z_E (apres_modifs) which bias the results.
 variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
 variables_reg_ee <- variables_reg_ee[!(variables_reg_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
-formula_ee2 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + ", 
+formula_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + ", 
                                       paste(variables_reg_ee, collapse = ' + ')))
-tsls1_ee2 <- lm(formula_ee2, data=s, weights = s$weight, na.action='na.exclude')
+tsls1_ee1 <- lm(formula_ee1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_ee1)
+s$taxe_efficace.hat <- fitted.values(tsls1_ee1)
+formula2_ee1 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ", paste(variables_reg_ee, collapse = ' + ')))
+tsls2_ee1 <- lm(formula2_ee1, data=s, weights=s$weight)
+summary(tsls2_ee1)
+
+# (2) 2SLS both instruments, no controls: 52 p.p.*
+tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight) # I(info_CC==1 | info_PM==1) + I(info_PM==0 & info_CC==1) + I(info_PM==1 & info_CC==0)
 summary(tsls1_ee2)
-s$taxe_efficace.hat <- fitted.values(tsls1_ee2)
-formula2_ee2 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ", paste(variables_reg_ee, collapse = ' + ')))
-tsls2_ee2 <- lm(formula2_ee2, data=s, weights=s$weight)
+s$taxe_efficace.hat <- tsls1_ee2$fitted.values
+tsls2_ee2 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
 summary(tsls2_ee2)
+summary(lm(tax_acceptance ~ info_CC * info_PM, data=s, weights=s$weight)) # info_CC is a good instrument
 
 s$prog_not_no <- (s$prog_na == 'Oui' | s$prog_na == 'NSP')
 # (3) OLS with controls: 39 p.p. ***
@@ -517,19 +517,40 @@ summary(logit_ee4)
 logit_ee4_margins <- logitmfx(data=s, formula=logit_ee4, atmean=FALSE)$mfxest
 logit_ee4_margins
 
-# (5) IV, no controls and efficace is yes: 56 p.p. *
-tsls1_ee5 <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
+
+# (5) IV, with controls and efficace is yes: 47 p.p. *
+formula_ee5 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC * info_PM + ", 
+                                paste(variables_reg_ee, collapse = ' + ')))
+tsls1_ee5 <- lm(formula_ee5, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee5)
-s$taxe_efficace.yes <- tsls1_ee5$fitted.values
-tsls2_ee5 <- lm(tax_acceptance ~ taxe_efficace.yes, data=s, weights=s$weight)
+s$taxe_efficace_yes.hat <- tsls1_ee5$fitted.values
+formula2_ee5 <- as.formula(paste("tax_acceptance ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
+tsls2_ee5 <- lm(formula2_ee5, data=s, weights=s$weight)
 summary(tsls2_ee5)
 
-# (6) IV, no controls and approval: 42 p.p. **
-tsls1_ee6 <- lm((taxe_efficace!='Non') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
+# (5) IV, no controls and efficace is yes: 56 p.p. *
+tsls1_ee5_bis <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
+summary(tsls1_ee5_bis)
+s$taxe_efficace.yes <- tsls1_ee5_bis$fitted.values
+tsls2_ee5_bis <- lm(tax_acceptance ~ taxe_efficace.yes, data=s, weights=s$weight)
+summary(tsls2_ee5_bis)
+
+# (6) IV, with controls and approval: 42 p.p. **
+formula_ee6 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC * info_PM + ", 
+                                paste(variables_reg_ee, collapse = ' + ')))
+tsls1_ee6 <- lm(formula_ee6, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee6)
-s$taxe_efficace.hat <- tsls1_ee6$fitted.values
-tsls2_ee6 <- lm(tax_approval ~ taxe_efficace.hat, data=s, weights=s$weight)
+s$taxe_efficace_yes.hat <- tsls1_ee6$fitted.values
+formula2_ee6 <- as.formula(paste("tax_approval ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
+tsls2_ee6 <- lm(formula2_ee6, data=s, weights=s$weight)
 summary(tsls2_ee6)
+
+# (6 bis) IV, no controls and approval: 42 p.p. **
+tsls1_ee6_bis <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
+summary(tsls1_ee6_bis)
+s$taxe_efficace.hat <- tsls1_ee6_bis$fitted.values
+tsls2_ee6_bis <- lm(tax_approval ~ taxe_efficace.hat, data=s, weights=s$weight)
+summary(tsls2_ee6_bis)
 
 # Results
 TableVII <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls2_ee6,
@@ -540,7 +561,7 @@ TableVII <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls2
                      coef = list(NULL, NULL, NULL, logit_ee4_margins[,1], NULL, NULL), 
                      se = list(NULL, NULL, NULL, logit_ee4_margins[,2], NULL, NULL),
                      add.lines = list(c("Instruments: info E.E., C.C. \\& P.M. ", "\\checkmark ", "\\checkmark ", "", " ", "\\checkmark ", "\\checkmark"),
-                       c("Controls: Socio-demo, other motives ", "", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "", "")), 
+                       c("Controls: Socio-demo, other motives ", "\\checkmark ", "", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark ")), 
                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
                "\\textit{IV} & \\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
@@ -555,9 +576,9 @@ TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                                            "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
                       dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
                       keep = c("info", "apres_modifs"), 
-                      column.labels = c("(1, 6)", "(2)", "(5)"), model.numbers = FALSE,
+                      column.labels = c("(1)", "(2)", "(5,6)"), model.numbers = FALSE,
                       add.lines = list(c("Controls ", "", "\\checkmark ", "")), 
-                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
+                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "ser"), label="first_stage_environmental_effectiveness")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 ## 5.3 Progressivity
