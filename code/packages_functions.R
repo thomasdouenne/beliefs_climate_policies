@@ -52,6 +52,8 @@ package("grDevices")
 package("colorspace")
 package("RColorBrewer")
 package("colorRamps")
+package("ordinal")
+package("oglmx")
 # package("doMC") # for parallel computing, does not work on Windows
 
 # Fs <- function(QID) { s[QID][[1]] }
@@ -332,13 +334,13 @@ yes_no5 <- c("Not at all", "Not really", "Indifferent/PNR", "Rather yes", "Yes, 
 # agree5 <- c("Strongly disagree", "Disagree", "Indifferent", "Agree", "Strongly agree")
 # evol5 <- c("Baisser fortement", "Baisser légèrement", "Maintenir au niveau", "Augmenter légèrement", "Augmenter fortement")
 # evolve5 <- c("Strongly decrease", "Slightly decrease", "Maintain", "Slightly increase", "Strongly increase")
-barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE, display_values=T, thin=FALSE, legend_x=NA) {
+barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE, display_values=T, thin=FALSE, legend_x=NA, show_ticks=T) {
   if (length(color)==0) color <- color(data, nsp, rev_color = rev_color)
   margin_t <- 0 + 25*(!(thin))
   if (title!="") { margin_t <- 100 }
   if (grepl("<br>", title)) { margin_t <- 150 }
   legendSize <- 13 # 10
-  legendY <- 1.1 
+  legendY <- 1.1  + 0.3*thin/(ncol(data)-1) # last term may be problematic
   legendX <- 0.2 
   # legendFont <- 'Open Sans'
   if (is.na(margin_l)) { margin_l <- 4.7*max(nchar(labels)/(1 + str_count(labels, '<br>'))) }
@@ -406,7 +408,7 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
     layout(xaxis = list(title = "",
                         showgrid = T,
                         showline = FALSE,
-                        showticklabels = T,
+                        showticklabels = show_ticks,
                         gridcolor = toRGB("gray70"), # + noir, + proche de 0
                         gridwidth = 1,
                         griddash = "dot",

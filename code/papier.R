@@ -115,9 +115,9 @@ axis(3, at=c(-280, -190, -120, -70, -30, 0, 20, 40, 60, 80), tck=0.0, lwd=0, lwd
 par(mar = mar_old, cex = cex_old)
 
 ## Relative gain in partial reforms
-decrit(s$perte_relative_chauffage, weights = s$weight, miss=T) # -: 15 / +: 54%
-decrit(s$perte_relative_fuel, weights = s$weight, miss=T) # 10 / 56%
-decrit(s$perte_relative_tva, weights = s$weight, miss=T) # 2 / 60%
+decrit(s$perte_relative_chauffage, weights = s$weight, miss=T) # -: 15 / =: 21 / +: 54%
+decrit(s$perte_relative_fuel, weights = s$weight, miss=T) # 10 / 29 / 56%
+decrit(s$perte_relative_tva, weights = s$weight, miss=T) # 2 / 32 / 60%
 decrit(s$perte_relative_partielle, weights = s$weight, miss=T)
 decrit(s$perte_relative_chauffage[s$fioul == 0 & s$gaz == 0], weights = s$weight[s$fioul == 0 & s$gaz == 0], miss=T)
 
@@ -138,7 +138,7 @@ logit_bias_margins
 formula_bias_bis <- as.formula(paste("abs(simule_gain - gain) > 110 ~ taxe_approbation + (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + 
                                       ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
 reg_bias_bis <- lm(formula_bias_bis, data=s, weights=s$weight)
-summary(reg_bias_bis)
+summary(reg_bias_bis) # TODO: redefine Gilets_jaunes pour que les NAs comptent
 
 Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
      title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 

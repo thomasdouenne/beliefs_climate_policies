@@ -161,18 +161,17 @@ s$elast_chauffage_perso <- revalue(s$elast_chauffage_perso, c("+ de 30% - Je cha
 #           "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 10%"="0 to 10%", 
 #           "0% - Je suis contraint sur tous mes déplacements"="0%: won't reduce", "0% - Je n'en consomme déjà presque pas"="0%: don't consume"))
 barres(file="elasticities_perso", thin=T, title="", data=dataKN(c("elast_chauffage_perso", "elast_fuel_perso"), miss=FALSE), 
-       nsp=FALSE, labels=c("Own: Housing", "Own: Transport"), legend = dataN("elast_chauffage_perso", return="legend"))
+       nsp=FALSE, labels=c("Own: Housing", "Own: Transport"), legend = dataN("elast_chauffage_perso", return="legend"), show_ticks=FALSE)
 s$elast_chauffage <- factor(s$elasticite_chauffage, levels(as.factor(s$elasticite_chauffage))[c(1,4,3,5,2)])
 s$elast_fuel <- factor(s$elasticite_fuel, levels(as.factor(s$elasticite_fuel))[c(1,4,3,5,2)])
 s$elast_chauffage <- revalue(s$elast_chauffage, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", 
                                 "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
 # s$elast_fuel <- revalue(s$elast_fuel, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
 barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elasticite_chauffage", "elasticite_fuel"), miss=FALSE), 
-       nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport"), legend = dataN("elast_chauffage", return="legend"))
-barres(file="elasticities", title="", data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE), 
+       nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport"), legend = dataN("elast_chauffage", return="legend"), show_ticks=FALSE)
+barres(file="elasticities", title="", thin=T, data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE), 
        nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport", "Own: Housing", "Own: Transport"), 
-       legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE))
-#TODO: peut-être enlever la gradation du bas
+       legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE), show_ticks=FALSE)
 
 
 ##### 5. Attitudes over Other Policies #####
@@ -182,8 +181,8 @@ barres(file="elasticities", title="", data=dataKN(c("Elasticite_chauffage", "Ela
 labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
                  "stricter standards on pollution from new vehicles", "stricter standards on pollution during roadworthiness tests", 
         "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
-barres(file="environmental_policies", title="", 
-       data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], miss=FALSE, rev=T), nsp=FALSE, sort=T, legend = rev(yes_no5), labels=labels_environmental_policies)
+barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
+                                                           miss=FALSE, rev=T), nsp=FALSE, sort=T, legend = rev(yes_no5), labels=labels_environmental_policies)
 
 ## 5.2 Preferred revenue recycling
 labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", 
@@ -258,22 +257,59 @@ summary(lm((s$effets_CC > 2) ~ as.factor(taille_agglo), data=s)) # Peu significa
 summary(lm((s$effets_CC > 2) ~ Gilets_jaunes, data=s)) # -5.6 p.p. soutient / -7.8 p.p. est dedans
 summary(lm((s$effets_CC > 2) ~ Gauche_droite, data=s)) # -19 p.p. droite / -16 p.p. ext-droite / -11 p.p. indeter
 
-variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie) # 
+variables_determinants <- c("Revenu", "Revenu_conjoint", "as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))", 
+                            "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie) # 
 variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_65_plus",
                                                                names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
                                                                names(s)[which(grepl("hausse_", names(s)))]))]
-formula_determinants_cause <- as.formula(paste("cause_CC=='anthropique' ~ ",
-                                                paste(variables_determinants, collapse = ' + ')))
-summary(lm(formula_determinants_cause, data=s, weights = s$weight))
+formula_determinants_cause <- as.formula(paste("cause_CC=='anthropique' ~ ", paste(variables_determinants, collapse = ' + ')))
+cause_ols <- lm(formula_determinants_cause, data=s, weights = s$weight)
+cause_logit <- glm(formula_determinants_cause, data=s, family="binomial")
+summary(cause_ols)
+summary(cause_logit)
+cause_logit_margins <- logitmfx(formula_determinants_cause, s, atmean=FALSE)$mfxest
+cause_logit_margins
 
-formula_determinants_effets <- as.formula(paste("effets_CC > 2 ~ ",
-                                               paste(variables_determinants, collapse = ' + ')))
-summary(lm(formula_determinants_effets, data=s, weights = s$weight))
+formula_determinants_effects <- as.formula(paste("effets_CC > 2 ~ ", paste(variables_determinants, collapse = ' + ')))
+effects_ols <- lm(formula_determinants_effects, data=s, weights = s$weight)
+effects_logit <- glm(formula_determinants_effects, data=s, family="binomial")
+summary(effects_ols)
+summary(effects_logit)
+effects_logit_margins <- logitmfx(formula_determinants_effects, s, atmean=FALSE)$mfxest
+effects_logit_margins
 
-formula_determinants_score <- as.formula(paste("(score_ges + score_climate_call)/7 ~ ",
-                                               paste(variables_determinants, collapse = ' + ')))
-summary(lm(formula_determinants_score, data=s, weights = s$weight))
+s$score <- (s$score_ges + s$score_climate_call)/7
+formula_determinants_score <- as.formula(paste("score ~ ", paste(variables_determinants, collapse = ' + ')))
+ges_ols <- lm(formula_determinants_score, data=s, weights = s$weight)
+summary(ges_ols)
+ges_ologit <- oglmx(formula_determinants_score, data=s, constantMEAN = FALSE, constantSD = FALSE, link="logit", delta=0)
+# ges_ologit <- ologit.reg(as.formula(paste("score_ges + score_climate_call ~ ", paste(variables_determinants, collapse = ' + '))), data=s)
+# ges_ologit <- polr(as.formula(paste("as.factor(score_ges + score_climate_call) ~ ", paste(variables_determinants, collapse = ' + '))), data=s, Hess = T)
+# with polr, regressors should be scaled with scale() 
+s$score <- as.factor((s$score_ges + s$score_climate_call)/7)
+ges_ologit <- clm(formula_determinants_score, data=s)
+summary(ges_ologit)
+ges_ologit_margins <- margins.oglmx(ges_ologit, atmeans=FALSE, AME=T)
+ges_ologit_margins
+ges_logit <- glm(formula_determinants_score, data=s, family="binomial")
+summary(ges_logit)
+ges_logit_margins <- logitmfx(formula_determinants_score, s, atmean=FALSE)$mfxest
+ges_logit_margins
 
+Table_determinants_CC <- stargazer(cause_ols, cause_logit, effects_ols, effects_logit, ges_ols, ges_logit, ges_ologit,
+           title="Determinants of attitudes towards climate change", model.names = T, model.numbers = FALSE, 
+           # covariate.labels = c("Constant", "Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist","Consumption Units (C.U.)", 
+           #                      "Yellow Vests: PNR","Yellow Vests: understands","Yellow Vests: supports", "Yellow Vests: is part"),
+           header = FALSE, dep.var.labels = c("CC anthropic", "CC disastrous", "Knowledge on CC", ""),#  dep.var.caption = "", 
+           keep = c("Constant", "sexe", "age", "diplome", "taille_agglo", "Gilets_jaunes", "humaniste", "ecologiste", "Gauche_droite"), 
+           # "interet_politique", "csp", "diesel", "essence", "sexe", "apolitique"
+           coef = list(NULL, cause_logit_margins[,1], NULL, effects_logit_margins[,1], NULL, ges_logit_margins[,1], NULL),
+           se = list(NULL, cause_logit_margins[,2], NULL, effects_logit_margins[,2], NULL, ges_logit_margins[,2], NULL),
+           # add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark", "\\checkmark")),
+           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+                                                       Table_determinants_CC, fixed=TRUE), fixed=TRUE), collapse=' ')
+            
 
 ## 6.2 Attitudes over policies
 summary(lm((s$taxe_approbation=='Oui') ~ Revenu, data=s)) # 0.7 p.p. (très faible)
