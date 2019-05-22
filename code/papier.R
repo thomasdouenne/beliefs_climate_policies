@@ -342,6 +342,55 @@ summary(lm(update_correct ~ (gagnant_feedback_categorie=='Gagnant') + taxe_appro
 summary(lm((cause_CC=='anthropique') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
 summary(lm(as.numeric(effets_CC) ~ apres_modifs + info_CC * info_PM, data=s, subset=!is.missing(effets_CC), weights=s$weight))
 
+variables_update_ee <- c("Revenu", variables_demo)
+variables_update_ee <- variables_update_ee[!(variables_update_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
+
+reg_update_ee1 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight, na.action='na.exclude')
+summary(reg_update_ee1)
+
+formula_update_ee <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + ", 
+                                paste(variables_update_ee, collapse = ' + ')))
+reg_update_ee2 <- lm(formula_update_ee, data=s, weights = s$weight, na.action='na.exclude')
+summary(reg_update_ee2)
+
+logit_update_ee3 <- glm(formula_update_ee, family = binomial(link='logit'), data=s)
+summary(logit_update_ee3)
+logit_update_ee3_margins <- logitmfx(formula_update_ee, s, atmean=FALSE)$mfxest
+logit_update_ee3_margins
+
+formula_update_ee_bis <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC * info_PM + ", 
+                                      paste(variables_update_ee, collapse = ' + ')))
+reg_update_ee4 <- lm(formula_update_ee_bis, data=s, weights = s$weight, na.action='na.exclude')
+summary(reg_update_ee4)
+
+Table_update_ee <- stargazer(reg_update_ee1, reg_update_ee2, logit_update_ee3, reg_update_ee4,
+                             title="Effect of primings on beliefs about environmental effectiveness",# model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
+                             covariate.labels = c("Info on Environmental Effectiveness ($Z_{E}$)",  
+                                                  "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
+                             dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
+                             keep = c("info", "apres_modifs"), 
+                             coef = list(NULL, NULL, logit_update_ee3_margins[,1], NULL), 
+                             se = list(NULL, NULL, logit_update_ee3_margins[,2], NULL),
+                             column.labels = c("(1)", "(2)", "(3)", "(4)"), model.numbers = FALSE,
+                             add.lines = list(c("Controls: Socio-demographics ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ")), 
+                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:update_ee")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
+                                                       Table_update_ee, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+#todelete
+TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
+                        title="First stage regressions results for environmental effectiveness", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                        # "Info on Climate Change and/or on Particulates", "Info on Climate Change only", "Info on Particulates only"
+                        covariate.labels = c("Info on Environmental Effectiveness ($Z_{E}$)",  
+                                             "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
+                        dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
+                        keep = c("info", "apres_modifs"), 
+                        column.labels = c("(1)", "(2)", "(5,6)"), model.numbers = FALSE,
+                        add.lines = list(c("Controls ", "", "\\checkmark ", "")), 
+                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "ser"), label="first_stage_environmental_effectiveness")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
+
 
 # 4.3 Beliefs over progressivity
 s$inactif <- s$statut_emploi %in% c("inactif", "au chômage")
@@ -488,7 +537,7 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 #     the absence of response is too correlated with our instrument Z_E (apres_modifs) which bias the results.
 variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
 variables_reg_ee <- variables_reg_ee[!(variables_reg_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
-formula_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM ", 
+formula_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ", 
                                       paste(variables_reg_ee, collapse = ' + ')))
 tsls1_ee1 <- lm(formula_ee1, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee1)
@@ -498,7 +547,7 @@ tsls2_ee1 <- lm(formula2_ee1, data=s, weights=s$weight)
 summary(tsls2_ee1)
 
 # (2) 2SLS both instruments, no controls: 52 p.p.*
-tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight) # I(info_CC==1 | info_PM==1) + I(info_PM==0 & info_CC==1) + I(info_PM==1 & info_CC==0)
+tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC, data=s, weights=s$weight) # I(info_CC==1 | info_PM==1) + I(info_PM==0 & info_CC==1) + I(info_PM==1 & info_CC==0)
 summary(tsls1_ee2)
 s$taxe_efficace.hat <- tsls1_ee2$fitted.values
 tsls2_ee2 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
@@ -523,7 +572,7 @@ logit_ee4_margins <- logitmfx(data=s, formula=logit_ee4, atmean=FALSE)$mfxest
 logit_ee4_margins
 
 # (5) IV, with controls and efficace is yes: 47 p.p. *
-formula_ee5 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC * info_PM + ", 
+formula_ee5 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ", 
                                 paste(variables_reg_ee, collapse = ' + ')))
 tsls1_ee5 <- lm(formula_ee5, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee5)
@@ -540,7 +589,7 @@ tsls2_ee5_bis <- lm(tax_acceptance ~ taxe_efficace.yes, data=s, weights=s$weight
 summary(tsls2_ee5_bis)
 
 # (6) IV, with controls and approval: 42 p.p. **
-formula_ee6 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC * info_PM + ", 
+formula_ee6 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ", 
                                 paste(variables_reg_ee, collapse = ' + ')))
 tsls1_ee6 <- lm(formula_ee6, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee6)
