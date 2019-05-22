@@ -537,7 +537,7 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 #     the absence of response is too correlated with our instrument Z_E (apres_modifs) which bias the results.
 variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
 variables_reg_ee <- variables_reg_ee[!(variables_reg_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
-formula_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ", 
+formula_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM ", 
                                       paste(variables_reg_ee, collapse = ' + ')))
 tsls1_ee1 <- lm(formula_ee1, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee1)
