@@ -1391,6 +1391,7 @@ iv_ee1 <- ivreg(as.formula(paste("tax_acceptance ~ (taxe_efficace!='Non') + ", p
                                  "| apres_modifs + info_CC + ", paste(variables_reg_ee, collapse = ' + '))), data = s, weights=s$weight)
 summary(iv_ee1, diagnostics = TRUE) # interpretation: https://rstudio-pubs-static.s3.amazonaws.com/109978_7bfc270924c1474e924dddf42e998d42.html
 
+summary(ivmodelFormula(tax_acceptance ~ (taxe_efficace!='Non') | apres_modifs + info_CC, data = s))
 # iv_ee1bis <- ivmodelFormula(as.formula(paste("tax_acceptance ~ (taxe_efficace!='Non') + ", paste(variables_reg_ee, collapse = ' + '),
 #                                              "| apres_modifs + info_CC + ", paste(variables_reg_ee, collapse = ' + '))), data = s) # bug with this function
 # s$single <- 1*(s$nb_adultes==1)
