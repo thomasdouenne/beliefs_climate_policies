@@ -159,7 +159,7 @@ wtd.mean((s$Elasticite_chauffage[s$taxe_efficace=='Non']<= -0.5), weights = s$we
 wtd.mean((s$Elasticite_fuel[s$taxe_efficace=='Non']<= -0.5), weights = s$weight[s$taxe_efficace=='Non'], na.rm=T) # 43%
 decrit(s$Elasticite_fuel, weights = s$weight) # -0.45
 decrit(s$Elasticite_chauffage, weights = s$weight) # -0.43
-variables_reg_elast <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
+variables_reg_elast <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "single", "Simule_gain", "Simule_gain2", variables_demo, variables_energie)
 variables_reg_elast <- variables_reg_elast[!(variables_reg_elast %in%
     c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
 elas_c <- lm(taxe_efficace!='Non' ~ Elasticite_chauffage, data=s, subset = variante_partielle=='c', weights = s$weight)
@@ -173,13 +173,14 @@ formula_f <- as.formula(paste("taxe_efficace!='Non' ~ Elasticite_fuel + ", paste
 elast_f_controls <- lm(formula_f, data=s, subset = variante_partielle=='f', weights = s$weight)
 summary(elast_f_controls)
 TableXV <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls, 
-                    title="Effect of subjective elasticities on perceived environmental effectiveness", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                    covariate.labels = c("Price elasticity: Housing", "Price elasticity: Transports", "Income","Size of town", "Age","Domestic fuel", "Natural gas", "Diesel"), 
-                    dep.var.labels = c("Environmental effectiveness: not ``No''"), dep.var.caption = "", header = FALSE,
-                    keep = c("Elasticite"),
-                    add.lines = list(c("Controls: Socio-demographics, energy", "", "", "\\checkmark  ", "\\checkmark")),
-                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXV, fixed=TRUE), fixed=TRUE), collapse=' ')
+        title="Effect of subjective elasticities on perceived environmental effectiveness", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
+        covariate.labels = c("Price elasticity: Housing", "Price elasticity: Transports", "Income","Size of town", "Age","Domestic fuel", "Natural gas", "Diesel"), 
+        dep.var.labels = c("Environmental effectiveness: not ``No''"), dep.var.caption = "", header = FALSE,
+        keep = c("Elasticite"),
+        add.lines = list(c("Controls: Socio-demographics, energy", "", "", "\\checkmark  ", "\\checkmark")),
+        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', 
+                                                       '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXV, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 ## 3.3 Progressivity
 decrit(s$progressivite, weights = s$weight) # 19.4% vs. 59.5%
@@ -296,9 +297,6 @@ binconf(x = x, n = n) # 83.0%
 # Those who think they win update more correctly when they should update
 base_winner <- lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(base_winner)
-s$retraites <- s$statut_emploi == 'retraité·e'
-s$actifs <- s$statut_emploi %in% c("autre actif", "CDD", "CDI", "fonctionnaire", "intérimaire ou contrat précaire")
-s$etudiants <- s$statut_emploi == 'étudiant·e'
 variables_update <- c("revenu", "(gagnant_categorie=='Gagnant')", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, 
                       variables_politiques, "Gilets_jaunes") # 
 variables_update <- variables_update[!(variables_update %in% c("revenu", "rev_tot", "age", "age_65_plus", "taille_agglo", "statut_emploi"))]
@@ -316,14 +314,16 @@ summary(covariates_update_correct_bis)
 asymmetric_simple <- stargazer(base_winner, covariates_update_correct, covariates_update_correct_bis,
                                title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                                covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
-                                                    "Retired", "Active", "Student", "Yellow Vests: PNR", "Yellow Vests: understands", "Yellow Vests: supports", "Yellow Vests: is part"),
+                                                    "Retired", "Active", "Student", "Yellow Vests: PNR", 
+                                                    "Yellow Vests: understands", "Yellow Vests: supports", "Yellow Vests: is part"),
                                dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, 
                                keep = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
                                order = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
                                add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark"), 
                                                 c("Includes controls", "", "\\checkmark", "\\checkmark")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
-write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes} }  \\end{table} ', 
+write_clip(gsub('\\end{table}', 
+    ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes} }  \\end{table} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Some alternative specifications
@@ -364,7 +364,7 @@ reg_update_ee4 <- lm(formula_update_ee_bis, data=s, weights = s$weight, na.actio
 summary(reg_update_ee4)
 
 Table_update_ee <- stargazer(reg_update_ee1, reg_update_ee2, logit_update_ee3, reg_update_ee4,
-                             title="Effect of primings on beliefs about environmental effectiveness",# model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
+                             title="Effect of primings on beliefs about environmental effectiveness", # "Diploma: Bachelor or above", 
                              covariate.labels = c("Info on Environmental Effectiveness ($Z_{E}$)",  
                                                   "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
                              dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
@@ -389,11 +389,11 @@ TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                         column.labels = c("(1)", "(2)", "(5,6)"), model.numbers = FALSE,
                         add.lines = list(c("Controls ", "", "\\checkmark ", "")), 
                         no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "ser"), label="first_stage_environmental_effectiveness")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
+                                                       TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
 # 4.3 Beliefs over progressivity
-s$inactif <- s$statut_emploi %in% c("inactif", "au chômage")
 cor(s$info_progressivite, (s$progressivite!='Non'), use='complete.obs') # -0.006
 # Table XVI: Effect of information on perceived progressivity
 ols_prog_1 <- lm(progressivite!='Non' ~ info_progressivite, data=s, weights=s$weight)
@@ -401,8 +401,8 @@ summary(ols_prog_1)
 ols_prog_2 <- lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, weights=s$weight)
 summary(ols_prog_2)
 formula_ols_prog_3 <- as.formula(paste("progressivite!='Non' ~  info_progressivite * biais_sur + info_progressivite * revenu + info_progressivite * taille_agglo + 
-                   info_progressivite * taille_menage + info_progressivite * age + info_progressivite * Gilets_jaunes + info_progressivite * sexe + info_progressivite * inactif + 
-                   info_progressivite * (Diplome>4) + ", paste(c(variables_demo, variables_politiques), collapse = '+ ')))
+           info_progressivite * taille_menage + info_progressivite * age + info_progressivite * Gilets_jaunes + info_progressivite * sexe + info_progressivite * inactif + 
+           info_progressivite * (Diplome>4) + ", paste(c(variables_demo, variables_politiques), collapse = '+ ')))
 ols_prog_3 <- lm(formula_ols_prog_3, data=s, weights=s$weight)
 summary(ols_prog_3)
 
@@ -414,7 +414,8 @@ prog <- stargazer(ols_prog_1, ols_prog_2, ols_prog_3, title="Effect of informati
                                dep.var.labels = "Progressivity: not No ($P$)", dep.var.caption = "", header = FALSE,
                                add.lines = list(c("Controls: Socio-demo, politics ", "", "", "\\checkmark ")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog")
-write_clip(gsub('\\end{table}', ' } \\end{table} ', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', prog, fixed=TRUE), fixed=TRUE), collapse=' ')
+write_clip(gsub('\\end{table}', ' } \\end{table} ', gsub('\\begin{tabular}{@', 
+                                                         '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', prog, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
 ##### 5 Motives for acceptance #####
@@ -425,25 +426,23 @@ sum(s$weight[s$taxe_approbation=='Non' & s$gagnant_categorie!='Gagnant' & s$simu
 
 # (1) Main identification strategy
 tsls1_si1 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
-                  I(traite_cible*traite_cible_conjoint) + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
+                  I(traite_cible*traite_cible_conjoint) + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single, data=s, weights = s$weight)
 summary(tsls1_si1)
 s$non_perdant <- tsls1_si1$fitted.values
 # 57 p.p.***
-tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
+tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single, data=s, weights = s$weight)
 summary(tsls2_si1)
 # Effective F-stat from Stata weakivtest: 44.093
 
-iv_si1 <- ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1) | 
-    traite_cible + traite_cible_conjoint + I(traite_cible*traite_cible_conjoint) + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), 
+iv_si1 <- ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single | 
+    traite_cible + traite_cible_conjoint + I(traite_cible*traite_cible_conjoint) + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single, 
     data = s, weights = s$weight)
 summary(iv_si1, diagnostics = TRUE)
 
 # Alternative specifications for robustness checks
-s$prog_na <- s$progressivite
-s$prog_na[is.na(s$prog_na)] <- "NA"
 # (2) With many controls 
-variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "prog_na", "taxe_efficace", "(nb_adultes==1)", 
-                                 "I(hausse_depenses_interaction/uc)", variables_demo) # 
+variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "prog_na", 
+                                 "taxe_efficace", "single",  "hausse_depenses_par_uc", variables_demo) 
 variables_reg_self_interest <- variables_reg_self_interest[!(variables_reg_self_interest %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
     I(traite_cible*traite_cible_conjoint) + cible + tax_acceptance +  (taxe_approbation=='NSP') + ", paste(variables_reg_self_interest, collapse = ' + ')))
@@ -466,11 +465,28 @@ summary(ols_si3)
 
 # (4) Simple Logit: 43 p.p.***
 s$non_perdant <- as.numeric(s$gagnant_cible_categorie!='Perdant')
-# Warning when weighting: it relates to number of trials and not to survey weights. 
+# Warning when weighting: it relates to number of trials and not to survey weights. Option weights = s$weight can be added in logistf, doesn't really change results
 logit_si4 <- glm(formula_ols_si3, family = binomial(link='logit'), data=s)
-summary(logit_si4) # TODO: Hauck-Donner effect, run logitsf https://prezi.com/di_n0_npv27n/hauck-donner-effect-and-instability-in-estimation-of-logisti/
+summary(logit_si4) # Warning: Hauck-Donner effect, run logitsf, cf. https://prezi.com/di_n0_npv27n/hauck-donner-effect-and-instability-in-estimation-of-logisti/
 logit_si4_margins <- logitmfx(formula_ols_si3, s, atmean=FALSE)$mfxest
 logit_si4_margins
+summary(logistf(formula_ols_si3, data=s, firth = T)) # Firth (93) regression to resolve separation => effect of 2.77*** instead of 2.85***, cf. Heinze & Ploner (03)
+# other way to check significance is to run a Likelihood Ratio test instead of the Wald/Chi-squared test reported in z value/Pr(>|z|) in glm, by running anova:
+# https://stat.ethz.ch/pipermail/r-help/2001-October/015779.html http://nross626.math.yorku.ca/math4330/R/Regression/Hauck_Donner_effect.pdf
+anova(logit_si4, test='LR') # <2e-16 ***
+
+for (v in variables_reg_self_interest) print(class(s[[paste(v, 'unclass', sep='_')]])) # 
+for (v in c(variables_reg_self_interest, "taxe_approbation", "prog_na", "taxe_efficace")) if (!is.numeric(s[[v]])) s[[paste(v, 'unclass', sep='_')]] <- as.factor(s[[v]]) 
+#s[[paste(v, 'unclass', sep='_')]] <- unclass(s[[v]]) # print(class(s[[paste(v, 'unclass', sep='_')]])) # 
+variables_reg_si_unclass <- paste(c(variables_reg_self_interest, "taxe_approbation", "prog_na", "taxe_efficace"), 'unclass', sep='_') 
+formula_logit_si4f  <- as.formula(paste("1*(taxe_cible_approbation!='Non') ~ non_perdant + cible +", paste(variables_reg_si_unclass, collapse = ' + '))) # 
+class(s$taxe_approbation=='NSP')
+logit_si4f <- logistf(formula_logit_si4f, data=s, firth = T)
+ggeffect(logit_si4f, "non_perdant")
+logit_si4t <- glm(formula_logit_si4f, family = binomial(link='logit'), data=s)
+ggemmeans(logit_si4t, "non_perdant")
+summary(margins(logit_si4t))
+summary(margins(logit_si4))
 
 # (5) IV Feedback
 tsls1_si5 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight)
@@ -482,14 +498,14 @@ summary(tsls2_si5)
 # Effective F-stat from Stata weakivtest: 37.966
 
 # (6) IV Feedback with controls
-formula_tsls1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + (nb_adultes==1) + 
-                                      prog_na + taxe_efficace +", paste(variables_reg_self_interest, collapse = ' + ')))
+formula_tsls1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + 
+      Simule_gain + Simule_gain2 + single + prog_na + taxe_efficace +", paste(variables_reg_self_interest, collapse = ' + ')))
 tsls1_si6 <- lm(formula_tsls1_si6, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
 summary(tsls1_si6)
 s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si6$fitted.values
 # 43 p.p. ***
-formula_tsls2_si6 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + (nb_adultes==1) + 
-                                      prog_na + taxe_efficace +", paste(variables_reg_self_interest, collapse = ' + ')))
+formula_tsls2_si6 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + 
+Simule_gain + Simule_gain2 + single + prog_na + taxe_efficace +", paste(variables_reg_self_interest, collapse = ' + ')))
 tsls2_si6 <- lm(formula_tsls2_si6, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(tsls2_si6)
 # Effective F-stat from Stata weakivtest: 57.866
@@ -540,7 +556,7 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 # (1) 2SLS both instruments, with controls: 45 p.p.** We do not control for progressivity: 
 #     as most of the people who did not answer the question were in the second half of the survey, 
 #     the absence of response is too correlated with our instrument Z_E (apres_modifs) which bias the results.
-variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
+variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "single", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
 variables_reg_ee <- variables_reg_ee[!(variables_reg_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 formula_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ", 
                                       paste(variables_reg_ee, collapse = ' + ')))
@@ -553,7 +569,7 @@ summary(tsls2_ee1)
 # Effective F-stat from Stata weakivtest: 5.866
 
 # (2) 2SLS both instruments, no controls: 52 p.p.*
-tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC, data=s, weights=s$weight) # I(info_CC==1 | info_PM==1) + I(info_PM==0 & info_CC==1) + I(info_PM==1 & info_CC==0)
+tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC, data=s, weights=s$weight)
 summary(tsls1_ee2)
 s$taxe_efficace.hat <- tsls1_ee2$fitted.values
 tsls2_ee2 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
@@ -561,10 +577,7 @@ summary(tsls2_ee2)
 # Effective F-stat from Stata weakivtest: 2.523
 summary(lm(tax_acceptance ~ info_CC * info_PM, data=s, weights=s$weight)) # info_CC is a good instrument
 
-s$prog_not_no <- (s$prog_na == 'Oui' | s$prog_na == 'NSP')
 # (3) OLS with controls: 39 p.p. ***
-s$prog_na <- s$progressivite
-s$prog_na[is.na(s$progressivite)] <- "NA"
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace!='Non')
 formula_ee3 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + prog_not_no + (prog_na == 'NA') + ", paste(variables_reg_ee, collapse = ' + '))) # 
 ols_ee3 <- lm(formula_ee3, data=s, weights = s$weight)
@@ -573,10 +586,12 @@ summary(ols_ee3)
 # (4) Logit
 # 37 p.p. ***
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace!='Non')
-logit_ee4 <- glm(formula_ee3, family = binomial(link='logit'), data=s) # TODO: Hauck-Donner effect, run logitsf. For a test run anova.glm, not Wald 
+logit_ee4 <- glm(formula_ee3, family = binomial(link='logit'), data=s) # Warning: Hauck-Donner effect, run logitsf. For a test run anova.glm, not Wald 
 summary(logit_ee4)
 logit_ee4_margins <- logitmfx(data=s, formula=logit_ee4, atmean=FALSE)$mfxest
 logit_ee4_margins
+summary(logistf(formula_ee3, data=s, firth = T)) # Firth (93) regression to resolve separation => effect of 2.20*** instead of 2.26***, cf. Heinze & Ploner (03) 
+anova(logit_ee4, test='LR') # <2e-16 ***: all is fine
 
 # (5) IV, with controls and efficace is yes: 47 p.p. *
 formula_ee5 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ", 
@@ -645,12 +660,10 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 
 ## 5.3 Progressivity
 # Identification challenge and strategies
-s$prog_na <- s$progressivite
-s$prog_na[is.na(s$prog_na)] <- "NA"
 s$progressif <- (s$prog_na == 'Oui' | s$prog_na == 'NSP') # Attention à ne pas inclure les NA
 s$effective <- s$taxe_efficace!='Non'
 s$gagnant_info <- s$gagnant_info_categorie!='Perdant'
-variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "(nb_adultes==1)", "Simule_gain", "Simule_gain2", variables_demo)
+variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "single", "Simule_gain", "Simule_gain2", variables_demo)
 variables_reg_prog <- variables_reg_prog[!(variables_reg_prog %in% 
     c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
 
@@ -694,15 +707,15 @@ summary(ols_prog6)
 TableVIII <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, ols_prog6,
   title="Effect of beliefs over progressivity on acceptance. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, 
     where strict dummies do not cover ``PNR'' or ``Unaffected' answers.", 
-                            covariate.labels = c("Progressivity $(P)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G^P)$", "Effective $(E)$", "$(G^P \\times E)$",
-                                                 "Interaction: winner $(P \\times G^P)$", "Interaction: effective $(P \\times E)$", "Interaction: income $(P \\times I)$", 
-                                                 "$P \\times G^P \\times E$"), # "Constant",
-                            dep.var.labels = c("Acceptance ($A^P$) on \\textit{not ``No''}", "Approval ($\\dot{A^P}$) on \\textit{``Yes''}"), dep.var.caption = "", header = FALSE,
-                            keep = c("progressi", "gagnant", 'effective', 'Revenu$'), # "Constant"
-                            coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
-                            se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
-                            add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
-                            no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
+          covariate.labels = c("Progressivity $(P)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G^P)$", "Effective $(E)$", "$(G^P \\times E)$",
+                               "Interaction: winner $(P \\times G^P)$", "Interaction: effective $(P \\times E)$", "Interaction: income $(P \\times I)$", 
+                               "$P \\times G^P \\times E$"), # "Constant",
+          dep.var.labels = c("Acceptance ($A^P$) on \\textit{not ``No''}", "Approval ($\\dot{A^P}$) on \\textit{``Yes''}"), dep.var.caption = "", header = FALSE,
+          keep = c("progressi", "gagnant", 'effective', 'Revenu$'), # "Constant"
+          coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
+          se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
+          add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
+          no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
                 For logit, average marginal effects are reported and not coefficients. } \\end{table} ',
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
@@ -733,8 +746,8 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Not
 
 # 5.4.2 Willingness-to-pay
 ggplot() + geom_smooth(data=s[s$taxe_efficace!='Non',], method = "auto", aes(x=gain, y=1*(tax_acceptance), col=" Effective: not `No'")) + ylim(c(0,1)) +
- xlab("Subjective gain, among non believers in ineffectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + #geom_vline(xintercept=-66, col='red') +
- geom_smooth(data=s, method = "auto", aes(x=gain, y=1*(tax_acceptance), col=' All            ')) + ylim(c(0,1)) +
+ xlab("Subjective gain, among non believers in ineffectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + 
+ geom_smooth(data=s, method = "auto", aes(x=gain, y=1*(tax_acceptance), col=' All            ')) + ylim(c(0,1)) + #geom_vline(xintercept=-66, col='red') +
  xlab("Subjective gain") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + theme(legend.position="top", ) + # legend.position="top", 
  scale_color_manual(name="Among:", values=c(" Effective: not `No'"="#000000", ' All            '="#99CCDD"))
 
@@ -770,8 +783,8 @@ decrit(s$conso)
 ##### Appendix C. Beliefs' persistence #####
 ## C.1 Self-interest: Tables VII and VIII
 ggplot(data=fit, aes(x=gain)) + theme_bw() + geom_smooth(method = "auto", aes(y=predicted_winner), se=F) + ylim(c(0,1)) + 
- xlab("Objective gain per consumption unit (density in black)") + ylab("Probability of predicting gain (in blue)") + xlim(c(-250, 200)) + 
- geom_density(aes(y=..scaled..), bw=30) + geom_vline(xintercept=0, col='grey')
+   xlab("Objective gain per consumption unit (density in black)") + ylab("Probability of predicting gain (in blue)") + xlim(c(-250, 200)) + 
+   geom_density(aes(y=..scaled..), bw=30) + geom_vline(xintercept=0, col='grey')
 crosstab_simule_gagnant
 crosstab_simule_perdant
 
@@ -788,60 +801,64 @@ TableXVIII
 ## D.2 Additional specifications
 # (1) Target: Acceptance ~ win 
 iv1_si1 <- lm(gagnant_cible_categorie=='Gagnant' ~ traite_cible + traite_cible_conjoint + 
-               I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + (nb_adultes==1), data=s, weights = s$weight)
+       I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + single, data=s, weights = s$weight)
 summary(iv1_si1)
 s$gagnant <- iv1_si1$fitted.values
-iv2_si1 <- lm(taxe_cible_approbation!='Non' ~ gagnant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
+iv2_si1 <- lm(taxe_cible_approbation!='Non' ~ gagnant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single, data=s, weights = s$weight)
 summary(iv2_si1)
 
 # (2) Target: Approval ~ win
 iv1_si2 <- lm(gagnant_cible_categorie=='Gagnant' ~ traite_cible + traite_cible_conjoint + 
-               I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + (nb_adultes==1), data=s, weights = s$weight)
+       I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + single, data=s, weights = s$weight)
 summary(iv1_si2)
 s$gagnant <- iv1_si2$fitted.values
-iv2_si2 <- lm(taxe_cible_approbation=='Oui' ~ gagnant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
+iv2_si2 <- lm(taxe_cible_approbation=='Oui' ~ gagnant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single, data=s, weights = s$weight)
 summary(iv2_si2)
 
 # (3) Target: Approval ~ not lose
 iv1_si3 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
-               I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + (nb_adultes==1), data=s, weights = s$weight)
+       I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + single, data=s, weights = s$weight)
 summary(iv1_si3)
 s$non_perdant <- iv1_si3$fitted.values
-iv2_si3 <- lm(taxe_cible_approbation=='Oui' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
+iv2_si3 <- lm(taxe_cible_approbation=='Oui' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single, data=s, weights = s$weight)
 summary(iv2_si3)
 
 # (4) Feedback: Acceptance ~ win
-iv1_si4 <- lm(gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+iv1_si4 <- lm(gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', 
+              weights = s$weight, na.action='na.exclude')
 summary(iv1_si4)
 s$gagnant[s$variante_taxe_info=='f'] <- iv1_si4$fitted.values
 iv2_si4 <- lm(taxe_feedback_approbation!='Non' ~ gagnant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(iv2_si4)
 
 # (5) Feedback: Approval ~ win
-iv1_si5 <- lm(gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+iv1_si5 <- lm(gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', 
+              weights = s$weight, na.action='na.exclude')
 summary(iv1_si5)
 s$gagnant[s$variante_taxe_info=='f'] <- iv1_si5$fitted.values
 iv2_si5 <- lm(taxe_feedback_approbation=='Oui' ~ gagnant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(iv2_si5)
 
 # (6) Feedback: Approval ~ not lose
-iv1_si6 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+iv1_si6 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', 
+              weights = s$weight, na.action='na.exclude')
 summary(iv1_si6)
 s$non_perdant[s$variante_taxe_info=='f'] <- iv1_si6$fitted.values
-iv2_si6 <- lm(taxe_feedback_approbation=='Oui' ~ non_perdant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+iv2_si6 <- lm(taxe_feedback_approbation=='Oui' ~ non_perdant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], 
+              weights = s$weight[s$variante_taxe_info=='f'])
 summary(iv2_si6)
 
 # Results
 TableXIX <- stargazer(iv2_si1, iv2_si2, iv2_si3, iv2_si4, iv2_si5, iv2_si6,
-                     title="Effect of self-interest on acceptance: second stages of alternative specifications", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                     covariate.labels = c("Believes wins", "Believes does not lose", "Initial tax Acceptance ($A^I$)"), model.names = FALSE,
-                     dep.var.labels = c("Acceptance", "Approval", "Acceptance", "Approval"), 
-                     dep.var.caption = c("\\multicolumn{3}{c}{Targeted Tax} & \\multicolumn{3}{c}{After Feedback}"), header = FALSE,
-                     keep = c("gagnant", "non_perdant", "tax_acceptance"),
-                     add.lines = list(
-                       c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark", "\\checkmark", "\\checkmark"),
-                       c("Controls: Estimated gain ", "", "", "", "\\checkmark", "\\checkmark ", "\\checkmark "),
-                       c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "", "", "")),
-                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
-write_clip(sub("\\multicolumn{6}{c}{", "", sub("er Feedback}}", "er Feedback}", gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
-                                                                                                                           TableXIX, fixed=TRUE), fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
+       title="Effect of self-interest on acceptance: second stages of alternative specifications", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+       covariate.labels = c("Believes wins", "Believes does not lose", "Initial tax Acceptance ($A^I$)"), model.names = FALSE,
+       dep.var.labels = c("Acceptance", "Approval", "Acceptance", "Approval"), 
+       dep.var.caption = c("\\multicolumn{3}{c}{Targeted Tax} & \\multicolumn{3}{c}{After Feedback}"), header = FALSE,
+       keep = c("gagnant", "non_perdant", "tax_acceptance"),
+       add.lines = list(
+         c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark", "\\checkmark", "\\checkmark"),
+         c("Controls: Estimated gain ", "", "", "", "\\checkmark", "\\checkmark ", "\\checkmark "),
+         c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "", "", "")),
+       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
+write_clip(sub("\\multicolumn{6}{c}{", "", sub("er Feedback}}", "er Feedback}", gsub('\\end{table}', '} \\end{table}', 
+            gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXIX, fixed=TRUE), fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')

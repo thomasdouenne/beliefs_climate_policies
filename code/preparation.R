@@ -1415,6 +1415,24 @@ convert_s <- function() {
   s$biais_sur <<- abs(s$simule_gain - s$gain) > 110
   label(s$biais_sur) <<- "biais_sur: Certitude à 99% que le gain subjectif du répondant est biaisé à la baisse: simule_gain - gain > 110"
   
+  s$prog_na <<- s$progressivite
+  s$prog_na[is.na(s$prog_na)] <<- "NA"
+  label(s$prog_na) <<- "prog_na: NA as 'NA' ~ Une hausse de la taxe carbone compensée avantagerait les plus modestes (réunion des trois variante_progressivite: prog/fb_info/fb_no_info où seule fb_no_info est sans information préalable sur la progressivité) - Q206-208"
+  s$prog_not_no <<- (s$prog_na == 'Oui' | s$prog_na == 'NSP')
+  label(s$prog_not_no) <<- "prog_not_no: Oui ou NSP (mais pas NA ni Non) à progressivite: Une hausse de la taxe carbone compensée avantagerait les plus modestes"
+  s$retraites <<- s$statut_emploi == 'retraité·e'
+  s$actifs <<- s$statut_emploi %in% c("autre actif", "CDD", "CDI", "fonctionnaire", "intérimaire ou contrat précaire")
+  s$etudiants <<- s$statut_emploi == 'étudiant·e'
+  s$inactif <<- s$statut_emploi %in% c("inactif", "au chômage")
+  label(s$retraites) <<- "retraites: statut_emploi == 'retraité·e'"
+  label(s$actifs) <<- 'actifs: statut_emploi %in% c("autre actif", "CDD", "CDI", "fonctionnaire", "intérimaire ou contrat précaire")'
+  label(s$etudiants) <<- "etudiants: statut_emploi == 'étudiant·e'"
+  label(s$inactif) <<- 'inactif: statut_emploi %in% c("inactif", "au chômage")'
+  s$single <<- 1*(s$nb_adultes==1)
+  label(s$single) <<- "single: nb_adultes == 1"
+  s$hausse_depenses_par_uc <<- s$hausse_depenses_interaction/s$uc
+  label(s$hausse_depenses_par_uc) <<- "hausse_depenses_par_uc: Hausse des dépenses énergétiques par UC simulées avec les termes d'interaction, suite à la taxe (élasticité de 0.4/0.2 pour carburants/chauffage)"
+  
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
   # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
   for (i in 0:10) {
