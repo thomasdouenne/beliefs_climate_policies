@@ -431,6 +431,7 @@ s$non_perdant <- tsls1_si1$fitted.values
 # 57 p.p.***
 tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
 summary(tsls2_si1)
+# Effective F-stat from Stata weakivtest: 44.093
 
 iv_si1 <- ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1) | 
     traite_cible + traite_cible_conjoint + I(traite_cible*traite_cible_conjoint) + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), 
@@ -454,6 +455,7 @@ formula_tsls2_si2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perda
                                       paste(variables_reg_self_interest, collapse = ' + '))) # 
 tsls2_si2 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
 summary(tsls2_si2)
+# Effective F-stat from Stata weakivtest: 40.834
 
 # (3) Simple OLS: 44 p.p. ***
 formula_ols_si3  <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + tax_acceptance + I(taxe_approbation=='NSP') + prog_na + taxe_efficace +", 
@@ -477,6 +479,7 @@ s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si5$fitted.values
 # 52 p.p.***
 tsls2_si5 <- lm(taxe_feedback_approbation!='Non' ~ non_perdant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight)
 summary(tsls2_si5)
+# Effective F-stat from Stata weakivtest: 37.966
 
 # (6) IV Feedback with controls
 formula_tsls1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + (nb_adultes==1) + 
@@ -489,6 +492,7 @@ formula_tsls2_si6 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_pe
                                       prog_na + taxe_efficace +", paste(variables_reg_self_interest, collapse = ' + ')))
 tsls2_si6 <- lm(formula_tsls2_si6, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
 summary(tsls2_si6)
+# Effective F-stat from Stata weakivtest: 57.866
 
 # Results
 TableVI <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_si6, # tsls2_si4: Unrecognized object type
@@ -521,8 +525,9 @@ TableXVII <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                     add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", "", " \\checkmark"),
                                   c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
                                   c("Controls: Target of the tax, single", " \\checkmark", " \\checkmark", " ", " "),
-                                  c("Controls: Socio-demo, other motives", "", " \\checkmark", " ", " \\checkmark")),
-                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "ser"), label="first_stage_private_benefits")
+                                  c("Controls: Socio-demo, other motives", "", " \\checkmark", " ", " \\checkmark"),
+                                  c("Effective F-Statistic", "44.093", "40.834", "37.966", "57.866")),
+                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Z test (cf. https://stats.stackexchange.com/questions/93540/testing-equality-of-coefficients-from-two-different-regressions)
@@ -545,6 +550,7 @@ s$taxe_efficace.hat <- fitted.values(tsls1_ee1)
 formula2_ee1 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ", paste(variables_reg_ee, collapse = ' + ')))
 tsls2_ee1 <- lm(formula2_ee1, data=s, weights=s$weight)
 summary(tsls2_ee1)
+# Effective F-stat from Stata weakivtest: 5.866
 
 # (2) 2SLS both instruments, no controls: 52 p.p.*
 tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC, data=s, weights=s$weight) # I(info_CC==1 | info_PM==1) + I(info_PM==0 & info_CC==1) + I(info_PM==1 & info_CC==0)
@@ -552,6 +558,7 @@ summary(tsls1_ee2)
 s$taxe_efficace.hat <- tsls1_ee2$fitted.values
 tsls2_ee2 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
 summary(tsls2_ee2)
+# Effective F-stat from Stata weakivtest: 2.523
 summary(lm(tax_acceptance ~ info_CC * info_PM, data=s, weights=s$weight)) # info_CC is a good instrument
 
 s$prog_not_no <- (s$prog_na == 'Oui' | s$prog_na == 'NSP')
@@ -580,6 +587,7 @@ s$taxe_efficace_yes.hat <- tsls1_ee5$fitted.values
 formula2_ee5 <- as.formula(paste("tax_acceptance ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
 tsls2_ee5 <- lm(formula2_ee5, data=s, weights=s$weight)
 summary(tsls2_ee5)
+# Effective F-stat from Stata weakivtest: 11.145
 
 # (5) IV, no controls and efficace is yes: 56 p.p. *
 tsls1_ee5_bis <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
@@ -597,6 +605,7 @@ s$taxe_efficace_yes.hat <- tsls1_ee6$fitted.values
 formula2_ee6 <- as.formula(paste("tax_approval ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
 tsls2_ee6 <- lm(formula2_ee6, data=s, weights=s$weight)
 summary(tsls2_ee6)
+# Effective F-stat from Stata weakivtest: 11.145
 
 # (6 bis) IV, no controls and approval: 42 p.p. **
 tsls1_ee6_bis <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
@@ -630,8 +639,8 @@ TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                       dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
                       keep = c("info", "apres_modifs"), 
                       column.labels = c("(1)", "(2)", "(5,6)"), model.numbers = FALSE,
-                      add.lines = list(c("Controls ", "", "\\checkmark ", "")), 
-                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "ser"), label="first_stage_environmental_effectiveness")
+                      add.lines = list(c("Controls ", "", "\\checkmark ", ""), c("Effective F-Statistic", "5.866", "2.523", "11.145")), 
+                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 ## 5.3 Progressivity
