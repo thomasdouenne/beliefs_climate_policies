@@ -1385,7 +1385,7 @@ waldtest(lm(educ ~ nearc4 + nearc2 + exper + black, data=card.data), lm(educ ~ e
 
 
 ivreg(as.formula(paste("tax_acceptance ~ (taxe_efficace!='Non') + prog_not_no + (prog_na == 'NA') + ", paste(variables_reg_ee, collapse = ' + '))))
-iv_ee2 <- ivreg(tax_acceptance ~ (taxe_efficace!='Non') | apres_modifs + info_CC, data = s, weights = s$weight)
+iv_ee2 <- ivreg(tax_acceptance ~ (taxe_efficace!='Non') | apres_modifs + info_CC, data = s, weights=s$weight)
 summary(iv_ee2, diagnostics = TRUE) 
 iv_ee1 <- ivreg(as.formula(paste("tax_acceptance ~ (taxe_efficace!='Non') + ", paste(variables_reg_ee, collapse = ' + '),
                                  "| apres_modifs + info_CC + ", paste(variables_reg_ee, collapse = ' + '))), data = s, weights=s$weight)

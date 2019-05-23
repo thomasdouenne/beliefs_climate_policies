@@ -716,4 +716,123 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Not
 # of effective + progressivity: 0.736
 0.228 + 0.244 + 0.281 + (0.098 + 0.126 - 0.314) * wtd.mean(s$gagnant_info_categorie=='Gagnant', weights = s$weight)
 # of winning + effective: 0.686
-0.303 + 0.244 + 0.126 + (0.098 
+0.303 + 0.244 + 0.126 + (0.098 + 0.281 - 0.314) * wtd.mean(s$progressivite=='Oui', weights = s$weight)
+# Of everything: 0.966
+0.228 + 0.303 + 0.244 + 0.126 + 0.098 + 0.281 - 0.314
+# Results are very close to the cumulative effect of the three motives: 0.903
+0.228 + 0.703 * 0.303 + 0.244 + 0.703 * 0.126 + 0.703 * 0.098 + 0.281 - 0.703 * 0.314
+
+# 5.4.2 Willingness-to-pay
+ggplot() + geom_smooth(data=s[s$taxe_efficace!='Non',], method = "auto", aes(x=gain, y=1*(tax_acceptance), col=" Effective: not `No'")) + ylim(c(0,1)) +
+ xlab("Subjective gain, among non believers in ineffectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + #geom_vline(xintercept=-66, col='red') +
+ geom_smooth(data=s, method = "auto", aes(x=gain, y=1*(tax_acceptance), col=' All            ')) + ylim(c(0,1)) +
+ xlab("Subjective gain") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + theme(legend.position="top", ) + # legend.position="top", 
+ scale_color_manual(name="Among:", values=c(" Effective: not `No'"="#000000", ' All            '="#99CCDD"))
+
+
+##### Appendix A. Raw data #####
+# cf. quotas.xls for objective data (from INSEE)
+decrit(s$sexe)
+decrit(s$age)
+decrit(s$csp)
+decrit(s$diplome4)
+decrit(s$taille_agglo)
+decrit(s$region)
+
+# for objective data, see python (BdF), preparation.R (ERFS, cf. wtd.mean(db$nb_adultes, db$wprm)) 
+#   and for domestic fuel: https://www.lesechos.fr/industrie-services/energie-environnement/le-chauffage-au-fioul-devient-de-plus-en-plus-cher-147372
+decrit(s$taille_menage)
+decrit(s$nb_adultes)
+decrit(s$chauffage)
+decrit(s$surface)
+decrit(s$km)
+decrit(s$conso)
+
+
+##### Appendix B. Estimation for feedback #####
+## B.2 Predicting gains and losses
+# Table: cf. test_predictions_ols_regression_with_transports.py and regression_feedback.py
+# Figure: cf. test_predictions_binary_models.py (and regression_feedback.py)
+
+## B.3 Distributive effects
+# Figure: cf. consistency_belief_losses.py (function compute_effort_rate_decile() defined in standardize_data_bdf_ptc.py)
+
+
+##### Appendix C. Beliefs' persistence #####
+## C.1 Self-interest: Tables VII and VIII
+ggplot(data=fit, aes(x=gain)) + theme_bw() + geom_smooth(method = "auto", aes(y=predicted_winner), se=F) + ylim(c(0,1)) + 
+ xlab("Objective gain per consumption unit (density in black)") + ylab("Probability of predicting gain (in blue)") + xlim(c(-250, 200)) + 
+ geom_density(aes(y=..scaled..), bw=30) + geom_vline(xintercept=0, col='grey')
+crosstab_simule_gagnant
+crosstab_simule_perdant
+
+
+## C.2 Environmental effectiveness: Table X
+TableXV # TODO: renumber Tables
+
+
+##### Appendix D. Estimation of acceptation motives #####
+## D.1 Two stage least squares: first stage results
+TableXVII
+TableXVIII
+
+## D.2 Additional specifications
+# (1) Target: Acceptance ~ win 
+iv1_si1 <- lm(gagnant_cible_categorie=='Gagnant' ~ traite_cible + traite_cible_conjoint + 
+               I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + (nb_adultes==1), data=s, weights = s$weight)
+summary(iv1_si1)
+s$gagnant <- iv1_si1$fitted.values
+iv2_si1 <- lm(taxe_cible_approbation!='Non' ~ gagnant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
+summary(iv2_si1)
+
+# (2) Target: Approval ~ win
+iv1_si2 <- lm(gagnant_cible_categorie=='Gagnant' ~ traite_cible + traite_cible_conjoint + 
+               I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + (nb_adultes==1), data=s, weights = s$weight)
+summary(iv1_si2)
+s$gagnant <- iv1_si2$fitted.values
+iv2_si2 <- lm(taxe_cible_approbation=='Oui' ~ gagnant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
+summary(iv2_si2)
+
+# (3) Target: Approval ~ not lose
+iv1_si3 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
+               I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + (nb_adultes==1), data=s, weights = s$weight)
+summary(iv1_si3)
+s$non_perdant <- iv1_si3$fitted.values
+iv2_si3 <- lm(taxe_cible_approbation=='Oui' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + (nb_adultes==1), data=s, weights = s$weight)
+summary(iv2_si3)
+
+# (4) Feedback: Acceptance ~ win
+iv1_si4 <- lm(gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(iv1_si4)
+s$gagnant[s$variante_taxe_info=='f'] <- iv1_si4$fitted.values
+iv2_si4 <- lm(taxe_feedback_approbation!='Non' ~ gagnant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+summary(iv2_si4)
+
+# (5) Feedback: Approval ~ win
+iv1_si5 <- lm(gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(iv1_si5)
+s$gagnant[s$variante_taxe_info=='f'] <- iv1_si5$fitted.values
+iv2_si5 <- lm(taxe_feedback_approbation=='Oui' ~ gagnant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+summary(iv2_si5)
+
+# (6) Feedback: Approval ~ not lose
+iv1_si6 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(iv1_si6)
+s$non_perdant[s$variante_taxe_info=='f'] <- iv1_si6$fitted.values
+iv2_si6 <- lm(taxe_feedback_approbation=='Oui' ~ non_perdant + Simule_gain + Simule_gain2, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+summary(iv2_si6)
+
+# Results
+TableXIX <- stargazer(iv2_si1, iv2_si2, iv2_si3, iv2_si4, iv2_si5, iv2_si6,
+                     title="Effect of self-interest on acceptance: second stages of alternative specifications", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                     covariate.labels = c("Believes wins", "Believes does not lose", "Initial tax Acceptance ($A^I$)"), model.names = FALSE,
+                     dep.var.labels = c("Acceptance", "Approval", "Acceptance", "Approval"), 
+                     dep.var.caption = c("\\multicolumn{3}{c}{Targeted Tax} & \\multicolumn{3}{c}{After Feedback}"), header = FALSE,
+                     keep = c("gagnant", "non_perdant", "tax_acceptance"),
+                     add.lines = list(
+                       c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark", "\\checkmark", "\\checkmark"),
+                       c("Controls: Estimated gain ", "", "", "", "\\checkmark", "\\checkmark ", "\\checkmark "),
+                       c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "", "", "")),
+                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
+write_clip(sub("\\multicolumn{6}{c}{", "", sub("er Feedback}}", "er Feedback}", gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+                                                                                                                           TableXIX, fixed=TRUE), fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
