@@ -1318,6 +1318,8 @@ convert_s <- function() {
   s$progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- s$progressivite_feedback_avec_info[!is.na(s$progressivite_feedback_avec_info)]
   s$progressivite[!is.na(s$progressivite_progressif)] <<- s$progressivite_progressif[!is.na(s$progressivite_progressif)]
   label(s$progressivite) <<- "progressivite: ~ Une hausse de la taxe carbone compensée avantagerait les plus modestes (réunion des trois variante_progressivite: prog/fb_info/fb_no_info où seule fb_no_info est sans information préalable sur la progressivité) - Q206-208"
+  s$prog_na <<- s$progressivite
+  s$prog_na[is.na(s$prog_na)] <<- "NA"
   s$variante_progressivite[!is.na(s$progressivite_feedback_sans_info)] <<- "fb_no_info"
   s$variante_progressivite[!is.na(s$progressivite_feedback_avec_info)] <<- "fb_info"
   s$variante_progressivite[s$variante_taxe_info=='p'] <<- "prog" # !is.na(s$progressivite_progressif) | 
@@ -1327,6 +1329,7 @@ convert_s <- function() {
   s$info_progressivite[s$variante_taxe_info=='p' | s$variante_progressivite=='fb_info'] <<- T
   label(s$info_progressivite) <<- "info_progressivite: Indicatrice qu'a été montrée l'information que la hausse de la taxe carbone compensée avantagerait les plus modestes"
 
+  
   s$variante_monetaire[is.na(s$variante_monetaire)] <<- 0 # concerne seulement une observation. Évite des complications inutiles.
   
   s$age_18_24 <<- 1*(s$age == '18-24')
