@@ -323,6 +323,7 @@ summary(lm((s$taxe_approbation=='Oui') ~ Gauche_droite, data=s)) # pas significt
 formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ",
                                                           paste(variables_determinants, collapse = ' + ')))
 summary(lm(formula_determinants_taxe_approbation, data=s, weights = s$weight))
+summary(mlogit(taxe_approbation ~ revenu + sexe + age, data = s))
 
 formula_determinants_mode_vie_ecolo <- as.formula(paste("mode_vie_ecolo=='Oui' ~ ",
                                                         paste(variables_determinants, collapse = ' + ')))
