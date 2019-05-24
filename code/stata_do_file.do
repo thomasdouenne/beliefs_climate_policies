@@ -60,6 +60,10 @@ weakivtest, level(0.05)
 ivreg2 y_var_si_1 i.cible y_var1 x_var1 x_var2 taxe_approbation_nsp hausse_dep_uc i.eprog_na revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie masculin i.estatut_emploi i.ecsp i.eregion ediplome4 taille_menage nb_14_et_plus nb_adultes fumeur i.eactualite etaille_agglo uc niveau_vie age_18_24 age_25_34 age_35_49 age_50_64 (x_var_si_1 = traite_cible traite_cible_conjoint traite_cible_interaction)
 weakivtest, level(0.05)
 
+* Firth Logit vs Logit
+*logit y_var_si_1 i.x_var_si_1 i.cible i.y_var1 i.x_var1 i.x_var2 i.taxe_approbation_nsp hausse_dep_uc i.eprog_na revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie i.masculin i.estatut_emploi i.ecsp i.eregion i.ediplome4 i.taille_menage nb_14_et_plus nb_adultes i.fumeur i.eactualite etaille_agglo uc niveau_vie i.age_18_24 i.age_25_34 i.age_35_49 i.age_50_64
+*firthlogit y_var_si_1 i.x_var_si_1 i.cible i.y_var1 i.x_var1 i.x_var2 i.taxe_approbation_nsp hausse_dep_uc i.eprog_na revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie i.masculin i.estatut_emploi i.ecsp i.eregion i.ediplome4 i.taille_menage nb_14_et_plus nb_adultes i.fumeur i.eactualite etaille_agglo uc niveau_vie i.age_18_24 i.age_25_34 i.age_35_49 i.age_50_64
+
 * Feedback without controls
 drop if variante_taxe_info != "f"
 ivreg2 y_var_si_2 simule_gain simule_gain2 (x_var_si_2 = simule_gagnant)
