@@ -15,9 +15,7 @@ load(".RData")
 
 
 ##### 3. Attitudes over Climate Change #####
-
 ## 3.1 Knowledge
-
 decrit(s$ges_avion, weights = s$weight) # 59%
 decrit(s$ges_boeuf, weights = s$weight) # 46%
 decrit(s$ges_nucleaire, weights = s$weight) # 50%
@@ -95,7 +93,15 @@ decrit((s$emission_cible[s$changer_deja_fait==F] >= 3), weights=s$weight[s$chang
 
 ## 4.1 Massive rejection
 
-## 4.2 Perceptived benefits
+## 4.2 Perceived winners and losers
+variables_winners <- names(s)[which(grepl("taxe_gagnant_", names(s)))]
+labels_winners <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "City dwellers", "Certain persons,<br> but no specific income category", "PNR (Don't know, don't want to answer)")
+barres(file="tax_winners", title="", data=data1(variables_winners), sort=T, showLegend=FALSE, labels=labels_winners, hover=labels_winners)
+variables_losers <- names(s)[which(grepl("taxe_perdant_", names(s)))]
+labels_losers <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "Rural or peri-urban households", "Certain persons, <br>but no specific income category", "PNR (Don't know, don't want to answer)")
+barres(file="tax_losers", title="", data=data1(variables_losers), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers)
+
+## 4.3 Perceived pros and cons
 decrit(s$benefices_aucun, weights=s$weight) # 44%
 decrit(s$benefices_CC, weights=s$weight) # 30%
 decrit(s$benefices_sante, weights=s$weight) # 27%
@@ -130,10 +136,8 @@ variables_benefits <- variables_benefits[!(variables_benefits %in% c("nb_benefic
 labels_benefits <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces congestion", "Increases my purchasing power", 
                      "Increases purchasing power of the poorest",
                      "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
-barres(file="CC_benefits", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits)
-# pb 35% NSP
+barres(file="CC_benefits", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits) # pb 35% NSP
 
-## 4.3 Perceived problems
 decrit(s$problemes_ruraux, weights=s$weight) # 47%
 decrit(s$problemes_pretexte, weights=s$weight) # 43%
 decrit(s$problemes_inefficace, weights=s$weight) # 37%

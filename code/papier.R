@@ -172,7 +172,7 @@ summary(elast_c_controls)
 formula_f <- as.formula(paste("taxe_efficace!='Non' ~ Elasticite_fuel + ", paste(variables_reg_elast, collapse=' + ')))
 elast_f_controls <- lm(formula_f, data=s, subset = variante_partielle=='f', weights = s$weight)
 summary(elast_f_controls)
-TableXV <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls, 
+Table_elast <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls, 
         title="Effect of subjective elasticities on perceived environmental effectiveness", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
         covariate.labels = c("Price elasticity: Housing", "Price elasticity: Transports", "Income","Size of town", "Age","Domestic fuel", "Natural gas", "Diesel"), 
         dep.var.labels = c("Environmental effectiveness: not ``No''"), dep.var.caption = "", header = FALSE,
@@ -180,7 +180,7 @@ TableXV <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls,
         add.lines = list(c("Controls: Socio-demographics, energy", "", "", "\\checkmark  ", "\\checkmark")),
         no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', 
-                                                       '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXV, fixed=TRUE), fixed=TRUE), collapse=' ')
+                                                       '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_elast, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 ## 3.3 Progressivity
 decrit(s$progressivite, weights = s$weight) # 19.4% vs. 59.5%
@@ -337,7 +337,6 @@ summary(lm(update_correct ~ (gagnant_feedback_categorie=='Gagnant') + taxe_appro
              as.factor(taille_agglo), subset = feedback_infirme_large==T, data=s, weights = s$weight))
 
 # 4.2 Beliefs over environmental effectiveness
-# Table XVIII: cf. 5.2
 # No effect of our information on other variables than taxe_efficace
 summary(lm((cause_CC=='anthropique') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight))
 summary(lm(as.numeric(effets_CC) ~ apres_modifs + info_CC * info_PM, data=s, subset=!is.missing(effets_CC), weights=s$weight))
@@ -345,7 +344,8 @@ summary(lm(as.numeric(effets_CC) ~ apres_modifs + info_CC * info_PM, data=s, sub
 variables_update_ee <- c("Revenu", variables_demo)
 variables_update_ee <- variables_update_ee[!(variables_update_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 
-reg_update_ee1 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight, na.action='na.exclude')
+# Effect of primings on beliefs about environmental effectiveness
+reg_ee1 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight, na.action='na.exclude')
 summary(reg_update_ee1)
 
 formula_update_ee <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + ", 
@@ -376,22 +376,6 @@ Table_update_ee <- stargazer(reg_update_ee1, reg_update_ee2, logit_update_ee3, r
                              no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:update_ee")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
                                                        Table_update_ee, fixed=TRUE), fixed=TRUE), collapse=' ')
-
-
-#todelete
-TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
-                        title="First stage regressions results for environmental effectiveness", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                        # "Info on Climate Change and/or on Particulates", "Info on Climate Change only", "Info on Particulates only"
-                        covariate.labels = c("Info on Environmental Effectiveness ($Z_{E}$)",  
-                                             "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
-                        dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
-                        keep = c("info", "apres_modifs"), 
-                        column.labels = c("(1)", "(2)", "(5,6)"), model.numbers = FALSE,
-                        add.lines = list(c("Controls ", "", "\\checkmark ", "")), 
-                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "ser"), label="first_stage_environmental_effectiveness")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
-                                                       TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
-
 
 # 4.3 Beliefs over progressivity
 cor(s$info_progressivite, (s$progressivite!='Non'), use='complete.obs') # -0.006
@@ -453,8 +437,7 @@ s$non_perdant <- tsls1_si2$fitted.values
 formula_tsls2_si2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + tax_acceptance + I(taxe_approbation=='NSP') + ", 
                                       paste(variables_reg_self_interest, collapse = ' + '))) # 
 tsls2_si2 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
-summary(tsls2_si2)
-# Effective F-stat from Stata weakivtest: 40.834
+summary(tsls2_si2) # Effective F-stat from Stata weakivtest: 40.834
 
 # (3) Simple OLS: 44 p.p. ***
 formula_ols_si3  <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + tax_acceptance + I(taxe_approbation=='NSP') + prog_na + taxe_efficace +", 
@@ -469,24 +452,11 @@ s$non_perdant <- as.numeric(s$gagnant_cible_categorie!='Perdant')
 logit_si4 <- glm(formula_ols_si3, family = binomial(link='logit'), data=s)
 summary(logit_si4) # Warning: Hauck-Donner effect, run logitsf, cf. https://prezi.com/di_n0_npv27n/hauck-donner-effect-and-instability-in-estimation-of-logisti/
 logit_si4_margins <- logitmfx(formula_ols_si3, s, atmean=FALSE)$mfxest
-logit_si4_margins
+logit_si4_margins # reason why mfx and not margins: https://stats.stackexchange.com/questions/409934/why-margins-and-mfx-yield-different-results-in-r/409937#409937
 summary(logistf(formula_ols_si3, data=s, firth = T)) # Firth (93) regression to resolve separation => effect of 2.77*** instead of 2.85***, cf. Heinze & Ploner (03)
 # other way to check significance is to run a Likelihood Ratio test instead of the Wald/Chi-squared test reported in z value/Pr(>|z|) in glm, by running anova:
 # https://stat.ethz.ch/pipermail/r-help/2001-October/015779.html http://nross626.math.yorku.ca/math4330/R/Regression/Hauck_Donner_effect.pdf
 anova(logit_si4, test='LR') # <2e-16 ***
-
-for (v in variables_reg_self_interest) print(class(s[[paste(v, 'unclass', sep='_')]])) # 
-for (v in c(variables_reg_self_interest, "taxe_approbation", "prog_na", "taxe_efficace")) if (!is.numeric(s[[v]])) s[[paste(v, 'unclass', sep='_')]] <- as.factor(s[[v]]) 
-#s[[paste(v, 'unclass', sep='_')]] <- unclass(s[[v]]) # print(class(s[[paste(v, 'unclass', sep='_')]])) # 
-variables_reg_si_unclass <- paste(c(variables_reg_self_interest, "taxe_approbation", "prog_na", "taxe_efficace"), 'unclass', sep='_') 
-formula_logit_si4f  <- as.formula(paste("1*(taxe_cible_approbation!='Non') ~ non_perdant + cible +", paste(variables_reg_si_unclass, collapse = ' + '))) # 
-class(s$taxe_approbation=='NSP')
-logit_si4f <- logistf(formula_logit_si4f, data=s, firth = T)
-ggeffect(logit_si4f, "non_perdant")
-logit_si4t <- glm(formula_logit_si4f, family = binomial(link='logit'), data=s)
-ggemmeans(logit_si4t, "non_perdant")
-summary(margins(logit_si4t))
-summary(margins(logit_si4))
 
 # (5) IV Feedback
 tsls1_si5 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight)
@@ -511,7 +481,7 @@ summary(tsls2_si6)
 # Effective F-stat from Stata weakivtest: 57.866
 
 # Results
-TableVI <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_si6, # tsls2_si4: Unrecognized object type
+Table_si2 <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_si6, # tsls2_si4: Unrecognized object type
                     title="Effect of self-interest on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                     covariate.labels = c("Believes does not lose", "Initial tax Acceptance ($A^I$)", "",  "Environmentally effective: ``Yes''"),
                     dep.var.labels = c("Targeted Acceptance ($A^T$)", "Feedback Acceptance ($A^F$)"), dep.var.caption = "", header = FALSE,
@@ -529,9 +499,9 @@ write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\mult
                "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\multicolumn{2}{c}{\\textit{IV}}", 
 gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
      For logit, average marginal effects are reported and not coefficients. }\\end{table}', 
-                    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVI, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
+                    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_si2, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
 
-TableXVII <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
+Table_si1 <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                     title="First stage regressions results for self-interest", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                     covariate.labels = c("Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
                                          "$T_1 \\times T_2$", "Initial tax Acceptance ($A^I$)", "Simulated winner ($\\widehat{\\Gamma}$)"),
@@ -544,7 +514,8 @@ TableXVII <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                                   c("Controls: Socio-demo, other motives", "", " \\checkmark", " ", " \\checkmark"),
                                   c("Effective F-Statistic", "44.093", "40.834", "37.966", "57.866")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVII, fixed=TRUE), fixed=TRUE), collapse=' ')
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+                                                       Table_si1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Z test (cf. https://stats.stackexchange.com/questions/93540/testing-equality-of-coefficients-from-two-different-regressions)
 (0.571-0.517)/(0.092^2+0.170^2)^0.5 # 0.28: not significantly different
@@ -565,17 +536,14 @@ summary(tsls1_ee1)
 s$taxe_efficace.hat <- fitted.values(tsls1_ee1)
 formula2_ee1 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ", paste(variables_reg_ee, collapse = ' + ')))
 tsls2_ee1 <- lm(formula2_ee1, data=s, weights=s$weight)
-summary(tsls2_ee1)
-# Effective F-stat from Stata weakivtest: 5.866
+summary(tsls2_ee1) # Effective F-stat from Stata weakivtest: 5.866
 
 # (2) 2SLS both instruments, no controls: 52 p.p.*
 tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC, data=s, weights=s$weight)
 summary(tsls1_ee2)
 s$taxe_efficace.hat <- tsls1_ee2$fitted.values
 tsls2_ee2 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
-summary(tsls2_ee2)
-# Effective F-stat from Stata weakivtest: 2.523
-summary(lm(tax_acceptance ~ info_CC * info_PM, data=s, weights=s$weight)) # info_CC is a good instrument
+summary(tsls2_ee2) # Effective F-stat from Stata weakivtest: 2.523
 
 # (3) OLS with controls: 39 p.p. ***
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace!='Non')
@@ -601,15 +569,7 @@ summary(tsls1_ee5)
 s$taxe_efficace_yes.hat <- tsls1_ee5$fitted.values
 formula2_ee5 <- as.formula(paste("tax_acceptance ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
 tsls2_ee5 <- lm(formula2_ee5, data=s, weights=s$weight)
-summary(tsls2_ee5)
-# Effective F-stat from Stata weakivtest: 11.145
-
-# (5) IV, no controls and efficace is yes: 56 p.p. *
-tsls1_ee5_bis <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
-summary(tsls1_ee5_bis)
-s$taxe_efficace.yes <- tsls1_ee5_bis$fitted.values
-tsls2_ee5_bis <- lm(tax_acceptance ~ taxe_efficace.yes, data=s, weights=s$weight)
-summary(tsls2_ee5_bis)
+summary(tsls2_ee5) # Effective F-stat from Stata weakivtest: 11.145
 
 # (6) IV, with controls and approval: 42 p.p. **
 formula_ee6 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ", 
@@ -622,15 +582,8 @@ tsls2_ee6 <- lm(formula2_ee6, data=s, weights=s$weight)
 summary(tsls2_ee6)
 # Effective F-stat from Stata weakivtest: 11.145
 
-# (6 bis) IV, no controls and approval: 42 p.p. **
-tsls1_ee6_bis <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
-summary(tsls1_ee6_bis)
-s$taxe_efficace.hat <- tsls1_ee6_bis$fitted.values
-tsls2_ee6_bis <- lm(tax_approval ~ taxe_efficace.hat, data=s, weights=s$weight)
-summary(tsls2_ee6_bis)
-
 # Results
-TableVII <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls2_ee6,
+Table_ee2 <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls2_ee6,
                      title="Effect of believing in environmental effectiveness on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                      covariate.labels = c("Environmental effectiveness: not ``No''", "Environmental effectiveness: ``Yes''"), # "Constant",
                      dep.var.labels = c("Tax Acceptance ($A^I$)", "Tax Approval ($\\dot{A^I}$)"), dep.var.caption = "", header = FALSE,
@@ -644,9 +597,9 @@ write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\text
                "\\textit{IV} & \\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
  gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
       For logit, average marginal effects are reported and not coefficients. }\\end{table}', 
-                    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
+                    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_ee2, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
 
-TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
+Table_ee1 <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                       title="First stage regressions results for environmental effectiveness", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                       # "Info on Climate Change and/or on Particulates", "Info on Climate Change only", "Info on Particulates only"
                       covariate.labels = c("Info on Environmental Effectiveness ($Z_{E}$)",  
@@ -656,7 +609,8 @@ TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                       column.labels = c("(1)", "(2)", "(5,6)"), model.numbers = FALSE,
                       add.lines = list(c("Controls ", "", "\\checkmark ", ""), c("Effective F-Statistic", "5.866", "2.523", "11.145")), 
                       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+                                                       Table_ee1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 ## 5.3 Progressivity
 # Identification challenge and strategies
@@ -704,7 +658,7 @@ summary(ols_prog5) # sum of all effects True: all :0.935. P+G: 0.599. P+E:0.709.
 ols_prog6 <- lm(taxe_info_approbation=='Oui' ~ progressif + (prog_na == 'NA'), weights=s$weight, data=s)
 summary(ols_prog6)
 
-TableVIII <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, ols_prog6,
+Table_prog <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, ols_prog6,
   title="Effect of beliefs over progressivity on acceptance. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, 
     where strict dummies do not cover ``PNR'' or ``Unaffected' answers.", 
           covariate.labels = c("Progressivity $(P)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G^P)$", "Effective $(E)$", "$(G^P \\times E)$",
@@ -718,7 +672,7 @@ TableVIII <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, 
           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
                 For logit, average marginal effects are reported and not coefficients. } \\end{table} ',
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_prog, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Average effect of Progressivity (Not no for acceptance), other things equal: 0.274
 0.223 + 0.183 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.172 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) - 
@@ -789,16 +743,16 @@ crosstab_simule_gagnant
 crosstab_simule_perdant
 
 
-## C.2 Environmental effectiveness: Table X
-TableXV # TODO: renumber Tables
+## C.2 Environmental effectiveness: Table XI
+Table_update_ee
 
 
 ##### Appendix D. Estimation of acceptation motives #####
 ## D.1 Two stage least squares: first stage results
-TableXVII
-TableXVIII
+Table_si1
+Table_ee1
 
-## D.2 Additional specifications
+## D.2 Additional specifications: Table XX
 # (1) Target: Acceptance ~ win 
 iv1_si1 <- lm(gagnant_cible_categorie=='Gagnant' ~ traite_cible + traite_cible_conjoint + 
        I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + single, data=s, weights = s$weight)
@@ -849,7 +803,7 @@ iv2_si6 <- lm(taxe_feedback_approbation=='Oui' ~ non_perdant + Simule_gain + Sim
 summary(iv2_si6)
 
 # Results
-TableXIX <- stargazer(iv2_si1, iv2_si2, iv2_si3, iv2_si4, iv2_si5, iv2_si6,
+Table_additional_res <- stargazer(iv2_si1, iv2_si2, iv2_si3, iv2_si4, iv2_si5, iv2_si6,
        title="Effect of self-interest on acceptance: second stages of alternative specifications", #star.cutoffs = c(0.1, 1e-5, 1e-30),
        covariate.labels = c("Believes wins", "Believes does not lose", "Initial tax Acceptance ($A^I$)"), model.names = FALSE,
        dep.var.labels = c("Acceptance", "Approval", "Acceptance", "Approval"), 
@@ -861,4 +815,4 @@ TableXIX <- stargazer(iv2_si1, iv2_si2, iv2_si3, iv2_si4, iv2_si5, iv2_si6,
          c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "", "", "")),
        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
 write_clip(sub("\\multicolumn{6}{c}{", "", sub("er Feedback}}", "er Feedback}", gsub('\\end{table}', '} \\end{table}', 
-            gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableXIX, fixed=TRUE), fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
+   gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')

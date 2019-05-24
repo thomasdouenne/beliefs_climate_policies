@@ -3175,6 +3175,58 @@ summary(lm(as.formula(paste("progressif ~ ", paste(variables_reg_prog, collapse=
 variables_correlees_prog <- c("Revenu", "Revenu2", "gagnant_categorie", "taxe_efficace", "sexe", "diplome4", "surface")
 
 
+s$temp <- s$taxe_cible_approbation!='Non'
+s$non_perdant <- s$gagnant_cible_categorie!='Perdant'
+logitmfx(temp ~ non_perdant, s, atmean=FALSE)$mfxest
+logit_si <- glm(temp ~ non_perdant, data=s, family = binomial(link='logit'))
+summary(logit_si)
+summary(margins(logit_si))
+
+for (v in c(variables_reg_self_interest, "taxe_approbation", "prog_na", "taxe_efficace")) {
+  if (!is.numeric(s[[v]])) s[[paste(v, 'unclass', sep='_')]] <- as.factor(s[[v]])
+  else s[[paste(v, 'unclass', sep='_')]] <- unclass(s[[v]]) }
+for (v in variables_reg_self_interest) print(class(s[[paste(v, 'unclass', sep='_')]])) #
+#s[[paste(v, 'unclass', sep='_')]] <- unclass(s[[v]]) # print(class(s[[paste(v, 'unclass', sep='_')]])) #
+variables_reg_si_unclass <- paste(c(variables_reg_self_interest, "taxe_approbation", "prog_na", "taxe_efficace"), 'unclass', sep='_')
+formula_logit_si4f  <- as.formula(paste("1*(taxe_cible_approbation!='Non') ~ non_perdant + cible +", paste(variables_reg_si_unclass, collapse = ' + '))) #
+class(s$taxe_approbation=='NSP')
+logit_si4f <- logistf(formula_logit_si4f, data=s, firth = T)
+ggeffect(logit_si4f, "non_perdant")
+logit_si4t <- glm(formula_logit_si4f, family = binomial(link='logit'), data=s)
+ggemmeans(logit_si4t, "non_perdant")
+summary(margins(logit_si4t))
+summary(margins(logit_si4, eps=0.001)) # 0.32
+
+# (5) IV, no controls and efficace is yes: 56 p.p. *
+tsls1_ee5_bis <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
+summary(tsls1_ee5_bis)
+s$taxe_efficace.yes <- tsls1_ee5_bis$fitted.values
+tsls2_ee5_bis <- lm(tax_acceptance ~ taxe_efficace.yes, data=s, weights=s$weight)
+summary(tsls2_ee5_bis)
+
+# (6 bis) IV, no controls and approval: 42 p.p. **
+tsls1_ee6_bis <- lm((taxe_efficace=='Oui') ~ apres_modifs + info_CC * info_PM, data=s, weights=s$weight)
+summary(tsls1_ee6_bis)
+s$taxe_efficace.hat <- tsls1_ee6_bis$fitted.values
+tsls2_ee6_bis <- lm(tax_approval ~ taxe_efficace.hat, data=s, weights=s$weight)
+summary(tsls2_ee6_bis)
+
+summary(lm(tax_acceptance ~ apres_modifs + info_CC, data=s, weights=s$weight)) # info_CC is a good instrument
+
+#todelete
+TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
+                        title="First stage regressions results for environmental effectiveness", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                        # "Info on Climate Change and/or on Particulates", "Info on Climate Change only", "Info on Particulates only"
+                        covariate.labels = c("Info on Environmental Effectiveness ($Z_{E}$)",  
+                                             "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
+                        dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
+                        keep = c("info", "apres_modifs"), 
+                        column.labels = c("(1)", "(2)", "(5,6)"), model.numbers = FALSE,
+                        add.lines = list(c("Controls ", "", "\\checkmark ", "")), 
+                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "ser"), label="first_stage_environmental_effectiveness")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
+                                                       TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
+
 ##### IV model selection ####
 data(card.data)
 Xname=c("exper", "expersq", "black", "south", "smsa", "reg661", "reg662", "reg663", "reg664", "reg665", "reg666", "reg667", "reg668", "smsa66")
