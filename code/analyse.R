@@ -555,6 +555,8 @@ summary(logit_elas_f_controls)
 logit_elas_f_margins_controls <- logitmfx(formula_f_controls, s, atmean=FALSE)$mfxest
 logit_elas_f_margins_controls
 
+summary(lm(Elasticite_partielle ~ benefices_CC + benefices_circulation + benefices_sante + problemes_inefficace + problemes_alternatives + variante_partielle, data=s, weights=s$weight))
+summary(lm(Elasticite_partielle ~ problemes_inefficace + problemes_alternatives, data=s, weights=s$weight))
 
 
 ##### Ciblage #####
@@ -2188,6 +2190,8 @@ TableVII <- stargazer(ols_prog1, ols_prog2, logit_prog3, ols_prog4,
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. } \\end{table} ',
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableVII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
+s$pauvre_gagne_moins_perd <- (s$benefices_pauvres==T) - (s$problemes_pauvres==T)
+summary(ivreg((taxe_info_approbation!='Non') ~ pauvre_gagne_moins_perd | info_progressivite, data=s))
 
 ##### 5.4 All effects #####
 variables_reg_all <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "Simule_gain", "Simule_gain2", variables_demo)
