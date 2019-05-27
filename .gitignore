@@ -5,5 +5,5 @@ code/*.Rproj
 .Rproj.user
 *.lyx#
 *.lyx~
-code/.Rhistory
-code/.RData
+*.Rhistory
+*.RData

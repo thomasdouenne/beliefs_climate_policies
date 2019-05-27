@@ -231,7 +231,7 @@ oui_non <- function(vars, file, labels = vars, data = s, display_value = T, sort
                     x = c(10, 90, 110),
                     y = 1.1,
                     text = Text,
-                    font = list(family = 'Arial', size = 16, color = 'black'),
+                    font = list(family = 'Arial', size = 15, color = 'black'),
                     showarrow = FALSE) # %>%
   # labeling the percentages of each bar (x_axis)
   # add_annotations(xref = 'x', yref = 'y',
@@ -338,17 +338,17 @@ yes_no5 <- c("Not at all", "Not really", "Indifferent/PNR", "Rather yes", "Yes, 
 # agree5 <- c("Strongly disagree", "Disagree", "Indifferent", "Agree", "Strongly agree")
 # evol5 <- c("Baisser fortement", "Baisser légèrement", "Maintenir au niveau", "Augmenter légèrement", "Augmenter fortement")
 # evolve5 <- c("Strongly decrease", "Slightly decrease", "Maintain", "Slightly increase", "Strongly increase")
-barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE, display_values=T, thin=FALSE, legend_x=NA, show_ticks=T) {
+barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, hover=legend, nsp=TRUE, sort=TRUE, legend=hover, showLegend=T, margin_r=0, margin_l=NA, online=FALSE, display_values=T, thin=FALSE, legend_x=NA, show_ticks=T, xrange=NA) {
   if (length(color)==0) color <- color(data, nsp, rev_color = rev_color)
   margin_t <- 0 + 25*(!(thin))
   if (title!="") { margin_t <- 100 }
   if (grepl("<br>", title)) { margin_t <- 150 }
-  legendSize <- 13 # 10
+  legendSize <- 15 # 10, 13
   legendY <- 1.1  + 0.3*thin/(ncol(data)-1) # last term may be problematic
-  legendX <- 0.2 
+  legendX <- 0.2
   # legendFont <- 'Open Sans'
   if (is.na(margin_l)) { margin_l <- 4.7*max(nchar(labels)/(1 + str_count(labels, '<br>'))) }
-  if (max(nchar(labels)) > 25) { legendSize <- 13 } # 9
+  if (max(nchar(labels)) > 25) { legendSize <- 15 } # 9, 13
   # if (max(nchar(labels)) > 50) { legendSize <- 8 }
   # if (max(nchar(labels)) > 60) { legendSize <- 7 }
   if (max(nchar(labels)) > 50) { # 70
@@ -410,7 +410,7 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
                   hoverinfo = hovers[,1], name=legend[1], marker = list(color = color[1], line = list(color = 'white'))) %>% # , width = 0
     
     layout(xaxis = list(title = "",
-                        showgrid = T,
+                        showgrid = show_ticks,
                         showline = FALSE,
                         showticklabels = show_ticks,
                         gridcolor = toRGB("gray70"), # + noir, + proche de 0
@@ -420,11 +420,12 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
                         ticks = "outside",
                         tick0 = 0,
                         dtick = 0.1,
-                        ticklen = 5,
+                        ticklen = 5*show_ticks,
                         tickwidth = 1,
                         tickcolor = toRGB("gray70"),
-                        zeroline = T,
-                        domain = c(0.15, 1)
+                        zeroline = T, 
+                        range = xrange,
+                        domain = c(0.01 + 0.14*(!(" " %in% labels)), 1)
     ),
     yaxis = list(title = "",
                  showgrid = FALSE,
@@ -439,7 +440,7 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
     titlefont = list(color='black'),
     font = list(color='black', size=legendSize-1),
     # paper_bgcolor = 'rgb(248, 248, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
-    margin = list(l = margin_l, r = margin_r, t = margin_t, b = 21, autoexpand = thin), # , autoexpand=FALSE removes useless margin at bottom but creates bug with legend
+    margin = list(l = margin_l, r = margin_r, t = margin_t, b = 24, autoexpand = thin), # 21, autoexpand=FALSE removes useless margin at bottom but creates bug with legend
     # margin = list(b = 20, t = margin_t),
     legend = list(orientation='h', y=legendY, x=legendX, traceorder='normal', font=list(size=legendSize, color='black')), # family='Balto',  , family=legendFont
     showlegend = (showLegend & (!("Yes" %in% legend) & !("Oui" %in% legend)))) %>%
@@ -449,7 +450,7 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
                     xanchor = 'right',
                     text = labels,
                     font = list(family = 'Arial', size = 14, color = 'black'),
-                    showarrow = FALSE, align = 'right') # %>% 
+                    showarrow = FALSE, align = 'right') # %>%
     # Legend in the Yes/No case
     if (("Yes" %in% legend) | ("Oui" %in% legend)) { 
       bars <- bars %>% add_annotations(xref = 'x', yref = 'paper',

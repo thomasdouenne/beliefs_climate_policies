@@ -30,17 +30,17 @@ decrit(s$region_CC, weights = s$weight) # 65% autant, 29% Inde, 6% UE
 decrit(s$generation_CC_min, weights = s$weight) #1960-2050: 11%-27%-43%-19%
 
 ges_climate_call <- rev(paste("ges_correct", c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm"), sep="_")) 
-labels_ges_climate_call <- rev(c("Plane", "Nuclear", "Beaf", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
-oui_non(margin_l=20, ges_climate_call, NSP=FALSE, en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE)
-barres(file="CC_target_emission", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), 
-       legend = dataN("emission_cible", return="levels"), labels=c("Emission compatible with +2°C (tCO<sub>2</sub>e/yr p.c.)")) 
-barres(file="CC_cause", title="", data=dataN("cause_CC"), nsp=T, sort=T, legend = c("Anthropic", "Natural", "Does not exist", "NSP"), labels=c("Cause of CC"))
-barres(file="CC_generation_min", title="", rev_color = T, data=dataN("generation_CC_min"), nsp=T, sort=T, 
-       legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c("First generation of French severely affected by CC (born in...)"))
+labels_ges_climate_call <- rev(c("Plane vs. car", "Nuclear vs. wind", "Beaf vs. pasta", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
+oui_non(margin_l=40, ges_climate_call, NSP=FALSE, colors=color(3)[1:2], en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE) # colors=color(3)[1:2], 
+barres(file="CC_target_emission_nolegend", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), 
+       legend = dataN("emission_cible", return="levels"), labels=c(" ")) 
+barres(file="CC_cause_nolegend", title="", thin=T, data=dataN("cause_CC"), nsp=T, sort=T, legend = c("Anthropic", "Natural", "Does not exist", "PNR"), labels=c(" "), show_ticks = F)
+barres(file="CC_generation_min_nolegend", title="", rev_color = T, data=dataN("generation_CC_min"), nsp=T, sort=T, thin=T,
+       legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c(" "))
 s$region_CC <- as.factor(s$region_CC)
 s$region_CC <- relevel(relevel(s$region_CC, "Autant dans les deux"), "L'Inde")
-barres(file="CC_region", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, 
-       legend = c("India", "As much in both", "European Union", "NSP"), labels=c("Region with biggest consequences of CC"))
+barres(file="CC_region_nolegend", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, show_ticks = F, thin=T,
+       legend = c("India", "As much in both", "European Union", "NSP"), labels=c(" "))
 
 
 ## 3.2 Opinions
@@ -61,8 +61,8 @@ barres(file="CC_effects", title="", thin=T, data=dataN("effets_CC"), nsp=T, sort
        legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "NSP"), labels=c("Consequences of CC"))
 s$parle_CC <- as.factor(s$parle_CC)
 s$parle_CC <- relevel(relevel(s$parle_CC, "Plusieurs fois par an"), "Plusieurs fois par mois")
-barres(file="CC_talks", title="", data=dataN("parle_CC"), nsp=T, sort=T, 
-       legend = c("Several times per month", "Several times per year", "Almost never", "PNR"), labels=c("Talks about CC...")) 
+barres(file="CC_talks_nolegend", title="", data=dataN("parle_CC"), nsp=T, sort=T, show_ticks = F, thin = T,
+       legend = c("Several times per month", "Several times per year", "Almost never", "PNR"), labels=c(" ")) 
 
 ## 3.3 Reaction needed
 decrit(s$mode_vie_ecolo, miss=T, weights = s$weight) # 65%
@@ -95,11 +95,11 @@ decrit((s$emission_cible[s$changer_deja_fait==F] >= 3), weights=s$weight[s$chang
 
 ## 4.2 Perceived winners and losers
 variables_winners <- names(s)[which(grepl("taxe_gagnant_", names(s)))]
-labels_winners <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "City dwellers", "Certain persons,<br> but no specific income category", "PNR (Don't know, don't want to answer)")
-barres(file="tax_winners", title="", data=data1(variables_winners), sort=T, showLegend=FALSE, labels=labels_winners, hover=labels_winners)
+labels_winners <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "City dwellers", "Certain persons, but no specific income category", "PNR (Don't know, don't want to answer)")
+barres(file="tax_winners_synchro", title="", data=data1(variables_winners), sort=T, showLegend=FALSE, labels=labels_winners, hover=labels_winners, xrange=c(0, 0.58), margin_l=270)
 variables_losers <- names(s)[which(grepl("taxe_perdant_", names(s)))]
-labels_losers <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "Rural or peri-urban households", "Certain persons, <br>but no specific income category", "PNR (Don't know, don't want to answer)")
-barres(file="tax_losers", title="", data=data1(variables_losers), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers)
+labels_losers <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "Rural or peri-urban households", "Certain persons, but no specific income category", "PNR (Don't know, don't want to answer)")
+barres(file="tax_losers_synchro", title="", data=data1(variables_losers), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers, xrange=c(0, 0.58), margin_l=270)
 
 ## 4.3 Perceived pros and cons
 decrit(s$benefices_aucun, weights=s$weight) # 44%
@@ -136,7 +136,7 @@ variables_benefits <- variables_benefits[!(variables_benefits %in% c("nb_benefic
 labels_benefits <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces congestion", "Increases my purchasing power", 
                      "Increases purchasing power of the poorest",
                      "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
-barres(file="CC_benefits", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits) # pb 35% NSP
+barres(file="CC_benefits_synchro", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits, xrange=c(0, 0.47), margin_l=261) # pb 35% NSP
 
 decrit(s$problemes_ruraux, weights=s$weight) # 47%
 decrit(s$problemes_pretexte, weights=s$weight) # 43%
@@ -152,7 +152,7 @@ variables_problems <- names(s)[which(grepl("problemes", names(s)))]
 variables_problems <- variables_problems[!(variables_problems %in% c("nb_problemes", "problemes_autre"))]
 labels_problems <- c("Is ineffective to reduce pollution", "Alternatives are insufficient or too expensive", "Penalizes rural households", "Decreases my purchaisng power",
                      "Penalizes the poorest", "Hurts the economy", "Is a pretext to increase taxes", "None of these reasons", "Other reasons")
-barres(file="CC_problems", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems)
+barres(file="CC_problems_synchro", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems, xrange=c(0, 0.47), margin_l=261)
 
 
 ## 4.4 Perceived elasticities
@@ -215,7 +215,7 @@ summary(logit_diesel)
 logit_diesel_margins <- logitmfx(formula_diesel, s, atmean=FALSE)$mfxest
 logit_diesel_margins
 
-barres(file="diesel_catch_up_val", dataKN(c("rattrapage_diesel")), nsp=TRUE, legend=c("Yes", "No", "PNR"), color=, labels = c("Favorable to catch-up diesel taxes"))
+barres(file="diesel_catch_up", dataKN(c("rattrapage_diesel")), thin=F, show_ticks = T, nsp=TRUE, legend=c("Yes", "No", "PNR"), labels = c(" "))
 
 # Shale gas
 decrit(s$schiste_approbation, miss=T) # 59% non, 17% oui
@@ -235,7 +235,7 @@ logit_schiste_approbation_margins <- logitmfx(formula_schiste_approbation, s, at
 logit_schiste_approbation_margins # -5.7 p.p. with logit
 summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights = s$weight)) # Not significant for approval
 
-barres(file="shale_val", dataKN(c("schiste_approbation")), nsp=TRUE, legend=c("Yes", "No", "PNR"), color=, labels = c("Favorable to shale gas extraction"))
+barres(file="shale_val_nolegend", dataKN(c("schiste_approbation")), nsp=TRUE, legend=c("Yes", "No", "PNR"), labels = c(" "))
 
 
 ## 5.2 Preferred revenue recycling

@@ -7,6 +7,10 @@
 source("packages_functions.R")
 load(".RData")
 
+##### 1 Introduction #####
+decrit(s$taxe_approbation, miss=T, weights = s$weight)
+
+
 ##### 2 Data #####
 ## 2.1 Survey "Beliefs climate policies"
 # 2.1.1 Table I: Sample Characteristics
@@ -816,3 +820,6 @@ Table_additional_res <- stargazer(iv2_si1, iv2_si2, iv2_si3, iv2_si4, iv2_si5, i
        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
 write_clip(sub("\\multicolumn{6}{c}{", "", sub("er Feedback}}", "er Feedback}", gsub('\\end{table}', '} \\end{table}', 
    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
+
+# clean heaviest objects
+rm(logit_bias, logit_ee4, logit_prog4, logit_si, logit_si4, logit_si4t)

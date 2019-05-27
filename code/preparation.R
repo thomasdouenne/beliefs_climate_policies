@@ -1432,6 +1432,16 @@ convert_s <- function() {
   label(s$single) <<- "single: nb_adultes == 1"
   s$hausse_depenses_par_uc <<- s$hausse_depenses_interaction/s$uc
   label(s$hausse_depenses_par_uc) <<- "hausse_depenses_par_uc: Hausse des dépenses énergétiques par UC simulées avec les termes d'interaction, suite à la taxe (élasticité de 0.4/0.2 pour carburants/chauffage)"
+
+  s$ges_correct_avion <<- (s$ges_avion == TRUE) # TODO: preparation
+  s$ges_correct_boeuf <<- (s$ges_boeuf == TRUE)
+  s$ges_correct_nucleaire <<- (s$ges_nucleaire == FALSE)
+  s$ges_correct_CO2 <<- (s$ges_CO2 == TRUE)
+  s$ges_correct_CH4 <<- (s$ges_CH4 == TRUE)
+  s$ges_correct_O2 <<- (s$ges_O2 == FALSE)
+  s$ges_correct_pm <<- (s$ges_pm == FALSE)
+  var_climate_call <- c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm")
+  for (v in var_climate_call) label(s[[paste("ges_correct", v, sep="_")]]) <<- paste("ges_correct_", v, ": Le répondant a correctement répondu à ges_", v, sep='')
   
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
   # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
@@ -1541,12 +1551,12 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   s$weight <<- weighting_s(s)
 }
 
-prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T) # TODO: let only_finished = FALSE
-sa <- s
-# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
-# se <- s
-# prepare_s(exclude_screened=FALSE)
-# sp <- s
+# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T) # TODO: let only_finished = FALSE
+# sa <- s
+# # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
+# # se <- s
+# # prepare_s(exclude_screened=FALSE)
+# # sp <- s
 
 prepare_s()
 
