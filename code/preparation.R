@@ -1010,7 +1010,10 @@ convert_s <- function() {
   s$gilets_jaunes[s$gilets_jaunes_dedans==T] <<- 2
   s$gilets_jaunes <<- as.item(s$gilets_jaunes, missing.values=-0.1, labels = structure(c(-0.1,-1:2), names=c('NSP', 'oppose', 'comprend', 'soutient', 'est_dedans')),
                              annotation="gilets_jaunes: -1: s'oppose / 0: comprend sans soutenir ni s'opposer / 1: soutient / 2: fait partie des gilets jaunes (gilets_jaunes_compris/oppose/soutien/dedans/NSP)" )
-  s$Gilets_jaunes <<- as.factor(s$gilets_jaunes)
+  s$Gilets_jaunes <<- as.factor(as.character(s$gilets_jaunes))
+  s$Gilets_jaunes <<- relevel(s$Gilets_jaunes, 'soutient')
+  s$Gilets_jaunes <<- relevel(s$Gilets_jaunes, 'comprend')
+  s$Gilets_jaunes <<- relevel(s$Gilets_jaunes, 'NSP')
   s$Gilets_jaunes <<- relevel(s$Gilets_jaunes, 'oppose')
   
   # temp <- label(s$diplome)
@@ -1551,8 +1554,8 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   s$weight <<- weighting_s(s)
 }
 
-# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T) # TODO: let only_finished = FALSE
-# sa <- s
+prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T) # TODO: let only_finished = FALSE
+sa <- s
 # # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
 # # se <- s
 # # prepare_s(exclude_screened=FALSE)

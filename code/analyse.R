@@ -3224,6 +3224,15 @@ TableXVIII <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
                                                        TableXVIII, fixed=TRUE), fixed=TRUE), collapse=' ')
 
+# omit = c("Diplome", "sexe", "age", "inactif", "Gilets_jaunes", "Gauche_droite", "liberal", "humaniste", "conservateur",
+#          "patriote", "apolitique", "ecologiste", "interet_politique", "revenu", "taille_menage", "taille_agglo"),   
+formula_ols_prog_3 <- as.formula(paste("progressivite!='Non' ~  info_progressivite * biais_sur + info_progressivite * revenu + info_progressivite * taille_agglo + 
+           info_progressivite * taille_menage + info_progressivite * age + info_progressivite * Gilets_jaunes + info_progressivite * sexe + info_progressivite * inactif + 
+                                       info_progressivite * (Diplome>4) + ", paste(c(variables_demo, variables_politiques), collapse = '+ ')))
+ols_prog_3 <- lm(formula_ols_prog_3, data=s, weights=s$weight)
+summary(ols_prog_3)
+
+
 ##### IV model selection ####
 data(card.data)
 Xname=c("exper", "expersq", "black", "south", "smsa", "reg661", "reg662", "reg663", "reg664", "reg665", "reg666", "reg667", "reg668", "smsa66")

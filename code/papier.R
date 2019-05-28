@@ -22,7 +22,7 @@ decrit(s$taille_agglo)
 decrit(s$region)
 
 # 2.1.2 Table I: Proportion of respondents per target of the payment
-decrit(as.numeric(s$cible)) # other lines of the Table are computed in preparation.R
+decrit(s$cible) # other lines of the Table are computed in preparation.R
 
 # 2.1.3 Ensuring Data Quality
 # Speeder screened out
@@ -142,14 +142,14 @@ logit_bias_margins
 formula_bias_bis <- as.formula(paste("abs(simule_gain - gain) > 110 ~ taxe_approbation + (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + 
                                       ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
 reg_bias_bis <- lm(formula_bias_bis, data=s, weights=s$weight)
-summary(reg_bias_bis) # TODO: redefine Gilets_jaunes pour que les NAs comptent
+summary(reg_bias_bis)
 
 Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
      title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
-     covariate.labels = c("Constant", "Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist","Consumption Units (C.U.)", 
+     covariate.labels = c("Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist",
                           "Yellow Vests: PNR","Yellow Vests: understands","Yellow Vests: supports", "Yellow Vests: is part"),
      dep.var.labels = c("Large bias ($\\left|\\widehat{\\gamma}-g\\right| > 110$)"), dep.var.caption = "", header = FALSE,
-     keep = c("Constant", "taxe_approbation", "Gilets_jaunes", "^uc", "Féminin", "ecologiste"),
+     keep = c("taxe_approbation", "Gilets_jaunes", "Féminin", "ecologiste"),
      coef = list(NULL, logit_bias_margins[,1], NULL),
      se = list(NULL, logit_bias_margins[,2], NULL),
      add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark", "\\checkmark")),
@@ -349,7 +349,7 @@ variables_update_ee <- c("Revenu", variables_demo)
 variables_update_ee <- variables_update_ee[!(variables_update_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 
 # Effect of primings on beliefs about environmental effectiveness
-reg_ee1 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight, na.action='na.exclude')
+reg_update_ee1 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM, data=s, weights = s$weight, na.action='na.exclude')
 summary(reg_update_ee1)
 
 formula_update_ee <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC * info_PM + ", 
@@ -388,17 +388,14 @@ ols_prog_1 <- lm(progressivite!='Non' ~ info_progressivite, data=s, weights=s$we
 summary(ols_prog_1)
 ols_prog_2 <- lm(progressivite!='Non' ~ info_progressivite * biais_sur, data=s, weights=s$weight)
 summary(ols_prog_2)
-formula_ols_prog_3 <- as.formula(paste("progressivite!='Non' ~  info_progressivite * biais_sur + info_progressivite * revenu + info_progressivite * taille_agglo + 
-           info_progressivite * taille_menage + info_progressivite * age + info_progressivite * Gilets_jaunes + info_progressivite * sexe + info_progressivite * inactif + 
-           info_progressivite * (Diplome>4) + ", paste(c(variables_demo, variables_politiques), collapse = '+ ')))
+formula_ols_prog_3 <- as.formula(paste("progressivite!='Non' ~  info_progressivite * biais_sur + ", paste(c(variables_demo, variables_politiques), collapse = '+ ')))
 ols_prog_3 <- lm(formula_ols_prog_3, data=s, weights=s$weight)
 summary(ols_prog_3)
 
 prog <- stargazer(ols_prog_1, ols_prog_2, ols_prog_3, title="Effect of information on perceived progressivity", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                                covariate.labels = c("Constant", "Information on progressivity ($Z_P$)", "Large bias $(\\left|\\widehat{\\gamma}-g\\right|>110)$",
                                                   "Interaction $Z_P \\times (\\left|\\widehat{\\gamma}-g\\right|>110)$"),
-                               omit = c("Diplome", "sexe", "age", "inactif", "Gilets_jaunes", "Gauche_droite", "liberal", "humaniste", "conservateur",
-                                        "patriote", "apolitique", "ecologiste", "interet_politique", "revenu", "taille_menage", "taille_agglo"),             
+                               keep = c("Constant", "info_progressiviteTRUE$", "biais_sur"), 
                                dep.var.labels = "Progressivity: not No ($P$)", dep.var.caption = "", header = FALSE,
                                add.lines = list(c("Controls: Socio-demo, politics ", "", "", "\\checkmark ")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog")
@@ -496,13 +493,13 @@ Table_si2 <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls
                       # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
                       c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", " ", "\\checkmark"),
                       c("Controls: Estimated gain ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark", "\\checkmark"),
-                      c("Controls: Target of the tax, single ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", ""),
+                      c("Controls: Target of the tax", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", ""),
                       c("Controls: Socio-demo, other motives ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", "\\checkmark  ")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\multicolumn{2}{c}{\\textit{OLS}}", 
                "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\multicolumn{2}{c}{\\textit{IV}}", 
-gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
-     For logit, average marginal effects are reported and not coefficients. }\\end{table}', 
+  gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
+     For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. }\\end{table}', 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_si2, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
 
 Table_si1 <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
@@ -514,7 +511,7 @@ Table_si1 <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                     keep = c("traite", "acceptance", "simule_gagnant"),
                     add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", "", " \\checkmark"),
                                   c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
-                                  c("Controls: Target of the tax, single", " \\checkmark", " \\checkmark", " ", " "),
+                                  c("Controls: Target of the tax", " \\checkmark", " \\checkmark", " ", " "),
                                   c("Controls: Socio-demo, other motives", "", " \\checkmark", " ", " \\checkmark"),
                                   c("Effective F-Statistic", "44.093", "40.834", "37.966", "57.866")),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
@@ -528,13 +525,12 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 ## 5.2 Environmental effectiveness
 # Main identification strategy
 # Alternative specifications for robustness checks
-# (1) 2SLS both instruments, with controls: 45 p.p.** We do not control for progressivity: 
+# (1) 2SLS both instruments, with controls: 48 p.p.** We do not control for progressivity: 
 #     as most of the people who did not answer the question were in the second half of the survey, 
 #     the absence of response is too correlated with our instrument Z_E (apres_modifs) which bias the results.
 variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "single", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
 variables_reg_ee <- variables_reg_ee[!(variables_reg_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
-formula_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ", 
-                                      paste(variables_reg_ee, collapse = ' + ')))
+formula_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ",  paste(variables_reg_ee, collapse = ' + ')))
 tsls1_ee1 <- lm(formula_ee1, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee1)
 s$taxe_efficace.hat <- fitted.values(tsls1_ee1)
@@ -542,7 +538,7 @@ formula2_ee1 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ", paste(
 tsls2_ee1 <- lm(formula2_ee1, data=s, weights=s$weight)
 summary(tsls2_ee1) # Effective F-stat from Stata weakivtest: 5.866
 
-# (2) 2SLS both instruments, no controls: 52 p.p.*
+# (2) 2SLS both instruments, no controls: 52 p.p.
 tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC, data=s, weights=s$weight)
 summary(tsls1_ee2)
 s$taxe_efficace.hat <- tsls1_ee2$fitted.values
@@ -565,7 +561,7 @@ logit_ee4_margins
 summary(logistf(formula_ee3, data=s, firth = T)) # Firth (93) regression to resolve separation => effect of 2.20*** instead of 2.26***, cf. Heinze & Ploner (03) 
 anova(logit_ee4, test='LR') # <2e-16 ***: all is fine
 
-# (5) IV, with controls and efficace is yes: 47 p.p. *
+# (5) IV, with controls and efficace is yes: 51 p.p. *
 formula_ee5 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ", 
                                 paste(variables_reg_ee, collapse = ' + ')))
 tsls1_ee5 <- lm(formula_ee5, data=s, weights = s$weight, na.action='na.exclude')
@@ -600,9 +596,9 @@ Table_ee2 <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
                "\\textit{IV} & \\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
  gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
-      For logit, average marginal effects are reported and not coefficients. }\\end{table}', 
+      For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}.}\\end{table}', 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_ee2, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
-
+# insert \hspace{1.6cm} incomes, estimated gains & & & & & &  \\ 
 Table_ee1 <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                       title="First stage regressions results for environmental effectiveness", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                       # "Info on Climate Change and/or on Particulates", "Info on Climate Change only", "Info on Particulates only"
@@ -675,7 +671,7 @@ Table_prog <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5,
           add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
-                For logit, average marginal effects are reported and not coefficients. } \\end{table} ',
+                For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. } \\end{table} ',
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_prog, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Average effect of Progressivity (Not no for acceptance), other things equal: 0.274
