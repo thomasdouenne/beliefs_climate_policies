@@ -946,8 +946,8 @@ convert_s <- function() {
                           # names = c("NSP","Insuffisante","Limitée, mais suffisante","Convenable, mais devrait être accrue","Satisfaisante")),
                         missing.values = -1, annotation=Label(s$transports_avis))
   
-  labels(s$transports_travail_commun) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
-  labels(s$transports_travail_actif) <<- c("Non"="Non", "NSP"="NSP", "Oui, aucun pb"="Oui, ça ne me poserait pas de grande difficulté", "Oui, embêtant"="Oui, mais ça m'embêterait")
+  s$transports_travail_commun <<- relabel(s$transports_travail_commun, "Non"="Non", "NSP"="NSP", "Oui, ça ne me poserait pas de grande difficulté"="Oui, aucun pb", "Oui, mais ça m'embêterait"="Oui, embêtant")
+  s$transports_travail_actif <<- relabel(s$transports_travail_actif, "Non"="Non", "NSP"="NSP", "Oui, ça ne me poserait pas de grande difficulté"="Oui, aucun pb", "Oui, mais ça m'embêterait"="Oui, embêtant")
   s$Transports_travail_commun <<- s$transports_travail_commun
   s$Transports_travail_actif <<- s$transports_travail_actif
   s$Transports_travail_commun[is.na(s$Transports_travail_commun)] <<- "Non concerné"
@@ -1166,9 +1166,9 @@ convert_s <- function() {
   for (v in c('CC', 'sante', 'circulation', 'revenu', 'pauvres', 'independance', 'enjeu', 'aucun', 'autre_choix', 'autre')) {
     s[[paste('benefices_', v, sep="")]] <<- s[paste('benefices_', v, '_p', sep="")][[1]]
     s[[paste('benefices_', v, sep="")]][s$variante_taxe_info=='f'] <<- s[paste('benefices_', v, '_f', sep="")][[1]][s$variante_taxe_info=='f']
-    if (!(v %in% c('aucun', 'autre'))) s$nb_problemes <<- s$nb_problemes + 1*(s[[paste('benefices_', v, sep="")]]==T)
+    if (!(v %in% c('aucun', 'autre'))) s$nb_benefices <<- s$nb_benefices + 1*(s[[paste('benefices_', v, sep="")]]==T)
     label(s[[paste('benefices_', v, sep="")]]) <<- sub("_f: \\* ", ": ", label(s[paste('benefices_', v, '_f', sep="")][[1]]))
-  }
+  } # TODO: mauvaise qualité : les gens qui ont coché "aucune de ces raisons" et autre chose
   for (v in c('inefficace', 'alternatives', 'ruraux', 'revenu', 'pauvres', 'economie', 'pretexte', 'aucun', 'autre_choix', 'autre')) {
     s[[paste('problemes_', v, sep="")]] <<- s[paste('problemes_', v, '_p', sep="")][[1]]
     s[[paste('problemes_', v, sep="")]][s$variante_taxe_info=='f'] <<- s[paste('problemes_', v, '_f', sep="")][[1]][s$variante_taxe_info=='f']

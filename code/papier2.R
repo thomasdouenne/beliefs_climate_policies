@@ -42,6 +42,13 @@ s$region_CC <- relevel(relevel(s$region_CC, "Autant dans les deux"), "L'Inde")
 barres(file="CC_region_nolegend", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, show_ticks = F, thin=T,
        legend = c("India", "As much in both", "European Union", "NSP"), labels=c(" "))
 
+usa_survey <- read.dta("CCES_Panel_Full3waves_VV_V4.dta") # https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/TOE8I1
+labels_CC_USA <- levels(usa_survey$CC14_321) # What action needed for climate change? 2014. 
+levels(usa_survey$CC14_321) <- c("Immediate", "Some", "Wait", "No", "Fake", "PNR", "NA")
+decrit(usa_survey$CC14_321, weights = usa_survey$weight) # 30/25/18/20/8
+# levels(usa_survey$CC10_321) <- levels(usa_survey$CC12_321) <- c("Immediate", "Some", "Wait", "No", "Fake", "PNR", "NA")
+# decrit(usa_survey$CC12_321, weights = usa_survey$weight)
+# decrit(usa_survey$CC10_321, weights = usa_survey$weight)
 
 ## 3.2 Opinions
 decrit(s$ecologiste, weights=s$weight) # 15% écologistes
@@ -57,8 +64,8 @@ decrit(s$ecologiste, miss=T, weights = s$weight)
 
 labels_resp <- c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations")
 barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_resp, hover=labels_resp)
-barres(file="CC_effects", title="", thin=T, data=dataN("effets_CC"), nsp=T, sort=T, 
-       legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "NSP"), labels=c("Consequences of CC"))
+barres(file="CC_effects_nolegend", title="", thin=T, data=dataN("effets_CC"), nsp=T, sort=T, 
+       legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "NSP"), labels=c(" "))
 s$parle_CC <- as.factor(s$parle_CC)
 s$parle_CC <- relevel(relevel(s$parle_CC, "Plusieurs fois par an"), "Plusieurs fois par mois")
 barres(file="CC_talks_nolegend", title="", data=dataN("parle_CC"), nsp=T, sort=T, show_ticks = F, thin = T,
@@ -84,10 +91,11 @@ variables_changer <- names(s)[which(grepl("changer", names(s)))]
 labels_changer <- c("Yes, if policies were going in this direction", "Yes, if I had the financial means", "Yes, if everyone was doing the same",
                     "No, only the richest must change it", "No, it is against my personal interest", "No, because CC is not a real problem",
                     "No, I already adopted a sustainable way of life", "I try but I have difficulties changing my habits")
-barres(file="changer_si_non", title="", data=data1(variables_changer), sort=T, showLegend=FALSE, labels=labels_changer, hover=labels_changer)
+barres(file="change_if_no", title="", data=data1(variables_changer), sort=T, showLegend=FALSE, labels=labels_changer, hover=labels_changer)
 
 decrit((s$emission_cible[s$changer_deja_fait==T] >= 3), weights = s$weight[s$changer_deja_fait==T]) # 79%
 decrit((s$emission_cible[s$changer_deja_fait==F] >= 3), weights=s$weight[s$changer_deja_fait==F]) # 85%
+
 
 ##### 4. Attitudes over Carbon Tax and Dividend #####
 
@@ -155,7 +163,8 @@ labels_problems <- c("Is ineffective to reduce pollution", "Alternatives are ins
 barres(file="CC_problems_synchro", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems, xrange=c(0, 0.47), margin_l=261)
 
 
-## 4.4 Perceived elasticities
+## 4.4 Consumption and mobility constraints
+# 4.4.1 Perceived elasticities
 s$elast_chauffage_perso <- factor(s$elasticite_chauffage_perso, levels(as.factor(s$elasticite_chauffage_perso))[c(1,6:2)])
 s$elast_fuel_perso <- factor(s$elasticite_fuel_perso, levels(as.factor(s$elasticite_fuel_perso))[c(1,6:2)])
 s$elast_chauffage_perso <- revalue(s$elast_chauffage_perso, c("+ de 30% - Je changerais largement ma consommation"="> 30%", 
@@ -176,6 +185,23 @@ barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elasticite_chau
 barres(file="elasticities", title="", thin=T, data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE), 
        nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport", "Own: Housing", "Own: Transport"), 
        legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE), show_ticks=FALSE)
+
+# 4.4.2 Mobility and public transport
+barres(file="transports_opinion", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Limited, but enough", "Decent, but not enough", "Satisfactory")), labels=c(" "))
+decrit(s$transports_courses)
+data_transports_use <- dataKN(c("transports_travail", "transports_courses", "transports_loisirs"))
+data_transports_use[3,] <- data_transports_use[3,] + data_transports_use[5,]
+barres(file="transports_use", title="", thin=T, nsp=T, data=data_transports_use[c(1,4,3,2,6),], legend=c("Walk/bike", "Public transport", "Other", "Car", "Unconcerned"), labels=c("Work", "Shopping", "Leisure"))
+decrit(s$transports_distance)
+s$transports_minutes <- "NSP"
+s$transports_minutes[s$transports_distance <= 5] <- "5 ou moins"
+s$transports_minutes[s$transports_distance > 5 & s$transports_distance <= 10] <- "5 à 10"
+s$transports_minutes[s$transports_distance > 10 & s$transports_distance <= 20] <- "10 à 20"
+s$transports_minutes[s$transports_distance > 20] <- "plus que 20" # TODO: preparation
+barres(file="transports_distance", title="", thin=T, data=dataN("transports_minutes"), labels=c(" "), legend=c("5 or less", "6 to 10", "11 to 20", "more than 20", "PNR"))
+# Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture de prendre les transports en commun pour ses trajets domicile-travail
+barres(file="transports_frequency", title="", thin=T, nsp=T, data=matrix(dataN("transports_frequence")[c(4:1,5),1], ncol=1), legend=rev(c("PNR", "< 3/day", "1/hour - 4/day", "1/h - 2/h", "> 3/h")), labels=(" "))
+barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transports_travail_commun", "transports_travail_actif"))[c(3:1,4),], legend=c("Yes, no difficulty", "Yes, but bothering", "No", "PNR"), color=color(5, grey=T)[c(1,2,4,5)], labels=c("Public transport", "Walk or bike"))
 
 
 ##### 5. Attitudes over Other Policies #####

@@ -284,18 +284,18 @@ data1 <- function(vars, data=s, weights=T) {
 }
 dataN <- function(var, data=s, miss=T, weights = T, return = "", fr=T) {
   mat <- c()
-  if (is.character(data[[var]]) | (is.numeric(data[[var]]) & !grepl("item", class(data[[var]])))) v <- as.factor(as.factor(data[[var]]))
+  if (is.character(data[[var]]) | (is.numeric(data[[var]]) & !grepl("item", class(data[[var]])))) v <- as.factor(data[[var]])
   else v <- data[[var]]
   if (is.null(annotation(v))) levels <- levels(v)
   else levels <- labels(v)@.Data
-  levels <- levels[!(levels %in% c("NSP"))]
-  for (val in levels) {
-    if (weights) mat <- c(mat, sum(data[['weight']][which(v==val)])/sum(data[['weight']][!is.missing(v)]))
-    else mat <- c(mat, length(which(v==val))/length(which(!is.missing(v)))) }
+  levels <- levels[!(levels %in% c("NSP", "PNR", "Non concerné·e"))]
+  for (val in levels) { # before: no %in% nowherer below
+    if (weights) mat <- c(mat, sum(data[['weight']][which(v==val)])/sum(data[['weight']][!is.missing(v) & (!(v %in% c("NSP", "Non concerné·e")))]))
+    else mat <- c(mat, length(which(v==val))/length(which(!is.missing(v) & (!(v %in% c("NSP", "Non concerné·e")))))) }
   if (miss) {
     if (is.null(annotation(v))) {
-      if (weights) mat <- c(mat, sum(data[['weight']][which(is.na(v))])/sum(data[['weight']][!is.missing(v)]))
-      else mat <- c(mat, length(which(is.na(v)))/length(which(!is.missing(v))))
+      if (weights) mat <- c(mat, sum(data[['weight']][which(is.na(v) | v %in% c("NSP", "Non concerné·e"))])/sum(data[['weight']][!is.missing(v) & (!(v %in% c("NSP", "Non concerné·e")))]))
+      else mat <- c(mat, length(which(is.na(v) | v %in% c("NSP", "Non concerné·e")))/length(which(!is.missing(v) & (!(v %in% c("NSP", "Non concerné·e"))))))
     } else  {
       if (weights) mat <- c(mat, sum(data[['weight']][which(is.missing(v) & !is.na(v))])/sum(data[['weight']][!is.missing(v)]))
       else mat <- c(mat, length(which(is.missing(v) & !is.na(v)))/length(which(!is.missing(v)))) } }
