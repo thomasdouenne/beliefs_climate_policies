@@ -65,7 +65,7 @@ decrit(s$ecologiste, miss=T, weights = s$weight)
 labels_resp <- c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations")
 barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_resp, hover=labels_resp)
 barres(file="CC_effects_nolegend", title="", thin=T, data=dataN("effets_CC"), nsp=T, sort=T, 
-       legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "NSP"), labels=c(" "))
+       legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "PNR"), labels=c(" "))
 s$parle_CC <- as.factor(s$parle_CC)
 s$parle_CC <- relevel(relevel(s$parle_CC, "Plusieurs fois par an"), "Plusieurs fois par mois")
 barres(file="CC_talks_nolegend", title="", data=dataN("parle_CC"), nsp=T, sort=T, show_ticks = F, thin = T,
@@ -91,7 +91,7 @@ variables_changer <- names(s)[which(grepl("changer", names(s)))]
 labels_changer <- c("Yes, if policies were going in this direction", "Yes, if I had the financial means", "Yes, if everyone was doing the same",
                     "No, only the richest must change it", "No, it is against my personal interest", "No, because CC is not a real problem",
                     "No, I already adopted a sustainable way of life", "I try but I have difficulties changing my habits")
-barres(file="change_if_no", title="", data=data1(variables_changer), sort=T, showLegend=FALSE, labels=labels_changer, hover=labels_changer)
+barres(file="change_if_no", title="", data=data1(variables_changer), sort=T, showLegend=FALSE, labels=labels_changer, hover=labels_changer, margin_l=250)
 
 decrit((s$emission_cible[s$changer_deja_fait==T] >= 3), weights = s$weight[s$changer_deja_fait==T]) # 79%
 decrit((s$emission_cible[s$changer_deja_fait==F] >= 3), weights=s$weight[s$changer_deja_fait==F]) # 85%
@@ -100,7 +100,8 @@ decrit((s$emission_cible[s$changer_deja_fait==F] >= 3), weights=s$weight[s$chang
 ##### 4. Attitudes over Carbon Tax and Dividend #####
 
 ## 4.1 Massive rejection
-
+barres(file="approval", title="", data=matrix(dataN("taxe_approbation")[c(2,1,3)], ncol=1), legend = c("Yes", "No", "PNR"), labels = c(" "))
+# TODO: nb color pair
 ## 4.2 Perceived winners and losers
 variables_winners <- names(s)[which(grepl("taxe_gagnant_", names(s)))]
 labels_winners <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "City dwellers", "Certain persons, but no specific income category", "PNR (Don't know, don't want to answer)")
@@ -174,25 +175,25 @@ s$elast_chauffage_perso <- revalue(s$elast_chauffage_perso, c("+ de 30% - Je cha
 #           "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 10%"="0 to 10%", 
 #           "0% - Je suis contraint sur tous mes déplacements"="0%: won't reduce", "0% - Je n'en consomme déjà presque pas"="0%: don't consume"))
 barres(file="elasticities_perso", thin=T, title="", data=dataKN(c("elast_chauffage_perso", "elast_fuel_perso"), miss=FALSE), 
-       nsp=FALSE, labels=c("Own: Housing", "Own: Transport"), legend = dataN("elast_chauffage_perso", return="legend"), show_ticks=FALSE)
+       nsp=FALSE, labels=c("Own: Housing", "Own: Transport"), legend = c("", "same as above", "", dataN("elast_chauffage_perso", return="legend")[4:6]), show_ticks=T)
 s$elast_chauffage <- factor(s$elasticite_chauffage, levels(as.factor(s$elasticite_chauffage))[c(1,4,3,5,2)])
 s$elast_fuel <- factor(s$elasticite_fuel, levels(as.factor(s$elasticite_fuel))[c(1,4,3,5,2)])
 s$elast_chauffage <- revalue(s$elast_chauffage, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", 
                                                   "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
 # s$elast_fuel <- revalue(s$elast_fuel, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
 barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elasticite_chauffage", "elasticite_fuel"), miss=FALSE), 
-       nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport"), legend = dataN("elast_chauffage", return="legend"), show_ticks=FALSE)
+       nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport"), legend = dataN("elast_chauffage", return="legend"), show_ticks=F)
 barres(file="elasticities", title="", thin=T, data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE), 
        nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport", "Own: Housing", "Own: Transport"), 
-       legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE), show_ticks=FALSE)
+       legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE), show_ticks=T)
 
 # 4.4.2 Mobility and public transport
 barres(file="transports_opinion", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Limited, but enough", "Decent, but not enough", "Satisfactory")), labels=c(" "))
-decrit(s$transports_courses)
+decrit(s$transports_avis)
 data_transports_use <- dataKN(c("transports_travail", "transports_courses", "transports_loisirs"))
 data_transports_use[3,] <- data_transports_use[3,] + data_transports_use[5,]
 barres(file="transports_use", title="", thin=T, nsp=T, data=data_transports_use[c(1,4,3,2,6),], legend=c("Walk/bike", "Public transport", "Other", "Car", "Unconcerned"), labels=c("Work", "Shopping", "Leisure"))
-decrit(s$transports_distance)
+decrit(s$transports_travail_actif)
 s$transports_minutes <- "NSP"
 s$transports_minutes[s$transports_distance <= 5] <- "5 ou moins"
 s$transports_minutes[s$transports_distance > 5 & s$transports_distance <= 10] <- "5 à 10"
@@ -202,27 +203,30 @@ barres(file="transports_distance", title="", thin=T, data=dataN("transports_minu
 # Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture de prendre les transports en commun pour ses trajets domicile-travail
 barres(file="transports_frequency", title="", thin=T, nsp=T, data=matrix(dataN("transports_frequence")[c(4:1,5),1], ncol=1), legend=rev(c("PNR", "< 3/day", "1/hour - 4/day", "1/h - 2/h", "> 3/h")), labels=(" "))
 barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transports_travail_commun", "transports_travail_actif"))[c(3:1,4),], legend=c("Yes, no difficulty", "Yes, but bothering", "No", "PNR"), color=color(5, grey=T)[c(1,2,4,5)], labels=c("Public transport", "Walk or bike"))
-
+# TODO: one or the other
 
 ##### 5. Attitudes over Other Policies #####
 ## 5.1 Other instruments
 
 # Favored environmental policies
 labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
-                                   "stricter standards on pollution from new vehicles", "stricter standards on pollution during roadworthiness tests", 
+                                   "stricter standards on pollution from new vehicles", "stricter standards during roadworthiness tests", 
                                    "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
 barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
-                                                           miss=FALSE, rev=T), nsp=FALSE, sort=T, legend = rev(yes_no5), labels=labels_environmental_policies)
+                                                           miss=FALSE)[,c(3,4,1,6,5,8,2,7)], nsp=FALSE, sort=F, legend = rep("", 5), labels=labels_environmental_policies[rev(c(3,4,1,6,5,8,2,7))], thin=T) # rev(yes_no5)
 
 ## 5.2 Preferred revenue recycling
-labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", 
+labels_tax_condition <- c("a payment for the 50% poorest French<br> (those earning less than 1670€/month)", "a payment to all French people", 
                           "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
-                          "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
+                          "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "non polluting transport")
 labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
-barres(file="tax_condition_val", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE, rev=T), nsp=FALSE, 
-       sort=T, thin=T, legend = rev(yes_no5), labels=labels_tax_condition)
-barres(file="tax_condition_valr", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
-       sort=T, legend = c(yes_no5), rev_color=T, labels=labels_tax_condition)
+# labels_tax_condition <- c("a payment to the bottom 50%", "a payment to all French people", 
+#                           "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
+#                           "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
+barres(file="tax_condition_val", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE, rev=T)[,rev(c(9,5,8,7,3,4,1,6,2))], nsp=FALSE, 
+       sort=F, thin=T, legend = rep("", 5), labels=labels_tax_condition[rev(c(9,5,8,7,3,4,1,6,2))], margin_l=220) # rev(yes_no5)
+# barres(file="tax_condition_valr", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
+#        sort=F, legend = rep("", 5), rev_color=T, labels=labels_tax_condition) # c(yes_no5)
 
 ## Favored environmental policies
 

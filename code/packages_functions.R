@@ -352,7 +352,7 @@ barres <- function(data, file, title="", labels, color=c(), rev_color = FALSE, h
   # if (max(nchar(labels)) > 50) { legendSize <- 8 }
   # if (max(nchar(labels)) > 60) { legendSize <- 7 }
   if (max(nchar(labels)) > 50) { # 70
-    # legendSize <- 13 # 11
+    legendSize <- 13 # 11
     # legendY = 1.2
     legendX= -0.2 # 1
     # if (ncol(data)>1) margin_t = 170
