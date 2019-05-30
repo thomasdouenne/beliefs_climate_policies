@@ -327,7 +327,8 @@ color <- function(v, grey=FALSE, grey_replaces_last = T, rev_color = FALSE, them
   } else {
     cols <- rev(brewer.pal(n, theme))
     if (n == 1) cols <- cols[1]
-    if (n == 2) cols <- cols[c(1,3)] }
+    # if (n == 2) cols <- cols[c(1,3)]
+    else if (n %% 2 == 0) cols <- rev(brewer.pal(n+2, theme))[c(1:(n/2),(n/2+2):(n+1))] }
   if (rev_color) cols <- rev(cols)
   if (grey & n > 1) return(c(cols, "#D3D3D3")) # lightgrey
   else return(cols)

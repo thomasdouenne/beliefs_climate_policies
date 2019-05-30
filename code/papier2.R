@@ -101,7 +101,7 @@ decrit((s$emission_cible[s$changer_deja_fait==F] >= 3), weights=s$weight[s$chang
 
 ## 4.1 Massive rejection
 barres(file="approval", title="", data=matrix(dataN("taxe_approbation")[c(2,1,3)], ncol=1), legend = c("Yes", "No", "PNR"), labels = c(" "))
-# TODO: nb color pair
+
 ## 4.2 Perceived winners and losers
 variables_winners <- names(s)[which(grepl("taxe_gagnant_", names(s)))]
 labels_winners <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "City dwellers", "Certain persons, but no specific income category", "PNR (Don't know, don't want to answer)")
@@ -188,7 +188,7 @@ barres(file="elasticities", title="", thin=T, data=dataKN(c("Elasticite_chauffag
        legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE), show_ticks=T)
 
 # 4.4.2 Mobility and public transport
-barres(file="transports_opinion", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Limited, but enough", "Decent, but not enough", "Satisfactory")), labels=c(" "))
+barres(file="transports_opinions", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Limited, but enough", "Decent, but not enough", "Satisfactory")), labels=c(" "))
 decrit(s$transports_avis)
 data_transports_use <- dataKN(c("transports_travail", "transports_courses", "transports_loisirs"))
 data_transports_use[3,] <- data_transports_use[3,] + data_transports_use[5,]
@@ -202,7 +202,7 @@ s$transports_minutes[s$transports_distance > 20] <- "plus que 20" # TODO: prepar
 barres(file="transports_distance", title="", thin=T, data=dataN("transports_minutes"), labels=c(" "), legend=c("5 or less", "6 to 10", "11 to 20", "more than 20", "PNR"))
 # Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture de prendre les transports en commun pour ses trajets domicile-travail
 barres(file="transports_frequency", title="", thin=T, nsp=T, data=matrix(dataN("transports_frequence")[c(4:1,5),1], ncol=1), legend=rev(c("PNR", "< 3/day", "1/hour - 4/day", "1/h - 2/h", "> 3/h")), labels=(" "))
-barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transports_travail_commun", "transports_travail_actif"))[c(3:1,4),], legend=c("Yes, no difficulty", "Yes, but bothering", "No", "PNR"), color=color(5, grey=T)[c(1,2,4,5)], labels=c("Public transport", "Walk or bike"))
+barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transports_travail_commun", "transports_travail_actif"))[c(3:1,4),], legend=c("Yes, no difficulty", "Yes, but bothering", "No", "PNR"), color=color(6, grey=T)[c(1,2,5,6)], labels=c("Public transport", "Walk or bike"))
 # TODO: one or the other
 
 ##### 5. Attitudes over Other Policies #####
