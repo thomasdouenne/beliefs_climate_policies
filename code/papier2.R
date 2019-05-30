@@ -181,8 +181,8 @@ s$elast_fuel <- factor(s$elasticite_fuel, levels(as.factor(s$elasticite_fuel))[c
 s$elast_chauffage <- revalue(s$elast_chauffage, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", 
                                                   "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
 # s$elast_fuel <- revalue(s$elast_fuel, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
-barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elasticite_chauffage", "elasticite_fuel"), miss=FALSE), 
-       nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport"), legend = dataN("elast_chauffage", return="legend"), show_ticks=F)
+barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elast_fuel", "elast_chauffage"), miss=FALSE), color=color(6)[1:5],
+       nsp=FALSE, labels=c("Aggregate: Transport", "Aggregate: Housing"), legend = dataN("elast_chauffage", return="legend"), show_ticks=T)
 barres(file="elasticities", title="", thin=T, data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE), 
        nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport", "Own: Housing", "Own: Transport"), 
        legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE), show_ticks=T)

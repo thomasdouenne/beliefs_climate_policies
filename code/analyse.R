@@ -1,4 +1,5 @@
 source("packages_functions.R")
+# To trim white edges on figures: mogrify -trim +repage *.png https://askubuntu.com/questions/351767/how-to-crop-borders-white-spaces-from-image
 
 ##### Distributions de revenus #####
 decrit(s$revenu, weights = s$weight)
