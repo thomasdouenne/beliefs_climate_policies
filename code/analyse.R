@@ -3234,6 +3234,28 @@ ols_prog_3 <- lm(formula_ols_prog_3, data=s, weights=s$weight)
 summary(ols_prog_3)
 
 
+##### Suggestions Martin #####
+# Regression Progressivity with causal effects: 40-56 p.p. for each motive but no significant interaction
+tsls1_prog1 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight)
+s$gagnant_info <- NA
+s$gagnant_info[s$variante_taxe_info=='f'] <- tsls1_prog1$fitted.values
+formula_prog2 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ",  paste(variables_reg_ee[!(variables_reg_ee %in% c("gagnant_categorie"))], collapse = ' + ')))
+tsls1_prog2 <- lm(formula_prog2, data=s, weights = s$weight, na.action='na.exclude')
+s$effective <- fitted.values(tsls1_prog2)
+formula_tsls_prog1 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+                                                                                            " + gagnant_info * effective * progressif + (prog_na == 'NA')")))
+tsls_prog1 <- lm(formula_ols_prog1, weights=s$weight, data=s)
+summary(tsls_prog1)
+
+# McCrary (2008) test
+# A p-value below the significance threshhold indicates that the user can reject the null hypothesis of no sorting.
+DCdensity(pmin(s$revenu, 5000), 780, verbose=T)
+DCdensity(pmin(s$revenu, 5000), 1140)
+DCdensity(pmin(s$revenu, 5000), 1430)
+DCdensity(pmin(s$revenu, 5000), 1670)
+DCdensity(pmin(s$revenu, 5000), 2220)
+
+
 ##### IV model selection ####
 data(card.data)
 Xname=c("exper", "expersq", "black", "south", "smsa", "reg661", "reg662", "reg663", "reg664", "reg665", "reg666", "reg667", "reg668", "smsa66")

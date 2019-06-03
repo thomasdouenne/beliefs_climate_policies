@@ -426,16 +426,16 @@ summary(iv_si1, diagnostics = TRUE)
 
 # Alternative specifications for robustness checks
 # (2) With many controls 
-variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "prog_na", 
+variables_reg_self_interest <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "prog_na", "Simule_gain", "Simule_gain2",
                                  "taxe_efficace", "single",  "hausse_depenses_par_uc", variables_demo) 
 variables_reg_self_interest <- variables_reg_self_interest[!(variables_reg_self_interest %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
-    I(traite_cible*traite_cible_conjoint) + cible + tax_acceptance +  (taxe_approbation=='NSP') + ", paste(variables_reg_self_interest, collapse = ' + ')))
+    I(traite_cible*traite_cible_conjoint) + cible + ", paste(variables_reg_self_interest, collapse = ' + ')))
 tsls1_si2 <- lm(formula_tsls1_si2, data=s, weights = s$weight)
 summary(tsls1_si2)
 s$non_perdant <- tsls1_si2$fitted.values
 # 57 p.p.***
-formula_tsls2_si2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + tax_acceptance + I(taxe_approbation=='NSP') + ", 
+formula_tsls2_si2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + ", 
                                       paste(variables_reg_self_interest, collapse = ' + '))) # 
 tsls2_si2 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
 summary(tsls2_si2) # Effective F-stat from Stata weakivtest: 40.834
@@ -614,12 +614,12 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 
 ## 5.3 Progressivity
 # Identification challenge and strategies
-s$progressif <- (s$prog_na == 'Oui' | s$prog_na == 'NSP') # Attention à ne pas inclure les NA
-s$effective <- s$taxe_efficace!='Non'
-s$gagnant_info <- s$gagnant_info_categorie!='Perdant'
 variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "single", "Simule_gain", "Simule_gain2", variables_demo)
 variables_reg_prog <- variables_reg_prog[!(variables_reg_prog %in% 
     c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
+s$progressif <- (s$prog_na == 'Oui' | s$prog_na == 'NSP') # Attention à ne pas inclure les NA
+s$effective <- s$taxe_efficace!='Non'
+s$gagnant_info <- s$gagnant_info_categorie!='Perdant'
 
 # (1) OLS with controls and interactions
 formula_ols_prog1 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
