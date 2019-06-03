@@ -110,6 +110,33 @@ variables_losers <- names(s)[which(grepl("taxe_perdant_", names(s)))]
 labels_losers <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "Rural or peri-urban households", "Certain persons, but no specific income category", "PNR (Don't know, don't want to answer)")
 barres(file="tax_losers_synchro", title="", data=data1(variables_losers), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers, xrange=c(0, 0.58), margin_l=270)
 
+# When question specific to purchasing power:
+variables_winners <- names(s)[which(grepl("taxe_gagnant_", names(s)))]
+labels_winners <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "City dwellers", "Certain persons,<br> but no specific income category", "PNR (Don't know, don't want to answer)")
+barres(file="tax_winners", title="", data=data1(variables_winners, data=s[s$variante_monetaire==1,], weights = s$weight[s$variante_monetaire==1]), sort=T, showLegend=FALSE, labels=labels_winners, hover=labels_winners)
+variables_losers <- names(s)[which(grepl("taxe_perdant_", names(s)))]
+labels_losers <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "Rural or peri-urban households", "Certain persons, <br>but no specific income category", "PNR (Don't know, don't want to answer)")
+barres(file="tax_losers", title="", data=data1(variables_losers, data=s[s$variante_monetaire==1,], weights = s$weight[s$variante_monetaire==1]), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers)
+
+summary(lm((s$taxe_gagnant_riches==T) ~ variante_monetaire, data=s)) # 0.308 / -0.029 .
+summary(lm((s$taxe_gagnant_pauvres==T) ~ variante_monetaire, data=s)) # 0.058 / +0.044 ***
+summary(lm((s$taxe_gagnant_moyennes==T) ~ variante_monetaire, data=s)) # 0.041 / +0.016 *
+summary(lm((s$taxe_gagnant_citadins==T) ~ variante_monetaire, data=s)) # 0.21 / -0.031 *
+summary(lm((s$taxe_gagnant_certains==T) ~ variante_monetaire, data=s)) # 0.139 / -0.012
+
+summary(lm((s$taxe_perdant_riches==T) ~ variante_monetaire, data=s)) # 0.009 / +0.012 **
+summary(lm((s$taxe_perdant_pauvres==T) ~ variante_monetaire, data=s)) # 0.48 / -0.01
+summary(lm((s$taxe_perdant_moyennes==T) ~ variante_monetaire, data=s)) # 0.55 / + 0.054 **
+summary(lm((s$taxe_perdant_ruraux==T) ~ variante_monetaire, data=s)) # 0.36 / -0.022
+summary(lm((s$taxe_perdant_certains==T) ~ variante_monetaire, data=s)) # 0.09 / -0.011
+
+s$nb_taxe_gagnant <- 0
+for (v in variables_taxe_gagnant) s$nb_taxe_gagnant[s[[v]]==T] <- 1 + s$nb_taxe_gagnant[s[[v]]==T]
+decrit(s$nb_taxe_gagnant)
+s$nb_taxe_perdant <- 0
+for (v in variables_taxe_perdant) s$nb_taxe_perdant[s[[v]]==T] <- 1 + s$nb_taxe_perdant[s[[v]]==T]
+decrit(s$nb_taxe_perdant)
+
 ## 4.3 Perceived pros and cons
 decrit(s$benefices_aucun, weights=s$weight) # 44%
 decrit(s$benefices_CC, weights=s$weight) # 30%
@@ -163,6 +190,13 @@ labels_problems <- c("Is ineffective to reduce pollution", "Alternatives are ins
                      "Penalizes the poorest", "Hurts the economy", "Is a pretext to increase taxes", "None of these reasons", "Other reasons")
 barres(file="CC_problems_synchro", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems, xrange=c(0, 0.47), margin_l=261)
 
+decrit(s$nb_benefices) # 1.14
+decrit(s$nb_problemes) # 2.36
+decrit(s$nb_problemes - s$nb_benefices) # 15% more benefits, 27% as much, 58% more problems
+
+s$nb_benefits <- 0
+for (v in variables_benefits[variables_benefits != 'benefices_aucun']) s$nb_benefits[s[[v]]==T] <- 1 + s$nb_benefits[s[[v]]==T]
+decrit(s$nb_benefits)
 
 ## 4.4 Consumption and mobility constraints
 # 4.4.1 Perceived elasticities
