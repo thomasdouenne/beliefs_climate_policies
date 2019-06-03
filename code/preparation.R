@@ -856,6 +856,8 @@ convert_s <- function() {
   s$mauvaise_qualite[n(s$rev_tot) > 10000] <<- 1 + s$mauvaise_qualite[n(s$rev_tot) > 10000] # 55
   s$revenu <<- clean_number(s$revenu, high_numbers='divide')
   s$rev_tot <<- clean_number(s$rev_tot, high_numbers='divide')
+  # s$revenu[s$revenu > 10000] <<- wtd.mean(s$revenu[s$revenu < 10000], weights = s$weight[s$revenu < 10000], na.rm=T)
+  # s$rev_tot[s$rev_tot > 10000] <<- wtd.mean(s$rev_tot[s$rev_tot < 10000], weights = s$weight[s$rev_tot < 10000], na.rm=T)
   for (i in c( # TODO: check number outliers 
      "revenu", "rev_tot", "taille_menage", "nb_adultes", "nb_14_et_plus", "duree", "variation_aide", "depense_aide", "km_0", "km_1", "km_2", "conso_1", "conso_2", "surface", "emission_cible",
       "depense_totale", "depense_sante", "depense_retraites", "depense_protection", "depense_education", "depense_recherche", "depense_loisirs", 
