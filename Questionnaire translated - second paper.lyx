@@ -1,0 +1,1606 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+To resume enumerate:
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+package{enumitem}
+\end_layout
+
+\begin_layout Plain Layout
+
+\backslash
+begin{enumerate}[resume] instead of 
+\backslash
+begin{enumerate}
+\end_layout
+
+\begin_layout Plain Layout
+To remove indentation: [leftmargin=*]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Hereafter, we only describe questions of the survey that are used in the
+ present paper.
+ The other questions are described and analyzed in our companion paper,
+ TODO:cite.
+\end_layout
+
+\begin_layout Paragraph
+Socio-demographics
+\end_layout
+
+\begin_layout Enumerate
+What is your postal code? 
+\end_layout
+
+\begin_layout Enumerate
+What is your gender (in the sense of civil status)? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Female; Male 
+\end_layout
+
+\begin_layout Enumerate
+What is your age group? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+18 to 24 years old; 25 to 34 years old; 35 to 49 years old; 50 to 64 years
+ old; 65 years old or more
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+What is your employment status? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Permanent; Temporary contract; Unemployed; Student; Retired; Other active;
+ Inactive
+\end_layout
+
+\begin_layout Enumerate
+What is your socio-professional category? (Remember that the unemployed
+ are active workers).
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Farmer; Craftsperson, merchant; Independent; Executive; Intermediate occupation;
+ Employee; Worker; Retired; Other Inactive
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+What is your highest degree? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+No diploma; Brevet des collèges; CAP or BEP [secondary]; Baccalaureate;
+ Bac +2 (BTS, DUT, DEUG, schools of health and social training...); Bac +3
+ (licence...) [bachelor]; Bac +5 or more (master, engineering or business school,
+ doctorate, medicine, master, DEA, DESS...)
+\end_layout
+
+\begin_layout Enumerate
+How many people live in your household? Household includes: you, your family
+ members who live with you, and your dependents.
+ 
+\end_layout
+
+\begin_layout Enumerate
+What is your net 
+\series bold
+\bar under
+monthly
+\series default
+\bar default
+ income (in euros)? 
+\series bold
+\bar under
+All income
+\series default
+\bar default
+ (before withholding tax) is included here: salaries, pensions, allowances,
+ APL [housing allowance], land income, etc.
+ 
+\end_layout
+
+\begin_layout Enumerate
+What is the net 
+\series bold
+\bar under
+monthly
+\series default
+\bar default
+ income (in euros) 
+\series bold
+\bar under
+of your household
+\series default
+\bar default
+? 
+\series bold
+\bar under
+All income
+\series default
+\bar default
+ (before withholding tax) is included here: salaries, pensions, allowances,
+ APL [housing allowance], land income, etc.
+ 
+\end_layout
+
+\begin_layout Enumerate
+In your household how many people are 14 years old or older (
+\series bold
+\bar under
+including yourself
+\series default
+\bar default
+)? 
+\end_layout
+
+\begin_layout Enumerate
+In your household, how many people are over the age of majority (
+\series bold
+\bar under
+including yourself
+\series default
+\bar default
+)? 
+\end_layout
+
+\begin_layout Paragraph
+Energy characteristics
+\end_layout
+
+\begin_layout Enumerate
+What is the surface area of your home? (in m²)
+\end_layout
+
+\begin_layout Enumerate
+What is the heating system in your home? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Individual heating; Collective heating; PNR (Don't know, don't say)
+\end_layout
+
+\begin_layout Enumerate
+What is the main heating energy source in your home? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Electricity Town gas; Butane, propane, tank gas; Heating oil; Wood, solar,
+ geothermal, aerothermal (heat pump); Other; PNR (Don't know, don't say)
+\end_layout
+
+\begin_layout Enumerate
+How many motor vehicles does your household have? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+None; One; Two or more
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+[Without a vehicle] How many kilometers have you driven in the last 12 months?
+ 
+\end_layout
+
+\begin_layout Enumerate
+[One vehicle] What type of fuel do you use for this vehicle? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Electric or hybrid; Diesel; Gasoline; Other
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+[One vehicle] What is the average fuel economy of your vehicle? (in Liters
+ per 100 km)
+\end_layout
+
+\begin_layout Enumerate
+[One vehicle] How many kilometers have you driven with your vehicle in the
+ last 12 months?
+\end_layout
+
+\begin_layout Enumerate
+[At least two vehicles] What type of fuel do you use for your main vehicle?
+\begin_inset Newline newline
+\end_inset
+
+ 
+\emph on
+Electric or hybrid; Diesel; Gasoline; Other
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+[At least two vehicles] What type of fuel do you use for your second vehicle?
+\begin_inset Newline newline
+\end_inset
+
+ 
+\emph on
+Electric or hybrid; Diesel; Gasoline; Other
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+[At least two vehicles] What is the average fuel economy of all your vehicles?
+ (in Liters per 100 km) 
+\end_layout
+
+\begin_layout Enumerate
+[At least two vehicles] How many kilometers have you driven with all your
+ vehicles in the last 12 months? 
+\end_layout
+
+\begin_layout Paragraph
+Partial reforms [transport / housing]
+\end_layout
+
+\begin_layout Standard
+(...)
+\emph on
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Enumerate
+Do you think that an increase in VAT would result in a loss of more purchasing
+ power for your household than for the average French household? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes, much more; Yes, a little more; As much as the average; No, a little
+ less; No, a lot less; PNR (Don't know, don't say)
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+Do you think that an increase in [fuel taxes / taxes on gas and heating
+ oil] would cause your household to lose more purchasing power than an average
+ French household? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes, much more; Yes, a little more; As much as the average; No, a little
+ less; No, a lot less; PNR (Don't know, don't say) % TODO:keep this (except
+ 3), same thing for next blocks?
+\end_layout
+
+\begin_layout Enumerate
+The government is studying a fuel tax increase, whose revenues would be
+ redistributed to all households, regardless of their income.
+ This would imply: 
+\end_layout
+
+\begin_layout Itemize
+[an increase in the price of gasoline by 11 cents per liter and diesel by
+ 13 cents per liter / a 13% increase in the price of gas, and a 15% increase
+ in the price of heating oil]; 
+\end_layout
+
+\begin_layout Itemize
+an annual payment of [60 / 50]€ to each adult, or [120 / 100]€ per year
+ for a couple.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+In terms of purchasing power, would your household be a winner or a loser
+ with such a measure?
+\series default
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Winner; Unaffected; Loser
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+[
+\emph on
+Winner
+\emph default
+ selected] 
+\series bold
+According to you, your household's purchasing power would increase:
+\series default
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+From 0 to [10
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [10
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [20
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [20
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [30
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [30
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [40
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; More than [40
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year
+\end_layout
+
+\begin_layout Enumerate
+[
+\emph on
+Loser
+\emph default
+ selected] 
+\series bold
+According to you, the purchasing power of your household would decrease:
+\series default
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+From 0 to [15
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [15
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [40
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [40
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [70
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [70
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [110
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [110
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [160
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From more than [160
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+If fuel prices increased by 50 cents per liter, by how much would 
+\series bold
+\bar under
+your household
+\series default
+\bar default
+ reduce its fuel consumption? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+0% -
+\emph default
+ [
+\emph on
+I already consume almost none 
+\emph default
+/
+\emph on
+ I am already not consuming
+\emph default
+]
+\emph on
+; 0% - 
+\emph default
+[
+\emph on
+I am constrained on all my trips
+\emph default
+ / 
+\emph on
+I will not reduce it
+\emph default
+]
+\emph on
+; From 0% to 10%; From 10% to 20%; From 20% to 30%; More than 30% - 
+\emph default
+[
+\emph on
+I would change my travel habits significantly 
+\emph default
+/ 
+\emph on
+I would change my consumption significantly
+\emph default
+]
+\end_layout
+
+\begin_layout Enumerate
+In your opinion, if [fuel prices increased by 50 cents per liter / gas and
+ heating oil prices increased by 30%], by how much would 
+\series bold
+\bar under
+French people
+\series default
+\bar default
+ reduce their consumption on average? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+From 0% to 3%; From 3% to 10%; From 3% to 10%; From 10% to 20%; From 20%
+ to 30%; More than 30%
+\emph default
+ 
+\end_layout
+
+\begin_layout Paragraph
+Tax & dividend: initial
+\end_layout
+
+\begin_layout Enumerate
+The government is studying an increase in the carbon tax, whose revenues
+ would be redistributed to all households, regardless of their income.
+ This would imply: 
+\end_layout
+
+\begin_layout Itemize
+an increase in the price of gasoline by 11 cents per liter and diesel by
+ 13 cents per liter; 
+\end_layout
+
+\begin_layout Itemize
+an increase of 13% in the price of gas, and 15% in the price of heating
+ oil;
+\end_layout
+
+\begin_layout Itemize
+an annual payment of 110€ to each adult, or 220€ per year for a couple.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+(...)
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Itemize
+
+\series bold
+In terms of purchasing power, would your household win or loser with such
+ a measure? 
+\series default
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Win; Be unaffected; Lose
+\end_layout
+
+\begin_layout Enumerate
+[
+\emph on
+Winner
+\emph default
+ selected] 
+\series bold
+According to you, your household's purchasing power would increase:
+\series default
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+From 0 to [20
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [20
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [40
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [40
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [60
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [60
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [80
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From more than [80
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year
+\end_layout
+
+\begin_layout Enumerate
+[
+\emph on
+Loser
+\emph default
+ selected] 
+\series bold
+According to you, the purchasing power of your household would decrease:
+\series default
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+From 0 to [30
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [30
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [70
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [70
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [120
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [120
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [190
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From [190
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] to [280
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year; From more than [280
+\begin_inset Formula $\cdot$
+\end_inset
+
+uc] € per year
+\emph default
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+[ [empty] / Scientists agree that a carbon tax would be effective in reducing
+ pollution.] Do you think that such a measure would reduce pollution and
+ fight climate change? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes; No; PNR (Don't know, don't say)
+\end_layout
+
+\begin_layout Enumerate
+In your opinion, which categories would lose [ [blank] / purchasing power]
+ with such a measure? (Several answers possible) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+No one; The poorest; The middle classes; The richest; All French people;
+ Rural or peri-urban people; Some French people, but not a particular income
+ category; PNR (Don't know, don't say)
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+In your opinion, what categories would gain purchasing power with such a
+ measure? (Several answers possible) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+No one; The poorest; The middle classes; The richest; All French people;
+ Urban dwellers; Some French people, but not a particular income category;
+ PNR (Don't know, don't say)
+\emph default
+ 
+\end_layout
+
+\begin_layout Paragraph
+Tax & dividend: after knowledge
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+[Feedback] 
+\end_layout
+
+\end_inset
+
+We always consider the same measure.
+ (...)
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Enumerate
+As a reminder, it would imply: 
+\end_layout
+
+\begin_layout Itemize
+an increase in the price of petrol by 11 cents per liter and diesel by 13
+ cents per liter; 
+\end_layout
+
+\begin_layout Itemize
+an increase of 13% in the price of gas, and 15% in the price of heating
+ oil; 
+\end_layout
+
+\begin_layout Itemize
+an annual payment of 110€ to each adult, or 220€ per year for a couple.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+In five out of six cases, a household with the same characteristics as yours
+ would 
+\series bold
+\bar under
+[win / lose]
+\series default
+\bar default
+.
+ (The characteristics taken into account are: heating with [source] for
+ a dwelling of [size] m²; [distance] km covered with an average consumption
+ of [fuel economy] liters per 100 km).
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Based on this estimate, do you now think that your household would be: 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Winner; Unaffected; Loser
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+[Info on progressivity] On average, this measure would increase the purchasing
+ power of poorest households, and decrease that of the richest, who consume
+ more energy.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+In view of this new information, do you think this measure would benefit
+ the poorest? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes; No; PNR (Don't know, don't say)
+\end_layout
+
+\begin_layout Enumerate
+[No info on progressivity] Do you think this measure would benefit the poorest?
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Yes; No; PNR (Don't know, don't say)
+\end_layout
+
+\begin_layout Enumerate
+In view of the above estimate, would you approve of such a measure? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes; No; PNR (Don't know, don't say)
+\emph default
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Why do you think this measure is beneficial? (Maximum three responses) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Contributes to the fight climate change; Reduces the harmful effects of
+ pollution on health; Reduces traffic congestion; Increases my purchasing
+ power; Increases the purchasing power of the poorest; Fosters France's
+ independence from fossil energy imports; Prepares the economy for tomorrow's
+ challenges; For none of these reasons; Other (specify): 
+\end_layout
+
+\begin_layout Enumerate
+Why do you think this measure is unwanted? (Maximum three answers) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Is ineffective in reducing pollution; Alternatives are insufficient or too
+ expensive; Penalizes rural areas; Decreases my purchasing power; Decreases
+ the purchasing power of some modest households; Harms the economy and employmen
+t; Is a pretext for raising taxes; For none of these reasons; Other (specify):
+\emph default
+ 
+\end_layout
+
+\begin_layout Standard
+(...)
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Paragraph
+Tax & targeted dividend
+\end_layout
+
+\begin_layout Enumerate
+The government is studying an increase in the carbon tax, whose revenues
+ would be redistributed 
+\series bold
+\bar under
+to the [20 / 30 / 40 / 50]% of the poorest French people only
+\series default
+\bar default
+.
+ This would imply: 
+\end_layout
+
+\begin_layout Itemize
+an increase in the price of gasoline by 11 cents per liter and diesel by
+ 13 cents per liter; 
+\end_layout
+
+\begin_layout Itemize
+an increase of 13% in the price of gas, and 15% in the price of heating
+ oil; 
+\end_layout
+
+\begin_layout Itemize
+an annual payment of [550 / 360 / 270 / 220]€ for each adult earning less
+ than [780 / 1140 / 1430 / 1670]€ per month (welfare benefits included,
+ before withholding tax); 
+\end_layout
+
+\begin_layout Itemize
+no compensation for the others.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+We estimate that in your household, [number of recipients] persons would
+ receive this payment.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+In terms of purchasing power, would your household win or lose with such
+ a measure? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Win; Be unaffected; Lose
+\end_layout
+
+\begin_layout Enumerate
+Would you approve such a measure? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes; No; PNR (Don't know, don't say)
+\emph default
+ 
+\end_layout
+
+\end_inset
+
+Attitudes over other policies
+\end_layout
+
+\begin_layout Enumerate
+In which cases would you be in favor of increasing the carbon tax? I would
+ be in favor if the tax revenues were used to finance...
+
+\emph on
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+a payment to the 50% poorest French people (those earning less than 1670€
+ per month) 
+\end_layout
+
+\begin_layout Enumerate
+a payment to all French people 
+\end_layout
+
+\begin_layout Enumerate
+a compensation for households forced to consume petroleum products
+\end_layout
+
+\begin_layout Enumerate
+a decrease in social contributions
+\end_layout
+
+\begin_layout Enumerate
+a decrease in VAT 
+\end_layout
+
+\begin_layout Enumerate
+a decrease in the public deficit 
+\end_layout
+
+\begin_layout Enumerate
+the thermal renovation of buildings 
+\end_layout
+
+\begin_layout Enumerate
+renewable energy (wind, solar, etc.) 
+\end_layout
+
+\begin_layout Enumerate
+clean transport
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\emph on
+Yes, absolutely; Yes, rather; Indifferent or Don't know; No, not really;
+ No, not at all
+\end_layout
+
+\begin_layout Enumerate
+Please select 
+\begin_inset Quotes eld
+\end_inset
+
+A little
+\begin_inset Quotes erd
+\end_inset
+
+ (test to check that you are attentive).
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Not at all; A little; A lot; Completely; PNR (Don't know, don't say)
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+Would you support the following environmental policies? 
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+A tax on kerosene (aviation) 
+\end_layout
+
+\begin_layout Enumerate
+A tax on red meat 
+\end_layout
+
+\begin_layout Enumerate
+Stricter standards on the insulation of new buildings 
+\end_layout
+
+\begin_layout Enumerate
+Stricter standards on the pollution of new vehicles Stricter standards on
+ pollution during roadworthiness tests 
+\end_layout
+
+\begin_layout Enumerate
+The prohibition of polluting vehicles in city centers 
+\end_layout
+
+\begin_layout Enumerate
+The introduction of urban tolls 
+\end_layout
+
+\begin_layout Enumerate
+A contribution to a global climate fund 
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\emph on
+Yes, absolutely; Yes, rather; Indifferent or Don't know; No, not really;
+ No, not at all
+\end_layout
+
+\begin_layout Enumerate
+For historical reasons, diesel is taxed less than gasoline.
+ Would you be in favor of raising taxes on diesel to catch up with the level
+ of taxation on gasoline? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes; No; PNR (Don't know, don't say) 
+\end_layout
+
+\begin_layout Paragraph
+Attitudes over climate change
+\end_layout
+
+\begin_layout Enumerate
+How often do you talk about climate change? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Several times a month; Several times a year; Almost never; PNR (Don't know,
+ don't say) 
+\end_layout
+
+\begin_layout Enumerate
+In your opinion, climate change...
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+is not a reality; is mainly due to natural climate variability; is mainly
+ due to human activity; PNR (Don't know, don't say).
+ 
+\end_layout
+
+\begin_layout Enumerate
+Which of the following elements contribute to global warming? (Several answers
+ possible) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+CO
+\begin_inset Formula $_{2}$
+\end_inset
+
+; Methane; Oxygen; Particulate matter
+\end_layout
+
+\begin_layout Enumerate
+In your opinion, which of the following statements are true? (Several answers
+ possible).
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Consuming one beef steak emits about 20 times more greenhouse gases than
+ eating two servings of pasta.; Electricity produced by nuclear power emits
+ about 20 times more greenhouse gases than electricity produced by wind
+ turbines.; A seat in a Bordeaux - Nice journey emits about 20 times more
+ greenhouse gases by plane than by high speed train.
+ 
+\end_layout
+
+\begin_layout Enumerate
+In your opinion, how would the effects of climate change be, if humanity
+ did nothing to limit it? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Insignificant, or even beneficial; Small, because humans would be able to
+ live with it; Grave, because there would be more natural disasters; Disastrous,
+ lifestyles would be largely altered; Cataclysmic, humankind would disappear;
+ PNR(Don't know, don't say) 
+\end_layout
+
+\begin_layout Enumerate
+In which of these two regions do you think will climate change have the
+ worst consequences? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+The European Union; India; As much in both 
+\end_layout
+
+\begin_layout Enumerate
+In your opinion, in France, which generations will be seriously affected
+ by climate change? (Several answers possible) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+People born in the 1960s; People born in the 1990s; People born in the 2020s;
+ People born in the 2050s; None of the four 
+\end_layout
+
+\begin_layout Enumerate
+In your opinion, who is responsible for climate change? (Several possible
+ choices) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Each of us; The richest; Governments; Some foreign countries; Past generations;
+ Natural causes 
+\end_layout
+
+\begin_layout Enumerate
+Currently, each French person emits on average the equivalent of 10 tons
+ of CO
+\begin_inset Formula $_{2}$
+\end_inset
+
+ per year.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+In your opinion, how much must this figure be reduced to by 2050 in order
+ to hope to contain global warming to +2°C in 2100 (if all countries did
+ the same)? In 2050, we should emit at most...
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10
+\emph default
+ tons 
+\end_layout
+
+\begin_layout Enumerate
+Has climate change had or will it have an influence on your decision to
+ make a child (or children)?
+\emph on
+ 
+\begin_inset Newline newline
+\end_inset
+
+Yes; No; PNR (Don't know, don't say)
+\end_layout
+
+\begin_layout Enumerate
+[If 
+\emph on
+Yes
+\emph default
+] Why does climate change influence your decision to have a child (or children)?
+ (Several answers possible).
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Because I don't want my child to live in a devastated world.; Because each
+ additional human being aggravates climate change.
+\end_layout
+
+\begin_layout Enumerate
+Would you be willing to change your lifestyle to fight climate change? (Several
+ answers possible) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes, if policies went in this direction; Yes, if I had the financial means;
+ Yes, if everyone did the same; No, only the richest people have to change
+ their way of life; No, it is against my personal interest; No, I think
+ climate change is not a real problem; I have already adopted a sustainable
+ way of life; I try, but I have trouble changing my habits
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+Assuming that all states in the world agree to firmly fight climate change,
+ notably through a transition to renewable energy, through efforts of the
+ richest, and imagining that France would expand the supply of non-polluting
+ transport very widely; would you be willing to adopt an ecological lifestyle
+ (i.e.
+ eat little red meat and ensure to use almost no gasoline, diesel or kerosene)?
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes; No; PNR (Don't know, don't say) 
+\end_layout
+
+\begin_layout Paragraph
+Shale gas (and smoking)
+\end_layout
+
+\begin_layout Enumerate
+Do you smoke regularly? 
+\emph on
+Yes; No 
+\end_layout
+
+\begin_layout Enumerate
+The use of shale gas would limit climate change, as gas would be exported
+ and used to produce electricity instead of coal.
+ On the other hand, extraction would risk reducing water quality at the
+ local level.
+ Your department [would be / would not be] concerned by the exploitation
+ of shale gas.
+ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+In view of this information, would you be in favor of shale gas exploitation
+ in France? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes; No; PNR (Don't know, don't say) 
+\end_layout
+
+\begin_layout Enumerate
+What would be the main benefit to you from shale gas development? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+This would limit climate change; This would create jobs and boost the department
+; None of these two reasons 
+\end_layout
+
+\begin_layout Enumerate
+What do you think of the idea that shale gas would limit climate change?
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+It is valid: any decrease in emissions goes in the right direction; It is
+ unwelcome: emissions should be stopped, not just slowed down; PNR(Don't
+ know, don't say) 
+\end_layout
+
+\begin_layout Paragraph
+Access to public transport and mobility habits
+\end_layout
+
+\begin_layout Enumerate
+How many minutes walk is it to the nearest public transit stop? (To simplify,
+ you can use the conversion 1 km = 10 min walk).
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+in min:
+\emph default
+ ; 
+\emph on
+PNR (Don't know, don't say) 
+\end_layout
+
+\begin_layout Enumerate
+How often does the nearest public transport pass? (excluding school buses)
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Less than three times a day; Between four times a day and once an hour;
+ Once or twice an hour; More than three times an hour; PNR (Don't know,
+ don't say) 
+\end_layout
+
+\begin_layout Enumerate
+What do you think about the availability of public transport where you live?
+ It is...
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Satisfactory; Suitable, but should be increased; Limited, but sufficient;
+ Insufficient; PNR (Don't know, don't say) 
+\end_layout
+
+\begin_layout Enumerate
+What mode of transportation do you mainly use for each of the following
+ trips?
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Home - work (or studies) 
+\end_layout
+
+\begin_layout Enumerate
+Grocery shopping 
+\end_layout
+
+\begin_layout Enumerate
+Leisure (excluding holidays) 
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\emph on
+Car; Public transport; Walking or cycling; Two-wheeled vehicle; Carpooling;
+\emph default
+ 
+\emph on
+Not concerned
+\emph default
+ 
+\end_layout
+
+\begin_layout Enumerate
+[If 
+\emph on
+Car 
+\emph default
+selected for Work] Would it be possible for you, without changing your home
+ or workplace, to travel from home to work using public transport? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes, it would not be very difficult for me; Yes, but it would bother me;
+ No; PNR (Don't know, don't say) 
+\end_layout
+
+\begin_layout Enumerate
+[If 
+\emph on
+Car 
+\emph default
+selected for Work] Would it be possible for you, without changing your home
+ or workplace, to travel from home to work by walking or cycling? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Yes, it would not be very difficult for me; Yes, but it would bother me;
+ No; PNR (Don't know, don't say) 
+\end_layout
+
+\begin_layout Paragraph
+Politics and media
+\end_layout
+
+\begin_layout Enumerate
+How much are you interested in politics? 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Almost not; A little; A lot 
+\end_layout
+
+\begin_layout Enumerate
+How would you define yourself? (Several answers possible) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Extreme left; Left; Center; Right; Extreme right; Liberal; Conservative;
+ Liberal; Humanist; Patriot; Apolitical; Ecologist 
+\end_layout
+
+\begin_layout Enumerate
+How do you keep yourself informed of current events? Mainly through...
+ 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+Television; Press (written or online); Social networks; Radio; Other
+\end_layout
+
+\begin_layout Enumerate
+What do you think of the Yellow Vests? (Several answers possible) 
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+I am part of them; I support them; I understand them; I oppose them; PNR
+ (Don't know, don't say) 
+\end_layout
+
+\begin_layout Paragraph
+Open field
+\end_layout
+
+\begin_layout Enumerate
+The survey is nearing completion.
+ You can now enter any comments, comments or suggestions in the field below.
+\end_layout
+
+\end_body
+\end_document
