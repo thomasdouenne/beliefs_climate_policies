@@ -3469,7 +3469,7 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 (0.571-0.517)/(0.092^2+0.170^2)^0.5 # 0.28: not significantly different
 
 
-## 5.2 Environmental effectiveness
+## 5.2 Environmental effectiveness avec 6 spécifications
 # Main identification strategy
 # Alternative specifications for robustness checks
 # (1) 2SLS both instruments, with controls: 48 p.p.** We do not control for progressivity: 
@@ -3485,53 +3485,60 @@ formula2_ee1 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + ", paste(
 tsls2_ee1 <- lm(formula2_ee1, data=s, weights=s$weight)
 summary(tsls2_ee1) # Effective F-stat from Stata weakivtest: 5.866
 
+# (2) 2SLS both instruments, no controls: 52 p.p.
+tsls1_ee2 <- lm(taxe_efficace!='Non' ~ apres_modifs + info_CC, data=s, weights=s$weight)
+summary(tsls1_ee2)
+s$taxe_efficace.hat <- tsls1_ee2$fitted.values
+tsls2_ee2 <- lm(tax_acceptance ~ taxe_efficace.hat, data=s, weights=s$weight)
+summary(tsls2_ee2) # Effective F-stat from Stata weakivtest: 2.523
+
 # (3) OLS with controls: 39 p.p. ***
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace!='Non')
-formula_ee2 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + prog_not_no + (prog_na == 'NA') + ", paste(variables_reg_ee, collapse = ' + '))) # 
-ols_ee2 <- lm(formula_ee2, data=s, weights = s$weight)
-summary(ols_ee2)
+formula_ee3 <- as.formula(paste("tax_acceptance ~ taxe_efficace.hat + prog_not_no + (prog_na == 'NA') + ", paste(variables_reg_ee, collapse = ' + '))) # 
+ols_ee3 <- lm(formula_ee3, data=s, weights = s$weight)
+summary(ols_ee3)
 
 # (4) Logit
 # 37 p.p. ***
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace!='Non')
-logit_ee3 <- glm(formula_ee2, family = binomial(link='logit'), data=s) # Warning: Hauck-Donner effect, run logitsf. For a test run anova.glm, not Wald 
-summary(logit_ee3)
-logit_ee3_margins <- logitmfx(data=s, formula=logit_ee3, atmean=FALSE)$mfxest
-logit_ee3_margins
-#summary(logistf(formula_ee3, data=s, firth = T)) # Firth (93) regression to resolve separation => effect of 2.20*** instead of 2.26***, cf. Heinze & Ploner (03) 
-#anova(logit_ee3, test='LR') # <2e-16 ***: all is fine
+logit_ee4 <- glm(formula_ee3, family = binomial(link='logit'), data=s) # Warning: Hauck-Donner effect, run logitsf. For a test run anova.glm, not Wald 
+summary(logit_ee4)
+logit_ee4_margins <- logitmfx(data=s, formula=logit_ee4, atmean=FALSE)$mfxest
+logit_ee4_margins
+summary(logistf(formula_ee3, data=s, firth = T)) # Firth (93) regression to resolve separation => effect of 2.20*** instead of 2.26***, cf. Heinze & Ploner (03) 
+anova(logit_ee4, test='LR') # <2e-16 ***: all is fine
 
 # (5) IV, with controls and efficace is yes: 51 p.p. *
-formula_ee4 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ", 
-                                paste(variables_reg_ee, collapse = ' + ')))
-tsls1_ee4 <- lm(formula_ee4, data=s, weights = s$weight, na.action='na.exclude')
-summary(tsls1_ee4)
-s$taxe_efficace_yes.hat <- tsls1_ee4$fitted.values
-formula2_ee4 <- as.formula(paste("tax_acceptance ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
-tsls2_ee4 <- lm(formula2_ee4, data=s, weights=s$weight)
-summary(tsls2_ee4) # Effective F-stat from Stata weakivtest: 11.145
-
-# (6) IV, with controls and approval: 42 p.p. **
 formula_ee5 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ", 
                                 paste(variables_reg_ee, collapse = ' + ')))
 tsls1_ee5 <- lm(formula_ee5, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee5)
 s$taxe_efficace_yes.hat <- tsls1_ee5$fitted.values
-formula2_ee5 <- as.formula(paste("tax_approval ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
+formula2_ee5 <- as.formula(paste("tax_acceptance ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
 tsls2_ee5 <- lm(formula2_ee5, data=s, weights=s$weight)
-summary(tsls2_ee5)
+summary(tsls2_ee5) # Effective F-stat from Stata weakivtest: 11.145
+
+# (6) IV, with controls and approval: 42 p.p. **
+formula_ee6 <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ", 
+                                paste(variables_reg_ee, collapse = ' + ')))
+tsls1_ee6 <- lm(formula_ee6, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_ee6)
+s$taxe_efficace_yes.hat <- tsls1_ee6$fitted.values
+formula2_ee6 <- as.formula(paste("tax_approval ~ taxe_efficace_yes.hat + ", paste(variables_reg_ee, collapse = ' + ')))
+tsls2_ee6 <- lm(formula2_ee6, data=s, weights=s$weight)
+summary(tsls2_ee6)
 # Effective F-stat from Stata weakivtest: 11.145
 
 # Results
-Table_ee2 <- stargazer(tsls2_ee1, ols_ee2, logit_ee3, tsls2_ee4, tsls2_ee5,
+Table_ee2 <- stargazer(tsls2_ee1, tsls2_ee2, ols_ee3, logit_ee4, tsls2_ee5, tsls2_ee6,
                        title="Effect of believing in environmental effectiveness on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                        covariate.labels = c("Environmental effectiveness: not ``No''", "Environmental effectiveness: ``Yes''"), # "Constant",
                        dep.var.labels = c("Tax Acceptance ($A^I$)", "Tax Approval ($\\dot{A^I}$)"), dep.var.caption = "", header = FALSE,
                        keep = c("efficace"), # "Constant",
-                       coef = list(NULL, NULL, logit_ee3_margins[,1], NULL, NULL), 
-                       se = list(NULL, NULL, logit_ee3_margins[,2], NULL, NULL),
-                       add.lines = list(c("Instruments: info E.E., C.C. \\& P.M. ", "\\checkmark ", "", " ", "\\checkmark ", "\\checkmark"),
-                                        c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark ")), 
+                       coef = list(NULL, NULL, NULL, logit_ee4_margins[,1], NULL, NULL), 
+                       se = list(NULL, NULL, NULL, logit_ee4_margins[,2], NULL, NULL),
+                       add.lines = list(c("Instruments: info E.E., C.C. \\& P.M. ", "\\checkmark ", "\\checkmark ", "", " ", "\\checkmark ", "\\checkmark"),
+                                        c("Controls: Socio-demo, other motives ", "\\checkmark ", "", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark ")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
 write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
                "\\textit{IV} & \\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
@@ -3539,18 +3546,20 @@ write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\text
                     For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}.}\\end{table}', 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_ee2, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
 # insert \hspace{1.6cm} incomes, estimated gains & & & & & &  \\ 
-Table_ee1 <- stargazer(tsls1_ee1, tsls1_ee5,
+Table_ee1 <- stargazer(tsls1_ee1, tsls1_ee2, tsls1_ee5,
                        title="First stage regressions results for environmental effectiveness", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                        # "Info on Climate Change and/or on Particulates", "Info on Climate Change only", "Info on Particulates only"
                        covariate.labels = c("Info on Environmental Effectiveness ($Z_{E}$)",  
                                             "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
                        dep.var.labels = c("not ``No''", "``Yes''"), dep.var.caption = "Environmental effectiveness", header = FALSE,
                        keep = c("info", "apres_modifs"), 
-                       column.labels = c("(1)", "(5,6)"), model.numbers = FALSE,
-                       add.lines = list(c("Controls ", "\\checkmark ", "\\checkmark "), c("Effective F-Statistic", "5.945", "11.208")), 
+                       column.labels = c("(1)", "(2)", "(5,6)"), model.numbers = FALSE,
+                       add.lines = list(c("Controls ", "", "\\checkmark ", ""), c("Effective F-Statistic", "5.866", "2.523", "11.145")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_ee1, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
 
 
 # D.2
