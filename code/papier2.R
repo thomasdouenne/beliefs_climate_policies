@@ -29,6 +29,11 @@ decrit(s$cause_CC, miss=T, weights = s$weight) # 72% anthropic, 20% natural, 3% 
 decrit(s$region_CC, weights = s$weight) # 65% autant, 29% Inde, 6% UE
 decrit(s$generation_CC_min, weights = s$weight) #1960-2050: 11%-27%-43%-19%
 
+decrit(s$score_climate_call, weights = s$weight)
+decrit(s$emission_cible >= 5, weights = s$weight)
+decrit(s$emission_cible <= 2, weights = s$weight)
+decrit(s$generation_CC_min >= 2020, weights = s$weight)
+
 ges_climate_call <- rev(paste("ges_correct", c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm"), sep="_")) 
 labels_ges_climate_call <- rev(c("Plane vs. car", "Nuclear vs. wind", "Beaf vs. pasta", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
 oui_non(margin_l=40, ges_climate_call, NSP=FALSE, colors=color(3)[1:2], en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE) # colors=color(3)[1:2], 
@@ -53,7 +58,7 @@ decrit(usa_survey$CC14_321, weights = usa_survey$weight) # 30/25/18/20/8
 ## 3.2 Opinions
 decrit(s$ecologiste, weights=s$weight) # 15% écologistes
 decrit(s$parle_CC, miss=T, weights = s$weight) # 3 tiers
-decrit(s$effets_CC, miss=T, weights = s$weight) # 20% cataclysmiques; 31% désastreux, 38% graves
+decrit(s$effets_CC, miss=T, weights = s$weight) # 18% cataclysmiques; 28% désastreux, 35% graves
 decrit(s$responsable_CC_chacun, miss=T, weights = s$weight) # 63%
 decrit(s$responsable_CC_govts, miss=T, weights = s$weight) # 47%
 decrit(s$responsable_CC_etranger, miss=T, weights = s$weight) # 42%
@@ -78,6 +83,10 @@ decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC==
 decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui']) # 86%
 summary(lm((enfant_CC=='Oui') ~ sexe, data=s)) #V -3.4 p.p.
 
+decrit(s$changer_deja_fait==T | s$changer_essaie==T, weights=s$weight) # 36%
+decrit(s$changer_non_interet == T | s$changer_non_riches==T | s$changer_non_negation==T, weights=s$weight) # 11%
+decrit(s$changer_si_moyens == T | s$changer_si_politiques==T | s$changer_si_tous==T | s$changer_essaie==T, weights=s$weight) # 85%
+decrit(s$changer_si_moyens == T | s$changer_si_politiques==T | s$changer_si_tous==T, weights=s$weight) # 82%
 decrit(s$changer_si_tous, weights=s$weight) # 47%
 decrit(s$changer_si_moyens, weights=s$weight) # 45%
 decrit(s$changer_si_politiques, weights=s$weight) # 43%
