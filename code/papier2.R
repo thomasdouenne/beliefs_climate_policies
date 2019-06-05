@@ -284,7 +284,9 @@ barres(file="environmental_policies", title="", data=data5(names(s)[(which(names
 
 
 ## Diesel taxation
-decrit(s$rattrapage_diesel, miss=T) # 59% non, 29% oui
+decrit(s$rattrapage_diesel, miss=T, weights=s$weight) # 59% non, 29% oui
+decrit(s[s$diesel==T,]$rattrapage_diesel, miss=T, weights=s[s$diesel==T,]$weight) # 81% non, 12% oui
+decrit(s[s$taille_agglo=='Paris',]$rattrapage_diesel, miss=T, weights=s[s$taille_agglo=='Paris',]$weight) # 81% non, 12% oui
 
 variables_diesel <- c("Revenu", "score_ges", "score_climate_call", variables_demo, variables_energie) # 
 variables_diesel <- variables_diesel[!(variables_diesel %in% c("revenu", "rev_tot", "age", "age_65_plus",
@@ -301,22 +303,38 @@ logit_diesel_margins
 barres(file="diesel_catch_up", dataKN(c("rattrapage_diesel")), thin=F, show_ticks = T, nsp=TRUE, legend=c("Yes", "No", "PNR"), labels = c(" "))
 
 # Shale gas
-decrit(s$schiste_approbation, miss=T) # 59% non, 17% oui
-decrit(s$schiste_traite) # 59% traités
-decrit(s$schiste_avantage, miss=T) # 56% aucun, 26% emplois, 18% CC
-decrit(s$schiste_CC, miss=T) # 44% malvenue, 25% valable
+decrit(s$schiste_approbation, miss=T, weights=s$weight) # 59% non, 16% oui
+decrit(s$schiste_traite, weights=s$weight) # 61% traités
+decrit(s$schiste_avantage, miss=T, weights=s$weight) # 56% aucun, 26% emplois, 18% CC
+decrit(s[s$schiste_approbation=='Oui',]$schiste_avantage, miss=T, weights=s[s$schiste_approbation=='Oui',]$weight) # 56% aucun, 26% emplois, 18% CC
+decrit(s$schiste_CC, miss=T, weights=s$weight) # 43% malvenue, 25% valable
 
-summary(lm((schiste_approbation!='Non') ~ (schiste_traite==1), data=s, weights = s$weight)) # - 3.9 p.p. acceptance when treated
+reg_shale_1 <- lm((schiste_approbation!='Non') ~ (schiste_traite==1), data=s, weights = s$weight)
+summary(reg_shale_1) # - 3.9 p.p. acceptance when treated
 variables_reg_schiste <- c("Revenu", "score_ges", "score_climate_call", variables_demo) # 
 variables_reg_schiste <- variables_reg_schiste[!(variables_reg_schiste %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
 formula_schiste_approbation <- as.formula(paste("schiste_approbation!='Non' ~ (schiste_traite==1) + ",
                                                 paste(variables_reg_schiste, collapse = ' + ')))
-summary(lm(formula_schiste_approbation, data=s, weights = s$weight)) # - 5.1 p.p. acceptance when treated / Scores, Sex and Education matter
-logit_schiste_approbation <- glm(formula_schiste_approbation, family = binomial(link='logit'), data=s)
-summary(logit_schiste_approbation)
-logit_schiste_approbation_margins <- logitmfx(formula_schiste_approbation, s, atmean=FALSE)$mfxest
-logit_schiste_approbation_margins # -5.7 p.p. with logit
+reg_shale_2 <- lm(formula_schiste_approbation, data=s, weights = s$weight)
+summary(reg_shale_2) # - 5.1 p.p. acceptance when treated / Scores, Sex and Education matter
+logit_shale_3 <- glm(formula_schiste_approbation, family = binomial(link='logit'), data=s)
+summary(logit_shale_3)
+logit_shale_3_margins <- logitmfx(formula_schiste_approbation, s, atmean=FALSE)$mfxest
+logit_shale_3_margins # -5.7 p.p. with logit
 summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights = s$weight)) # Not significant for approval
+
+Table_shale_gas <- stargazer(reg_shale_1, reg_shale_2, logit_shale_3, 
+                         title="Effect of being treated on acceptance of shale gas exploitation", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                         covariate.labels = c("Treated"), 
+                         dep.var.labels = c("Shale gas exploitation: not ``No''"),# dep.var.caption = "", header = FALSE,
+                         keep = c("schiste_traite"),
+                         coef = list(NULL, NULL, logit_shale_3_margins[,1]), 
+                         se = list(NULL, NULL, logit_shale_3_margins[,2]),
+                         column.labels = c("(1)", "(2)", "(3)"), model.numbers = FALSE,
+                         add.lines = list(c("Controls: Socio-demographics, scores", "", "\\checkmark", "\\checkmark")),
+                         no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:shale_gas")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', 
+                                                       '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_shale_gas, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 barres(file="shale_val_nolegend", dataKN(c("schiste_approbation")), nsp=TRUE, legend=c("Yes", "No", "PNR"), labels = c(" "))
 
