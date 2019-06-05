@@ -249,16 +249,13 @@ barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transport
 # TODO: one or the other
 
 ##### 5. Attitudes over Other Policies #####
-## 5.1 Other instruments
 
-# Favored environmental policies
-labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
-                                   "stricter standards on pollution from new vehicles", "stricter standards during roadworthiness tests", 
-                                   "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
-barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
-                                                           miss=FALSE)[,c(3,4,1,6,5,8,2,7)], nsp=FALSE, sort=F, legend = rep("", 5), labels=labels_environmental_policies[rev(c(3,4,1,6,5,8,2,7))], thin=T) # rev(yes_no5)
+## 5.1 Preferred revenue recycling
+for (variable in variables_taxe_condition) {
+  cat(variable)
+  print(decrit(s[variable], weights=s$weight))
+}
 
-## 5.2 Preferred revenue recycling
 labels_tax_condition <- c("a payment for the 50% poorest French<br> (those earning less than 1670€/month)", "a payment to all French people", 
                           "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
                           "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "non polluting transport")
@@ -271,7 +268,20 @@ barres(file="tax_condition_val", title="", data=data5(names(s)[which(names(s)=='
 # barres(file="tax_condition_valr", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
 #        sort=F, legend = rep("", 5), rev_color=T, labels=labels_tax_condition) # c(yes_no5)
 
-## Favored environmental policies
+## 5.2 Other instruments
+
+# Favored environmental policies
+for (variable in variables_politiques_environnementales) {
+  cat(variable)
+  print(decrit(s[variable], weights=s$weight))
+}
+
+labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
+                                   "stricter standards on pollution from new vehicles", "stricter standards during roadworthiness tests", 
+                                   "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
+barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
+                                                           miss=FALSE)[,c(3,4,1,6,5,8,2,7)], nsp=FALSE, sort=F, legend = rep("", 5), labels=labels_environmental_policies[rev(c(3,4,1,6,5,8,2,7))], thin=T) # rev(yes_no5)
+
 
 ## Diesel taxation
 decrit(s$rattrapage_diesel, miss=T) # 59% non, 29% oui
