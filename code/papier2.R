@@ -34,8 +34,19 @@ decrit(s$emission_cible >= 5, weights = s$weight)
 decrit(s$emission_cible <= 2, weights = s$weight)
 decrit(s$generation_CC_min >= 2020, weights = s$weight)
 
+s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 
+  3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=='Inde')
+label(s$connaissances_CC) <- "connaissances_CC: index des bonnes réponses aux questions sur le changement climatique (GES, climate call, cause, emission_cible, region)"
+decrit(s$connaissances_CC)
+summary(lm(I((connaissances_CC - mean(connaissances_CC))/sd(connaissances_CC)) ~ I((generation_CC_min-1960)/30), data=s, weights = s$weight))
+formula_connaissances_CC <- as.formula(paste("I((connaissances_CC - mean(connaissances_CC))/sd(connaissances_CC)) ~ I((generation_CC_min-1960)/30) + region_CC + diplome + ", 
+        paste(variables_determinants[!(variables_determinants %in% c("Gauche_droite", "humaniste", "patriote", "ecologiste", "apolitique", "liberal", 
+        "conservateur", "diplome4", "as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))"))], collapse = ' + ')))
+summary(lm(formula_connaissances_CC, data=s, weights = s$weight))
+# summary(lm(connaissances_CC ~ as.factor(generation_CC_min), data=s, weights = s$weight))
+
 ges_climate_call <- rev(paste("ges_correct", c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm"), sep="_")) 
-labels_ges_climate_call <- rev(c("Plane vs. car", "Nuclear vs. wind", "Beaf vs. pasta", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
+labels_ges_climate_call <- rev(c("Plane vs. train", "Nuclear vs. wind", "Beaf vs. pasta", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
 oui_non(margin_l=40, ges_climate_call, NSP=FALSE, colors=color(3)[1:2], en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE) # colors=color(3)[1:2], 
 barres(file="CC_target_emission_nolegend", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), 
        legend = dataN("emission_cible", return="levels"), labels=c(" ")) 
@@ -77,6 +88,13 @@ barres(file="CC_talks_nolegend", title="", data=dataN("parle_CC"), nsp=T, sort=T
        legend = c("Several times per month", "Several times per year", "Almost never", "PNR"), labels=c(" ")) 
 
 ## 3.3 Reaction needed
+decrit(s$ecologiste, weights = s$weight)
+decrit(s$humaniste, weights = s$weight)
+decrit(s$patriote, weights = s$weight)
+decrit(s$liberal, weights = s$weight)
+decrit(s$conservateur, weights = s$weight)
+decrit(s$apolitique, weights = s$weight)
+decrit(s$Gauche_droite, weights = s$weight, miss=T)
 decrit(s$mode_vie_ecolo, miss=T, weights = s$weight) # 65%
 decrit(s$enfant_CC, weights = s$weight) # 20% oui
 decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui']) # 37%
@@ -250,6 +268,8 @@ barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transport
 
 ##### 5. Attitudes over Other Policies #####
 
+labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
+barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
 ## 5.1 Preferred revenue recycling
 for (variable in variables_taxe_condition) {
   cat(variable)
@@ -323,6 +343,7 @@ logit_shale_3_margins <- logitmfx(formula_schiste_approbation, s, atmean=FALSE)$
 logit_shale_3_margins # -5.7 p.p. with logit
 summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights = s$weight)) # Not significant for approval
 
+decrit(s$schiste_approbation)
 Table_shale_gas <- stargazer(reg_shale_1, reg_shale_2, logit_shale_3, 
                          title="Effect of being treated on acceptance of shale gas exploitation", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
                          covariate.labels = c("Treated"), 
@@ -347,8 +368,7 @@ labels_tax_condition[3] <- "compensation for households constrained<br> to consu
 barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
        sort=T, legend = c(yes_no5), labels=labels_tax_condition)
 
-##### 6. Determinants
-
+##### 6. Determinants #####
 ## 6.1 Attitudes over CC
 summary(lm((s$cause_CC=='anthropique') ~ Revenu, data=s)) # Pas significatif
 summary(lm((s$cause_CC=='anthropique') ~ sexe, data=s)) # Pas significatif

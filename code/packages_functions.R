@@ -300,6 +300,7 @@ dataN <- function(var, data=s, miss=T, weights = T, return = "", fr=T) {
     } else  {
       if (weights) mat <- c(mat, sum(data[['weight']][which(is.missing(v) & !is.na(v))])/sum(data[['weight']][!is.missing(v)]))
       else mat <- c(mat, length(which(is.missing(v) & !is.na(v)))/length(which(!is.missing(v)))) } }
+  if (max(nchar(levels))==3 & 'Oui' %in% levels & 'Non' %in% levels) { if (which(levels=='Non') < which(levels=='Oui')) mat[2:1] <- mat[1:2]; levels[c(which(levels=='Oui'),which(levels=='Non'))] <- c('Non', 'Oui') }
   if ((return %in% c("levels", "legend")) & miss & fr) return(c(levels, 'NSP'))
   else if ((return %in% c("levels", "legend")) & miss & (!(fr))) return(c(levels, 'PNR'))
   else if ((return %in% c("levels", "legend")) & (!(miss))) return(levels)
