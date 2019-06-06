@@ -225,6 +225,8 @@ s$nb_benefits <- 0
 for (v in variables_benefits[variables_benefits != 'benefices_aucun']) s$nb_benefits[s[[v]]==T] <- 1 + s$nb_benefits[s[[v]]==T]
 decrit(s$nb_benefits)
 
+decrit(s$taxe_efficace, miss=T, weight=s$weight)
+
 ## 4.4 Consumption and mobility constraints
 # 4.4.1 Perceived elasticities
 s$elast_chauffage_perso <- factor(s$elasticite_chauffage_perso, levels(as.factor(s$elasticite_chauffage_perso))[c(1,6:2)])
