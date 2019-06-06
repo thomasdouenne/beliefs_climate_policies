@@ -1612,6 +1612,18 @@ objective_gains_inelastic$transport <- n(objective_gains_inelastic$gain_net_nume
 objective_gains_inelastic$housing <- n(objective_gains_inelastic$gain_net_numeric_uc_chauffage)
 objective_gains_inelastic$all <- n(objective_gains_inelastic$gain_net_numeric_uc_taxe_carbone)
 
+# Enquête transport
+entd <- read.csv2("df_menages_domicile_teg.csv")
+entd$Mode <- NA
+entd$Mode[entd$mode==1 | entd$v1_btravmtp=="2.20"] <- "Walk/bike"
+entd$Mode[entd$mode==2 & entd$v1_btravmtp!="2.20"] <- "Other" # deux-roues
+entd$Mode[entd$mode==3 | entd$mode==4] <- "Car"
+entd$Mode[entd$mode==5 | entd$mode==6] <- "Public transport"
+entd$weight <- n(entd$poids_qind1) # plus de 6 ans, mobilité régulière
+entd$dist_obj_km <- n(entd$distrteg) # distance calculée par l'INSEE du trajet pendulaire
+entd$dist_subj_km <- n(entd$v1_btravdist) # distance renseignée par le répondent du trajet pendulaire
+
+
 # Pooling variables
 variables_taxe_gagnant <- c("taxe_gagnant_personne", "taxe_gagnant_pauvres", "taxe_gagnant_moyennes", "taxe_gagnant_riches", "taxe_gagnant_tous", "taxe_gagnant_citadins", "taxe_gagnant_certains", "taxe_gagnant_NSP")
 variables_taxe_perdant <- c("taxe_perdant_personne", "taxe_perdant_pauvres", "taxe_perdant_moyennes", "taxe_perdant_riches", "taxe_perdant_tous", "taxe_perdant_ruraux", "taxe_perdant_certains", "taxe_perdant_NSP")

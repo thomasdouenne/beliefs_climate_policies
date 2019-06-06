@@ -252,26 +252,35 @@ barres(file="elasticities", title="", thin=T, data=dataKN(c("Elasticite_chauffag
 
 # 4.4.2 Mobility and public transport
 barres(file="transports_opinions", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Limited, but enough", "Decent, but not enough", "Satisfactory")), labels=c(" "))
-decrit(s$transports_avis)
+decrit(s$transports_avis[s$transports_avis!=-1]<2, weights = s$weight[s$transports_avis!=-1])
+decrit(s$transports_travail[s$transports_travail!='Non concerné·e'], weights = s$weight[s$transports_travail!='Non concerné·e'])
 data_transports_use <- dataKN(c("transports_travail", "transports_courses", "transports_loisirs"))
 data_transports_use[3,] <- data_transports_use[3,] + data_transports_use[5,]
 barres(file="transports_use", title="", thin=T, nsp=T, data=data_transports_use[c(1,4,3,2,6),], legend=c("Walk/bike", "Public transport", "Other", "Car", "Unconcerned"), labels=c("Work", "Shopping", "Leisure"))
 decrit(s$transports_travail_actif)
+decrit(s$transports_minutes)
+decrit(s$transports_distance <= 10, weights = s$weight)
 s$transports_minutes <- "NSP"
 s$transports_minutes[s$transports_distance <= 5] <- "5 ou moins"
-s$transports_minutes[s$transports_distance > 5 & s$transports_distance <= 10] <- "5 à 10"
-s$transports_minutes[s$transports_distance > 10 & s$transports_distance <= 20] <- "10 à 20"
+s$transports_minutes[s$transports_distance > 5 & s$transports_distance <= 10] <- "6 à 10"
+s$transports_minutes[s$transports_distance > 10 & s$transports_distance <= 20] <- "11 à 20"
 s$transports_minutes[s$transports_distance > 20] <- "plus que 20" # TODO: preparation
-barres(file="transports_distance", title="", thin=T, data=dataN("transports_minutes"), labels=c(" "), legend=c("5 or less", "6 to 10", "11 to 20", "more than 20", "PNR"))
+barres(file="transports_distance", title="", thin=T, data=matrix(dataN("transports_minutes")[c(2,3,1,4,5),1], ncol=1), labels=c(" "), legend=c("5 or less", "6 to 10", "11 to 20", "more than 20", "PNR"))
 # Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture de prendre les transports en commun pour ses trajets domicile-travail
 barres(file="transports_frequency", title="", thin=T, nsp=T, data=matrix(dataN("transports_frequence")[c(4:1,5),1], ncol=1), legend=rev(c("PNR", "< 3/day", "1/hour - 4/day", "1/h - 2/h", "> 3/h")), labels=(" "))
 barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transports_travail_commun", "transports_travail_actif"))[c(3:1,4),], legend=c("Yes, no difficulty", "Yes, but bothering", "No", "PNR"), color=color(6, grey=T)[c(1,2,5,6)], labels=c("Public transport", "Walk or bike"))
 # TODO: one or the other
+decrit(entd$Mode, weights = entd$weight)
+decrit(entd$Mode[entd$dist_subj_km <= 2], weights = entd$weight[entd$dist_subj_km <= 2])
+decrit(is.na(entd$dist_subj_km)[!is.na(entd$dist_obj_km)]) # objective distance only present when subjective distance is present
+decrit(entd$Mode[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1], weights = entd$weight[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1])
+decrit(entd$Mode[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1 & !is.na(entd$dist_obj_km)], weights = entd$weight[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1 & !is.na(entd$dist_obj_km)])
+# when objective dist not NA, car -4%, public +4% in subjective: there is selection for calculation of objective
+decrit(entd$Mode[entd$dist_obj_km <= 2 & entd$dist_obj_km >= 1], weights = entd$weight[entd$dist_obj_km <= 2 & entd$dist_obj_km >= 1])
+decrit(s$transports_travail_commun=='Non' & s$transports_travail_actif=='Non', weights = s$weight)
+
 
 ##### 5. Attitudes over Other Policies #####
-
-labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
-barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
 ## 5.1 Preferred revenue recycling
 for (variable in variables_taxe_condition) {
   cat(variable)
@@ -282,13 +291,8 @@ labels_tax_condition <- c("a payment for the 50% poorest French<br> (those earni
                           "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
                           "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "non polluting transport")
 labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
-# labels_tax_condition <- c("a payment to the bottom 50%", "a payment to all French people", 
-#                           "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
-#                           "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
 barres(file="tax_condition_val", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE, rev=T)[,rev(c(9,5,8,7,3,4,1,6,2))], nsp=FALSE, 
        sort=F, thin=T, legend = rep("", 5), labels=labels_tax_condition[rev(c(9,5,8,7,3,4,1,6,2))], margin_l=220) # rev(yes_no5)
-# barres(file="tax_condition_valr", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
-#        sort=F, legend = rep("", 5), rev_color=T, labels=labels_tax_condition) # c(yes_no5)
 
 ## 5.2 Other instruments
 
@@ -302,8 +306,7 @@ labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red
                                    "stricter standards on pollution from new vehicles", "stricter standards during roadworthiness tests", 
                                    "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
 barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
-                                                           miss=FALSE)[,c(3,4,1,6,5,8,2,7)], nsp=FALSE, sort=F, legend = rep("", 5), labels=labels_environmental_policies[rev(c(3,4,1,6,5,8,2,7))], thin=T) # rev(yes_no5)
-
+                                                           miss=FALSE, rev = T)[,rev(c(3,4,1,6,5,8,2,7))], nsp=FALSE, sort=F, legend = rep("", 5), labels=labels_environmental_policies[rev(c(3,4,1,6,5,8,2,7))], thin=T) # rev(yes_no5)
 
 ## Diesel taxation
 decrit(s$rattrapage_diesel, miss=T, weights=s$weight) # 59% non, 29% oui

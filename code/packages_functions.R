@@ -283,7 +283,7 @@ data1 <- function(vars, data=s, weights=T) {
   }
   return( matrix(res, ncol=length(vars)) )
 }
-dataN <- function(var, data=s, miss=T, weights = T, return = "", fr=T) {
+dataN <- function(var, data=s, miss=T, weights = T, return = "", fr=T, rev=FALSE) {
   mat <- c()
   if (is.character(data[[var]]) | (is.numeric(data[[var]]) & !grepl("item", class(data[[var]])))) v <- as.factor(data[[var]])
   else v <- data[[var]]
@@ -293,6 +293,7 @@ dataN <- function(var, data=s, miss=T, weights = T, return = "", fr=T) {
   for (val in levels) { # before: no %in% nowherer below
     if (weights) mat <- c(mat, sum(data[['weight']][which(v==val)])/sum(data[['weight']][!is.missing(v) & (!(v %in% c("NSP", "Non concerné·e")))]))
     else mat <- c(mat, length(which(v==val))/length(which(!is.missing(v) & (!(v %in% c("NSP", "Non concerné·e")))))) }
+  if (rev) mat <- rev(mat)
   if (miss) {
     if (is.null(annotation(v))) {
       if (weights) mat <- c(mat, sum(data[['weight']][which(is.na(v) | v %in% c("NSP", "Non concerné·e"))])/sum(data[['weight']][!is.missing(v) & (!(v %in% c("NSP", "Non concerné·e")))]))
@@ -306,9 +307,9 @@ dataN <- function(var, data=s, miss=T, weights = T, return = "", fr=T) {
   else if ((return %in% c("levels", "legend")) & (!(miss))) return(levels)
   else return(matrix(mat, ncol=1))
 }
-dataKN <- function(vars, data=s, miss=T, weights = T, return = "", fr=T) {
+dataKN <- function(vars, data=s, miss=T, weights = T, return = "", fr=T, rev=FALSE) {
   res <- c()
-  for (var in vars) res <- c(res, dataN(var, data, miss, weights, return, fr))
+  for (var in vars) res <- c(res, dataN(var, data, miss, weights, return, fr, rev))
   return(matrix(res, ncol=length(vars)))
 }
 color5 <- c(rainbow(4, end=4/15)[1:3], "#00FF00", "#228B22") # the last two are: green, forestgreen
