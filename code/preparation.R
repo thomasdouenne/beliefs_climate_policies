@@ -1672,3 +1672,4 @@ variables_toutes <- c(variables_approbation, variables_qualite, variables_aleato
                       variables_gilets_jaunes, "gilets_jaunes", variables_gains_subjectifs, variables_Elasticite, variables_elasticite, variables_taxe_croyances, variables_benefices, 
                       variables_problemes, variables_taxe_condition, variables_politiques_environnementales, "rattrapage_diesel", variables_connaissances_CC, variables_avis_CC, 
                       variables_comportement_CC, variables_schiste, variables_depenses_publiques)
+variables_mobilite <- c("transports_avis", "transports_frequence", "transports_travail")
