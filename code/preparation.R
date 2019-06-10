@@ -1447,7 +1447,11 @@ convert_s <- function() {
   s$ges_correct_pm <<- (s$ges_pm == FALSE)
   var_climate_call <- c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm")
   for (v in var_climate_call) label(s[[paste("ges_correct", v, sep="_")]]) <<- paste("ges_correct_", v, ": Le répondant a correctement répondu à ges_", v, sep='')
-  
+  s$connaissances_CC <<- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 
+    3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=='Inde')
+  s$connaissances_CC <<- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
+  label(s$connaissances_CC) <<- "connaissances_CC: index des bonnes réponses aux questions sur le changement climatique (GES, climate call, cause, emission_cible, region)"
+
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
   # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
   for (i in 0:10) {

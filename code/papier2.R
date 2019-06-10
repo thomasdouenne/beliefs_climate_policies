@@ -34,10 +34,8 @@ decrit(s$emission_cible >= 5, weights = s$weight)
 decrit(s$emission_cible <= 2, weights = s$weight)
 decrit(s$generation_CC_min >= 2020, weights = s$weight)
 
-s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 
-  3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=='Inde')
-label(s$connaissances_CC) <- "connaissances_CC: index des bonnes réponses aux questions sur le changement climatique (GES, climate call, cause, emission_cible, region)"
 decrit(s$connaissances_CC)
+plot(density(s$connaissances_CC))
 summary(lm(I((connaissances_CC - mean(connaissances_CC))/sd(connaissances_CC)) ~ I((generation_CC_min-1960)/30), data=s, weights = s$weight))
 formula_connaissances_CC <- as.formula(paste("I((connaissances_CC - mean(connaissances_CC))/sd(connaissances_CC)) ~ I((generation_CC_min-1960)/30) + region_CC + diplome + ", 
         paste(variables_determinants[!(variables_determinants %in% c("Gauche_droite", "humaniste", "patriote", "ecologiste", "apolitique", "liberal", 
@@ -373,6 +371,7 @@ labels_tax_condition[3] <- "compensation for households constrained<br> to consu
 barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
        sort=T, legend = c(yes_no5), labels=labels_tax_condition)
 
+
 ##### 6. Determinants #####
 ## 6.1 Attitudes over CC
 summary(lm((s$cause_CC=='anthropique') ~ Revenu, data=s)) # Pas significatif
@@ -386,8 +385,19 @@ summary(lm((s$effets_CC > 2) ~ sexe, data=s)) # Pas significatif
 summary(lm((s$effets_CC > 2) ~ as.factor(taille_agglo), data=s)) # Peu significatif (grandes villes + 6.7 p.p.)
 summary(lm((s$effets_CC > 2) ~ Gilets_jaunes, data=s)) # -5.6 p.p. soutient / -7.8 p.p. est dedans
 summary(lm((s$effets_CC > 2) ~ Gauche_droite, data=s)) # -19 p.p. droite / -16 p.p. ext-droite / -11 p.p. indeter
+summary(lm(effets_CC ~ connaissances_CC + diplome4, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ (connaissances_CC + diplome4) * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ score_ges + diplome4, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ score_ges * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ Diplome, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ Diplome * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm((effets_CC > 2) ~ connaissances_CC, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm((effets_CC > 2) ~ diplome4 * Gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(score_ges ~ gauche_droite, data=s, weights = s$weight))
+summary(lm(score_climate_call ~ gauche_droite, data=s, weights = s$weight))
+summary(lm(cause_CC=='anthropique' ~ Gauche_droite, data=s, weights = s$weight))
 
-variables_determinants <- c("Revenu", "Revenu_conjoint", "as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))", 
+variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", # as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))
                             "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie) # 
 variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_65_plus",
                                                                                  names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
