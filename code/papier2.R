@@ -454,6 +454,39 @@ write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\
 
 
 ## 6.2 Attitudes over policies
+s$nb_politiques_env <- 0
+for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <- 1 + s$nb_politiques_env[s[[v]]>0]
+formula_determinants_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ",
+                                                        paste(variables_determinants, collapse = ' + ')))
+normes_environnementales <- c("normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants")
+taxes_environnementales <- c("taxe_kerosene", "taxe_viande", "peages_urbains", "fonds_mondial")
+s$normes_vs_taxes <- 0
+for (v in normes_environnementales) s$normes_vs_taxes <- s$normes_vs_taxes + s[[v]]
+for (v in taxes_environnementales) s$normes_vs_taxes[s[[v]]>0] <- s$normes_vs_taxes[s[[v]]>0] - s[[v]]
+
+earmarked <- c("si_renovation", "si_renouvelables", "si_transports")
+compensations <- c("si_pauvres", "si_compensee", "si_contraints")
+s$earmarked_vs_compensation <- 0
+for (v in earmarked) s$earmarked_vs_compensation <- s$earmarked_vs_compensation + s[[v]]
+for (v in compensations) s$earmarked_vs_compensation[s[[v]]>0] <- s$earmarked_vs_compensation[s[[v]]>0] - s[[v]]
+
+decrit(s$taxe_approbation, weights = s$weight, miss=TRUE)
+decrit(s$nb_politiques_env, weights = s$weight)
+decrit(s$mode_vie_ecolo, weights = s$weight, miss=TRUE)
+decrit(s$normes_vs_taxes, weights = s$weight)
+decrit(s$earmarked_vs_compensation, weights = s$weight)
+
+variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes",
+                            "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie, variables_mobilite) # 
+variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_65_plus",
+                                                                                 names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
+                                                                                 names(s)[which(grepl("hausse_", names(s)))]))]
+
+formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ",
+                                                          paste(variables_determinants, collapse = ' + ')))
+lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
+summary(ols_taxe_approbation)
+
 summary(lm((s$taxe_approbation=='Oui') ~ Revenu, data=s)) # 0.7 p.p. (très faible)
 summary(lm((s$taxe_approbation=='Oui') ~ sexe, data=s)) # 3.5 p.p.
 summary(lm((s$taxe_approbation=='Oui') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : +8.5 p.p.
