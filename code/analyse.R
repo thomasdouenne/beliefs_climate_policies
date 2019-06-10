@@ -3699,3 +3699,53 @@ barres(file="CC_effects", title="", thin=T, data=dataN("effets_CC"), nsp=T, sort
 labels_resp <- c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations")
 barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_resp, hover=labels_resp)
 barres(file="transports_opinionb", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Just enough", "Decent", "Satisfactory")), labels=c(" "))
+
+
+cause_ols <- lm(formula_determinants_cause, data=s, weights = s$weight)
+cause_logit <- glm(formula_determinants_cause, data=s, family="binomial")
+summary(cause_ols)
+summary(cause_logit)
+cause_logit_margins <- logitmfx(formula_determinants_cause, s, atmean=FALSE)$mfxest
+cause_logit_margins
+
+formula_determinants_effects <- as.formula(paste("effets_CC > 2 ~ ", paste(variables_determinants, collapse = ' + ')))
+effects_ols <- lm(formula_determinants_effects, data=s, weights = s$weight)
+effects_logit <- glm(formula_determinants_effects, data=s, family="binomial")
+summary(effects_ols)
+summary(effects_logit)
+effects_logit_margins <- logitmfx(formula_determinants_effects, s, atmean=FALSE)$mfxest
+effects_logit_margins
+
+decrit(s$score_ges + s$score_climate_call, weights = s$weight) # variance: 2.08 < mean: 4.15
+wtd.var(s$score_ges + s$score_climate_call, weights = s$weight) 
+s$score <- (s$score_ges + s$score_climate_call)/7
+formula_determinants_score <- as.formula(paste("score ~ ", paste(variables_determinants, collapse = ' + ')))
+ges_ols <- lm(formula_determinants_score, data=s, weights = s$weight)
+summary(ges_ols)
+ges_ologit <- oglmx(formula_determinants_score, data=s, constantMEAN = FALSE, constantSD = FALSE, link="logit", delta=0)
+# ges_ologit <- ologit.reg(as.formula(paste("score_ges + score_climate_call ~ ", paste(variables_determinants, collapse = ' + '))), data=s)
+# ges_ologit <- polr(as.formula(paste("as.factor(score_ges + score_climate_call) ~ ", paste(variables_determinants, collapse = ' + '))), data=s, Hess = T)
+# with polr, regressors should be scaled with scale() 
+s$score <- as.factor((s$score_ges + s$score_climate_call)/7)
+ges_ologit <- clm(formula_determinants_score, data=s)
+summary(ges_ologit)
+ges_ologit_margins <- margins.oglmx(ges_ologit, atmeans=FALSE, AME=T)
+ges_ologit_margins
+ges_logit <- glm(formula_determinants_score, data=s, family="binomial")
+summary(ges_logit)
+ges_logit_margins <- logitmfx(formula_determinants_score, s, atmean=FALSE)$mfxest
+ges_logit_margins
+
+Table_determinants_CC <- stargazer(cause_ols, cause_logit, effects_ols, effects_logit, ges_ols, ges_logit, ges_ologit,
+                                   title="Determinants of attitudes towards climate change", model.names = T, model.numbers = FALSE, 
+                                   # covariate.labels = c("Constant", "Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist","Consumption Units (C.U.)", 
+                                   #                      "Yellow Vests: PNR","Yellow Vests: understands","Yellow Vests: supports", "Yellow Vests: is part"),
+                                   header = FALSE, dep.var.labels = c("CC anthropic", "CC disastrous", "Knowledge on CC", ""),#  dep.var.caption = "", 
+                                   keep = c("Constant", "sexe", "age", "diplome", "taille_agglo", "Gilets_jaunes", "humaniste", "ecologiste", "Gauche_droite"), 
+                                   # "interet_politique", "csp", "diesel", "essence", "sexe", "apolitique"
+                                   coef = list(NULL, cause_logit_margins[,1], NULL, effects_logit_margins[,1], NULL, ges_logit_margins[,1], NULL),
+                                   se = list(NULL, cause_logit_margins[,2], NULL, effects_logit_margins[,2], NULL, ges_logit_margins[,2], NULL),
+                                   # add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark", "\\checkmark")),
+                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+                                                       Table_determinants_CC, fixed=TRUE), fixed=TRUE), collapse=' ')

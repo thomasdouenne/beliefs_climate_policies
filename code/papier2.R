@@ -388,7 +388,7 @@ summary(lm((s$effets_CC > 2) ~ Gauche_droite, data=s)) # -19 p.p. droite / -16 p
 summary(lm(effets_CC ~ connaissances_CC + diplome4, data=s, subset=s$effets_CC!=-1, weights = s$weight))
 summary(lm(effets_CC ~ (connaissances_CC + diplome4) * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
 summary(lm(effets_CC ~ score_ges + diplome4, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm(effets_CC ~ score_ges * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ connaissances_CC * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
 summary(lm(effets_CC ~ Diplome, data=s, subset=s$effets_CC!=-1, weights = s$weight))
 summary(lm(effets_CC ~ Diplome * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
 summary(lm((effets_CC > 2) ~ connaissances_CC, data=s, subset=s$effets_CC!=-1, weights = s$weight))
@@ -397,62 +397,58 @@ summary(lm(score_ges ~ gauche_droite, data=s, weights = s$weight))
 summary(lm(score_climate_call ~ gauche_droite, data=s, weights = s$weight))
 summary(lm(cause_CC=='anthropique' ~ Gauche_droite, data=s, weights = s$weight))
 
-variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", # as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))
-                            "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie) # 
-variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_65_plus",
+variables_determinants_attitudes <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", "as.factor(diplome4)", # as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))
+                            "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie, variables_mobilite) # 
+variables_determinants_attitudes <- variables_determinants_attitudes[!(variables_determinants_attitudes %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_18_24", "diplome4",
                                                                                  names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
                                                                                  names(s)[which(grepl("hausse_", names(s)))]))]
+variables_determinants_attitudes_CC <- variables_determinants_attitudes[c(21, 27, 3, 28, 4, 17:20, 1, 6, 15, 35)]
+for (v in variables_determinants_attitudes) if (!(v %in% variables_determinants_attitudes_CC)) variables_determinants_attitudes_CC <- c(variables_determinants_attitudes_CC, v)
+
 s$Gauche_droite <- relevel(s$Gauche_droite, 'Indeterminate')
 
-formula_determinants_cause <- as.formula(paste("cause_CC=='anthropique' ~ ", paste(variables_determinants, collapse = ' + ')))
-cause_ols <- lm(formula_determinants_cause, data=s, weights = s$weight)
-cause_logit <- glm(formula_determinants_cause, data=s, family="binomial")
-summary(cause_ols)
-summary(cause_logit)
-cause_logit_margins <- logitmfx(formula_determinants_cause, s, atmean=FALSE)$mfxest
-cause_logit_margins
+# (1) Cause of CC (anthropic or not)
+formula_determinants_cause <- as.formula(paste("cause_CC=='anthropique' ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + ')))
+cause_ols1 <- lm(formula_determinants_cause, data=s, weights = s$weight)
+summary(cause_ols1)
 
-formula_determinants_effects <- as.formula(paste("effets_CC > 2 ~ ", paste(variables_determinants, collapse = ' + ')))
-effects_ols <- lm(formula_determinants_effects, data=s, weights = s$weight)
-effects_logit <- glm(formula_determinants_effects, data=s, family="binomial")
-summary(effects_ols)
-summary(effects_logit)
-effects_logit_margins <- logitmfx(formula_determinants_effects, s, atmean=FALSE)$mfxest
-effects_logit_margins
+# (2) Cause of CC: diploma, age
+cause_ols2 <- lm(cause_CC=='anthropique' ~ age_25_34 + age_35_49 + age_50_64 + age_65_plus , data=s, weights = s$weight)
+summary(cause_ols2)
 
-decrit(s$score_ges + s$score_climate_call, weights = s$weight) # variance: 2.08 < mean: 4.15
-wtd.var(s$score_ges + s$score_climate_call, weights = s$weight) 
-s$score <- (s$score_ges + s$score_climate_call)/7
-formula_determinants_score <- as.formula(paste("score ~ ", paste(variables_determinants, collapse = ' + ')))
-ges_ols <- lm(formula_determinants_score, data=s, weights = s$weight)
-summary(ges_ols)
-ges_ologit <- oglmx(formula_determinants_score, data=s, constantMEAN = FALSE, constantSD = FALSE, link="logit", delta=0)
-# ges_ologit <- ologit.reg(as.formula(paste("score_ges + score_climate_call ~ ", paste(variables_determinants, collapse = ' + '))), data=s)
-# ges_ologit <- polr(as.formula(paste("as.factor(score_ges + score_climate_call) ~ ", paste(variables_determinants, collapse = ' + '))), data=s, Hess = T)
-# with polr, regressors should be scaled with scale() 
-s$score <- as.factor((s$score_ges + s$score_climate_call)/7)
-ges_ologit <- clm(formula_determinants_score, data=s)
-summary(ges_ologit)
-ges_ologit_margins <- margins.oglmx(ges_ologit, atmeans=FALSE, AME=T)
-ges_ologit_margins
-ges_logit <- glm(formula_determinants_score, data=s, family="binomial")
-summary(ges_logit)
-ges_logit_margins <- logitmfx(formula_determinants_score, s, atmean=FALSE)$mfxest
-ges_logit_margins
+# (3) Cause of CC: politics
+cause_ols3 <- lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4), data=s, weights = s$weight)
+summary(cause_ols3)
 
-Table_determinants_CC <- stargazer(cause_ols, cause_logit, effects_ols, effects_logit, ges_ols, ges_logit, ges_ologit,
-                                   title="Determinants of attitudes towards climate change", model.names = T, model.numbers = FALSE, 
-                                   # covariate.labels = c("Constant", "Initial tax: PNR (I don't know)", "Initial tax: Approves", "Sex: Female", "Ecologist","Consumption Units (C.U.)", 
-                                   #                      "Yellow Vests: PNR","Yellow Vests: understands","Yellow Vests: supports", "Yellow Vests: is part"),
-                                   header = FALSE, dep.var.labels = c("CC anthropic", "CC disastrous", "Knowledge on CC", ""),#  dep.var.caption = "", 
-                                   keep = c("Constant", "sexe", "age", "diplome", "taille_agglo", "Gilets_jaunes", "humaniste", "ecologiste", "Gauche_droite"), 
-                                   # "interet_politique", "csp", "diesel", "essence", "sexe", "apolitique"
-                                   coef = list(NULL, cause_logit_margins[,1], NULL, effects_logit_margins[,1], NULL, ges_logit_margins[,1], NULL),
-                                   se = list(NULL, cause_logit_margins[,2], NULL, effects_logit_margins[,2], NULL, ges_logit_margins[,2], NULL),
-                                   # add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark", "\\checkmark")),
-                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
-                                                       Table_determinants_CC, fixed=TRUE), fixed=TRUE), collapse=' ')
+# (4) Knowledge of CC
+formula_determinants_connaissances <- as.formula(paste("connaissances_CC ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + ')))
+knowledge_ols1 <- lm(formula_determinants_connaissances, data=s, weights = s$weight)
+summary(knowledge_ols1)
+
+# (5) Effects of CC
+formula_determinants_effets <- as.formula(paste("(effets_CC > 2) ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + ')))
+effects_ols1 <- lm(formula_determinants_effets, data=s, weights = s$weight)
+summary(effects_ols1)
+
+# (6) Effects of CC: 
+effects_ols2 <- lm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight) # diplome4 ou connaissances_CC ?
+summary(effects_ols2)
+
+Table_determinants_attitudes_CC <- stargazer(cause_ols1, cause_ols2, cause_ols3, knowledge_ols1, effects_ols1, effects_ols2,
+                                   title="Determinants of attitudes towards climate change (CC).", model.names = FALSE, model.numbers = T, 
+                                   covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                                                        "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
+                                                        "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
+                                                        "Diploma: \\textit{Baccalauréat}", "Diploma: Superior", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
+                                                        "Income (k€/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
+                                   header = FALSE, dep.var.labels = c("CC is anthropic", "Knowledge on CC", "CC is disastrous"),  dep.var.caption = "", 
+                                   keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
+                                            "Gauche_droite", "interet_politique", "transports_frequence"), # "humaniste", , "transports_avis", "conso"
+                                   add.lines = list(c("Additional covariates & \\checkmark &  &  & \\checkmark & \\checkmark &  \\\\ ")),
+                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:determinants_attitudes_CC")
+write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Interaction term is computed using numeric variables. Omitted modalities are: \\textit{Yellow Vests: opposes}, \\textit{Left-right: Indeterminate}, \\textit{Diploma: Brevet or no diploma}, \\textit{Age: 18 -- 24}. Additional covariates are defined in \\ref{app:covariatesTODO}. }                \\end{table*} ', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                                                       Table_determinants_attitudes_CC, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
 
 
 ## 6.2 Attitudes over policies
