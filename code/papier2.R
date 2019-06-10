@@ -402,6 +402,8 @@ variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", # as.f
 variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_65_plus",
                                                                                  names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
                                                                                  names(s)[which(grepl("hausse_", names(s)))]))]
+s$Gauche_droite <- relevel(s$Gauche_droite, 'Indeterminate')
+
 formula_determinants_cause <- as.formula(paste("cause_CC=='anthropique' ~ ", paste(variables_determinants, collapse = ' + ')))
 cause_ols <- lm(formula_determinants_cause, data=s, weights = s$weight)
 cause_logit <- glm(formula_determinants_cause, data=s, family="binomial")
@@ -471,43 +473,64 @@ for (v in earmarked) s$earmarked_vs_compensation <- s$earmarked_vs_compensation 
 for (v in compensations) s$earmarked_vs_compensation[s[[v]]>0] <- s$earmarked_vs_compensation[s[[v]]>0] - s[[v]]
 
 decrit(s$taxe_approbation, weights = s$weight, miss=TRUE)
-decrit(s$nb_politiques_env, weights = s$weight)
+decrit(s$nb_politiques_env, weights = s$weight) #TODO: exploiter le -2/+2
 decrit(s$mode_vie_ecolo, weights = s$weight, miss=TRUE)
 decrit(s$normes_vs_taxes, weights = s$weight)
 decrit(s$earmarked_vs_compensation, weights = s$weight)
 
-variables_determinants <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes",
+variables_determinants_policy <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes",
                             "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie, variables_mobilite) # 
-variables_determinants <- variables_determinants[!(variables_determinants %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_65_plus",
+variables_determinants_policy <- variables_determinants_policy[!(variables_determinants_policy %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_18_24",
                                                                                  names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
                                                                                  names(s)[which(grepl("hausse_", names(s)))]))]
 
 formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ",
-                                                          paste(variables_determinants, collapse = ' + ')))
-lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
+                                                          paste(variables_determinants_policy, collapse = ' + ')))
+ols_taxe_approbation <- lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
 summary(ols_taxe_approbation)
 
+formula_determinants_nb_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ",
+                                                          paste(variables_determinants_policy, collapse = ' + ')))
+ols_nb_politiques_env <- lm(formula_determinants_nb_politiques_env, data=s, weights = s$weight)
+summary(ols_nb_politiques_env)
+
+formula_determinants_nb_politiques_env_bis <- as.formula(paste("nb_politiques_env/8 ~ ",
+                                                           paste("Gauche_droite + Gilets_jaunes", collapse = ' + ')))
+ols_nb_politiques_env_bis <- lm(formula_determinants_nb_politiques_env_bis, data=s, weights = s$weight)
+summary(ols_nb_politiques_env_bis)
+
+formula_determinants_mode_vie_ecolo <- as.formula(paste("mode_vie_ecolo == 'Oui' ~ ",
+                                                           paste(variables_determinants_policy, collapse = ' + ')))
+ols_mode_vie_ecolo <- lm(formula_determinants_mode_vie_ecolo, data=s, weights = s$weight)
+summary(ols_mode_vie_ecolo)
+
+formula_determinants_normes_vs_taxes <- as.formula(paste("normes_vs_taxes ~ ",
+                                                        paste(variables_determinants_policy, collapse = ' + ')))
+ols_normes_vs_taxes <- lm(formula_determinants_normes_vs_taxes, data=s, weights = s$weight)
+summary(ols_normes_vs_taxes)
+
+formula_determinants_earmarked_vs_compensation <- as.formula(paste("earmarked_vs_compensation ~ ",
+                                                         paste(variables_determinants_policy, collapse = ' + ')))
+ols_earmarked_vs_compensation <- lm(formula_determinants_earmarked_vs_compensation, data=s, weights = s$weight)
+summary(ols_earmarked_vs_compensation)
+
+Table_politiques_env <- stargazer(ols_taxe_approbation, ols_nb_politiques_env, ols_nb_politiques_env_bis, ols_normes_vs_taxes, ols_earmarked_vs_compensation, ols_mode_vie_ecolo,
+                                   title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = FALSE, 
+                                   covariate.labels = c("Income (k€/month)", "Yellow Vests: PNR", "Yellow Vests: understands", "Yellow Vests: supports",
+                                                       "Yellow Vests: is part", "Sex: Male", "Diploma (1 to 4)", "Size of town (1 to 5)",
+                                                       "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", "Interest in politics (0 to 2)",
+                                                       "Ecologist", "Extreme-left", "Left", "Center", "Right", "Extreme-right", "Frequency public transit"),                                   #covariate.labels = c("Income (k", "Sex: Female", "Diploma", "Size of town", "Ecologist", "Age: 25-34", "Age: 35-49", "Age: 50-64", "Age >= 65",
+                                   header = FALSE, dep.var.labels = c("Tax \\& dividend", "Number of policies", "norms vs. taxes", "earmarking vs. transfers", "ecological lifestyle"),  dep.var.caption = "", 
+                                   keep = c("Revenu$", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
+                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
+write_clip(gsub('\\end{table}', '} \\end{table*}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                                                  gsub('\\\\[-1.8ex] & Tax \\& dividend & \\multicolumn{2}{c}{Share of policies} & norms vs. taxes & earmarking vs. transfers & ecological lifestyle \\\\',
+                                                       '\\\\[-1.8ex] & Acceptance of & \\multicolumn{2}{c}{Number of policies} & Norms & Earmarking & Ecological \\\\ \\\\[-1.8ex] & Tax \\& dividend & \\multicolumn{2}{c}{approved} & vs. taxes & vs. transfers & lifestyle \\\\',
+                                                      Table_politiques_env, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
+
+# Moins important :
 summary(lm((s$taxe_approbation=='Oui') ~ Revenu, data=s)) # 0.7 p.p. (très faible)
 summary(lm((s$taxe_approbation=='Oui') ~ sexe, data=s)) # 3.5 p.p.
 summary(lm((s$taxe_approbation=='Oui') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : +8.5 p.p.
 summary(lm((s$taxe_approbation=='Oui') ~ Gilets_jaunes, data=s)) # -15 p.p. soutient / -14 p.p. est dedans
 summary(lm((s$taxe_approbation=='Oui') ~ Gauche_droite, data=s)) # pas significtaif (centre .)
-
-formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ",
-                                                          paste(variables_determinants, collapse = ' + ')))
-summary(lm(formula_determinants_taxe_approbation, data=s, weights = s$weight))
-summary(mlogit(taxe_approbation ~ revenu + sexe + age, data = s))
-
-formula_determinants_mode_vie_ecolo <- as.formula(paste("mode_vie_ecolo=='Oui' ~ ",
-                                                        paste(variables_determinants, collapse = ' + ')))
-summary(lm(formula_determinants_mode_vie_ecolo, data=s, weights = s$weight))
-
-s$nb_politiques_env <- 0
-for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <- 1 + s$nb_politiques_env[s[[v]]>0]
-formula_determinants_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ",
-                                                        paste(variables_determinants, collapse = ' + ')))
-summary(lm(formula_determinants_politiques_env, data=s, weights = s$weight))
-
-formula_determinants_politiques_env <- as.formula(paste("taxe_kerosene ~ ",
-                                                        paste(variables_determinants, collapse = ' + ')))
-summary(lm(formula_determinants_politiques_env, data=s, weights = s$weight))
