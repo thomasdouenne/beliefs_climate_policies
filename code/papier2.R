@@ -374,35 +374,34 @@ barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_p
 
 ##### 6. Determinants #####
 ## 6.1 Attitudes over CC
-summary(lm((s$cause_CC=='anthropique') ~ Revenu, data=s)) # Pas significatif
-summary(lm((s$cause_CC=='anthropique') ~ sexe, data=s)) # Pas significatif
-summary(lm((s$cause_CC=='anthropique') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : env +8.5 p.p.
-summary(lm((s$cause_CC=='anthropique') ~ Gilets_jaunes, data=s)) # -10 p.p. soutient / -20 p.p. est dedans
-summary(lm((s$cause_CC=='anthropique') ~ Gauche_droite, data=s)) # -18 p.p. droite / -21 p.p. ext-droite / -12 p.p. indeter / -9 p.p. centre
+data_cor <- s[,c("cause_CC", "effets_CC", "connaissances_CC", "taxe_approbation", "nb_politiques_env", "mode_vie_ecolo", "diplome4", "age", "taille_agglo")] # , "gauche_droite", "gilets_jaunes"
+data_cor <- s[,c("connaissances_CC", "nb_politiques_env", "age")]
+corr <- cor(data_cor, use="complete.obs")
+cor.mtest <- function(mat, ...) {
+  mat <- as.matrix(mat)
+  n <- ncol(mat)
+  p.mat<- matrix(NA, n, n)
+  diag(p.mat) <- 0
+  for (i in 1:(n - 1)) {
+    for (j in (i + 1):n) {
+      tmp <- cor.test(mat[, i], mat[, j], ...)
+      p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+    }
+  }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+p.mat <- cor.mtest(data_cor)
+corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=T, tl.srt=45, tl.col='black', insig = 'blank', type='upper') # , order='hclust', addCoef.col = 'white', addCoefasPercent = T
+corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=T, tl.srt=45, tl.col='black', insig = 'blank', addCoef.col = 'white', addCoefasPercent = T , type='upper') #, order='hclust'
 
-summary(lm((s$effets_CC > 2) ~ Revenu, data=s)) # Pas significatif
-summary(lm((s$effets_CC > 2) ~ sexe, data=s)) # Pas significatif
-summary(lm((s$effets_CC > 2) ~ as.factor(taille_agglo), data=s)) # Peu significatif (grandes villes + 6.7 p.p.)
-summary(lm((s$effets_CC > 2) ~ Gilets_jaunes, data=s)) # -5.6 p.p. soutient / -7.8 p.p. est dedans
-summary(lm((s$effets_CC > 2) ~ Gauche_droite, data=s)) # -19 p.p. droite / -16 p.p. ext-droite / -11 p.p. indeter
-summary(lm(effets_CC ~ connaissances_CC + diplome4, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm(effets_CC ~ (connaissances_CC + diplome4) * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm(effets_CC ~ score_ges + diplome4, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm(effets_CC ~ connaissances_CC * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm(effets_CC ~ Diplome, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm(effets_CC ~ Diplome * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm((effets_CC > 2) ~ connaissances_CC, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm((effets_CC > 2) ~ diplome4 * Gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
-summary(lm(score_ges ~ gauche_droite, data=s, weights = s$weight))
-summary(lm(score_climate_call ~ gauche_droite, data=s, weights = s$weight))
-summary(lm(cause_CC=='anthropique' ~ Gauche_droite, data=s, weights = s$weight))
 
 variables_determinants_attitudes <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", "as.factor(diplome4)", # as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))
                             "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie, variables_mobilite) # 
 variables_determinants_attitudes <- variables_determinants_attitudes[!(variables_determinants_attitudes %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_18_24", "diplome4",
                                                                                  names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
                                                                                  names(s)[which(grepl("hausse_", names(s)))]))]
-variables_determinants_attitudes_CC <- variables_determinants_attitudes[c(21, 27, 3, 28, 4, 17:20, 1, 6, 15, 35)]
+variables_determinants_attitudes_CC <- variables_determinants_attitudes[c(21, 27, 3, 28, 4, 17:20, 1, 6, 15, 39)]
 for (v in variables_determinants_attitudes) if (!(v %in% variables_determinants_attitudes_CC)) variables_determinants_attitudes_CC <- c(variables_determinants_attitudes_CC, v)
 
 s$Gauche_droite <- relevel(s$Gauche_droite, 'Indeterminate')
@@ -454,8 +453,7 @@ write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotes
 ## 6.2 Attitudes over policies
 s$nb_politiques_env <- 0
 for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <- 1 + s$nb_politiques_env[s[[v]]>0]
-formula_determinants_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ",
-                                                        paste(variables_determinants, collapse = ' + ')))
+formula_determinants_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ", paste(variables_determinants, collapse = ' + ')))
 normes_environnementales <- c("normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants")
 taxes_environnementales <- c("taxe_kerosene", "taxe_viande", "peages_urbains", "fonds_mondial")
 s$normes_vs_taxes <- 0
@@ -468,6 +466,9 @@ s$earmarked_vs_compensation <- 0
 for (v in earmarked) s$earmarked_vs_compensation <- s$earmarked_vs_compensation + s[[v]]
 for (v in compensations) s$earmarked_vs_compensation[s[[v]]>0] <- s$earmarked_vs_compensation[s[[v]]>0] - s[[v]]
 
+s$norms_vs_taxes <- (s$norms_vs_taxes - mean(s$norms_vs_taxes))/sd(s$norms_vs_taxes)
+s$earmarked_vs_compensation <- (s$earmarked_vs_compensation - mean(s$earmarked_vs_compensation))/sd(s$earmarked_vs_compensation)
+
 decrit(s$taxe_approbation, weights = s$weight, miss=TRUE)
 decrit(s$nb_politiques_env, weights = s$weight) #TODO: exploiter le -2/+2
 decrit(s$mode_vie_ecolo, weights = s$weight, miss=TRUE)
@@ -479,47 +480,45 @@ variables_determinants_policy <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes",
 variables_determinants_policy <- variables_determinants_policy[!(variables_determinants_policy %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_18_24",
                                                                                  names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
                                                                                  names(s)[which(grepl("hausse_", names(s)))]))]
+variables_determinants_policy_CC <- variables_determinants_policy[c(21, 27, 3, 28, 9, 17:20, 1, 5, 15, 39)]
+for (v in variables_determinants_policy) if (!(v %in% variables_determinants_policy_CC)) variables_determinants_policy_CC <- c(variables_determinants_policy_CC, v)
 
-formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ",
-                                                          paste(variables_determinants_policy, collapse = ' + ')))
+formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_taxe_approbation <- lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
 summary(ols_taxe_approbation)
 
-formula_determinants_nb_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ",
-                                                          paste(variables_determinants_policy, collapse = ' + ')))
+formula_determinants_nb_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_nb_politiques_env <- lm(formula_determinants_nb_politiques_env, data=s, weights = s$weight)
 summary(ols_nb_politiques_env)
 
-formula_determinants_nb_politiques_env_bis <- as.formula(paste("nb_politiques_env/8 ~ ",
-                                                           paste("Gauche_droite + Gilets_jaunes", collapse = ' + ')))
+formula_determinants_nb_politiques_env_bis <- as.formula(paste("nb_politiques_env/8 ~ ", paste("Gauche_droite + Gilets_jaunes", collapse = ' + ')))
 ols_nb_politiques_env_bis <- lm(formula_determinants_nb_politiques_env_bis, data=s, weights = s$weight)
 summary(ols_nb_politiques_env_bis)
 
-formula_determinants_mode_vie_ecolo <- as.formula(paste("mode_vie_ecolo == 'Oui' ~ ",
-                                                           paste(variables_determinants_policy, collapse = ' + ')))
+formula_determinants_mode_vie_ecolo <- as.formula(paste("mode_vie_ecolo == 'Oui' ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_mode_vie_ecolo <- lm(formula_determinants_mode_vie_ecolo, data=s, weights = s$weight)
 summary(ols_mode_vie_ecolo)
 
-formula_determinants_normes_vs_taxes <- as.formula(paste("normes_vs_taxes ~ ",
-                                                        paste(variables_determinants_policy, collapse = ' + ')))
+formula_determinants_normes_vs_taxes <- as.formula(paste("normes_vs_taxes ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_normes_vs_taxes <- lm(formula_determinants_normes_vs_taxes, data=s, weights = s$weight)
 summary(ols_normes_vs_taxes)
 
-formula_determinants_earmarked_vs_compensation <- as.formula(paste("earmarked_vs_compensation ~ ",
-                                                         paste(variables_determinants_policy, collapse = ' + ')))
+formula_determinants_earmarked_vs_compensation <- as.formula(paste("earmarked_vs_compensation ~ ",  paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_earmarked_vs_compensation <- lm(formula_determinants_earmarked_vs_compensation, data=s, weights = s$weight)
 summary(ols_earmarked_vs_compensation)
 
 Table_politiques_env <- stargazer(ols_taxe_approbation, ols_nb_politiques_env, ols_nb_politiques_env_bis, ols_normes_vs_taxes, ols_earmarked_vs_compensation, ols_mode_vie_ecolo,
                                    title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = FALSE, 
-                                   covariate.labels = c("Income (k€/month)", "Yellow Vests: PNR", "Yellow Vests: understands", "Yellow Vests: supports",
-                                                       "Yellow Vests: is part", "Sex: Male", "Diploma (1 to 4)", "Size of town (1 to 5)",
-                                                       "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", "Interest in politics (0 to 2)",
-                                                       "Ecologist", "Extreme-left", "Left", "Center", "Right", "Extreme-right", "Frequency public transit"),                                   #covariate.labels = c("Income (k", "Sex: Female", "Diploma", "Size of town", "Ecologist", "Age: 25-34", "Age: 35-49", "Age: 50-64", "Age >= 65",
-                                   header = FALSE, dep.var.labels = c("Tax \\& dividend", "Number of policies", "norms vs. taxes", "earmarking vs. transfers", "ecological lifestyle"),  dep.var.caption = "", 
+                                  covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                                                       "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
+                                                       "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)", 
+                                                       "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
+                                                       "Income (k€/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit"),
+                                   header = FALSE, dep.var.labels = c("Tax \\& dividend", "Share of policies", "norms vs. taxes", "earmarking vs. transfers", "ecological lifestyle"),  dep.var.caption = "", 
                                    keep = c("Revenu$", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
                                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
-write_clip(gsub('\\end{table}', '} \\end{table*}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in \\ref{app:covariatesTODO}.} \\end{table*}', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
                                                   gsub('\\\\[-1.8ex] & Tax \\& dividend & \\multicolumn{2}{c}{Share of policies} & norms vs. taxes & earmarking vs. transfers & ecological lifestyle \\\\',
                                                        '\\\\[-1.8ex] & Acceptance of & \\multicolumn{2}{c}{Number of policies} & Norms & Earmarking & Ecological \\\\ \\\\[-1.8ex] & Tax \\& dividend & \\multicolumn{2}{c}{approved} & vs. taxes & vs. transfers & lifestyle \\\\',
                                                       Table_politiques_env, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')

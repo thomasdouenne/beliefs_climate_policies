@@ -59,6 +59,7 @@ package("emmeans")
 package("ggeffects")
 package("snakecase")
 package("rdd")
+package("corrplot")
 # package("doMC") # for parallel computing, does not work on Windows
 
 # Fs <- function(QID) { s[QID][[1]] }

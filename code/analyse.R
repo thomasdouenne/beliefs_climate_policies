@@ -3749,3 +3749,26 @@ Table_determinants_CC <- stargazer(cause_ols, cause_logit, effects_ols, effects_
                                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_determinants_CC, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+summary(lm((s$cause_CC=='anthropique') ~ Revenu, data=s)) # Pas significatif
+summary(lm((s$cause_CC=='anthropique') ~ sexe, data=s)) # Pas significatif
+summary(lm((s$cause_CC=='anthropique') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : env +8.5 p.p.
+summary(lm((s$cause_CC=='anthropique') ~ Gilets_jaunes, data=s)) # -10 p.p. soutient / -20 p.p. est dedans
+summary(lm((s$cause_CC=='anthropique') ~ Gauche_droite, data=s)) # -18 p.p. droite / -21 p.p. ext-droite / -12 p.p. indeter / -9 p.p. centre
+
+summary(lm((s$effets_CC > 2) ~ Revenu, data=s)) # Pas significatif
+summary(lm((s$effets_CC > 2) ~ sexe, data=s)) # Pas significatif
+summary(lm((s$effets_CC > 2) ~ as.factor(taille_agglo), data=s)) # Peu significatif (grandes villes + 6.7 p.p.)
+summary(lm((s$effets_CC > 2) ~ Gilets_jaunes, data=s)) # -5.6 p.p. soutient / -7.8 p.p. est dedans
+summary(lm((s$effets_CC > 2) ~ Gauche_droite, data=s)) # -19 p.p. droite / -16 p.p. ext-droite / -11 p.p. indeter
+summary(lm(effets_CC ~ connaissances_CC + diplome4, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ (connaissances_CC + diplome4) * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ score_ges + diplome4, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ connaissances_CC * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ Diplome, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(effets_CC ~ Diplome * gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm((effets_CC > 2) ~ connaissances_CC, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm((effets_CC > 2) ~ diplome4 * Gauche_droite, data=s, subset=s$effets_CC!=-1, weights = s$weight))
+summary(lm(score_ges ~ gauche_droite, data=s, weights = s$weight))
+summary(lm(score_climate_call ~ gauche_droite, data=s, weights = s$weight))
+summary(lm(cause_CC=='anthropique' ~ Gauche_droite, data=s, weights = s$weight))
