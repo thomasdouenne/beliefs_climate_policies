@@ -335,6 +335,14 @@ barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_p
 
 ##### 6. Determinants #####
 ## 6.1 Attitudes over CC
+decrit(s$Gauche_droite, weights=s$weight)
+s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 
+  3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=='Inde')
+decrit(s$connaissances_CC, weights = s$weight)
+decrit(s$connaissances_CC)
+sd(s$connaissances_CC)
+s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
+
 s$anthropique <- s$cause_CC=='anthropique'
 s$mode_vie_ecolo_oui <- s$mode_vie_ecolo=='Oui'
 s$male <- s$sexe=='Masculin'
