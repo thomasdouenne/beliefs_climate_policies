@@ -374,8 +374,12 @@ barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_p
 
 ##### 6. Determinants #####
 ## 6.1 Attitudes over CC
-data_cor <- s[,c("cause_CC", "effets_CC", "connaissances_CC", "taxe_approbation", "nb_politiques_env", "mode_vie_ecolo", "diplome4", "age", "taille_agglo")] # , "gauche_droite", "gilets_jaunes"
-data_cor <- s[,c("connaissances_CC", "nb_politiques_env", "age")]
+s$anthropique <- s$cause_CC=='anthropique'
+s$mode_vie_ecolo_oui <- s$mode_vie_ecolo=='Oui'
+s$male <- s$sexe=='Masculin'
+s$ecolo <- s$ecologiste==T
+data_cor <- s[,c("anthropique", "connaissances_CC", "effets_CC", "parle_CC", "mode_vie_ecolo_oui", "nb_politiques_env", "tax_acceptance", "ecolo", "diplome4", "age", "taille_agglo", "Revenu")] # , "gauche_droite", "gilets_jaunes"
+names(data_cor) <- c("Anthropic", "Knowledge", "Gravity", "Frequency talks", "Ecological lifestyle", "Number policies", "Tax acceptance", "Ecologist", "Diploma", "Age", "Size of town", "Income")
 corr <- cor(data_cor, use="complete.obs")
 cor.mtest <- function(mat, ...) {
   mat <- as.matrix(mat)
@@ -392,9 +396,8 @@ cor.mtest <- function(mat, ...) {
   p.mat
 }
 p.mat <- cor.mtest(data_cor)
-corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=T, tl.srt=45, tl.col='black', insig = 'blank', type='upper') # , order='hclust', addCoef.col = 'white', addCoefasPercent = T
-corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=T, tl.srt=45, tl.col='black', insig = 'blank', addCoef.col = 'white', addCoefasPercent = T , type='upper') #, order='hclust'
-
+# corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=T, tl.srt=45, tl.col='black', insig = 'blank', type='upper') # , order='hclust', addCoef.col = 'white', addCoefasPercent = T
+corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
 
 variables_determinants_attitudes <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", "as.factor(diplome4)", # as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))
                             "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie, variables_mobilite) # 
@@ -412,7 +415,7 @@ cause_ols1 <- lm(formula_determinants_cause, data=s, weights = s$weight)
 summary(cause_ols1)
 
 # (2) Cause of CC: diploma, age
-cause_ols2 <- lm(cause_CC=='anthropique' ~ age_25_34 + age_35_49 + age_50_64 + age_65_plus , data=s, weights = s$weight)
+cause_ols2 <- lm(cause_CC=='anthropique' ~ age_25_34 + age_35_49 + age_50_64 + age_65_plus, data=s, weights = s$weight)
 summary(cause_ols2)
 
 # (3) Cause of CC: politics
@@ -425,7 +428,7 @@ knowledge_ols1 <- lm(formula_determinants_connaissances, data=s, weights = s$wei
 summary(knowledge_ols1)
 
 # (5) Effects of CC
-formula_determinants_effets <- as.formula(paste("(effets_CC > 2) ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + ')))
+formula_determinants_effets <- as.formula(paste("(effets_CC > 2) ~  ", paste(variables_determinants_attitudes_CC, collapse = ' + ')))
 effects_ols1 <- lm(formula_determinants_effets, data=s, weights = s$weight)
 summary(effects_ols1)
 
@@ -439,7 +442,7 @@ Table_determinants_attitudes_CC <- stargazer(cause_ols1, cause_ols2, cause_ols3,
                                                         "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
                                                         "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
                                                         "Diploma: \\textit{Baccalauréat}", "Diploma: Superior", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
-                                                        "Income (k€/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
+                                                        "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
                                    header = FALSE, dep.var.labels = c("CC is anthropic", "Knowledge on CC", "CC is disastrous"),  dep.var.caption = "", 
                                    keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
                                             "Gauche_droite", "interet_politique", "transports_frequence"), # "humaniste", , "transports_avis", "conso"
@@ -458,15 +461,15 @@ normes_environnementales <- c("normes_isolation", "normes_vehicules", "controle_
 taxes_environnementales <- c("taxe_kerosene", "taxe_viande", "peages_urbains", "fonds_mondial")
 s$normes_vs_taxes <- 0
 for (v in normes_environnementales) s$normes_vs_taxes <- s$normes_vs_taxes + s[[v]]
-for (v in taxes_environnementales) s$normes_vs_taxes[s[[v]]>0] <- s$normes_vs_taxes[s[[v]]>0] - s[[v]]
+for (v in taxes_environnementales) s$normes_vs_taxes <- s$normes_vs_taxes - s[[v]]
 
 earmarked <- c("si_renovation", "si_renouvelables", "si_transports")
 compensations <- c("si_pauvres", "si_compensee", "si_contraints")
 s$earmarked_vs_compensation <- 0
 for (v in earmarked) s$earmarked_vs_compensation <- s$earmarked_vs_compensation + s[[v]]
-for (v in compensations) s$earmarked_vs_compensation[s[[v]]>0] <- s$earmarked_vs_compensation[s[[v]]>0] - s[[v]]
+for (v in compensations) s$earmarked_vs_compensation <- s$earmarked_vs_compensation - s[[v]]
 
-s$norms_vs_taxes <- (s$norms_vs_taxes - mean(s$norms_vs_taxes))/sd(s$norms_vs_taxes)
+s$normes_vs_taxes <- (s$normes_vs_taxes - mean(s$normes_vs_taxes))/sd(s$normes_vs_taxes)
 s$earmarked_vs_compensation <- (s$earmarked_vs_compensation - mean(s$earmarked_vs_compensation))/sd(s$earmarked_vs_compensation)
 
 decrit(s$taxe_approbation, weights = s$weight, miss=TRUE)
@@ -508,12 +511,12 @@ ols_earmarked_vs_compensation <- lm(formula_determinants_earmarked_vs_compensati
 summary(ols_earmarked_vs_compensation)
 
 Table_politiques_env <- stargazer(ols_taxe_approbation, ols_nb_politiques_env, ols_nb_politiques_env_bis, ols_normes_vs_taxes, ols_earmarked_vs_compensation, ols_mode_vie_ecolo,
-                                   title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = FALSE, 
+                                   title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = T, 
                                   covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
                                                        "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
                                                        "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)", 
                                                        "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
-                                                       "Income (k€/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit"),
+                                                       "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit"),
                                    header = FALSE, dep.var.labels = c("Tax \\& dividend", "Share of policies", "norms vs. taxes", "earmarking vs. transfers", "ecological lifestyle"),  dep.var.caption = "", 
                                    keep = c("Revenu$", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
                                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
