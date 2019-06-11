@@ -342,6 +342,8 @@ decrit(s$connaissances_CC, weights = s$weight)
 decrit(s$connaissances_CC)
 sd(s$connaissances_CC)
 s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
+summary(lm(cause_CC=='anthropique' ~ as.factor(age) + as.factor(diplome) + statut_emploi, data=s, weights=s$weight)) # statut_emploi = étudiant matters for lowering the (omitted) effect of 18-24
+summary(lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight))
 
 s$anthropique <- s$cause_CC=='anthropique'
 s$mode_vie_ecolo_oui <- s$mode_vie_ecolo=='Oui'
