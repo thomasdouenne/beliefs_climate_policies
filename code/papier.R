@@ -584,8 +584,8 @@ Table_ee2 <- stargazer(tsls2_ee1, ols_ee2, logit_ee3, tsls2_ee4, tsls2_ee5,
                        add.lines = list(c("Instruments: info E.E., C.C. \\& P.M. ", "\\checkmark ", "", " ", "\\checkmark ", "\\checkmark"),
                                         c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark ")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
-write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
-               "\\textit{IV} & \\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
+write_clip(sub("\\multicolumn{2}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
+               "\\textit{IV} & \\textit{OLS} & \\textit{logit} & \\textit{IV} & \\textit{IV}", 
                gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
                     For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}.}\\end{table}', 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_ee2, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
