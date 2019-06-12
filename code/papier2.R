@@ -344,6 +344,13 @@ sd(s$connaissances_CC)
 s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
 summary(lm(cause_CC=='anthropique' ~ as.factor(age) + as.factor(diplome) + statut_emploi, data=s, weights=s$weight)) # statut_emploi = étudiant matters for lowering the (omitted) effect of 18-24
 summary(lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight))
+summary(lm(cause_CC=='anthropique' ~ Gilets_jaunes + as.factor(diplome4) + diplome4 * gilets_jaunes, data=s, weights = s$weight))
+summary(lm((effets_CC > 2) ~ Gilets_jaunes + as.factor(diplome4) + diplome4 * gilets_jaunes, data=s, weights = s$weight))
+summary(lm(connaissances_CC ~ Gilets_jaunes + as.factor(diplome4) + diplome4 * gilets_jaunes, data=s, weights = s$weight))
+summary(lm(connaissances_CC ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight)) # .
+summary(lm(cause_CC=='anthropique' ~ Gauche_droite + connaissances_CC * gauche_droite, data=s, weights = s$weight)) # **
+summary(lm((effets_CC > 2) ~ Gauche_droite + connaissances_CC * gauche_droite, data=s, weights = s$weight))
+summary(lm((effets_CC > 2) ~ Gilets_jaunes + connaissances_CC * gilets_jaunes, data=s, weights = s$weight))
 
 s$anthropique <- s$cause_CC=='anthropique'
 s$mode_vie_ecolo_oui <- s$mode_vie_ecolo=='Oui'
@@ -390,7 +397,7 @@ cause_ols2 <- lm(cause_CC=='anthropique' ~ age_25_34 + age_35_49 + age_50_64 + a
 summary(cause_ols2)
 
 # (3) Cause of CC: politics
-cause_ols3 <- lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4), data=s, weights = s$weight)
+cause_ols3 <- lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight)
 summary(cause_ols3)
 
 # (4) Knowledge of CC
@@ -412,7 +419,7 @@ Table_determinants_attitudes_CC <- stargazer(cause_ols1, cause_ols2, cause_ols3,
                                    covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
                                                         "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
                                                         "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
-                                                        "Diploma: \\textit{Baccalauréat}", "Diploma: Superior", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
+                                                        "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
                                                         "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
                                    header = FALSE, dep.var.labels = c("CC is anthropic", "Knowledge on CC", "CC is disastrous"),  dep.var.caption = "", 
                                    keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
@@ -459,7 +466,7 @@ for (v in variables_determinants_policy) if (!(v %in% variables_determinants_pol
 
 variables_determinants_policy_CC_bis <- variables_determinants_policy_CC[!(variables_determinants_policy_CC %in% c("Gilets_jaunes", "Gauche_droite", "connaissances_CC", "interet_politique", "ecologiste"))]
 variables_determinants_policy_CC_ter <- c("diplome4", "age_25_34", "age_35_49", "age_50_64", "age_65_plus", "Revenu", "sexe", "taille_agglo", "transports_frequence")
-
+# TODO: la seule différence entre variables 6.1 et 6.2 c'est le diplôme (continu ou pas): simplifier
 formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_taxe_approbation_bis <- lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
 summary(ols_taxe_approbation)
