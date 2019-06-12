@@ -427,7 +427,7 @@ write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotes
 ## 6.2 Attitudes over policies
 s$nb_politiques_env <- 0
 for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <- 1 + s$nb_politiques_env[s[[v]]>0]
-formula_determinants_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ", paste(variables_determinants, collapse = ' + ')))
+
 normes_environnementales <- c("normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants")
 taxes_environnementales <- c("taxe_kerosene", "taxe_viande", "peages_urbains", "fonds_mondial")
 s$normes_vs_taxes <- 0
@@ -467,6 +467,10 @@ summary(ols_taxe_approbation)
 formula_determinants_taxe_approbation_bis <- as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_determinants_policy_CC_ter, collapse = ' + ')))
 ols_taxe_approbation_bis <- lm(formula_determinants_taxe_approbation_bis, data=s, weights = s$weight)
 summary(ols_taxe_approbation_bis)
+
+summary(lm("taxe_approbation!='Non' ~ Gauche_droite", data=s, weights = s$weight))
+summary(lm("nb_politiques_env/8 ~ Gauche_droite", data=s, weights = s$weight))
+summary(lm("taxe_approbation!='Non' ~ diplome4 + age", data=s, weights = s$weight))
 
 formula_determinants_nb_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_nb_politiques_env <- lm(formula_determinants_nb_politiques_env, data=s, weights = s$weight)
@@ -618,8 +622,46 @@ p.mat <- cor.mtest(data_cor)
 # corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=T, tl.srt=45, tl.col='black', insig = 'blank', type='upper') # , order='hclust', addCoef.col = 'white', addCoefasPercent = T
 corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
 
-decrit(s[s$ecologiste==T,]$Gilets_jaunes, miss=T, weights=s[s$ecologiste==T,]$weight) # 81% non, 12% oui
-decrit(s[s$Gauche_droite=='Extreme-left',]$Gilets_jaunes, miss=T, weights=s[s$Gauche_droite=='Extreme-left',]$weight) # 81% non, 12% oui
+
+decrit(s[s$Gauche_droite=='Extreme-left',]$Gilets_jaunes, miss=T, weights=s[s$Gauche_droite=='Extreme-left',]$weight)
+decrit(s[s$Gauche_droite=='Left',]$Gilets_jaunes, miss=T, weights=s[s$Gauche_droite=='Left',]$weight)
+decrit(s[s$Gauche_droite=='Center',]$Gilets_jaunes, miss=T, weights=s[s$Gauche_droite=='Center',]$weight)
+decrit(s[s$Gauche_droite=='Right',]$Gilets_jaunes, miss=T, weights=s[s$Gauche_droite=='Right',]$weight)
+decrit(s[s$Gauche_droite=='Extreme-right',]$Gilets_jaunes, miss=T, weights=s[s$Gauche_droite=='Extreme-right',]$weight)
+decrit(s[s$Gauche_droite=='Indeterminate',]$Gilets_jaunes, miss=T, weights=s[s$Gauche_droite=='Indeterminate',]$weight)
+
+decrit(s[s$liberal==T,]$Gilets_jaunes, miss=T, weights=s[s$liberal==T,]$weight)
+decrit(s[s$conservateur==T,]$Gilets_jaunes, miss=T, weights=s[s$conservateur==T,]$weight)
+decrit(s[s$humaniste==T,]$Gilets_jaunes, miss=T, weights=s[s$humaniste==T,]$weight)
+decrit(s[s$patriote==T,]$Gilets_jaunes, miss=T, weights=s[s$patriote==T,]$weight)
+decrit(s[s$apolitique==T,]$Gilets_jaunes, miss=T, weights=s[s$apolitique==T,]$weight)
+decrit(s[s$ecologiste==T,]$Gilets_jaunes, miss=T, weights=s[s$ecologiste==T,]$weight)
+
+decrit(s[s$taille_agglo=='rural',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='rural',]$weight)
+decrit(s[s$taille_agglo=='-20k',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='-20k',]$weight)
+decrit(s[s$taille_agglo=='20-100k',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='20-100k',]$weight)
+decrit(s[s$taille_agglo=='+100k',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='+100k',]$weight)
+decrit(s[s$taille_agglo=='Paris',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='Paris',]$weight)
+
+decrit(s[s$diplome4==1,]$Gilets_jaunes, miss=T, weights=s[s$diplome4==1,]$weight)
+decrit(s[s$diplome4==2,]$Gilets_jaunes, miss=T, weights=s[s$diplome4==2,]$weight)
+decrit(s[s$diplome4==3,]$Gilets_jaunes, miss=T, weights=s[s$diplome4==3,]$weight)
+decrit(s[s$diplome4==4,]$Gilets_jaunes, miss=T, weights=s[s$diplome4==4,]$weight)
+
+decrit(s[s$age_18_24==T,]$Gilets_jaunes, miss=T, weights=s[s$age_18_24==T,]$weight)
+decrit(s[s$age_25_34==T,]$Gilets_jaunes, miss=T, weights=s[s$age_25_34==T,]$weight)
+decrit(s[s$age_35_49==T,]$Gilets_jaunes, miss=T, weights=s[s$age_35_49==T,]$weight)
+decrit(s[s$age_50_64==T,]$Gilets_jaunes, miss=T, weights=s[s$age_50_64==T,]$weight)
+decrit(s[s$age_65_plus==T,]$Gilets_jaunes, miss=T, weights=s[s$age_65_plus==T,]$weight)
+
+for (i in 1:10) {
+  cat(i)
+  print(decrit(s[s$revenu_decile == i,]$Gilets_jaunes, weights=s[s$revenu_decile == i,]$weight))
+}
+
+decrit(s[s$sexe=='Féminin',]$Gilets_jaunes, miss=T, weights=s[s$sexe=='Féminin',]$weight)
+decrit(s[s$sexe=='Masculin',]$Gilets_jaunes, miss=T, weights=s[s$sexe=='Masculin',]$weight)
+
 decrit(s$Gilets_jaunes, weights=s$weight)
 
 # Moins important :
