@@ -470,7 +470,7 @@ summary(ols_taxe_approbation_bis)
 
 summary(lm("taxe_approbation!='Non' ~ Gauche_droite", data=s, weights = s$weight))
 summary(lm("nb_politiques_env/8 ~ Gauche_droite", data=s, weights = s$weight))
-summary(lm("taxe_approbation!='Non' ~ diplome4 + age", data=s, weights = s$weight))
+summary(lm("taxe_approbation!='Non' ~ diplome4 + as.factor(age)", data=s, weights = s$weight))
 
 formula_determinants_nb_politiques_env <- as.formula(paste("nb_politiques_env/8 ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_nb_politiques_env <- lm(formula_determinants_nb_politiques_env, data=s, weights = s$weight)
@@ -637,17 +637,20 @@ decrit(s[s$patriote==T,]$Gilets_jaunes, miss=T, weights=s[s$patriote==T,]$weight
 decrit(s[s$apolitique==T,]$Gilets_jaunes, miss=T, weights=s[s$apolitique==T,]$weight)
 decrit(s[s$ecologiste==T,]$Gilets_jaunes, miss=T, weights=s[s$ecologiste==T,]$weight)
 
+decrit(s$taille_agglo, weights=s$weight)
 decrit(s[s$taille_agglo=='rural',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='rural',]$weight)
 decrit(s[s$taille_agglo=='-20k',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='-20k',]$weight)
 decrit(s[s$taille_agglo=='20-100k',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='20-100k',]$weight)
 decrit(s[s$taille_agglo=='+100k',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='+100k',]$weight)
 decrit(s[s$taille_agglo=='Paris',]$Gilets_jaunes, miss=T, weights=s[s$taille_agglo=='Paris',]$weight)
 
+decrit(s$diplome4, weights=s$weight)
 decrit(s[s$diplome4==1,]$Gilets_jaunes, miss=T, weights=s[s$diplome4==1,]$weight)
 decrit(s[s$diplome4==2,]$Gilets_jaunes, miss=T, weights=s[s$diplome4==2,]$weight)
 decrit(s[s$diplome4==3,]$Gilets_jaunes, miss=T, weights=s[s$diplome4==3,]$weight)
 decrit(s[s$diplome4==4,]$Gilets_jaunes, miss=T, weights=s[s$diplome4==4,]$weight)
 
+decrit(s$age, weights=s$weight)
 decrit(s[s$age_18_24==T,]$Gilets_jaunes, miss=T, weights=s[s$age_18_24==T,]$weight)
 decrit(s[s$age_25_34==T,]$Gilets_jaunes, miss=T, weights=s[s$age_25_34==T,]$weight)
 decrit(s[s$age_35_49==T,]$Gilets_jaunes, miss=T, weights=s[s$age_35_49==T,]$weight)
@@ -659,6 +662,7 @@ for (i in 1:10) {
   print(decrit(s[s$revenu_decile == i,]$Gilets_jaunes, weights=s[s$revenu_decile == i,]$weight))
 }
 
+decrit(s$sexe, weights=s$weight)
 decrit(s[s$sexe=='Féminin',]$Gilets_jaunes, miss=T, weights=s[s$sexe=='Féminin',]$weight)
 decrit(s[s$sexe=='Masculin',]$Gilets_jaunes, miss=T, weights=s[s$sexe=='Masculin',]$weight)
 
