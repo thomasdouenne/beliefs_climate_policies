@@ -580,8 +580,8 @@ an annual payment of [60 / 50]€ to each adult, or [120 / 100]€ per year
 
 
 \series bold
-In terms of purchasing power, would your household be a winner or a loser
- with such a measure?
+In terms of purchasing power, would your household win or a lose with such
+ a measure?
 \series default
  
 \emph on
@@ -589,9 +589,7 @@ In terms of purchasing power, would your household be a winner or a loser
 \begin_inset Newline newline
 \end_inset
 
-Winner; Unaffected; Loser
-\emph default
- 
+Win; Be unaffected; Lose
 \end_layout
 
 \begin_layout Enumerate
