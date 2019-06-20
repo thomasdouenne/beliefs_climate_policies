@@ -346,15 +346,13 @@ decrit(s$connaissances_CC, weights = s$weight)
 decrit(s$connaissances_CC)
 sd(s$connaissances_CC)
 s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
+# below: remove? TODO
 summary(lm(cause_CC=='anthropique' ~ as.factor(age) + as.factor(diplome) + statut_emploi, data=s, weights=s$weight)) # statut_emploi = étudiant matters for lowering the (omitted) effect of 18-24
 summary(lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight))
 summary(lm(cause_CC=='anthropique' ~ Gilets_jaunes + as.factor(diplome4) + diplome4 * gilets_jaunes, data=s, weights = s$weight))
-summary(lm((effets_CC > 2) ~ Gilets_jaunes + as.factor(diplome4) + diplome4 * gilets_jaunes, data=s, weights = s$weight))
 summary(lm(connaissances_CC ~ Gilets_jaunes + as.factor(diplome4) + diplome4 * gilets_jaunes, data=s, weights = s$weight))
 summary(lm(connaissances_CC ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight)) # .
 summary(lm(cause_CC=='anthropique' ~ Gauche_droite + connaissances_CC * gauche_droite, data=s, weights = s$weight)) # **
-summary(lm((effets_CC > 2) ~ Gauche_droite + connaissances_CC * gauche_droite, data=s, weights = s$weight))
-summary(lm((effets_CC > 2) ~ Gilets_jaunes + connaissances_CC * gilets_jaunes, data=s, weights = s$weight))
 
 s$anthropique <- s$cause_CC=='anthropique'
 s$mode_vie_ecolo_oui <- s$mode_vie_ecolo=='Oui'
@@ -727,9 +725,29 @@ Table_determinants_attitudes_CC_logit <- stargazer(cause_logit1, cause_logit2, c
      keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
               "Gauche_droite", "interet_politique", "transports_frequence"), # "humaniste", , "transports_avis", "conso"
      add.lines = list(c("Additional covariates & \\checkmark &  &  & \\checkmark &  \\\\ ")),
-     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:determinants_attitudes_CC")
+     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:determinants_attitudes_CC_logit")
 write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Interaction term is computed using numeric variables. Omitted modalities are: \\textit{Yellow Vests: opposes}, \\textit{Left-right: Indeterminate}, \\textit{Diploma: Brevet or no diploma}, \\textit{Age: 18 -- 24}. Additional covariates are defined in \\ref{app:covariates}. }                \\end{table*} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
-                                                                                                 Table_determinants_attitudes_CC_logit, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
+       Table_determinants_attitudes_CC_logit, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
 
 # 6.2 in logit
+
+
+# No interaction: replacing left-right by Yellow Vests and diploma by knowledge
+interact_yv <- lm((effets_CC > 2) ~ Gilets_jaunes + as.factor(diplome4) + diplome4 : gilets_jaunes, data=s, weights = s$weight)
+summary(interact_yv)
+interact_k <- lm((effets_CC > 2) ~ Gauche_droite + connaissances_CC + connaissances_CC : gauche_droite, data=s, weights = s$weight)
+summary(interact_k)
+interact_yv_k <- lm((effets_CC > 2) ~ Gilets_jaunes + connaissances_CC + connaissances_CC : gilets_jaunes, data=s, weights = s$weight)
+summary(interact_yv_k)
+Table_interaction <- stargazer(interact_yv, interact_k, interact_yv_k,
+       title="Robustness of the absence interaction on perceived effects between political orientation and knowledge.", model.names = FALSE, model.numbers = T, 
+       covariate.labels = c("Constant", "Yellow Vests: PNR", "Yellow Vests: understands",
+                            "Yellow Vests: supports", "Yellow Vests: is part", "Diploma: \\textit{CAP} or \\textit{BEP}",
+                            "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Diploma $\\times$ Yellow Vests", "Left-right: Left",
+                            "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Knowledge CC", "Knowledge CC $\\times$ Left-right", "Knowledge CC $\\times$ Yellow Vests"),
+       header = FALSE, dep.var.labels = c("CC is disastrous"),  dep.var.caption = "", 
+       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:robustness_no_interaction")
+write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Interaction term is computed using numeric variables. Omitted modalities are: \\textit{Yellow Vests: opposes}, \\textit{Left-right: Extreme-left}, \\textit{Diploma: Brevet or no diploma}. }                \\end{table*} ', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+            Table_interaction, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
