@@ -460,19 +460,19 @@ decrit(s$mode_vie_ecolo, weights = s$weight, miss=TRUE)
 decrit(s$normes_vs_taxes, weights = s$weight)
 decrit(s$earmarked_vs_compensation, weights = s$weight)
 
-variables_determinants_policy <- c("Revenu", "Revenu_conjoint", "connaissances_CC", "Gilets_jaunes",
+variables_determinants_policy <- c("Revenu", "Revenu_conjoint", "connaissances_CC", "(effets_CC > 2)", "Gilets_jaunes",
                             "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie, variables_mobilite) # 
 variables_determinants_policy <- variables_determinants_policy[!(variables_determinants_policy %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_18_24",
                                                                                  names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
                                                                                  names(s)[which(grepl("hausse_", names(s)))]))]
-variables_determinants_policy_CC <- variables_determinants_policy[c(3, 22, 28, 4, 29, 10, 18:21, 1, 6, 16, 40)]
+variables_determinants_policy_CC <- variables_determinants_policy[c(3, 4, 23, 29, 5, 30, 11, 19:22, 1, 7, 17, 41)]
 for (v in variables_determinants_policy) if (!(v %in% variables_determinants_policy_CC)) variables_determinants_policy_CC <- c(variables_determinants_policy_CC, v)
 
 variables_determinants_policy_CC_bis <- variables_determinants_policy_CC[!(variables_determinants_policy_CC %in% c("Gilets_jaunes", "Gauche_droite", "connaissances_CC", "interet_politique", "ecologiste"))]
-variables_determinants_policy_CC_ter <- c("diplome4", "age_25_34", "age_35_49", "age_50_64", "age_65_plus", "Revenu", "sexe", "taille_agglo", "transports_frequence")
+variables_determinants_policy_CC_ter <- c("connaissances_CC", "(effets_CC > 2)", "diplome4", "age_25_34", "age_35_49", "age_50_64", "age_65_plus", "Revenu", "sexe", "taille_agglo", "transports_frequence")
 # TODO: la seule différence entre variables 6.1 et 6.2 c'est le diplôme (continu ou pas): simplifier
 formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
-ols_taxe_approbation_bis <- lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
+ols_taxe_approbation <- lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
 summary(ols_taxe_approbation)
 
 formula_determinants_taxe_approbation_bis <- as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_determinants_policy_CC_ter, collapse = ' + ')))
@@ -505,13 +505,13 @@ summary(ols_earmarked_vs_compensation)
 
 Table_politiques_env <- stargazer(ols_taxe_approbation, ols_taxe_approbation_bis, ols_nb_politiques_env, ols_normes_vs_taxes, ols_earmarked_vs_compensation, ols_mode_vie_ecolo,
                                    title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = T, 
-                                  covariate.labels = c("Knowledge on CC", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                                  covariate.labels = c("Knowledge on CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
                                                        "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
                                                        "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)", 
                                                        "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
                                                        "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit"),
                                    header = FALSE, dep.var.labels = c("Tax \\& dividend", "Share of policies", "norms vs. taxes", "earmarking vs. transfers", "ecological lifestyle"),  dep.var.caption = "", 
-                                   keep = c("Revenu$", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
+                                   keep = c("Revenu$", "effets_CC", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
                                    add.lines = list(c("Additional covariates & \\checkmark & & \\checkmark  & \\checkmark & \\checkmark & \\checkmark  \\\\ ")),
                                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
 write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in \\ref{app:covariatesTODO}.} \\end{table*}', 
@@ -587,7 +587,7 @@ summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights =
 
 decrit(s$schiste_approbation)
 Table_shale_gas <- stargazer(reg_shale_1, reg_shale_2, logit_shale_3, 
-                             title="Effect of being treated on acceptance of shale gas exploitation", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                             title="Effect of being treated on acceptance of shale gas exploitation", model.names = TRUE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
                              covariate.labels = c("Treated"), 
                              dep.var.labels = c("Shale gas exploitation: not ``No''"),# dep.var.caption = "", header = FALSE,
                              keep = c("schiste_traite"),
