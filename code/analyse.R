@@ -528,6 +528,10 @@ s$Elasticite_chauffage_max <- s$Elasticite_chauffage + 0.05 * (s$Elasticite_chau
 wtd.mean(s$Elasticite_fuel_perso > s$Elasticite_fuel_max, weights=s$weight, na.rm = T) # 45%
 wtd.mean(s$Elasticite_chauffage_perso > s$Elasticite_chauffage_max, weights=s$weight, na.rm = T) # 53%
 
+cor(s$km, s$elasticite_fuel_perso=='0% - Je suis contraint sur tous mes déplacements', use='complete.obs') # 0.22
+cor(s$depense_carburants, s$Elasticite_fuel_perso-s$Elasticite_fuel_max, use='complete.obs') # -0.03
+cor(s$depense_carburants, s$Elasticite_fuel_perso-s$Elasticite_fuel_max>0, use='complete.obs') # -0.02
+
 summary(lm(Elasticite_fuel_perso ~ (taille_agglo == 'rural') + (taille_agglo == '-20k') + (taille_agglo == '20-100k') + (taille_agglo == '+100k'), data=s, subset=variante_partielle=='f', weights = s$weight))
 summary(lm(Elasticite_fuel_perso ~ Revenu, data=s, subset=variante_partielle=='f', weights = s$weight))
 

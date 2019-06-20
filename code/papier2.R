@@ -231,7 +231,7 @@ s$elast_chauffage_perso <- factor(s$elasticite_chauffage_perso, levels(as.factor
 s$elast_fuel_perso <- factor(s$elasticite_fuel_perso, levels(as.factor(s$elasticite_fuel_perso))[c(1,6:2)])
 s$elast_chauffage_perso <- revalue(s$elast_chauffage_perso, c("+ de 30% - Je changerais largement ma consommation"="> 30%", 
                                                               "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 10%"="0 to 10%", 
-                                                              "0% - Je ne la réduirais pas"="0%: won't reduce", "0% - Je n'en consomme déjà pas"="0%: don't consume"))
+                                                              "0% - Je ne la réduirais pas"="0%: constrained", "0% - Je n'en consomme déjà pas"="0%: don't consume")) # won't reduce
 # s$elast_fuel_perso <- revalue(s$elast_fuel_perso, c("+ de 30% - Je changerais largement mes habitudes de déplacement"="> 30%", 
 #           "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 10%"="0 to 10%", 
 #           "0% - Je suis contraint sur tous mes déplacements"="0%: won't reduce", "0% - Je n'en consomme déjà presque pas"="0%: don't consume"))
@@ -247,6 +247,10 @@ barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elast_fuel", "e
 barres(file="elasticities", title="", thin=T, data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE), 
        nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport", "Own: Housing", "Own: Transport"), 
        legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE), show_ticks=T)
+# Correlations
+cor(s$Elasticite_chauffage, s$Elasticite_chauffage_perso, use='complete.obs') # 0.48
+cor(s$Elasticite_fuel, s$Elasticite_fuel_perso, use='complete.obs') # 0.52
+
 
 # 4.4.2 Mobility and public transport
 barres(file="transports_opinions", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Limited, but enough", "Decent, but not enough", "Satisfactory")), labels=c(" "))
@@ -681,3 +685,51 @@ summary(lm((s$taxe_approbation=='Oui') ~ sexe, data=s)) # 3.5 p.p.
 summary(lm((s$taxe_approbation=='Oui') ~ as.factor(taille_agglo), data=s)) # Paris et +100k vs rural : +8.5 p.p.
 summary(lm((s$taxe_approbation=='Oui') ~ Gilets_jaunes, data=s)) # -15 p.p. soutient / -14 p.p. est dedans
 summary(lm((s$taxe_approbation=='Oui') ~ Gauche_droite, data=s)) # pas significtaif (centre .)
+
+
+##### Online Appendix #####
+# 6.1 in logit
+cause_logit1 <- glm(formula_determinants_cause, family = binomial(link='logit'), data=s)
+summary(cause_logit1)
+logit_cause1_margins <- logitmfx(cause_logit1, s, atmean=FALSE)$mfxest
+logit_cause1_margins
+
+cause_logit2 <- glm(cause_CC=='anthropique' ~ age_25_34 + age_35_49 + age_50_64 + age_65_plus, family = binomial(link='logit'), data=s)
+summary(cause_logit2)
+logit_cause2_margins <- logitmfx(cause_logit2, s, atmean=FALSE)$mfxest
+logit_cause2_margins
+
+cause_logit3 <- glm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite, family = binomial(link='logit'), data=s)
+summary(cause_logit3)
+logit_cause3_margins <- logitmfx(cause_logit3, s, atmean=FALSE)$mfxest
+logit_cause3_margins
+
+effects_logit <- glm(formula_determinants_effets, family = binomial(link='logit'), data=s)
+summary(effects_logit)
+logit_effects_margins <- logitmfx(effects_logit, s, atmean=FALSE)$mfxest
+logit_effects_margins
+
+effects_logit2 <- glm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite, family = binomial(link='logit'), data=s)
+summary(effects_logit2)
+logit_effects2_margins <- logitmfx(effects_logit2, s, atmean=FALSE)$mfxest
+logit_effects2_margins
+
+Table_determinants_attitudes_CC_logit <- stargazer(cause_logit1, cause_logit2, cause_logit3, effects_logit, effects_logit2,
+     title="Determinants of attitudes towards climate change (CC).", model.names = FALSE, model.numbers = T, 
+     covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
+                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
+                          "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
+                          "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
+     header = FALSE, dep.var.labels = c("CC is anthropic", "CC is disastrous"),  dep.var.caption = "", 
+     coef = list(logit_cause1_margins[,1], logit_cause2_margins[,1], logit_cause3_margins[,1], logit_effects_margins[,1], logit_effects2_margins[,1]),
+     se = list(logit_cause1_margins[,2], logit_cause2_margins[,2], logit_cause3_margins[,2], logit_effects_margins[,2], logit_effects2_margins[,2]),
+     keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
+              "Gauche_droite", "interet_politique", "transports_frequence"), # "humaniste", , "transports_avis", "conso"
+     add.lines = list(c("Additional covariates & \\checkmark &  &  & \\checkmark &  \\\\ ")),
+     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:determinants_attitudes_CC")
+write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Interaction term is computed using numeric variables. Omitted modalities are: \\textit{Yellow Vests: opposes}, \\textit{Left-right: Indeterminate}, \\textit{Diploma: Brevet or no diploma}, \\textit{Age: 18 -- 24}. Additional covariates are defined in \\ref{app:covariatesTODO}. }                \\end{table*} ', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                                                                                                 Table_determinants_attitudes_CC_logit, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
+
+# 6.2 in logit
