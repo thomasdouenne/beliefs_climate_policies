@@ -688,27 +688,22 @@ summary(lm((s$taxe_approbation=='Oui') ~ Gauche_droite, data=s)) # pas significt
 ##### Online Appendix #####
 # 6.1 in logit
 cause_logit1 <- glm(formula_determinants_cause, family = binomial(link='logit'), data=s)
-summary(cause_logit1)
 logit_cause1_margins <- logitmfx(cause_logit1, s, atmean=FALSE)$mfxest
 logit_cause1_margins
 
 cause_logit2 <- glm(cause_CC=='anthropique' ~ age_25_34 + age_35_49 + age_50_64 + age_65_plus, family = binomial(link='logit'), data=s)
-summary(cause_logit2)
 logit_cause2_margins <- logitmfx(cause_logit2, s, atmean=FALSE)$mfxest
 logit_cause2_margins
 
 cause_logit3 <- glm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite, family = binomial(link='logit'), data=s)
-summary(cause_logit3)
 logit_cause3_margins <- logitmfx(cause_logit3, s, atmean=FALSE)$mfxest
 logit_cause3_margins
 
 effects_logit <- glm(formula_determinants_effets, family = binomial(link='logit'), data=s)
-summary(effects_logit)
 logit_effects_margins <- logitmfx(effects_logit, s, atmean=FALSE)$mfxest
 logit_effects_margins
 
 effects_logit2 <- glm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite, family = binomial(link='logit'), data=s)
-summary(effects_logit2)
 logit_effects2_margins <- logitmfx(effects_logit2, s, atmean=FALSE)$mfxest
 logit_effects2_margins
 
@@ -731,7 +726,40 @@ write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotes
        Table_determinants_attitudes_CC_logit, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
 
 # 6.2 in logit
+tax_logit <- glm(formula_determinants_taxe_approbation, family = binomial(link='logit'), data=s)
+tax_logit_margins <- logitmfx(tax_logit, s, atmean=FALSE)$mfxest
+tax_logit_margins
 
+tax_logit2 <- glm(formula_determinants_taxe_approbation_bis, family = binomial(link='logit'), data=s)
+tax_logit2_margins <- logitmfx(tax_logit2, s, atmean=FALSE)$mfxest
+tax_logit2_margins
+
+env_logit <- glm(formula_determinants_nb_politiques_env, family = binomial(link='logit'), data=s)
+env_logit_margins <- logitmfx(env_logit, s, atmean=FALSE)$mfxest
+env_logit_margins
+
+ecologit <- glm(formula_determinants_mode_vie_ecolo, family = binomial(link='logit'), data=s)
+ecologit_margins <- logitmfx(ecologit, s, atmean=FALSE)$mfxest
+ecologit_margins
+
+Table_politiques_env_logit <- stargazer(tax_logit, tax_logit2, env_logit, ecologit,
+    title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = T, 
+    covariate.labels = c("Knowledge on CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
+                         "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
+                         "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)",
+                         "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65",
+                         "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit"),
+    header = FALSE, dep.var.labels = c("Tax \\& dividend", "Share of policies", "Ecological lifestyle"),  dep.var.caption = "", 
+    coef = list(tax_logit_margins[,1], tax_logit2_margins[,1], env_logit_margins[,1], ecologit_margins[,1]),
+    se = list(tax_logit_margins[,2], tax_logit2_margins[,2], env_logit_margins[,2], ecologit_margins[,2]),
+    keep = c("Revenu$", "effets_CC", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
+    add.lines = list(c("Additional covariates & \\checkmark & & \\checkmark  & \\checkmark  \\\\ ")),
+    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env_logit")
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in \\ref{app:covariates}.} \\end{table*}', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                 gsub('\\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & Share of policies & norms vs. taxes & earmarking vs. transfers & ecological lifestyle \\\\',
+                      '\\\\[-1.8ex] & \\multicolumn{2}{c}{Acceptance of} & Share of policies & Norms & Earmarking & Ecological \\\\ \\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & approved & vs. taxes & vs. transfers & lifestyle \\\\',
+                      Table_politiques_env_logit, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
 
 # No interaction: replacing left-right by Yellow Vests and diploma by knowledge
 interact_yv <- lm((effets_CC > 2) ~ Gilets_jaunes + as.factor(diplome4) + diplome4 : gilets_jaunes, data=s, weights = s$weight)
