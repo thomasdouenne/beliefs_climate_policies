@@ -1452,6 +1452,9 @@ convert_s <- function() {
   s$connaissances_CC <<- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
   label(s$connaissances_CC) <<- "connaissances_CC: index des bonnes réponses aux questions sur le changement climatique (GES, climate call, cause, emission_cible, region)"
 
+  s$nb_politiques_env <<- 0
+  for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <<- 1 + s$nb_politiques_env[s[[v]]>0]
+
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
   # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
   for (i in 0:10) {

@@ -3666,6 +3666,26 @@ write_clip(sub("\\multicolumn{6}{c}{", "", sub("er Feedback}}", "er Feedback}", 
                                                                                      gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
+##### Champ libre Bénéfices/Problèmes #####
+print(s$benefices_autre[!is.na(s$benefices_autre)])
+# aucun: ................
+# inéquité: ...............
+# modifications structurelles: ............
+# diesel, kerosène: ...........
+# déficit: .........
+# état prend argent: ..................
+# pépites : "maléfique" "Aucunement bénéfique sauf pour contrer ceux qui utilisent leur véhicule alors qu'ils peuvent faire autrement" 
+# "aucune prime de nous sera versé. ce n est que  du blabla de la part du gouvernement" "brassage"
+# "elle est bénéfique pour le gouvernement qui n'investirait pas la TOTALITE des ressources budgétaires supplémentaires"
+# "Globalement l'ensemble des mesures et le reversement d'une \"compensation\" ne recouvrerait pas la différence de prix sur l'année. 
+#     Je  parle de l'ensemble des augmentations ainsi que les augmentation forcément induites et répercutées sur l'ensemble des produits de consommations..." 
+# "vos donnees sont erronees" "On est toujours perdant" "je ne pourrai plus me chauffer tout simplement"
+# "Je ne vois pas en quoi nous prendre de l'argent pour nous le redonner, changerait quelque chose à notre manière de polluer."
+# "J' ai deja réduit au maximum mes consommations d' énergie mais néanmoins  je paye toujours plus" Problème : "Pour la paix sociale"
+# "il faut taxer les nouveaux véicule a l'achats et de fasson significative et pas apré leurs mise en services!"
+# "Ce projet a entrainé un fort mécontentement; je ne le soutiens pas car je le juge absurde."
+print(s$problemes_autre[!is.na(s$problemes_autre)])
+
 
 ##### Trash papier2.R #####
 barres(file="CC_target_emission", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), 
@@ -3776,3 +3796,87 @@ summary(lm((effets_CC > 2) ~ diplome4 * Gauche_droite, data=s, subset=s$effets_C
 summary(lm(score_ges ~ gauche_droite, data=s, weights = s$weight))
 summary(lm(score_climate_call ~ gauche_droite, data=s, weights = s$weight))
 summary(lm(cause_CC=='anthropique' ~ Gauche_droite, data=s, weights = s$weight))
+
+decrit(s$connaissances_CC)
+plot(density(s$connaissances_CC))
+summary(lm(I((connaissances_CC - mean(connaissances_CC))/sd(connaissances_CC)) ~ I((generation_CC_min-1960)/30), data=s, weights = s$weight))
+formula_connaissances_CC <- as.formula(paste("I((connaissances_CC - mean(connaissances_CC))/sd(connaissances_CC)) ~ I((generation_CC_min-1960)/30) + region_CC + diplome + ", 
+        paste(variables_determinants[!(variables_determinants %in% c("Gauche_droite", "humaniste", "patriote", "ecologiste", "apolitique", "liberal", 
+        "conservateur", "diplome4", "as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))"))], collapse = ' + ')))
+summary(lm(formula_connaissances_CC, data=s, weights = s$weight))
+summary(lm(connaissances_CC ~ as.factor(generation_CC_min), data=s, weights = s$weight))
+
+decrit(s$ecologiste, weights = s$weight)
+decrit(s$humaniste, weights = s$weight)
+decrit(s$patriote, weights = s$weight)
+decrit(s$liberal, weights = s$weight)
+decrit(s$conservateur, weights = s$weight)
+decrit(s$apolitique, weights = s$weight)
+decrit(s$Gauche_droite, weights = s$weight, miss=T)
+summary(lm((enfant_CC=='Oui') ~ sexe, data=s)) # -3.4 p.p.
+
+decrit(s$changer_si_moyens == T | s$changer_si_politiques==T | s$changer_si_tous==T | s$changer_essaie==T, weights=s$weight) # 85%
+decrit((s$emission_cible[s$changer_deja_fait==T] >= 3), weights = s$weight[s$changer_deja_fait==T]) # 79%
+decrit((s$emission_cible[s$changer_deja_fait==F] >= 3), weights=s$weight[s$changer_deja_fait==F]) # 85%
+# TODO: use US results?
+usa_survey <- read.dta("CCES_Panel_Full3waves_VV_V4.dta") # https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/TOE8I1
+labels_CC_USA <- levels(usa_survey$CC14_321) # What action needed for climate change? 2014.
+levels(usa_survey$CC14_321) <- c("Immediate", "Some", "Wait", "No", "Fake", "PNR", "NA")
+decrit(usa_survey$CC14_321, weights = usa_survey$weight) # 30/25/18/20/8
+# levels(usa_survey$CC10_321) <- levels(usa_survey$CC12_321) <- c("Immediate", "Some", "Wait", "No", "Fake", "PNR", "NA")
+# decrit(usa_survey$CC12_321, weights = usa_survey$weight)
+# decrit(usa_survey$CC10_321, weights = usa_survey$weight)
+
+# When question specific to purchasing power:
+variables_winners <- names(s)[which(grepl("taxe_gagnant_", names(s)))]
+labels_winners <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "City dwellers", "Certain persons,<br> but no specific income category", "PNR (Don't know, don't want to answer)")
+barres(file="tax_winners", title="", data=data1(variables_winners, data=s[s$variante_monetaire==1,], weights = s$weight[s$variante_monetaire==1]), sort=T, showLegend=FALSE, labels=labels_winners, hover=labels_winners)
+variables_losers <- names(s)[which(grepl("taxe_perdant_", names(s)))]
+labels_losers <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "Rural or peri-urban households", "Certain persons, <br>but no specific income category", "PNR (Don't know, don't want to answer)")
+barres(file="tax_losers", title="", data=data1(variables_losers, data=s[s$variante_monetaire==1,], weights = s$weight[s$variante_monetaire==1]), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers)
+
+decrit(s$taxe_efficace, miss=T, weight=s$weight)
+s$elast_fuel_perso <- revalue(s$elast_fuel_perso, c("+ de 30% - Je changerais largement mes habitudes de déplacement"="> 30%",
+          "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 10%"="0 to 10%",
+          "0% - Je suis contraint sur tous mes déplacements"="0%: won't reduce", "0% - Je n'en consomme déjà presque pas"="0%: don't consume"))
+s$elast_fuel <- revalue(s$elast_fuel, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
+barres(file="elasticities", title="", thin=T, data=dataKN(c("Elasticite_chauffage", "Elasticite_fuel", "Elasticite_chauffage_perso", "Elasticite_fuel_perso"), miss=FALSE),
+       nsp=FALSE, labels=c("Aggregate: Housing", "Aggregate: Transport", "Own: Housing", "Own: Transport"),
+       legend = dataN("Elasticite_chauffage", return="levels", miss=FALSE), show_ticks=T)
+# Correlations TODO: use?
+cor(s$Elasticite_chauffage, s$Elasticite_chauffage_perso, use='complete.obs') # 0.48
+cor(s$Elasticite_fuel, s$Elasticite_fuel_perso, use='complete.obs') # 0.52
+
+decrit(s$schiste_traite, weights=s$weight) # 61% traités
+decrit(s[s$schiste_approbation=='Oui',]$schiste_avantage, miss=T, weights=s[s$schiste_approbation=='Oui',]$weight) # 56% aucun, 26% emplois, 18% CC
+
+# ## 5.2 Preferred revenue recycling
+# labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", 
+#                           "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
+#                           "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
+# labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
+# barres(file="tax_condition", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE), nsp=FALSE, 
+#        sort=T, legend = c(yes_no5), labels=labels_tax_condition)
+
+# below: remove? TODO
+summary(lm(cause_CC=='anthropique' ~ as.factor(age) + as.factor(diplome) + statut_emploi, data=s, weights=s$weight)) # statut_emploi = étudiant matters for lowering the (omitted) effect of 18-24
+summary(lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight))
+summary(lm(cause_CC=='anthropique' ~ Gilets_jaunes + as.factor(diplome4) + diplome4 * gilets_jaunes, data=s, weights = s$weight))
+summary(lm(connaissances_CC ~ Gilets_jaunes + as.factor(diplome4) + diplome4 * gilets_jaunes, data=s, weights = s$weight))
+summary(lm(connaissances_CC ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight)) # .
+summary(lm(cause_CC=='anthropique' ~ Gauche_droite + connaissances_CC * gauche_droite, data=s, weights = s$weight)) # **
+
+decrit(s$taxe_approbation, weights = s$weight, miss=TRUE)
+decrit(s$nb_politiques_env, weights = s$weight) #TODO: exploiter le -2/+2
+decrit(s$mode_vie_ecolo, weights = s$weight, miss=TRUE)
+decrit(s$normes_vs_taxes, weights = s$weight)
+decrit(s$earmarked_vs_compensation, weights = s$weight)
+
+summary(lm("taxe_approbation!='Non' ~ Gauche_droite", data=s, weights = s$weight))
+summary(lm("nb_politiques_env/8 ~ Gauche_droite", data=s, weights = s$weight))
+summary(lm("taxe_approbation!='Non' ~ diplome4 + as.factor(age)", data=s, weights = s$weight))
+
+formula_determinants_nb_politiques_env_bis <- as.formula(paste("nb_politiques_env/8 ~ ", paste(variables_determinants_policy_bis, collapse = ' + ')))
+ols_nb_politiques_env_bis <- lm(formula_determinants_nb_politiques_env_bis, data=s, weights = s$weight)
+summary(ols_nb_politiques_env_bis)
+
