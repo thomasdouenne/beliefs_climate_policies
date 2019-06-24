@@ -1453,6 +1453,8 @@ convert_s <- function() {
   label(s$connaissances_CC) <<- "connaissances_CC: index des bonnes réponses aux questions sur le changement climatique (GES, climate call, cause, emission_cible, region)"
 
   s$nb_politiques_env <<- 0
+  variables_politiques_environnementales <- c("taxe_kerosene", "taxe_viande", "normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants", 
+                                              "peages_urbains", "fonds_mondial") # "rattrapage_diesel"
   for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <<- 1 + s$nb_politiques_env[s[[v]]>0]
 
   categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
