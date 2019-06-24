@@ -13,7 +13,7 @@
   <key attr.name="description" attr.type="string" for="edge" id="d9"/>
   <key for="edge" id="d10" yfiles.type="edgegraphics"/>
   <graph edgedefault="directed" id="G">
-    <data key="d0"/>
+    <data key="d0" xml:space="preserve"/>
     <node id="n0">
       <data key="d6">
         <y:ShapeNode>
@@ -21,7 +21,7 @@
           <y:Fill color="#33CCCC50" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="node_width" configuration="CroppingLabel" fontFamily="Dialog" fontSize="16" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="66.375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="c" textColor="#000000" verticalTextPosition="bottom" visible="true" width="220.0" x="0.0" xml:space="preserve" y="1.8125">Set-up:
-primings and households chacracteristics</y:NodeLabel>
+primings and households characteristics</y:NodeLabel>
           <y:Shape type="rectangle"/>
         </y:ShapeNode>
       </data>
@@ -95,7 +95,6 @@ orientations<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel>
       </data>
     </node>
     <edge id="e0" source="n0" target="n1">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -106,7 +105,6 @@ orientations<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel>
       </data>
     </edge>
     <edge id="e1" source="n2" target="n3">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -117,7 +115,6 @@ orientations<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel>
       </data>
     </edge>
     <edge id="e2" source="n4" target="n5">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -128,7 +125,6 @@ orientations<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel>
       </data>
     </edge>
     <edge id="e3" source="n5" target="n6">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -139,7 +135,6 @@ orientations<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel>
       </data>
     </edge>
     <edge id="e4" source="n3" target="n4">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
@@ -155,7 +150,6 @@ orientations<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel>
       </data>
     </edge>
     <edge id="e5" source="n1" target="n2">
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">

@@ -109,19 +109,6 @@ decrit(s$taxe_perdant_riches, weights=s$weight) # 2%
 wtd.mean(s$taxe_perdant_pauvres==T, s$weight) - wtd.mean(s$taxe_gagnant_pauvres==T, s$weight) # 40%
 wtd.mean(s$taxe_perdant_moyennes==T, s$weight) - wtd.mean(s$taxe_gagnant_moyennes==T, s$weight) # 53%
 decrit(s$taxe_perdant_riches, weights=s$weight) # 2%
-
-summary(lm((s$taxe_gagnant_riches==T) ~ variante_monetaire, data=s)) # 0.308 / -0.029 .
-summary(lm((s$taxe_gagnant_pauvres==T) ~ variante_monetaire, data=s)) # 0.058 / +0.044 ***
-summary(lm((s$taxe_gagnant_moyennes==T) ~ variante_monetaire, data=s)) # 0.041 / +0.016 *
-summary(lm((s$taxe_gagnant_citadins==T) ~ variante_monetaire, data=s)) # 0.21 / -0.031 *
-summary(lm((s$taxe_gagnant_certains==T) ~ variante_monetaire, data=s)) # 0.139 / -0.012
-
-summary(lm((s$taxe_perdant_riches==T) ~ variante_monetaire, data=s)) # 0.009 / +0.012 **
-summary(lm((s$taxe_perdant_pauvres==T) ~ variante_monetaire, data=s)) # 0.48 / -0.01
-summary(lm((s$taxe_perdant_moyennes==T) ~ variante_monetaire, data=s)) # 0.55 / + 0.054 **
-summary(lm((s$taxe_perdant_ruraux==T) ~ variante_monetaire, data=s)) # 0.36 / -0.022
-summary(lm((s$taxe_perdant_certains==T) ~ variante_monetaire, data=s)) # 0.09 / -0.011
-
 decrit(s$taxe_gagnant_citadins, weights=s$weight) # 19%
 decrit(s$taxe_perdant_ruraux, weights=s$weight) # 34%
 
@@ -442,6 +429,32 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
 
 ##### Appendix #####
 # TODO: clean Appendix
+
+
+## Winners/losers in purchasing power:
+gagnant_pauvres_monetaire_1 <- lm((s$taxe_gagnant_pauvres==T) ~ variante_monetaire, data=s, weights=s$weight)
+summary(gagnant_pauvres_monetaire_1) # 0.058 / +0.044
+
+gagnant_citadins_monetaire_2 <- lm((s$taxe_gagnant_citadins==T) ~ variante_monetaire, data=s, weights=s$weight)
+summary(gagnant_citadins_monetaire_2) # 0.207 / -0.029 *
+
+perdant_riches_monetaire_3 <- lm((s$taxe_perdant_riches==T) ~ variante_monetaire, data=s, weights=s$weight)
+summary(perdant_riches_monetaire_3) # 0.009 / +0.012 **
+
+perdant_ruraux_monetaire_4 <- lm((s$taxe_perdant_ruraux==T) ~ variante_monetaire, data=s, weights=s$weight)
+summary(perdant_ruraux_monetaire_4) # 0.352 / -0.014
+
+Table_variante_monetaire <- stargazer(gagnant_pauvres_monetaire_1, gagnant_citadins_monetaire_2, perdant_riches_monetaire_3, perdant_ruraux_monetaire_4,
+                             title="Effect of defining winners/losers in terms of purchasing power", model.names = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                             covariate.labels = c("Constant", "In purchasing power"), 
+                             dep.var.labels = c("Poors expected to win", "City dwellers expected to win", "Rich expected to lose", "Rural expected to lose"),# dep.var.caption = "", header = FALSE,
+                             keep = c("Constant", "variante_monetaire"),
+                             column.labels = c("(1)", "(2)", "(3)", "(4)"), model.numbers = FALSE,
+                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:purchasing_power")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', 
+                                                       '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_variante_monetaire, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
 ## Diesel
 # variables_diesel <- c("Revenu", "score_ges", "score_climate_call", "as.factor(taille_aggl)", variables_demo, variables_energie) # 
 # variables_diesel <- variables_diesel[!(variables_diesel %in% c("revenu", "rev_tot", "age", "age_65_plus",
@@ -465,6 +478,9 @@ summary(ols_diesel_2)
 
 ols_diesel_3 <- lm("rattrapage_diesel!='Non' ~ Gilets_jaunes", data=s, weights = s$weight)
 summary(ols_diesel_3)
+
+ols_diesel_4 <- lm("rattrapage_diesel!='Non' ~ Gauche_droite", data=s, weights = s$weight)
+summary(ols_diesel_4)
 
 Table_diesel <- stargazer(ols_diesel_1, ols_diesel_2, ols_diesel_3, ols_diesel_4, # TODO: object 'ols_diesel_4' not found
                                   title="Determinants of attitudes towards diesel taxation", model.names = FALSE, model.numbers = T, 
@@ -517,6 +533,38 @@ Table_shale_gas <- stargazer(reg_shale_1, reg_shale_2, logit_shale_3,
                              no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:shale_gas")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', 
                                                        '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_shale_gas, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+## Additional specifications determinants of policy approval
+variables_determinants_policy_with_less_controls <- c("connaissances_CC", "(effets_CC > 2)", "diplome4", "age_25_34", "age_35_49", "age_50_64", "age_65_plus", "Revenu", "sexe", "taille_agglo", "transports_frequence")
+
+formula_determinants_nb_politiques_env_bis <- as.formula(paste("nb_politiques_env/8 ~ ", paste(variables_determinants_policy_with_less_controls, collapse = ' + ')))
+ols_nb_politiques_env_bis <- lm(formula_determinants_nb_politiques_env_bis, data=s, weights = s$weight)
+summary(ols_nb_politiques_env_bis)
+
+ols_nb_politiques_env_left_right <- lm("nb_politiques_env/8 ~ Gauche_droite", data=s)
+summary(ols_nb_politiques_env_left_right)
+
+ols_tax_and_dividend_left_right <- lm("taxe_approbation!='Non' ~ Gauche_droite", data=s)
+summary(ols_tax_and_dividend_left_right)
+
+Table_politiques_env_additional <- stargazer(ols_nb_politiques_env_bis, ols_nb_politiques_env_left_right, ols_tax_and_dividend_left_right,
+                                  title="Determinants of attitudes towards climate policies, additional specifications", model.names = FALSE, model.numbers = T, 
+                                  covariate.labels = c("Knowledge on CC", "CC is disastrous", "Diploma (1 to 4)", 
+                                                       "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
+                                                       "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit",
+                                                       "Left-right: Extreme-left", "Left-right: Left", 
+                                                       "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right"),
+                                  header = FALSE, dep.var.labels = c("Share of policies", "Tax \\& dividend"),  dep.var.caption = "", 
+                                  keep = c("Revenu$", "effets_CC", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
+                                  #add.lines = list(c("Additional covariates & \\checkmark & & \\checkmark  & \\checkmark & \\checkmark & \\checkmark  \\\\ ")),
+                                  no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in \\ref{app:covariates}.} \\end{table*}', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                                                                                                 gsub('\\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & Share of policies & norms vs. taxes & earmarking vs. transfers & ecological lifestyle \\\\',
+                                                                                                      '\\\\[-1.8ex] & \\multicolumn{2}{c}{Acceptance of} & Share of policies & Norms & Earmarking & Ecological \\\\ \\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & approved & vs. taxes & vs. transfers & lifestyle \\\\',
+                                                                                                      Table_politiques_env_additional, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
+
 
 
 ## Yellow Vests
