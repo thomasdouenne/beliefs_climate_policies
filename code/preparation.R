@@ -63,7 +63,7 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # sum(taille_agglo$share[taille_agglo$taille_agglo<=5 & taille_agglo$taille_agglo>3]) # <100k
 # sum(taille_agglo$share[taille_agglo$taille_agglo<8 & taille_agglo$taille_agglo>5]) # >100k
 # taille_agglo$share[taille_agglo$taille_agglo==8] # Paris
-
+# TODO: push these .csv on github
 
 ##### Quantiles de revenus ERFS 2014 #####
 # quantiles <- function(data, weights = NULL)  {
@@ -1605,7 +1605,6 @@ fit$predicted_gain <- (16.1 + 110 * fit$nb_beneficiaries - fit$predicted_total_e
 fit_2 <- read.csv("../model_reforms_data/prediction expenditures (2).csv") # specification (2), élasticité 0.2, + 9.1 dans predicted_winner
 fit_2$gain <- (110 * fit_2$nb_beneficiaries - fit_2$total_expenditures_increase) / fit_2$consumption_units
 fit_2$predicted_gain <- (16.1 + 110 * fit_2$nb_beneficiaries - fit_2$predicted_total_expenditures_increase) / fit_2$consumption_units
-# TODO: push these .csv on github
 
   # Preparation for Figures 1 and 2: importation of distribution calculated (for objective) or smoothed (for subjective) in standardize_data_bdf_ptc.py
 objective_gains <- read.csv2("df_objective_gains.csv") 

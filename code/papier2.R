@@ -35,7 +35,7 @@ decrit(s$generation_CC_min >= 2020, weights = s$weight) # 62%
 # Figures 2-7
 barres(file="CC_cause_nolegend", title="", thin=T, data=dataN("cause_CC"), nsp=T, sort=T, legend = c("Anthropic", "Natural", "Does not exist", "PNR"), labels=c(" "), show_ticks = F)
 ges_climate_call <- rev(paste("ges_correct", c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm"), sep="_")) 
-labels_ges_climate_call <- rev(c("Plane vs. train", "Nuclear vs. wind", "Beaf vs. pasta", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
+labels_ges_climate_call <- rev(c("Plane vs. train", "Nuclear vs. wind", "Beef vs. pasta", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
 oui_non(margin_l=40, ges_climate_call, NSP=FALSE, colors=color(3)[1:2], en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE) # colors=color(3)[1:2], 
 s$region_CC <- as.factor(s$region_CC)
 s$region_CC <- relevel(relevel(s$region_CC, "Autant dans les deux"), "L'Inde")
@@ -194,14 +194,7 @@ barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elast_fuel", "e
 
 # 4.4.2 Mobility and public transportdecrit(s$transports_avis[s$transports_avis!=-1]<2, weights = s$weight[s$transports_avis!=-1])
 decrit(s$transports_travail[s$transports_travail!='Non concerné·e'], weights = s$weight[s$transports_travail!='Non concerné·e']) # 65%
-# TODO: one or the other
-decrit(entd$Mode, weights = entd$weight)
-decrit(entd$Mode[entd$dist_subj_km <= 2], weights = entd$weight[entd$dist_subj_km <= 2])
-decrit(is.na(entd$dist_subj_km)[!is.na(entd$dist_obj_km)]) # objective distance only present when subjective distance is present
-decrit(entd$Mode[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1], weights = entd$weight[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1])
-decrit(entd$Mode[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1 & !is.na(entd$dist_obj_km)], weights = entd$weight[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1 & !is.na(entd$dist_obj_km)])
-# when objective dist not NA, car -4%, public +4% in subjective: there is selection for calculation of objective
-decrit(entd$Mode[entd$dist_obj_km <= 2 & entd$dist_obj_km >= 1], weights = entd$weight[entd$dist_obj_km <= 2 & entd$dist_obj_km >= 1])
+decrit(entd$Mode[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1], weights = entd$weight[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1]) # 52%
 
 decrit(s$transports_distance <= 10, weights = s$weight) # 73%
 decrit(s$transports_travail_commun=='Non' & s$transports_travail_actif=='Non', weights = s$weight) # 58%
@@ -217,7 +210,7 @@ s$transports_minutes <- "NSP"
 s$transports_minutes[s$transports_distance <= 5] <- "5 ou moins"
 s$transports_minutes[s$transports_distance > 5 & s$transports_distance <= 10] <- "6 à 10"
 s$transports_minutes[s$transports_distance > 10 & s$transports_distance <= 20] <- "11 à 20"
-s$transports_minutes[s$transports_distance > 20] <- "plus que 20" # TODO: preparation
+s$transports_minutes[s$transports_distance > 20] <- "plus que 20"
 barres(file="transports_distance", title="", thin=T, data=matrix(dataN("transports_minutes")[c(2,3,1,4,5),1], ncol=1), labels=c(" "), legend=c("5 or less", "6 to 10", "11 to 20", "more than 20", "PNR"))
 barres(file="transports_frequency", title="", thin=T, nsp=T, data=matrix(dataN("transports_frequence")[c(4:1,5),1], ncol=1), legend=rev(c("PNR", "< 3/day", "1/hour - 4/day", "1/h - 2/h", "> 3/h")), labels=(" "))
 # Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture de prendre les transports en commun pour ses trajets domicile-travail
@@ -384,7 +377,7 @@ for (v in variables_determinants_policy) if (!(v %in% variables_determinants_pol
 
 variables_determinants_policy_CC_bis <- variables_determinants_policy_CC[!(variables_determinants_policy_CC %in% c("Gilets_jaunes", "Gauche_droite", "connaissances_CC", "interet_politique", "ecologiste"))]
 variables_determinants_policy_CC_ter <- c("connaissances_CC", "(effets_CC > 2)", "diplome4", "age_25_34", "age_35_49", "age_50_64", "age_65_plus", "Revenu", "sexe", "taille_agglo", "transports_frequence")
-# TODO: la seule différence entre variables 6.1 et 6.2 c'est le diplôme (continu ou pas): simplifier
+
 formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_taxe_approbation <- lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
 summary(ols_taxe_approbation)

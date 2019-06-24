@@ -1,5 +1,4 @@
 *.pyc
-*.csv
 code/*.Rproj.user
 code/*.Rproj
 .Rproj.user
@@ -8,3 +7,19 @@ code/*.Rproj
 *.Rhistory
 *.RData
 *.dta
+*.csv
+code/*.csv
+model_reforms_data/*.csv
+!code/agglos.csv
+!code/survey.csv
+!code/survey_prepared.csv
+!code/survey.csv
+!code/survey.csv
+!model_reforms_data/prediction housing expenditures.csv
+!model_reforms_data/prediction housing expenditures (2).csv
+!model_reforms_data/prediction expenditures.csv
+!model_reforms_data/prediction expenditures (2).csv
+!code/df_objective_gains.csv
+!code/df_subjective_gains.csv
+!code/df_objective_gains_inelastic.csv
+!code/df_menages_domicile_teg.csv

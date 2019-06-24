@@ -3880,3 +3880,17 @@ formula_determinants_nb_politiques_env_bis <- as.formula(paste("nb_politiques_en
 ols_nb_politiques_env_bis <- lm(formula_determinants_nb_politiques_env_bis, data=s, weights = s$weight)
 summary(ols_nb_politiques_env_bis)
 
+# 4.4.2 Mobility and public transportdecrit(s$transports_avis[s$transports_avis!=-1]<2, weights = s$weight[s$transports_avis!=-1])
+decrit(s$transports_travail[s$transports_travail!='Non concerné·e'], weights = s$weight[s$transports_travail!='Non concerné·e']) # 65%
+# TODO: one or the other
+decrit(entd$Mode, weights = entd$weight)
+decrit(entd$Mode[entd$dist_subj_km <= 2], weights = entd$weight[entd$dist_subj_km <= 2])
+decrit(is.na(entd$dist_subj_km)[!is.na(entd$dist_obj_km)]) # objective distance only present when subjective distance is present
+decrit(entd$Mode[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1], weights = entd$weight[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1]) # 52%
+decrit(entd$Mode[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1 & !is.na(entd$dist_obj_km)], weights = entd$weight[entd$dist_subj_km <= 2 & entd$dist_subj_km >= 1 & !is.na(entd$dist_obj_km)])
+# when objective dist not NA, car -4%, public +4% in subjective: there is selection for calculation of objective
+decrit(entd$Mode[entd$dist_obj_km <= 2 & entd$dist_obj_km >= 1], weights = entd$weight[entd$dist_obj_km <= 2 & entd$dist_obj_km >= 1])
+
+# TODO: la seule différence entre variables 6.1 et 6.2 c'est le diplôme (continu ou pas): simplifier
+variables_determinants_policy_CC[which(!(variables_determinants_policy_CC %in% variables_determinants_attitudes_CC))]
+variables_determinants_attitudes_CC[which(!(variables_determinants_attitudes_CC %in% variables_determinants_policy_CC))]
