@@ -63,7 +63,7 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # sum(taille_agglo$share[taille_agglo$taille_agglo<=5 & taille_agglo$taille_agglo>3]) # <100k
 # sum(taille_agglo$share[taille_agglo$taille_agglo<8 & taille_agglo$taille_agglo>5]) # >100k
 # taille_agglo$share[taille_agglo$taille_agglo==8] # Paris
-# TODO: push these .csv on github
+
 
 ##### Quantiles de revenus ERFS 2014 #####
 # quantiles <- function(data, weights = NULL)  {
