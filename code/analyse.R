@@ -1,6 +1,7 @@
 source("packages_functions.R")
 # To trim white edges on figures: mogrify -trim +repage *.png https://askubuntu.com/questions/351767/how-to-crop-borders-white-spaces-from-image
 
+
 ##### Distributions de revenus #####
 decrit(s$revenu, weights = s$weight)
 round(deciles_erfs_inflates_weighted)
@@ -229,6 +230,16 @@ lines(fit$predicted_gain[1:100], predicted_gain[1:100,1], xlim=c(-400,240), ylim
 lines(fit$predicted_gain[1:100], predicted_gain[1:100,2], type='l', lwd=2)
 lines(fit$predicted_gain[1:100], predicted_gain[1:100,3], type='l', lwd=2)
 
+sd(fit_2$predicted_gain - fit_2$gain) # 55
+prediction_gain <- lm(gain ~ predicted_gain, data=fit_2) # Good specification: (2) interaction
+summary(prediction_gain)
+predicted_gain <- predict(prediction_gain, interval='predict', level=0.9)
+mean(predicted_gain[,3] - predicted_gain[,2]) / 2 # 87: demi-largeur de l'intervalle de confiance à 90%
+predicted_gain <- predict(prediction_gain, interval='predict', level=0.75)
+mean(predicted_gain[,3] - predicted_gain[,2]) / 2 # 60: demi-largeur de l'intervalle de confiance à 63%
+predicted_gain <- predict(prediction_gain, interval='predict', level=0.6667)
+mean(predicted_gain[,3] - predicted_gain[,2]) / 2 # 51: demi-largeur de l'intervalle de confiance à 83.4%
+
 prediction_gain <- lm(gain ~ predicted_gain, data=fit_housing)
 summary(prediction_gain)
 predicted_gain_housing <- predict(prediction_gain, interval='predict', level=0.9)
@@ -331,6 +342,13 @@ decrit(s$taxe_feedback_approbation[s$gagnant_categorie=='Gagnant'], miss=T) # 32
 decrit(s$taxe_feedback_approbation[s$gagnant_feedback_categorie=='Gagnant'], miss=T) # 52% de ceux qui s'estiment gagnant après info approuvent après info
 decrit(s$taxe_feedback_approbation[s$gagnant_categorie!='Gagnant' & s$gagnant_feedback_categorie=='Gagnant'], miss=T) 
 # 48% de ceux qu'on fait changer d'avis approuvent
+
+decrit(s$taxe_approbation, weights=s$weight, miss=T) # Oui/Non 10/ 70
+decrit(s$taxe_info_approbation, weights=s$weight, miss=T) # 16 / 64
+decrit(s$taxe_feedback_approbation[(s$gagnant_info_categorie=='Gagnant' & s$simule_gagnant==1) | (s$gagnant_info_categorie=='Perdant' & s$simule_gagnant==0)], weights=s$weight[(s$gagnant_info_categorie=='Gagnant' & s$simule_gagnant==1) | (s$gagnant_info_categorie=='Perdant' & s$simule_gagnant==0)], miss=T) # 29 / 54
+decrit(s$taxe_feedback_approbation[(s$gagnant_info_categorie=='Gagnant' & s$simule_gagnant==1)], weights=s$weight[(s$gagnant_info_categorie=='Gagnant' & s$simule_gagnant==1)], miss=T) # 53 / 21
+decrit(s$taxe_feedback_approbation[s$gagnant_info_categorie=='Gagnant'], weights=s$weight[s$gagnant_info_categorie=='Gagnant'], miss=T) # 53 / 21
+
 
 # Approbation des répondants biaisés
 summary(lm(taxe_approbation != 'Non'~ (simule_gain - gain > 110) + simule_gagnant + simule_gain, data=s, subset=(gagnant_categorie == 'Perdant'), weights = s$weight))
