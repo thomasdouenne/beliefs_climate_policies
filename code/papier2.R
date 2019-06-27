@@ -155,13 +155,13 @@ decrit(s$nb_problemes - s$nb_benefices) # 15% more benefits, 27% as much, 58% mo
 # Figure 13
 variables_benefits <- names(s)[which(grepl("benefice", names(s)))[which(grepl("problemes", names(s)))>300]]
 variables_benefits <- variables_benefits[!(variables_benefits %in% c("nb_benefices", "benefices_autre"))]
-labels_benefits <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces congestion", "Increases my purchasing power", 
+labels_benefits <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces traffic congestion", "Increases my purchasing power", 
                      "Increases purchasing power of the poorest",
                      "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
 barres(file="CC_benefits_synchro", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits, xrange=c(0, 0.47), margin_l=261) # pb 35% NSP
 variables_problems <- names(s)[which(grepl("problemes", names(s)))]
 variables_problems <- variables_problems[!(variables_problems %in% c("nb_problemes", "problemes_autre"))]
-labels_problems <- c("Is ineffective to reduce pollution", "Alternatives are insufficient or too expensive", "Penalizes rural households", "Decreases my purchaisng power",
+labels_problems <- c("Is ineffective to reduce pollution", "Alternatives are insufficient or too expensive", "Penalizes rural households", "Decreases my purchasing power",
                      "Penalizes the poorest", "Hurts the economy", "Is a pretext to increase taxes", "None of these reasons", "Other reasons")
 barres(file="CC_problems_synchro", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems, xrange=c(0, 0.47), margin_l=261)
 
@@ -274,7 +274,7 @@ s$mode_vie_ecolo_oui <- s$mode_vie_ecolo=='Oui'
 s$male <- s$sexe=='Masculin'
 s$ecolo <- s$ecologiste==T
 data_cor <- s[,c("anthropique", "connaissances_CC", "effets_CC", "parle_CC", "mode_vie_ecolo_oui", "nb_politiques_env", "tax_acceptance", "ecolo", "diplome4", "age", "taille_agglo", "Revenu")] # , "gauche_droite", "gilets_jaunes"
-names(data_cor) <- c("Anthropic", "Knowledge", "Gravity", "Frequency talks", "Ecological lifestyle", "Number policies", "Tax acceptance", "Ecologist", "Diploma", "Age", "Size of town", "Income")
+names(data_cor) <- c("Anthropic", "Knowledge", "Perceived gravity", "Frequency of talks", "Ecological lifestyle", "Number of policies", "Tax acceptance", "Ecologist", "Diploma", "Age", "Size of town", "Income")
 corr <- cor(data_cor, use="complete.obs")
 cor.mtest <- function(mat, ...) {
   mat <- as.matrix(mat)
