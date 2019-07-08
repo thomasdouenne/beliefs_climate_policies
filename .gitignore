@@ -24,3 +24,4 @@ model_reforms_data/*.csv
 !code/df_objective_gains_inelastic.csv
 !code/df_menages_domicile_teg.csv
 !code/correspondance-code-insee-code-postal.csv
+soumission/*
