@@ -581,7 +581,7 @@ Table_ee2 <- stargazer(tsls2_ee1, ols_ee2, logit_ee3, tsls2_ee4, tsls2_ee5,
                        keep = c("efficace"), # "Constant",
                        coef = list(NULL, NULL, logit_ee3_margins[,1], NULL, NULL), 
                        se = list(NULL, NULL, logit_ee3_margins[,2], NULL, NULL),
-                       add.lines = list(c("Instruments: info E.E., C.C. \\& P.M. ", "\\checkmark ", "", " ", "\\checkmark ", "\\checkmark"),
+                       add.lines = list(c("Instruments: info E.E. \\& C.C. ", "\\checkmark ", "", " ", "\\checkmark ", "\\checkmark"),
                                         c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark ")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
 write_clip(sub("\\multicolumn{2}{c}{\\textit{OLS}} & \\textit{logistic} & \\textit{OLS} & \\textit{OLS}", 
@@ -675,6 +675,52 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Not
 # of effectiveness: 0.313
 0.258 + 0.127 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.172 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 
   0.400 * wtd.mean(s$progressivite!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+
+#
+variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "single", "Simule_gain", "Simule_gain2", variables_demo)
+variables_reg_prog <- variables_reg_prog[!(variables_reg_prog %in% 
+    c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
+s$progressif <- (s$prog_na == 'Oui' | s$prog_na == 'NSP') # Attention à ne pas inclure les NA
+s$effective <- s$taxe_efficace!='Non'
+s$gagnant_info <- s$gagnant_info_categorie!='Perdant'
+
+# (1) OLS with controls and interactions
+s$taxapprobation <- s$taxe_info_approbation!='Non'
+s$prog_na_na <- s$prog_na == 'NA'
+formula_ols_prog1 <- as.formula(paste("taxapprobation ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+                                                                                            " + gagnant_info * effective * progressif + prog_na_na")))
+ols_prog1 <- lm(formula_ols_prog1, weights=s$weight, data=s)
+summary(ols_prog1) # sum of all effects True: all :0.879. P+G: 0.727. P+E:0.692. G+E: 0.637
+
+ci_manual <- function(lm, alpha=0.05, vars=c(2,3,5)) {
+  reg <- lm
+  res <- summary(lm)
+  CIs <- array(dim = c(2, length(vars)), dimnames = list("stat" = c('lower', 'upper'), "variable" = names(reg$coefficients)[vars]))
+  i <- 0
+  for (var in vars) {
+    i <- i+1
+    CIs[1:2, i] <- c(res$coef[var,1] - qt(1-alpha/2, df = res$df[2]) * res$coef[var, 2],
+                     res$coef[var,1] + qt(1-alpha/2, df = res$df[2]) * res$coef[var, 2])   
+  }
+  return(CIs)
+}
+
+temp <- "progressif"
+gsub(paste("s$", temp, "==T & ", sep=''), "", gsub("(.*)", "s$\\1", gsub(":", " & s$", gsub("TRUE", "==T", "progressifTRUE:gagnant_infoTRUE:effectiveTRUE"))), fixed=T)
+
+ci_at_sample_mean <- function(lm, alpha = 0.05, var, vars) {
+  reg <- lm
+  res <- summary(lm)
+  var_name <- var
+  for (v in 1:length(var)) var[v] <- which(names(ols_prog1$coefficients)==paste(var_name[v], 'TRUE', sep=''))
+  vars_names <- vars
+  for (v in 1:length(vars)) vars[v] <- which(names(ols_prog1$coefficients)==paste(vars_names[v], 'TRUE', sep=''))
+  sd <- qt(1-alpha/2, df = res$df[2]) * res$coef[var, 2] # assumes that length(var) = 1
+  for (v in 1:length(vars)) sd <- sd + 
+  for (v in 1:length(vars)) ci <- ci + wtd.mean(as.formula(gsub(paste("s$", temp, "==T & ", sep=''), "", gsub("(.*)", "s$\\1", gsub(":", " & s$", gsub("TRUE", "==T", vars_names[v]))), fixed=T)), weights = s$weight)
+  ci <- c('lower' = , 'upper' = )
+  return(ci)  
+}
 
 ## 5.4 Complementarity between motives
 # 5.4.1 Combined effects
