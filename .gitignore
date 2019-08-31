@@ -2,6 +2,7 @@
 code/*.Rproj.user
 code/*.Rproj
 .Rproj.user
+*.RDataTmp
 *.lyx#
 *.lyx~
 *.Rhistory
