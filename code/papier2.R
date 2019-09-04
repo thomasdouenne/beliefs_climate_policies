@@ -420,6 +420,28 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
                                                       Table_politiques_env, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
 
 
+### Cronbach's alpha:
+
+#install.packages("psy")
+#library(psy)
+
+s$ges_CO2_num_cor <- 1 * (s$ges_CO2 == TRUE)
+s$ges_CH4_num_cor <- 1 * (s$ges_CH4 == TRUE)
+s$ges_O2_num_cor <- 1 * (s$ges_O2 == FALSE)
+s$ges_pm_num_cor <- 1 * (s$ges_pm == FALSE)
+s$ges_avion_num_cor <- 1 * (s$ges_avion == TRUE)
+s$ges_boeuf_num_cor <- 1 * (s$ges_boeuf == TRUE)
+s$ges_nucleaire_num_cor <- 1 * (s$ges_nucleaire == FALSE)
+
+s$existe <- 1-1*(s$cause_CC=="n'existe pas")
+s$proximite_cible <- 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
+s$inde <- 1*(s$region_CC=='Inde')
+
+#unlist(cronbach(s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")]))
+unlist(cronbach(s[,c("ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
+                     "anthropique", "existe", "proximite_cible", "inde")]))
+
+
 ##### Appendix #####
 # TODO: clean Appendix
 
