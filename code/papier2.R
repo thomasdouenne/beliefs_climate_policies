@@ -33,7 +33,7 @@ decrit(s$generation_CC_min, weights = s$weight) #1960-2050: 11%-27%-43%-19%
 decrit(s$generation_CC_min >= 2020, weights = s$weight) # 62%
 
 # Figures 2-7
-barres(file="CC_cause_nolegend", title="", thin=T, data=dataN("cause_CC"), nsp=T, sort=T, legend = c("Anthropic", "Natural", "Does not exist", "PNR"), labels=c(" "), show_ticks = F)
+barres(file="CC_cause_nolegend", title="", thin=T, data=dataN("cause_CC"), nsp=T, sort=T, legend = c("Anthropogenic", "Natural", "Does not exist", "PNR"), labels=c(" "), show_ticks = F)
 ges_climate_call <- rev(paste("ges_correct", c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm"), sep="_")) 
 labels_ges_climate_call <- rev(c("Plane vs. train", "Nuclear vs. wind", "Beef vs. pasta", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
 oui_non(margin_l=40, ges_climate_call, NSP=FALSE, colors=color(3)[1:2], en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE) # colors=color(3)[1:2], 
@@ -274,7 +274,7 @@ s$mode_vie_ecolo_oui <- s$mode_vie_ecolo=='Oui'
 s$male <- s$sexe=='Masculin'
 s$ecolo <- s$ecologiste==T
 data_cor <- s[,c("anthropique", "connaissances_CC", "effets_CC", "parle_CC", "mode_vie_ecolo_oui", "nb_politiques_env", "tax_acceptance", "ecolo", "diplome4", "age", "taille_agglo", "Revenu")] # , "gauche_droite", "gilets_jaunes"
-names(data_cor) <- c("Anthropic", "Knowledge", "Perceived gravity", "Frequency of talks", "Ecological lifestyle", "Number of policies", "Tax acceptance", "Ecologist", "Diploma", "Age", "Size of town", "Income")
+names(data_cor) <- c("Anthropogenic", "Knowledge", "Perceived gravity", "Frequency of talks", "Ecological lifestyle", "# of policies supported", "Tax acceptance", "Ecologist", "Diploma", "Age", "Size of town", "Income")
 corr <- cor(data_cor, use="complete.obs")
 cor.mtest <- function(mat, ...) {
   mat <- as.matrix(mat)
@@ -290,7 +290,7 @@ cor.mtest <- function(mat, ...) {
   colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
   p.mat
 }
-p.mat <- cor.mtest(data_cor)
+p.mat <- cor.mtest(data_cor) # corrplot does not work when some packages are loaded before 'corrplot' => if it doesn't work, restart R and load only corrplot.
 corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
 
 # Table I
