@@ -61,10 +61,10 @@ package("snakecase")
 package("rdd")
 package("corrplot")
 
-package("interplot")
-package("jtools")
-package("effects")
-package("sjplot")
+# package("interplot")
+# package("jtools")
+# package("effects")
+# package("sjplot")
 # package("doMC") # for parallel computing, does not work on Windows
 
 # Fs <- function(QID) { s[QID][[1]] }
