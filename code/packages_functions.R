@@ -60,6 +60,11 @@ package("ggeffects")
 package("snakecase")
 package("rdd")
 package("corrplot")
+package("psy")
+
+package("lavaan")
+package("psych")
+package("semTools")
 
 # package("interplot")
 # package("jtools")

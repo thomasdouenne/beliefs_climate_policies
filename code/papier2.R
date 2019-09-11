@@ -314,7 +314,7 @@ cause_ols2 <- lm(cause_CC=='anthropique' ~ age_25_34 + age_35_49 + age_50_64 + a
 summary(cause_ols2)
 
 # (3) Cause of CC: politics
-cause_ols3 <- lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight)
+cause_ols3 <- lm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite_na + diplome4 * indeterminate, data=s, weights = s$weight)
 summary(cause_ols3)
 
 # (4) Knowledge of CC
@@ -328,7 +328,7 @@ effects_ols1 <- lm(formula_determinants_effets, data=s, weights = s$weight)
 summary(effects_ols1)
 
 # (6) Effects of CC: 
-effects_ols2 <- lm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite, data=s, weights = s$weight) # diplome4 ou connaissances_CC ?
+effects_ols2 <- lm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 * gauche_droite_na + diplome4 * indeterminate, data=s, weights = s$weight) # diplome4 ou connaissances_CC ?
 summary(effects_ols2)
 
 Table_determinants_attitudes_CC <- stargazer(cause_ols1, cause_ols2, cause_ols3, knowledge_ols1, effects_ols1, effects_ols2,
@@ -337,7 +337,7 @@ Table_determinants_attitudes_CC <- stargazer(cause_ols1, cause_ols2, cause_ols3,
                                                         "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
                                                         "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
                                                         "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
-                                                        "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
+                                                        "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right", "Diploma $\\times$ Left-right: Indeterminate"),
                                    header = FALSE, dep.var.labels = c("CC is anthropic", "Knowledge on CC", "CC is disastrous"),  dep.var.caption = "", 
                                    keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
                                             "Gauche_droite", "interet_politique", "transports_frequence"), # "humaniste", , "transports_avis", "conso"
@@ -422,9 +422,6 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
 
 ### Cronbach's alpha:
 
-#install.packages("psy")
-#library(psy)
-
 s$ges_CO2_num_cor <- 1 * (s$ges_CO2 == TRUE)
 s$ges_CH4_num_cor <- 1 * (s$ges_CH4 == TRUE)
 s$ges_O2_num_cor <- 1 * (s$ges_O2 == FALSE)
@@ -435,11 +432,33 @@ s$ges_nucleaire_num_cor <- 1 * (s$ges_nucleaire == FALSE)
 
 s$existe <- 1-1*(s$cause_CC=="n'existe pas")
 s$proximite_cible <- 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
-s$inde <- 1*(s$region_CC=='Inde')
+s$inde <- 1*(s$region_CC=="L'Inde")
 
 #unlist(cronbach(s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")]))
-unlist(cronbach(s[,c("ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
-                     "anthropique", "existe", "proximite_cible", "inde")]))
+connaissances <- s[,c("ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
+                      "anthropique", "existe", "proximite_cible", "inde")]
+unlist(cronbach(connaissances))
+
+EFA <- factanal(connaissances, 1)
+EFA # 1 factor not enough (even 5, the max, is not enough)
+temp <- EFA$loadings
+factor <- factor.pa(connaissances, 1)
+pca <- principal(connaissances, 1)
+
+s$connaissances_efa <- 0.264*s$ges_CO2_num_cor + 0.248*s$ges_CH4_num_cor + 0.114*s$ges_O2_num_cor - 0.167*s$ges_pm_num_cor + 0.302*s$ges_boeuf_num_cor + 0.692*s$anthropique + 0.35*s$existe + 0.202*s$proximite_cible
+cor(s$connaissances_efa, s$connaissances_CC)
+
+s$connaissances_CC_wo_region <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) +   3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
+s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=="L'Inde")
+s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
+cor(s$connaissances_CC_wo_region, s$connaissances_CC)
+
+connaissances_all <- cbind(s$connaissances_CC, s$connaissances_efa, connaissances)
+names(connaissances_all) <- c("connaissances_CC", "connaissances_efa", "ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
+                          "anthropique", "existe", "proximite_cible", "inde")
+corrc <- cor(connaissances_all, use="complete.obs")
+p.matc <- cor.mtest(connaissances_all)
+corrplot(corrc, method='color', p.mat = p.matc, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
 
 
 ##### Appendix #####
@@ -763,3 +782,4 @@ Table_interaction <- stargazer(interact_yv, interact_k, interact_yv_k,
 write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Interaction term is computed using numeric variables. Omitted modalities are: \\textit{Yellow Vests: opposes}, \\textit{Left-right: Extreme-left}, \\textit{Diploma: Brevet or no diploma}. }                \\end{table*} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
             Table_interaction, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
+

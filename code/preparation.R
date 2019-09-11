@@ -1000,6 +1000,9 @@ convert_s <- function() {
                           names = c("Extrême gauche","Gauche","Centre","Droite","Extrême droite")), annotation="gauche_droite:échelle de -2 (extr_gauche) à +2 (extr_droite) - Orientation politique (Comment vous définiriez-vous ? Plusieurs réponses possibles: (D'extrême) gauche/Du centre/(D'extrême) droite/Libéral/Humaniste/Patriote/Apolitique/Écologiste/Conservateur (champ libre)/NSP)") 
   levels(s$Gauche_droite) <<- c("Extreme-left", "Left", "Center", "Right", "Extreme-right", "Indeterminate")
   s$Gauche_droite[is.na(s$Gauche_droite)] <<- "Indeterminate"
+  s$indeterminate <<- s$Gauche_droite == "Indeterminate"
+  s$gauche_droite_na <<- as.numeric(s$gauche_droite)
+  s$gauche_droite_na[s$indeterminate == T] <<- wtd.mean(s$gauche_droite, weights = s$weight)
   
   temp <- Label(s$interet_politique)
   s$interet_politique <<- 1*(s$interet_politique=='Un peu') + 2*(s$interet_politique=='Beaucoup')
