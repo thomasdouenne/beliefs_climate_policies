@@ -581,6 +581,120 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
                                                                                                       Table_politiques_env_additional, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
 
 
+# Attitudes over carbon tax recycling
+variables_determinants_policy <- c("Revenu", "Revenu_conjoint", "connaissances_CC", "(effets_CC > 2)", "Gilets_jaunes",
+                                   "(nb_adultes==1)", variables_demo, variables_politiques, variables_energie, variables_mobilite) # 
+variables_determinants_policy <- variables_determinants_policy[!(variables_determinants_policy %in% c("revenu", "rev_tot", "niveau_vie", "age", "age_18_24",
+                                                                                                      names(s)[which(grepl("Chauffage", names(s)))], names(s)[which(grepl("Mode_chauffage", names(s)))],
+                                                                                                      names(s)[which(grepl("hausse_", names(s)))]))]
+variables_determinants_policy_CC <- variables_determinants_policy[c(3, 4, 23, 29, 5, 30, 11, 19:22, 1, 7, 17, 41)]
+for (v in variables_determinants_policy) if (!(v %in% variables_determinants_policy_CC)) variables_determinants_policy_CC <- c(variables_determinants_policy_CC, v)
+
+formula_determinants_si_transports <- as.formula(paste("si_transports ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_transports <- lm(formula_determinants_si_transports, data=s, weights = s$weight)
+summary(ols_si_transports)
+
+formula_determinants_si_baisse_tva <- as.formula(paste("si_baisse_tva ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_baisse_tva <- lm(formula_determinants_si_baisse_tva, data=s, weights = s$weight)
+summary(ols_si_baisse_tva)
+
+formula_determinants_si_renouvelables <- as.formula(paste("si_renouvelables ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_renouvelables <- lm(formula_determinants_si_renouvelables, data=s, weights = s$weight)
+summary(ols_si_renouvelables)
+
+formula_determinants_si_renovation <- as.formula(paste("si_renovation ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_renovation <- lm(formula_determinants_si_renovation, data=s, weights = s$weight)
+summary(ols_si_renovation)
+
+formula_determinants_si_contraints <- as.formula(paste("si_contraints ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_contraints <- lm(formula_determinants_si_contraints, data=s, weights = s$weight)
+summary(ols_si_contraints)
+
+formula_determinants_si_baisse_cotsoc <- as.formula(paste("si_baisse_cotsoc ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_baisse_cotsoc <- lm(formula_determinants_si_baisse_cotsoc, data=s, weights = s$weight)
+summary(ols_si_baisse_cotsoc)
+
+formula_determinants_si_pauvres <- as.formula(paste("si_pauvres ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_pauvres <- lm(formula_determinants_si_pauvres, data=s, weights = s$weight)
+summary(ols_si_pauvres)
+
+formula_determinants_si_baisse_deficit <- as.formula(paste("si_baisse_deficit ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_baisse_deficit <- lm(formula_determinants_si_baisse_deficit, data=s, weights = s$weight)
+summary(ols_si_baisse_deficit)
+
+formula_determinants_si_compensee <- as.formula(paste("si_compensee ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_si_compensee <- lm(formula_determinants_si_compensee, data=s, weights = s$weight)
+summary(ols_si_compensee)
+
+
+Table_modes_recyclage <- stargazer(ols_si_transports, ols_si_baisse_tva, ols_si_renouvelables, ols_si_renovation, ols_si_contraints, ols_si_baisse_cotsoc, ols_si_pauvres, ols_si_baisse_deficit, ols_si_compensee,
+                                  title="Determinants of attitudes towards carbon tax revenue recycling", model.names = FALSE, model.numbers = T, 
+                                  covariate.labels = c("Knowledge on CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                                                       "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
+                                                       "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)", 
+                                                       "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
+                                                       "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit"),
+                                  header = FALSE, dep.var.labels = c("Transports", "VAT", "Renewables", "Renovation", "Constrained", "CotSoc", "Poors", "Deficit", "Compensated"),  dep.var.caption = "", 
+                                  keep = c("Revenu$", "effets_CC", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
+                                  add.lines = list(c("Additional covariates & \\checkmark & \\checkmark & \\checkmark  & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark  \\\\ ")),
+                                  no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in Appendix C.} \\end{table*}', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                                                                                                 gsub('\\\\[-1.8ex] & Transports & VAT & Renewables & Renovation & Constrained & CotSoc & Poors & Deficit & Compensated \\\\',
+                                                                                                      '\\\\[-1.8ex] & Non-polluting & VAT & Renewable & Renovation & Transfer & Reduction & Transfer & Reduction & Transfer \\\\ \\\\[-1.8ex] & transports & cut & energies & of buildings & constrained hh. & soc. contri. & poor hh. & pub. deficit & all hh. \\\\',
+                                                                                                      Table_modes_recyclage, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
+
+
+# Attitudes over alternative climate policies, by policy
+formula_determinants_normes_isolation <- as.formula(paste("normes_isolation ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_normes_isolation <- lm(formula_determinants_normes_isolation, data=s, weights = s$weight)
+summary(ols_normes_isolation)
+
+formula_determinants_normes_vehicules <- as.formula(paste("normes_vehicules ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_normes_vehicules <- lm(formula_determinants_normes_vehicules, data=s, weights = s$weight)
+summary(ols_normes_vehicules)
+
+formula_determinants_taxe_kerosene <- as.formula(paste("taxe_kerosene ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_taxe_kerosene <- lm(formula_determinants_taxe_kerosene, data=s, weights = s$weight)
+summary(ols_taxe_kerosene)
+
+formula_determinants_interdiction_polluants <- as.formula(paste("interdiction_polluants ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_interdiction_polluants <- lm(formula_determinants_interdiction_polluants, data=s, weights = s$weight)
+summary(ols_interdiction_polluants)
+
+formula_determinants_controle_technique <- as.formula(paste("controle_technique ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_controle_technique <- lm(formula_determinants_controle_technique, data=s, weights = s$weight)
+summary(ols_controle_technique)
+
+formula_determinants_fonds_mondial <- as.formula(paste("fonds_mondial ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_fonds_mondial <- lm(formula_determinants_fonds_mondial, data=s, weights = s$weight)
+summary(ols_fonds_mondial)
+
+formula_determinants_taxe_viande <- as.formula(paste("taxe_viande ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_taxe_viande <- lm(formula_determinants_taxe_viande, data=s, weights = s$weight)
+summary(ols_taxe_viande)
+
+formula_determinants_peages_urbains <- as.formula(paste("peages_urbains ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+ols_peages_urbains <- lm(formula_determinants_peages_urbains, data=s, weights = s$weight)
+summary(ols_peages_urbains)
+
+Table_politiques_env_par_pol <- stargazer(ols_normes_isolation, ols_normes_vehicules, ols_taxe_kerosene, ols_interdiction_polluants, ols_controle_technique, ols_fonds_mondial, ols_taxe_viande, ols_peages_urbains,
+                                  title="Determinants of attitudes towards specific climate policies", model.names = FALSE, model.numbers = T, 
+                                  covariate.labels = c("Knowledge on CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                                                       "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
+                                                       "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)", 
+                                                       "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
+                                                       "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit"),
+                                  header = FALSE, dep.var.labels = c("Buildings", "Vehicles", "Kerosene", "Interdiction", "Control", "Fund", "Meat", "Tolls"),  dep.var.caption = "", 
+                                  keep = c("Revenu$", "effets_CC", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
+                                  add.lines = list(c("Additional covariates & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark  \\\\ ")),
+                                  no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in Appendix C.} \\end{table*}', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                                                                                                 gsub('\\\\[-1.8ex] & Buildings & Vehicles & Kerosene & Interdiction & Control & Fund & Meat & Tolls \\\\',
+                                                                                                      '\\\\[-1.8ex] & Norms for & Norms for & Tax on & Prohibition & Norms for & Contribution & Tax on & Urban \\\\ \\\\[-1.8ex] & buildings & new vehicles & kerosene & pol. vehicles & old vehicles & climate fund & red meat & tolls \\\\',
+                                                                                                      Table_politiques_env_par_pol, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
+
 
 ## Yellow Vests
 s$anthropique <- s$cause_CC=='anthropique'
