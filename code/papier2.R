@@ -260,12 +260,15 @@ barres(file="shale_val_nolegend", dataKN(c("schiste_approbation")), nsp=TRUE, le
 
 ##### 6. Determinants #####
 ## 6.1 Attitudes over CC
-s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 
-  3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=='Inde')
-decrit(s$connaissances_CC, weights = s$weight) # -3 to +13, quartiles: 6 8 9, mean 7.6, sd 2.5
+factanal(s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")], 1)
+s$connaissances_EFA <- 0.212*s$score_ges + 0.182*s$score_climate_call + 0.601*s$anthropique + 0.398*s$existe + 0.20*s$proximite_cible
+s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*(s$cause_CC=='anthropique') - 2*(s$cause_CC=="n'existe pas") + 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
+cor(s$connaissances_EFA, s$connaissances_CC) # 0.999
+decrit(s$connaissances_CC, weights = s$weight) # -2 (0) to +13 (22), quartiles: 6 8 9, mean 7.6, sd 2.5
 decrit(s$connaissances_CC)
 sd(s$connaissances_CC)
 s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
+
 decrit(s$Gauche_droite, weights=s$weight) # 40% indeterminate
 
 # Figure 24
@@ -437,7 +440,9 @@ s$inde <- 1*(s$region_CC=="L'Inde")
 #unlist(cronbach(s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")]))
 connaissances <- s[,c("ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
                       "anthropique", "existe", "proximite_cible", "inde")]
+connaissances_groupees <- s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")]
 unlist(cronbach(connaissances))
+unlist(cronbach(connaissances_groupees))
 
 EFA <- factanal(connaissances, 1)
 EFA # 1 factor not enough (even 5, the max, is not enough)
@@ -445,12 +450,22 @@ temp <- EFA$loadings
 factor <- factor.pa(connaissances, 1)
 pca <- principal(connaissances, 1)
 
+EFA2 <- factanal(connaissances_groupees, 1)
+EFA2 # 1 factor not enough (even 5, the max, is not enough)
+temp <- EFA2$loadings
+factor2 <- factor.pa(connaissances_groupees, 1)
+pca2 <- principal(connaissances_groupees, 1)
+
 s$connaissances_efa <- 0.264*s$ges_CO2_num_cor + 0.248*s$ges_CH4_num_cor + 0.114*s$ges_O2_num_cor - 0.167*s$ges_pm_num_cor + 0.302*s$ges_boeuf_num_cor + 0.692*s$anthropique + 0.35*s$existe + 0.202*s$proximite_cible
 cor(s$connaissances_efa, s$connaissances_CC)
 
+s$connaissances_efa2 <- 0.212*s$score_ges + 0.182*s$score_climate_call + 0.601*s$anthropique + 0.398*s$existe + 0.20*s$proximite_cible
+cor(s$connaissances_efa2, s$connaissances_CC) # 0.999
+
 s$connaissances_CC_wo_region <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) +   3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
-s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=="L'Inde")
+s$connaissances_CC_old <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=="L'Inde")
 s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
+cor(s$connaissances_CC_old, s$connaissances_CC)
 cor(s$connaissances_CC_wo_region, s$connaissances_CC)
 
 pca <- prcomp(connaissances, rank. = 1, scale = T)
@@ -531,9 +546,9 @@ Table_diesel <- stargazer(ols_diesel_1, ols_diesel_2, ols_diesel_3, ols_diesel_4
                                                        "Diesel", "Gasoline", "Number vehicles", "Frequency of public transit"),
                                   header = FALSE, dep.var.labels = c("Acceptance increase in diesel taxation"),  dep.var.caption = "", 
                                   keep = c("connaissances_CC", "_agglo", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence", "diesel", "essence", "nb_vehicules"), 
-                                  add.lines = list(c("Additional covariates & \\checkmark &  &  &  \\\\ ")),
+                                  add.lines = list(c("Additional covariates & \\checkmark &  &  &  \\\\ ")), # => remove empty line in latex
                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:determinants_diesel")
-write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in \\ref{app:covariates}.} \\end{table*}', 
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in Appendix C.} \\end{table*}', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
                                                                                                  gsub('\\\\[-1.8ex] & Acceptance increase in diesel taxation & \\multicolumn{3}{c}{NA} \\\\',
                                                                                                       '\\\\[-1.8ex] & \\multicolumn{3}{c}{Acceptance increase in diesel taxation} \\\\',
@@ -599,7 +614,7 @@ Table_politiques_env_additional <- stargazer(ols_nb_politiques_env_bis, ols_nb_p
                                   keep = c("Revenu$", "effets_CC", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
                                   #add.lines = list(c("Additional covariates & \\checkmark & & \\checkmark  & \\checkmark & \\checkmark & \\checkmark  \\\\ ")),
                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
-write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in \\ref{app:covariates}.} \\end{table*}', 
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in Appendix C.} \\end{table*}', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
                                                                                                  gsub('\\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & Share of policies & norms vs. taxes & earmarking vs. transfers & ecological lifestyle \\\\',
                                                                                                       '\\\\[-1.8ex] & \\multicolumn{2}{c}{Acceptance of} & Share of policies & Norms & Earmarking & Ecological \\\\ \\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & approved & vs. taxes & vs. transfers & lifestyle \\\\',
@@ -876,9 +891,9 @@ Table_politiques_env_logit <- stargazer(tax_logit, tax_logit2, env_logit, ecolog
     coef = list(tax_logit_margins[,1], tax_logit2_margins[,1], env_logit_margins[,1], ecologit_margins[,1]),
     se = list(tax_logit_margins[,2], tax_logit2_margins[,2], env_logit_margins[,2], ecologit_margins[,2]),
     keep = c("Revenu$", "effets_CC", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
-    add.lines = list(c("Additional covariates & \\checkmark & & \\checkmark  & \\checkmark  \\\\ ")),
+    add.lines = list(c("Additional covariates & \\checkmark & & \\checkmark  & \\checkmark  \\\\ ")), # => remove empty line in latex 
     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env_logit")
-write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in \\ref{app:covariates}.} \\end{table*}', 
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in Appendix C.} \\end{table*}', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
                  gsub('\\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & Share of policies & norms vs. taxes & earmarking vs. transfers & ecological lifestyle \\\\',
                       '\\\\[-1.8ex] & \\multicolumn{2}{c}{Acceptance of} & Share of policies & Norms & Earmarking & Ecological \\\\ \\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & approved & vs. taxes & vs. transfers & lifestyle \\\\',

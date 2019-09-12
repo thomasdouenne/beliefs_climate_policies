@@ -63,7 +63,7 @@ package("corrplot")
 package("psy")
 
 package("lavaan")
-package("psych")
+# package("psych") # library(psych, exclude = "describe")
 package("semTools")
 
 # package("interplot")
