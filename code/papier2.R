@@ -428,6 +428,78 @@ decrit(s$earmarked_vs_compensation, weights=s$weight)
 decrit(s$earmarked_vs_compensation[s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T], weights=s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T])
 decrit(s$earmarked_vs_compensation[s$ecologiste==T], weights=s$weight[s$ecologiste==T])
 
+# Preferred types of policies (Yellow Vests and Ecologists)
+s$acceptance_norms <- s$normes_isolation + s$normes_vehicules + s$controle_technique + s$interdiction_polluants
+s$acceptance_taxes <- s$taxe_kerosene + s$taxe_viande + s$peages_urbains + s$fonds_mondial
+
+decrit(s$acceptance_norms[s$ecologiste==TRUE], weights = s$weight[s$ecologiste==TRUE])
+decrit(s$acceptance_taxes[s$ecologiste==TRUE], weights = s$weight[s$ecologiste==TRUE])
+
+decrit(s$acceptance_norms[s$Gilets_jaunes=='soutient'], weights = s$weight[s$Gilets_jaunes=='soutient'])
+decrit(s$acceptance_taxes[s$Gilets_jaunes=='soutient'], weights = s$weight[s$Gilets_jaunes=='soutient'])
+
+decrit(s$acceptance_norms[s$Gilets_jaunes=='est_dedans'], weights = s$weight[s$Gilets_jaunes=='est_dedans'])
+decrit(s$acceptance_taxes[s$Gilets_jaunes=='est_dedans'], weights = s$weight[s$Gilets_jaunes=='est_dedans'])
+
+s$acceptance_earmarked <- s$si_renovation + s$si_renouvelables + s$si_transports
+s$acceptance_compensations <- s$si_pauvres + s$si_compensee + s$si_contraints
+
+decrit(s$acceptance_earmarked[s$ecologiste==TRUE], weights = s$weight[s$ecologiste==TRUE])
+decrit(s$acceptance_compensations[s$ecologiste==TRUE], weights = s$weight[s$ecologiste==TRUE])
+
+decrit(s$acceptance_earmarked[s$Gilets_jaunes=='soutient'], weights = s$weight[s$Gilets_jaunes=='soutient'])
+decrit(s$acceptance_compensations[s$Gilets_jaunes=='soutient'], weights = s$weight[s$Gilets_jaunes=='soutient'])
+
+decrit(s$acceptance_earmarked[s$Gilets_jaunes=='est_dedans'], weights = s$weight[s$Gilets_jaunes=='est_dedans'])
+decrit(s$acceptance_compensations[s$Gilets_jaunes=='est_dedans'], weights = s$weight[s$Gilets_jaunes=='est_dedans'])
+
+
+##### Cronbach's alpha: #####
+
+s$ges_CO2_num_cor <- 1 * (s$ges_CO2 == TRUE)
+s$ges_CH4_num_cor <- 1 * (s$ges_CH4 == TRUE)
+s$ges_O2_num_cor <- 1 * (s$ges_O2 == FALSE)
+s$ges_pm_num_cor <- 1 * (s$ges_pm == FALSE)
+s$ges_avion_num_cor <- 1 * (s$ges_avion == TRUE)
+s$ges_boeuf_num_cor <- 1 * (s$ges_boeuf == TRUE)
+s$ges_nucleaire_num_cor <- 1 * (s$ges_nucleaire == FALSE)
+
+s$existe <- 1-1*(s$cause_CC=="n'existe pas")
+s$proximite_cible <- 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
+s$inde <- 1*(s$region_CC=="L'Inde")
+
+#unlist(cronbach(s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")]))
+connaissances <- s[,c("ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
+                      "anthropique", "existe", "proximite_cible", "inde")]
+unlist(cronbach(connaissances))
+
+EFA <- factanal(connaissances, 1)
+EFA # 1 factor not enough (even 5, the max, is not enough)
+temp <- EFA$loadings
+factor <- factor.pa(connaissances, 1)
+pca <- principal(connaissances, 1)
+
+s$connaissances_efa <- 0.264*s$ges_CO2_num_cor + 0.248*s$ges_CH4_num_cor + 0.114*s$ges_O2_num_cor - 0.167*s$ges_pm_num_cor + 0.302*s$ges_boeuf_num_cor + 0.692*s$anthropique + 0.35*s$existe + 0.202*s$proximite_cible
+cor(s$connaissances_efa, s$connaissances_CC)
+
+s$connaissances_CC_wo_region <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) +   3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
+s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=="L'Inde")
+s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
+cor(s$connaissances_CC_wo_region, s$connaissances_CC)
+
+pca <- prcomp(connaissances, rank. = 1, scale = T)
+pca
+s$connaissances_pca <- -pca$x
+cor(s$connaissances_pca, s$connaissances_CC) # 0.904
+cor(s$connaissances_pca, s$connaissances_efa) # 0.923
+
+connaissances_all <- cbind(s$connaissances_CC, s$connaissances_pca, s$connaissances_efa, connaissances)
+names(connaissances_all) <- c("connaissances_CC", "connaissances_pca",  "connaissances_efa", "ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
+                          "anthropique", "existe", "proximite_cible", "inde")
+corrc <- cor(connaissances_all, use="complete.obs")
+p.matc <- cor.mtest(connaissances_all)
+corrplot(corrc, method='color', p.mat = p.matc, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
+
 
 ##### Appendix #####
 # TODO: clean Appendix
