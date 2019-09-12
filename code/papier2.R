@@ -420,7 +420,7 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
                                                       Table_politiques_env, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
 
 
-### Cronbach's alpha:
+##### Cronbach's alpha: #####
 
 s$ges_CO2_num_cor <- 1 * (s$ges_CO2 == TRUE)
 s$ges_CH4_num_cor <- 1 * (s$ges_CH4 == TRUE)
@@ -453,8 +453,14 @@ s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anth
 s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
 cor(s$connaissances_CC_wo_region, s$connaissances_CC)
 
-connaissances_all <- cbind(s$connaissances_CC, s$connaissances_efa, connaissances)
-names(connaissances_all) <- c("connaissances_CC", "connaissances_efa", "ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
+pca <- prcomp(connaissances, rank. = 1, scale = T)
+pca
+s$connaissances_pca <- -pca$x
+cor(s$connaissances_pca, s$connaissances_CC) # 0.904
+cor(s$connaissances_pca, s$connaissances_efa) # 0.923
+
+connaissances_all <- cbind(s$connaissances_CC, s$connaissances_pca, s$connaissances_efa, connaissances)
+names(connaissances_all) <- c("connaissances_CC", "connaissances_pca",  "connaissances_efa", "ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
                           "anthropique", "existe", "proximite_cible", "inde")
 corrc <- cor(connaissances_all, use="complete.obs")
 p.matc <- cor.mtest(connaissances_all)
