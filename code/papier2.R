@@ -420,6 +420,32 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
                                                       Table_politiques_env, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
 
 
+# Preferred types of policies (Yellow Vests and Ecologists)
+s$acceptance_norms <- s$normes_isolation + s$normes_vehicules + s$controle_technique + s$interdiction_polluants
+s$acceptance_taxes <- s$taxe_kerosene + s$taxe_viande + s$peages_urbains + s$fonds_mondial
+
+decrit(s$acceptance_norms[s$ecologiste==TRUE], weights = s$weight[s$ecologiste==TRUE])
+decrit(s$acceptance_taxes[s$ecologiste==TRUE], weights = s$weight[s$ecologiste==TRUE])
+
+decrit(s$acceptance_norms[s$Gilets_jaunes=='soutient'], weights = s$weight[s$Gilets_jaunes=='soutient'])
+decrit(s$acceptance_taxes[s$Gilets_jaunes=='soutient'], weights = s$weight[s$Gilets_jaunes=='soutient'])
+
+decrit(s$acceptance_norms[s$Gilets_jaunes=='est_dedans'], weights = s$weight[s$Gilets_jaunes=='est_dedans'])
+decrit(s$acceptance_taxes[s$Gilets_jaunes=='est_dedans'], weights = s$weight[s$Gilets_jaunes=='est_dedans'])
+
+s$acceptance_earmarked <- s$si_renovation + s$si_renouvelables + s$si_transports
+s$acceptance_compensations <- s$si_pauvres + s$si_compensee + s$si_contraints
+
+decrit(s$acceptance_earmarked[s$ecologiste==TRUE], weights = s$weight[s$ecologiste==TRUE])
+decrit(s$acceptance_compensations[s$ecologiste==TRUE], weights = s$weight[s$ecologiste==TRUE])
+
+decrit(s$acceptance_earmarked[s$Gilets_jaunes=='soutient'], weights = s$weight[s$Gilets_jaunes=='soutient'])
+decrit(s$acceptance_compensations[s$Gilets_jaunes=='soutient'], weights = s$weight[s$Gilets_jaunes=='soutient'])
+
+decrit(s$acceptance_earmarked[s$Gilets_jaunes=='est_dedans'], weights = s$weight[s$Gilets_jaunes=='est_dedans'])
+decrit(s$acceptance_compensations[s$Gilets_jaunes=='est_dedans'], weights = s$weight[s$Gilets_jaunes=='est_dedans'])
+
+
 ### Cronbach's alpha:
 
 #install.packages("psy")
