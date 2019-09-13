@@ -980,6 +980,8 @@ load(".RData")
 
 ##### 3. Attitudes over Climate Change #####
 ## 3.1 Knowledge
+=======
+>>>>>>> yellow vests & ecolo same preferences normes...
 decrit(s$cause_CC, miss=T, weights = s$weight) # 72% anthropogenic, 20% natural, 3% doesn't exist
 decrit(s$ges_CO2, weights = s$weight) # 77%
 decrit(s$ges_O2, weights = s$weight) # 4%
@@ -1311,7 +1313,7 @@ Table_determinants_attitudes_CC <- stargazer(cause_ols1, cause_ols2, cause_ols3,
                                                         "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
                                                         "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
                                                         "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right", "Diploma $\\times$ Left-right: Indeterminate"),
-                                   header = FALSE, dep.var.labels = c("CC is anthropogenic", "Knowledge on CC", "CC is disastrous"),  dep.var.caption = "", 
+                                   header = FALSE, dep.var.labels = c("CC is anthropogenic", "Knowledge about CC", "CC is disastrous"),  dep.var.caption = "", 
                                    keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
                                             "Gauche_droite", "interet_politique", "transports_frequence"), # "humaniste", , "transports_avis", "conso"
                                    add.lines = list(c("Additional covariates & \\checkmark &  &  & \\checkmark & \\checkmark &  \\\\ ")),
@@ -1336,8 +1338,8 @@ for (v in compensations) s$earmarked_vs_compensation <- s$earmarked_vs_compensat
 
 decrit(s$normes_vs_taxes) # mean 2.8, sd 3.3
 decrit(s$earmarked_vs_compensation) # mean 1.4, sd 3.1
-s$normes_vs_taxes <- (s$normes_vs_taxes - mean(s$normes_vs_taxes))/sd(s$normes_vs_taxes)
-s$earmarked_vs_compensation <- (s$earmarked_vs_compensation - mean(s$earmarked_vs_compensation))/sd(s$earmarked_vs_compensation)
+s$normes_vs_taxes_normalized <- (s$normes_vs_taxes - mean(s$normes_vs_taxes))/sd(s$normes_vs_taxes)
+s$earmarked_vs_normalized <- (s$earmarked_vs_compensation - mean(s$earmarked_vs_compensation))/sd(s$earmarked_vs_compensation)
 
 # Table II
 variables_determinants_policy <- c("Revenu", "Revenu_conjoint", "connaissances_CC", "(effets_CC > 2)", "Gilets_jaunes",
@@ -1368,20 +1370,20 @@ formula_determinants_mode_vie_ecolo <- as.formula(paste("mode_vie_ecolo == 'Oui'
 ols_mode_vie_ecolo <- lm(formula_determinants_mode_vie_ecolo, data=s, weights = s$weight)
 summary(ols_mode_vie_ecolo)
 
-formula_determinants_normes_vs_taxes <- as.formula(paste("normes_vs_taxes ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
+formula_determinants_normes_vs_taxes <- as.formula(paste("normes_vs_taxes_normalized ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_normes_vs_taxes <- lm(formula_determinants_normes_vs_taxes, data=s, weights = s$weight)
 summary(ols_normes_vs_taxes)
 
-formula_determinants_earmarked_vs_compensation <- as.formula(paste("earmarked_vs_compensation ~ ",  paste(variables_determinants_policy_CC, collapse = ' + ')))
+formula_determinants_earmarked_vs_compensation <- as.formula(paste("earmarked_vs_compensation_normalized ~ ",  paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_earmarked_vs_compensation <- lm(formula_determinants_earmarked_vs_compensation, data=s, weights = s$weight)
 summary(ols_earmarked_vs_compensation)
 
 Table_politiques_env <- stargazer(ols_taxe_approbation, ols_taxe_approbation_bis, ols_nb_politiques_env, ols_normes_vs_taxes, ols_earmarked_vs_compensation, ols_mode_vie_ecolo,
                                    title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = T, 
-                                  covariate.labels = c("Knowledge on CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
-                                                       "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
-                                                       "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)", 
-                                                       "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
+                                  covariate.labels = c("Knowledge about CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
+                                                       "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
+                                                       "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)",
+                                                       "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65",
                                                        "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit"),
                                    header = FALSE, dep.var.labels = c("Tax \\& dividend", "Share of policies", "norms vs. taxes", "earmarking vs. transfers", "ecological lifestyle"),  dep.var.caption = "", 
                                    keep = c("Revenu$", "effets_CC", "connaissances_CC", "sexe", "age_", "diplome", "_agglo", "interet_politique", "Gilets_jaunes", "ecologiste", "Gauche_droite", "transports_frequence"), 
@@ -1393,6 +1395,13 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
                                                        '\\\\[-1.8ex] & \\multicolumn{2}{c}{Acceptance of} & Share of policies & Norms & Earmarking & Ecological \\\\ \\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & approved & vs. taxes & vs. transfers & lifestyle \\\\',
                                                       Table_politiques_env, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
 
+# Yellow Vests and ecologists favor norms over taxes and earmarking over transfers
+decrit(s$normes_vs_taxes, weights=s$weight)
+decrit(s$normes_vs_taxes[s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T], weights=s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T])
+decrit(s$normes_vs_taxes[s$ecologiste==T], weights=s$weight[s$ecologiste==T])
+decrit(s$earmarked_vs_compensation, weights=s$weight)
+decrit(s$earmarked_vs_compensation[s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T], weights=s$weight[s$gilets_jaunes_dedans==T | s$gilets_jaunes_soutien==T])
+decrit(s$earmarked_vs_compensation[s$ecologiste==T], weights=s$weight[s$ecologiste==T])
 
 
 ##### Appendix #####
@@ -1452,7 +1461,7 @@ summary(ols_diesel_4)
 
 Table_diesel <- stargazer(ols_diesel_1, ols_diesel_2, ols_diesel_3, ols_diesel_4, # TODO: object 'ols_diesel_4' not found
                                   title="Determinants of attitudes towards diesel taxation", model.names = FALSE, model.numbers = T, 
-                                  covariate.labels = c("Knowledge on CC", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                                  covariate.labels = c("Knowledge about CC", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
                                                        "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
                                                        "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right",
                                                        "Size of town: -20k", "Size of town: 20-100k", "Size of town: +100k", "Size of town: Paris",
@@ -1518,7 +1527,7 @@ summary(ols_tax_and_dividend_left_right)
 
 Table_politiques_env_additional <- stargazer(ols_nb_politiques_env_bis, ols_nb_politiques_env_left_right, ols_tax_and_dividend_left_right,
                                   title="Determinants of attitudes towards climate policies, additional specifications", model.names = FALSE, model.numbers = T, 
-                                  covariate.labels = c("Knowledge on CC", "CC is disastrous", "Diploma (1 to 4)", 
+                                  covariate.labels = c("Knowledge about CC", "CC is disastrous", "Diploma (1 to 4)", 
                                                        "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
                                                        "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit",
                                                        "Left-right: Extreme-left", "Left-right: Left", 
@@ -1582,7 +1591,7 @@ summary(ols_si_compensee)
 
 Table_modes_recyclage <- stargazer(ols_si_transports, ols_si_baisse_tva, ols_si_renouvelables, ols_si_renovation, ols_si_contraints, ols_si_baisse_cotsoc, ols_si_pauvres, ols_si_baisse_deficit, ols_si_compensee,
                                   title="Determinants of attitudes towards carbon tax revenue recycling", model.names = FALSE, model.numbers = T, 
-                                  covariate.labels = c("Knowledge on CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                                  covariate.labels = c("Knowledge about CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
                                                        "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
                                                        "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)", 
                                                        "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
@@ -1633,7 +1642,7 @@ summary(ols_peages_urbains)
 
 Table_politiques_env_par_pol <- stargazer(ols_normes_isolation, ols_normes_vehicules, ols_taxe_kerosene, ols_interdiction_polluants, ols_controle_technique, ols_fonds_mondial, ols_taxe_viande, ols_peages_urbains,
                                   title="Determinants of attitudes towards specific climate policies", model.names = FALSE, model.numbers = T, 
-                                  covariate.labels = c("Knowledge on CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
+                                  covariate.labels = c("Knowledge about CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
                                                        "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
                                                        "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)", 
                                                        "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
@@ -1780,7 +1789,7 @@ summary(ols_K_robust_target)
 
 Table_K_robust <- stargazer(ols_taxe_approbation, ols_K_robust_anthro, ols_K_robust_exists, ols_K_robust_ghg, ols_K_robust_acti, ols_K_robust_target,
     title="Robustness of the determinants of Tax \\& Dividend Acceptance To Knowledge Variables", model.names = FALSE, model.numbers = T, 
-    covariate.labels = c("Knowledge on CC", "CC is Anthropogenic", "CC Exists", "Score GhG", "Score Activities", "Score Target proximity",
+    covariate.labels = c("Knowledge about CC", "CC is Anthropogenic", "CC Exists", "Score GhG", "Score Activities", "Score Target proximity",
                          "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Sex: Male"),
@@ -1850,7 +1859,7 @@ ecologit_margins
 
 Table_politiques_env_logit <- stargazer(tax_logit, tax_logit2, env_logit, ecologit,
     title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = T, 
-    covariate.labels = c("Knowledge on CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
+    covariate.labels = c("Knowledge about CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)",
                          "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65",
