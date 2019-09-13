@@ -14,7 +14,7 @@ load(".RData")
 
 ##### 3. Attitudes over Climate Change #####
 ## 3.1 Knowledge
-decrit(s$cause_CC, miss=T, weights = s$weight) # 72% anthropic, 20% natural, 3% doesn't exist
+decrit(s$cause_CC, miss=T, weights = s$weight) # 72% anthropogenic, 20% natural, 3% doesn't exist
 decrit(s$ges_CO2, weights = s$weight) # 77%
 decrit(s$ges_O2, weights = s$weight) # 4%
 decrit(s$ges_CH4, weights = s$weight) # 48%
@@ -260,6 +260,10 @@ barres(file="shale_val_nolegend", dataKN(c("schiste_approbation")), nsp=TRUE, le
 
 ##### 6. Determinants #####
 ## 6.1 Attitudes over CC
+s$existe <- 1-1*(s$cause_CC=="n'existe pas")
+s$proximite_cible <- 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
+s$inde <- 1*(s$region_CC=="L'Inde")
+
 factanal(s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")], 1)
 s$connaissances_EFA <- 0.212*s$score_ges + 0.182*s$score_climate_call + 0.601*s$anthropique + 0.398*s$existe + 0.20*s$proximite_cible
 s$connaissances_CC <- s$score_ges + s$score_climate_call + 3*(s$cause_CC=='anthropique') - 2*(s$cause_CC=="n'existe pas") + 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
@@ -307,7 +311,7 @@ for (v in variables_determinants_attitudes) if (!(v %in% variables_determinants_
 
 s$Gauche_droite <- relevel(s$Gauche_droite, 'Indeterminate')
 
-# (1) Cause of CC (anthropic or not)
+# (1) Cause of CC (anthropogenic or not)
 formula_determinants_cause <- as.formula(paste("cause_CC=='anthropique' ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + ')))
 cause_ols1 <- lm(formula_determinants_cause, data=s, weights = s$weight)
 summary(cause_ols1)
@@ -341,7 +345,7 @@ Table_determinants_attitudes_CC <- stargazer(cause_ols1, cause_ols2, cause_ols3,
                                                         "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
                                                         "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
                                                         "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right", "Diploma $\\times$ Left-right: Indeterminate"),
-                                   header = FALSE, dep.var.labels = c("CC is anthropic", "Knowledge on CC", "CC is disastrous"),  dep.var.caption = "", 
+                                   header = FALSE, dep.var.labels = c("CC is anthropogenic", "Knowledge on CC", "CC is disastrous"),  dep.var.caption = "", 
                                    keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
                                             "Gauche_droite", "interet_politique", "transports_frequence"), # "humaniste", , "transports_avis", "conso"
                                    add.lines = list(c("Additional covariates & \\checkmark &  &  & \\checkmark & \\checkmark &  \\\\ ")),
@@ -381,6 +385,7 @@ for (v in variables_determinants_policy) if (!(v %in% variables_determinants_pol
 variables_determinants_policy_CC_bis <- variables_determinants_policy_CC[!(variables_determinants_policy_CC %in% c("Gilets_jaunes", "Gauche_droite", "connaissances_CC", "interet_politique", "ecologiste"))]
 variables_determinants_policy_CC_ter <- c("connaissances_CC", "(effets_CC > 2)", "diplome4", "age_25_34", "age_35_49", "age_50_64", "age_65_plus", "Revenu", "sexe", "taille_agglo", "transports_frequence")
 
+s$Gauche_droite <- relevel(s$Gauche_droite, 'Indeterminate')
 formula_determinants_taxe_approbation <- as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_determinants_policy_CC, collapse = ' + ')))
 ols_taxe_approbation <- lm(formula_determinants_taxe_approbation, data=s, weights = s$weight)
 summary(ols_taxe_approbation)
@@ -422,64 +427,6 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
                                                        '\\\\[-1.8ex] & \\multicolumn{2}{c}{Acceptance of} & Share of policies & Norms & Earmarking & Ecological \\\\ \\\\[-1.8ex] & \\multicolumn{2}{c}{Tax \\& dividend} & approved & vs. taxes & vs. transfers & lifestyle \\\\',
                                                       Table_politiques_env, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
 
-
-##### Cronbach's alpha: #####
-
-s$ges_CO2_num_cor <- 1 * (s$ges_CO2 == TRUE)
-s$ges_CH4_num_cor <- 1 * (s$ges_CH4 == TRUE)
-s$ges_O2_num_cor <- 1 * (s$ges_O2 == FALSE)
-s$ges_pm_num_cor <- 1 * (s$ges_pm == FALSE)
-s$ges_avion_num_cor <- 1 * (s$ges_avion == TRUE)
-s$ges_boeuf_num_cor <- 1 * (s$ges_boeuf == TRUE)
-s$ges_nucleaire_num_cor <- 1 * (s$ges_nucleaire == FALSE)
-
-s$existe <- 1-1*(s$cause_CC=="n'existe pas")
-s$proximite_cible <- 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
-s$inde <- 1*(s$region_CC=="L'Inde")
-
-#unlist(cronbach(s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")]))
-connaissances <- s[,c("ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
-                      "anthropique", "existe", "proximite_cible", "inde")]
-connaissances_groupees <- s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")]
-unlist(cronbach(connaissances))
-unlist(cronbach(connaissances_groupees))
-
-EFA <- factanal(connaissances, 1)
-EFA # 1 factor not enough (even 5, the max, is not enough)
-temp <- EFA$loadings
-factor <- factor.pa(connaissances, 1)
-pca <- principal(connaissances, 1)
-
-EFA2 <- factanal(connaissances_groupees, 1)
-EFA2 # 1 factor not enough (even 5, the max, is not enough)
-temp <- EFA2$loadings
-factor2 <- factor.pa(connaissances_groupees, 1)
-pca2 <- principal(connaissances_groupees, 1)
-
-s$connaissances_efa <- 0.264*s$ges_CO2_num_cor + 0.248*s$ges_CH4_num_cor + 0.114*s$ges_O2_num_cor - 0.167*s$ges_pm_num_cor + 0.302*s$ges_boeuf_num_cor + 0.692*s$anthropique + 0.35*s$existe + 0.202*s$proximite_cible
-cor(s$connaissances_efa, s$connaissances_CC)
-
-s$connaissances_efa2 <- 0.212*s$score_ges + 0.182*s$score_climate_call + 0.601*s$anthropique + 0.398*s$existe + 0.20*s$proximite_cible
-cor(s$connaissances_efa2, s$connaissances_CC) # 0.999
-
-s$connaissances_CC_wo_region <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) +   3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6)
-s$connaissances_CC_old <- s$score_ges + s$score_climate_call + 3*((s$cause_CC=='anthropique') - (s$cause_CC=="n'existe pas")) + 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=="L'Inde")
-s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
-cor(s$connaissances_CC_old, s$connaissances_CC)
-cor(s$connaissances_CC_wo_region, s$connaissances_CC)
-
-pca <- prcomp(connaissances, rank. = 1, scale = T)
-pca
-s$connaissances_pca <- -pca$x
-cor(s$connaissances_pca, s$connaissances_CC) # 0.904
-cor(s$connaissances_pca, s$connaissances_efa) # 0.923
-
-connaissances_all <- cbind(s$connaissances_CC, s$connaissances_pca, s$connaissances_efa, connaissances)
-names(connaissances_all) <- c("connaissances_CC", "connaissances_pca",  "connaissances_efa", "ges_CO2_num_cor", "ges_CH4_num_cor", "ges_O2_num_cor", "ges_pm_num_cor", "ges_avion_num_cor", "ges_boeuf_num_cor", "ges_nucleaire_num_cor",
-                          "anthropique", "existe", "proximite_cible", "inde")
-corrc <- cor(connaissances_all, use="complete.obs")
-p.matc <- cor.mtest(connaissances_all)
-corrplot(corrc, method='color', p.mat = p.matc, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
 
 
 ##### Appendix #####
@@ -679,7 +626,7 @@ Table_modes_recyclage <- stargazer(ols_si_transports, ols_si_baisse_tva, ols_si_
                                   add.lines = list(c("Additional covariates & \\checkmark & \\checkmark & \\checkmark  & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark  \\\\ ")),
                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
 write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in Appendix C.} \\end{table*}', 
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                gsub('\\begin{tabular}{@', '\\hspace*{-1.3cm} \\resizebox{1.15\\columnwidth}{!}{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
                                                                                                  gsub('\\\\[-1.8ex] & Transports & VAT & Renewables & Renovation & Constrained & CotSoc & Poors & Deficit & Compensated \\\\',
                                                                                                       '\\\\[-1.8ex] & Non-polluting & VAT & Renewable & Renovation & Transfer & Reduction & Transfer & Reduction & Transfer \\\\ \\\\[-1.8ex] & transports & cut & energies & of buildings & constrained hh. & soc. contri. & poor hh. & pub. deficit & all hh. \\\\',
                                                                                                       Table_modes_recyclage, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
@@ -730,7 +677,7 @@ Table_politiques_env_par_pol <- stargazer(ols_normes_isolation, ols_normes_vehic
                                   add.lines = list(c("Additional covariates & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark & \\checkmark  \\\\ ")),
                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:politiques_env")
 write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are defined in Appendix C.} \\end{table*}', 
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
+                gsub('\\begin{tabular}{@', '\\hspace*{-1.3cm} \\resizebox{1.15\\columnwidth}{!}{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
                                                                                                  gsub('\\\\[-1.8ex] & Buildings & Vehicles & Kerosene & Interdiction & Control & Fund & Meat & Tolls \\\\',
                                                                                                       '\\\\[-1.8ex] & Norms for & Norms for & Tax on & Prohibition & Norms for & Contribution & Tax on & Urban \\\\ \\\\[-1.8ex] & buildings & new vehicles & kerosene & pol. vehicles & old vehicles & climate fund & red meat & tolls \\\\',
                                                                                                       Table_politiques_env_par_pol, fixed=TRUE), fixed=TRUE), fixed=T), fixed=T), collapse=' ')
@@ -824,6 +771,61 @@ summary(lm((s$taxe_approbation=='Oui') ~ Gauche_droite, data=s)) # pas significt
 
 
 ##### Online Appendix #####
+# Construction of the knowledge index
+connaissances <- s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")]
+factanal(connaissances, 1)
+unlist(cronbach(connaissances))
+# pca <- principal(s[,c("score_ges", "score_climate_call", "anthropique", "existe", "proximite_cible", "inde")], 1)
+s$connaissances_efa <- 0.212*s$score_ges + 0.182*s$score_climate_call + 0.601*s$anthropique + 0.398*s$existe + 0.20*s$proximite_cible
+cor(s$connaissances_efa, s$connaissances_CC) # 0.999
+
+s$connaissances_CC_old <- s$score_ges + s$score_climate_call + 3*(s$cause_CC=='anthropique') - 3*(s$cause_CC=="n'existe pas") + 3 - (s$emission_cible > 2) - (s$emission_cible > 4) - (s$emission_cible > 6) + (s$region_CC=="L'Inde")
+cor(s$connaissances_CC_old, s$connaissances_CC) # 0.98
+
+connaissances_all <- cbind(s$connaissances_CC, connaissances)
+names(connaissances_all) <- c("Knowledge", "GhG", "Activities",  "Anthropogenic", "Exists", "Target", "Region")
+corrc <- cor(connaissances_all, use="complete.obs")
+p.matc <- cor.mtest(connaissances_all)
+corrplot(corrc, method='color', p.mat = p.matc, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
+
+formula_K_robust_K <- as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_determinants_policy_CC[-1], collapse = ' + ')))
+ols_K_robust_K <- lm(formula_K_robust_K, data=s, weights = s$weight)
+summary(ols_K_robust_K)
+
+formula_K_robust_anthro <-  as.formula(paste("taxe_approbation!='Non' ~ anthropique + ", paste(variables_determinants_policy_CC[-1], collapse = ' + ')))
+ols_K_robust_anthro <- lm(formula_K_robust_anthro, data=s, weights = s$weight)
+summary(ols_K_robust_anthro)
+
+formula_K_robust_exists <-  as.formula(paste("taxe_approbation!='Non' ~ existe + ", paste(variables_determinants_policy_CC[-1], collapse = ' + ')))
+ols_K_robust_exists <- lm(formula_K_robust_exists, data=s, weights = s$weight)
+summary(ols_K_robust_exists)
+
+formula_K_robust_ghg <-  as.formula(paste("taxe_approbation!='Non' ~ score_ges + ", paste(variables_determinants_policy_CC[-1], collapse = ' + ')))
+ols_K_robust_ghg <- lm(formula_K_robust_ghg, data=s, weights = s$weight)
+summary(ols_K_robust_ghg)
+
+formula_K_robust_acti <-  as.formula(paste("taxe_approbation!='Non' ~ score_climate_call + ", paste(variables_determinants_policy_CC[-1], collapse = ' + ')))
+ols_K_robust_acti <- lm(formula_K_robust_acti, data=s, weights = s$weight)
+summary(ols_K_robust_acti)
+
+formula_K_robust_target <-  as.formula(paste("taxe_approbation!='Non' ~ proximite_cible + ", paste(variables_determinants_policy_CC[-1], collapse = ' + ')))
+ols_K_robust_target <- lm(formula_K_robust_target, data=s, weights = s$weight)
+summary(ols_K_robust_target)
+
+Table_K_robust <- stargazer(ols_taxe_approbation, ols_K_robust_anthro, ols_K_robust_exists, ols_K_robust_ghg, ols_K_robust_acti, ols_K_robust_target,
+    title="Robustness of the determinants of Tax \\& Dividend Acceptance To Knowledge Variables", model.names = FALSE, model.numbers = T, 
+    covariate.labels = c("Knowledge on CC", "CC is Anthropogenic", "CC Exists", "Score GhG", "Score Activities", "Score Target proximity",
+                         "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
+                         "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
+                         "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Sex: Male"),
+    header = FALSE, dep.var.labels = c("Tax \\& dividend"),  dep.var.caption = "", 
+    keep = c("connaissances_CC", "anthropique", "existe", "score_ges", "score_climate_call", "proximite_cible", "sexe", "Gilets_jaunes", "ecologiste", "Gauche_droite"),
+    add.lines = list(c("Additional covariates & \\checkmark & & \\checkmark  & \\checkmark & \\checkmark & \\checkmark  \\\\ ")),
+    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:robust_K")
+write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Omitted variables are \\textit{Yellow Vests: opposes}, \\textit{Age : 18 -- 24} and \\textit{Left-right: Indeterminate}. Additional covariates are the same as in Table II.} \\end{table*}', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}', Table_K_robust, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
+
+
 # 6.1 in logit
 cause_logit1 <- glm(formula_determinants_cause, family = binomial(link='logit'), data=s)
 logit_cause1_margins <- logitmfx(cause_logit1, s, atmean=FALSE)$mfxest
@@ -852,7 +854,7 @@ Table_determinants_attitudes_CC_logit <- stargazer(cause_logit1, cause_logit2, c
                           "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
                           "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
                           "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
-     header = FALSE, dep.var.labels = c("CC is anthropic", "CC is disastrous"),  dep.var.caption = "", 
+     header = FALSE, dep.var.labels = c("CC is anthropogenic", "CC is disastrous"),  dep.var.caption = "", 
      coef = list(logit_cause1_margins[,1], logit_cause2_margins[,1], logit_cause3_margins[,1], logit_effects_margins[,1], logit_effects2_margins[,1]),
      se = list(logit_cause1_margins[,2], logit_cause2_margins[,2], logit_cause3_margins[,2], logit_effects_margins[,2], logit_effects2_margins[,2]),
      keep = c("sexe", "Revenu$", "age_", "\\(diplome", "diplome4:", "taille_agglo", "Gilets_jaunes", "ecologiste", 
