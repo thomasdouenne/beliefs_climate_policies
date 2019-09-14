@@ -514,7 +514,7 @@ Crosstab <- function (..., dec.places = NULL, type = NULL, style = "wide", row.v
   stopifnot(as.integer(dec.places) == dec.places, dec.places > -1)
   #type: see next section of code
   stopifnot(is.character(style))    
-  stopifnot(is.logical(percetnages))
+  stopifnot(is.logical(percentages))
   stopifnot(is.logical(addmargins))
   stopifnot(is.logical(subtotals))
   stopifnot(n.vars>=1)

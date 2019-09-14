@@ -621,7 +621,8 @@ decrit(s$mode_vie_ecolo, miss=T, weights = s$weight) # 65%
 decrit(s$enfant_CC, weights = s$weight)
 decrit(s$enfant_CC_pour_CC[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui'])
 decrit(s$enfant_CC_pour_lui[s$enfant_CC=='Oui'], weights = s$weight[s$enfant_CC=='Oui'])
-summary(lm((enfant_CC=='Oui') ~ sexe, data=ss))
+summary(lm((enfant_CC=='Oui') ~ sexe + age, data=s))
+CrossTable(s$enfant_CC, s$age, prop.r = FALSE, prop.t = FALSE, prop.chisq = FALSE, )
 
 
 ##### Connaissances et opinions CC #####
