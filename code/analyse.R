@@ -613,6 +613,39 @@ summary(lm((schiste_avantage=='Cela permettrait de créer des emplois et dynamis
            data=s, subset=schiste_approbation=='Oui' & schiste_avantage !='Aucune de ces deux raisons', weights = s$weight))
 summary(lm((as.character(schiste_CC)=='valable') ~ (schiste_traite==1), data=s, 
            subset=schiste_approbation=='Oui' & as.character(schiste_CC) !='NSP', weights = s$weight))
+# Shale gas (cf. Appendix for regression)
+decrit(s$schiste_approbation, miss=T, weights=s$weight) # 59% non, 16% oui
+decrit(s$schiste_avantage, miss=T, weights=s$weight) # 56% aucun, 26% emplois, 18% CC
+decrit(s$schiste_CC, miss=T, weights=s$weight) # 43% malvenue, 25% valable
+barres(file="shale_val_nolegend", dataKN(c("schiste_approbation")), nsp=TRUE, legend=c("Yes", "No", "PNR"), labels = c(" "))
+## Shale gas
+reg_shale_1 <- lm((schiste_approbation!='Non') ~ (schiste_traite==1), data=s, weights = s$weight)
+summary(reg_shale_1) # - 3.9 p.p. acceptance when treated
+variables_reg_schiste <- c("Revenu", "score_ges", "score_climate_call", variables_demo) # 
+variables_reg_schiste <- variables_reg_schiste[!(variables_reg_schiste %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
+formula_schiste_approbation <- as.formula(paste("schiste_approbation!='Non' ~ (schiste_traite==1) + ",
+                                                paste(variables_reg_schiste, collapse = ' + ')))
+reg_shale_2 <- lm(formula_schiste_approbation, data=s, weights = s$weight)
+summary(reg_shale_2) # - 5.1 p.p. acceptance when treated / Scores, Sex and Education matter
+logit_shale_3 <- glm(formula_schiste_approbation, family = binomial(link='logit'), data=s)
+summary(logit_shale_3)
+logit_shale_3_margins <- logitmfx(formula_schiste_approbation, s, atmean=FALSE)$mfxest
+logit_shale_3_margins # -5.7 p.p. with logit
+summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights = s$weight)) # Not significant for approval
+
+decrit(s$schiste_approbation)
+Table_shale_gas <- stargazer(reg_shale_1, reg_shale_2, logit_shale_3, 
+                             title="Effect of being treated on acceptance of shale gas exploitation", model.names = TRUE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                             covariate.labels = c("Treated"), 
+                             dep.var.labels = c("Shale gas exploitation: not ``No''"),# dep.var.caption = "", header = FALSE,
+                             keep = c("schiste_traite"),
+                             coef = list(NULL, NULL, logit_shale_3_margins[,1]), 
+                             se = list(NULL, NULL, logit_shale_3_margins[,2]),
+                             column.labels = c("(1)", "(2)", "(3)"), model.numbers = FALSE,
+                             add.lines = list(c("Controls: Socio-demographics, scores", "", "\\checkmark", "\\checkmark")),
+                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:shale_gas")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', 
+                                                       '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_shale_gas, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
 ##### Engagement personnel ######

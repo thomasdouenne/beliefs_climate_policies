@@ -64,7 +64,7 @@ package("psy")
 
 package("lavaan")
 # package("psych") # library(psych, exclude = "describe")
-package("semTools")
+# package("semTools")
 
 # package("interplot")
 # package("jtools")

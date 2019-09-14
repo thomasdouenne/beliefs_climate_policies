@@ -33,20 +33,26 @@ decrit(s$generation_CC_min, weights = s$weight) #1960-2050: 11%-27%-43%-19%
 decrit(s$generation_CC_min >= 2020, weights = s$weight) # 62%
 
 # Figures 2-7
-barres(file="CC_cause_nolegend", title="", thin=T, data=dataN("cause_CC"), nsp=T, sort=T, legend = c("Anthropogenic", "Natural", "Does not exist", "PNR"), labels=c(" "), show_ticks = F)
+fig_cause <- barres(file="CC_cause_nolegend", title="", thin=T, data=dataN("cause_CC"), nsp=T, sort=T, legend = c("Anthropogenic", "Natural", "Does not exist", "PNR"), labels=c(" "), show_ticks = F)
 ges_climate_call <- rev(paste("ges_correct", c("avion", "nucleaire", "boeuf", "O2", "CO2", "CH4", "pm"), sep="_")) 
 labels_ges_climate_call <- rev(c("Plane vs. train", "Nuclear vs. wind", "Beef vs. pasta", "Oxygen", "CO<sub>2</sub>", "Methane", "Particulates")) 
-oui_non(margin_l=40, ges_climate_call, NSP=FALSE, colors=color(3)[1:2], en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE) # colors=color(3)[1:2], 
+fig_factors <- oui_non(margin_l=40, ges_climate_call, NSP=FALSE, colors=color(3)[1:2], en=c("Correct", "Wrong"), labels = labels_ges_climate_call, sort=FALSE) # colors=color(3)[1:2], 
 s$region_CC <- as.factor(s$region_CC)
 s$region_CC <- relevel(relevel(s$region_CC, "Autant dans les deux"), "L'Inde")
-barres(file="CC_region_nolegend", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, show_ticks = F, thin=T,
+fig_region <- barres(file="CC_region_nolegend", title="", data=dataN("region_CC", miss=FALSE), nsp=FALSE, sort=T, show_ticks = F, thin=T,
        legend = c("India", "As much in both", "European Union", "NSP"), labels=c(" "))
-barres(file="CC_target_emission_nolegend", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), 
+fig_target <- barres(file="CC_target_emission_nolegend", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), 
        legend = dataN("emission_cible", return="levels"), labels=c(" ")) 
-barres(file="CC_generation_min_nolegend", title="", rev_color = T, data=dataN("generation_CC_min"), nsp=T, sort=T, thin=T,
+fig_generation <- barres(file="CC_generation_min_nolegend", title="", rev_color = T, data=dataN("generation_CC_min"), nsp=T, sort=T, thin=T,
        legend = c(dataN("generation_CC_min", return="levels")[1:4], "PNR"), labels=c(" "))
-barres(file="CC_effects_nolegend", title="", thin=T, data=dataN("effets_CC"), nsp=T, sort=T, 
+fig_effects <- barres(file="CC_effects_nolegend", title="", thin=T, data=dataN("effets_CC"), nsp=T, sort=T, 
        legend = c("Insignificant", "Small", "Serious", "Disastrous", "Cataclysmic", "PNR"), labels=c(" "))
+orca(fig_cause, "CC_cause_nolegend2.eps", width = 683, height = 82)
+orca(fig_factors, "CC_knowledge_valbtr.eps", width = , height = , scale = )
+orca(fig_target, "CC_target_emission_nolegend.eps", width = , height = , scale = )
+orca(fig_effects, "CC_effects_nolegend.eps", width = , height = , scale = )
+orca(fig_region, "CC_region_nolegend.eps", width = , height = , scale = )
+orca(fig_generation, "CC_generation_min_nolegend_trim.eps", width = , height = , scale = )
 
 ## 3.2 Opinions
 decrit(s$effets_CC, miss=T, weights = s$weight) # 18% cataclysmiques; 28% désastreux, 35% graves
@@ -61,10 +67,12 @@ decrit(s$responsable_CC_passe, miss=T, weights = s$weight) # 21%
 # Figures 8-9
 s$parle_CC_factor <- as.factor(s$parle_CC)
 s$parle_CC_factor <- relevel(relevel(s$parle_CC_factor, "Plusieurs fois par an"), "Plusieurs fois par mois")
-barres(file="CC_talks_nolegend", title="", data=dataN("parle_CC_factor"), nsp=T, sort=T, show_ticks = F, thin = T,
+fig_talk <- barres(file="CC_talks_nolegend", title="", data=dataN("parle_CC_factor"), nsp=T, sort=T, show_ticks = F, thin = T,
        legend = c("Several times per month", "Several times per year", "Almost never", "PNR"), labels=c(" ")) 
 labels_resp <- c("Each one of us", "Governments", "Certain foreign countries", "The richest", "Natural causes", "Past generations")
-barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_resp, hover=labels_resp)
+fig_resp <- barres(file="CC_responsible", title="", data=data1(names(s)[which(grepl("responsable_CC", names(s)))]), sort=T, showLegend=FALSE, labels=labels_resp, hover=labels_resp)
+orca(fig_talk, "CC_talks_nolegend.eps", width = , height = , scale = )
+orca(fig_resp, "CC_responsiblec.eps", width = , height = , scale = )
 
 ## 3.3 Reaction needed
 decrit(s$mode_vie_ecolo, miss=T, weights = s$weight) # 65%
@@ -91,8 +99,8 @@ variables_changer <- names(s)[which(grepl("changer", names(s)))]
 labels_changer <- c("Yes, if policies were going in this direction", "Yes, if I had the financial means", "Yes, if everyone was doing the same",
                     "No, only the richest must change it", "No, it is against my personal interest", "No, because CC is not a real problem",
                     "No, I already adopted a sustainable way of life", "I try but I have difficulties changing my habits")
-barres(file="change_if_no", title="", data=data1(variables_changer), sort=T, showLegend=FALSE, labels=labels_changer, hover=labels_changer, margin_l=250)
-
+fig_change <- barres(file="change_if_no", title="", data=data1(variables_changer), sort=T, showLegend=FALSE, labels=labels_changer, hover=labels_changer, margin_l=250)
+orca(fig_change, "change_if_no.eps", width = , height = , scale = )
 
 ##### 4. Attitudes over Carbon Tax and Dividend #####
 ## 4.1 Massive rejection
@@ -101,7 +109,8 @@ wtd.mean((s$gain_chauffage<0)[(s$fioul | s$gaz) == FALSE & s$mode_chauffage=='in
          weights = s$weight[(s$fioul | s$gaz) == FALSE & s$mode_chauffage=='individuel' & s$chauffage!='NSP']) # 30%: ce n'est pas dû au mode de chauffage
 decrit(s$si_compensee %in% c('Plutôt', 'Tout à fait'), weights = s$weight) # 37%
 # Figure 11
-barres(file="approval", title="", data=matrix(dataN("taxe_approbation")[c(2,1,3)], ncol=1), legend = c("Yes", "No", "PNR"), labels = c(" "))
+fig_app <- barres(file="approval", title="", data=matrix(dataN("taxe_approbation")[c(2,1,3)], ncol=1), legend = c("Yes", "No", "PNR"), labels = c(" "))
+orca(fig_app, "approval_trim.eps", width = , height = , scale = )
 
 ## 4.2 Perceived winners and losers
 decrit(s$taxe_gagnant_riches, weights=s$weight) # 30%
@@ -122,10 +131,13 @@ decrit(s$nb_taxe_perdant) # 1.74
 # Figures 12
 variables_winners <- names(s)[which(grepl("taxe_gagnant_", names(s)))]
 labels_winners <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "City dwellers", "Certain persons, but no specific income category", "PNR (Don't know, don't want to answer)")
-barres(file="tax_winners_synchro", title="", data=data1(variables_winners), sort=T, showLegend=FALSE, labels=labels_winners, hover=labels_winners, xrange=c(0, 0.58), margin_l=270)
+fig_win <- barres(file="tax_winners_synchro", title="", data=data1(variables_winners), sort=T, showLegend=FALSE, labels=labels_winners, hover=labels_winners, xrange=c(0, 0.58), margin_l=270)
 variables_losers <- names(s)[which(grepl("taxe_perdant_", names(s)))]
 labels_losers <- c("No one", "The poorest", "The middle class", "The richest", "Everyone", "Rural or peri-urban households", "Certain persons, but no specific income category", "PNR (Don't know, don't want to answer)")
-barres(file="tax_losers_synchro", title="", data=data1(variables_losers), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers, xrange=c(0, 0.58), margin_l=270)
+fig_lose <- barres(file="tax_losers_synchro", title="", data=data1(variables_losers), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers, xrange=c(0, 0.58), margin_l=270)
+orca(fig_win, "tax_winners_synchro.eps", width = , height = , scale = )
+orca(fig_lose, "tax_losers_synchro.eps", width = , height = , scale = )
+
 
 ## 4.3 Perceived pros and cons
 decrit(s$problemes_ruraux, weights=s$weight) # 47%
@@ -158,12 +170,14 @@ variables_benefits <- variables_benefits[!(variables_benefits %in% c("nb_benefic
 labels_benefits <- c("Fights CC", "Reduces negative impact of pollution on health", "Reduces traffic congestion", "Increases my purchasing power", 
                      "Increases purchasing power of the poorest",
                      "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
-barres(file="CC_benefits_synchro", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits, xrange=c(0, 0.47), margin_l=261) # pb 35% NSP
+fig_ben <- barres(file="CC_benefits_synchro", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits, xrange=c(0, 0.47), margin_l=261) # pb 35% NSP
 variables_problems <- names(s)[which(grepl("problemes", names(s)))]
 variables_problems <- variables_problems[!(variables_problems %in% c("nb_problemes", "problemes_autre"))]
 labels_problems <- c("Is ineffective to reduce pollution", "Alternatives are insufficient or too expensive", "Penalizes rural households", "Decreases my purchasing power",
                      "Penalizes the poorest", "Hurts the economy", "Is a pretext to increase taxes", "None of these reasons", "Other reasons")
-barres(file="CC_problems_synchro", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems, xrange=c(0, 0.47), margin_l=261)
+fig_pb <- barres(file="CC_problems_synchro", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems, xrange=c(0, 0.47), margin_l=261)
+orca(fig_ben, "CC_benefits_synchro.eps", width = , height = , scale = )
+orca(fig_pb, "CC_problems_synchro.eps", width = , height = , scale = )
 
 ## 4.4 Consumption and mobility constraints
 # 4.4.1 Perceived elasticities
@@ -182,14 +196,16 @@ s$elast_fuel_perso <- factor(s$elasticite_fuel_perso, levels(as.factor(s$elastic
 s$elast_chauffage_perso <- revalue(s$elast_chauffage_perso, c("+ de 30% - Je changerais largement ma consommation"="> 30%", 
                                                               "de 20% à 30%"="20 to 30%", "de 10% à 20%"="10 to 20%", "de 0% à 10%"="0 to 10%", 
                                                               "0% - Je ne la réduirais pas"="0%: constrained", "0% - Je n'en consomme déjà pas"="0%: don't consume")) # won't reduce
-barres(file="elasticities_perso", thin=T, title="", data=dataKN(c("elast_chauffage_perso", "elast_fuel_perso"), miss=FALSE), 
+fig_elast_perso <- barres(file="elasticities_perso", thin=T, title="", data=dataKN(c("elast_chauffage_perso", "elast_fuel_perso"), miss=FALSE), 
        nsp=FALSE, labels=c("Own: Housing", "Own: Transport"), legend = c("", "same as above", "", dataN("elast_chauffage_perso", return="legend")[4:6]), show_ticks=T)
 s$elast_chauffage <- factor(s$elasticite_chauffage, levels(as.factor(s$elasticite_chauffage))[c(1,4,3,5,2)])
 s$elast_fuel <- factor(s$elasticite_fuel, levels(as.factor(s$elasticite_fuel))[c(1,4,3,5,2)])
 s$elast_chauffage <- revalue(s$elast_chauffage, c("+ de 30%"="> 30%", "de 20% à 30%"="20 to 30%", 
                                                   "de 10% à 20%"="10 to 20%", "de 0% à 3%"="0 to 3%", "de 3% à 10%"="3 to 10%"))
-barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elast_fuel", "elast_chauffage"), miss=FALSE), color=color(6)[1:5],
+fig_elast_agg <- barres(file="elasticities_agg", thin=T, title="", data=dataKN(c("elast_fuel", "elast_chauffage"), miss=FALSE), color=color(6)[1:5],
        nsp=FALSE, labels=c("Aggregate: Transport", "Aggregate: Housing"), legend = dataN("elast_chauffage", return="legend"), show_ticks=T)
+orca(fig_elast_perso, "elasticities_agg_valb.eps", width = , height = , scale = )
+orca(fig_elast_agg, "elasticities_perso_valbuena.eps", width = , height = , scale = )
 
 
 # 4.4.2 Mobility and public transportdecrit(s$transports_avis[s$transports_avis!=-1]<2, weights = s$weight[s$transports_avis!=-1])
@@ -205,17 +221,22 @@ decrit(s$transports_avis %in% c('Limitée', 'Satisfaisante'), weights = s$weight
 # Fgures 15-19
 data_transports_use <- dataKN(c("transports_travail", "transports_courses", "transports_loisirs"))
 data_transports_use[3,] <- data_transports_use[3,] + data_transports_use[5,]
-barres(file="transports_use", title="", thin=T, nsp=T, data=data_transports_use[c(1,4,3,2,6),], legend=c("Walk/bike", "Public transport", "Other", "Car", "Unconcerned"), labels=c("Work", "Shopping", "Leisure"))
+fig_tr_use <- barres(file="transports_use", title="", thin=T, nsp=T, data=data_transports_use[c(1,4,3,2,6),], legend=c("Walk/bike", "Public transport", "Other", "Car", "Unconcerned"), labels=c("Work", "Shopping", "Leisure"))
 s$transports_minutes <- "NSP"
 s$transports_minutes[s$transports_distance <= 5] <- "5 ou moins"
 s$transports_minutes[s$transports_distance > 5 & s$transports_distance <= 10] <- "6 à 10"
 s$transports_minutes[s$transports_distance > 10 & s$transports_distance <= 20] <- "11 à 20"
 s$transports_minutes[s$transports_distance > 20] <- "plus que 20"
-barres(file="transports_distance", title="", thin=T, data=matrix(dataN("transports_minutes")[c(2,3,1,4,5),1], ncol=1), labels=c(" "), legend=c("5 or less", "6 to 10", "11 to 20", "more than 20", "PNR"))
-barres(file="transports_frequency", title="", thin=T, nsp=T, data=matrix(dataN("transports_frequence")[c(4:1,5),1], ncol=1), legend=rev(c("PNR", "< 3/day", "1/hour - 4/day", "1/h - 2/h", "> 3/h")), labels=(" "))
+fig_tr_dist <- barres(file="transports_distance", title="", thin=T, data=matrix(dataN("transports_minutes")[c(2,3,1,4,5),1], ncol=1), labels=c(" "), legend=c("5 or less", "6 to 10", "11 to 20", "more than 20", "PNR"))
+fig_tr_freq <- barres(file="transports_frequency", title="", thin=T, nsp=T, data=matrix(dataN("transports_frequence")[c(4:1,5),1], ncol=1), legend=rev(c("PNR", "< 3/day", "1/hour - 4/day", "1/h - 2/h", "> 3/h")), labels=(" "))
 # Sans changer de logement ni de lieu de travail, il serait possible pour le répondant prenant sa voiture de prendre les transports en commun pour ses trajets domicile-travail
-barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transports_travail_commun", "transports_travail_actif"))[c(2,3,1,4),], legend=c("Yes, no difficulty", "Yes, but bothering", "No", "PNR"), color=color(6, grey=T)[c(1,2,5,6)], labels=c("Public transport", "Walk or bike"))
-barres(file="transports_opinions", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Limited, but enough", "Decent, but not enough", "Satisfactory")), labels=c(" "))
+fig_tr_work <- barres(file="transports_work", title="", thin=T, nsp=T, data=dataKN(c("transports_travail_commun", "transports_travail_actif"))[c(2,3,1,4),], legend=c("Yes, no difficulty", "Yes, but bothering", "No", "PNR"), color=color(6, grey=T)[c(1,2,5,6)], labels=c("Public transport", "Walk or bike"))
+fig_tr_op <- barres(file="transports_opinions", thin=T, title="", data=matrix(dataN("transports_avis")[c(4:1,5),], ncol=1),  legend=rev(c("PNR", "Insufficient", "Limited, but enough", "Decent, but not enough", "Satisfactory")), labels=c(" "))
+orca(fig_tr_use, "transports_use_trim.eps", width = , height = , scale = )
+orca(fig_tr_dist, "transports_distance_trim.eps", width = , height = , scale = )
+orca(fig_tr_freq, "transports_frequency_trim.eps", width = , height = , scale = )
+orca(fig_tr_work, "transports_work.eps", width = , height = , scale = )
+orca(fig_tr_op, "transports_opinion_trim.eps", width = , height = , scale = )
 
 
 ##### 5. Attitudes over Other Policies #####
@@ -227,8 +248,9 @@ labels_tax_condition <- c("a payment for the 50% poorest French<br> (those earni
                           "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", 
                           "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "non polluting transport")
 labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
-barres(file="tax_condition_val", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE, rev=T)[,rev(c(9,5,8,7,3,4,1,6,2))], nsp=FALSE, 
+fig_cond <- barres(file="tax_condition_val", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE, rev=T)[,rev(c(9,5,8,7,3,4,1,6,2))], nsp=FALSE, 
        sort=F, thin=T, legend = rep("", 5), labels=labels_tax_condition[rev(c(9,5,8,7,3,4,1,6,2))], margin_l=220) # rev(yes_no5)
+orca(fig_cond, "tax_condition_valc.eps", width = , height = , scale = )
 
 ## 5.2 Other instruments
 # Favored environmental policies
@@ -238,8 +260,9 @@ for (variable in variables_politiques_environnementales) {  cat(variable);  prin
 labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", 
                                    "stricter standards on pollution from new vehicles", "stricter standards during roadworthiness tests", 
                                    "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
-barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
+fig_pol <- barres(file="environmental_policies", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
                                                            miss=FALSE, rev = T)[,rev(c(3,4,1,6,5,8,2,7))], nsp=FALSE, sort=F, legend = rep("", 5), labels=labels_environmental_policies[rev(c(3,4,1,6,5,8,2,7))], thin=T) # rev(yes_no5)
+orca(fig_pol, "environmental_policies.eps", width = , height = , scale = )
 
 # Diesel taxation
 decrit(s$rattrapage_diesel, miss=T, weights=s$weight) # 59% non, 29% oui
@@ -248,14 +271,8 @@ decrit(s[s$diesel==T,]$rattrapage_diesel, miss=T, weights=s[s$diesel==T,]$weight
 decrit(s[s$taille_agglo=='rural',]$rattrapage_diesel, miss=T, weights=s[s$taille_agglo=='rural',]$weight) # 73% No
 decrit(s[s$taille_agglo=='Paris',]$rattrapage_diesel, miss=T, weights=s[s$taille_agglo=='Paris',]$weight) # 40% No
 # Figure 22
-barres(file="diesel_catch_up", dataKN(c("rattrapage_diesel")), thin=F, show_ticks = T, nsp=TRUE, legend=c("Yes", "No", "PNR"), labels = c(" "))
-
-# Shale gas (cf. Appendix for regression)
-decrit(s$schiste_approbation, miss=T, weights=s$weight) # 59% non, 16% oui
-decrit(s$schiste_avantage, miss=T, weights=s$weight) # 56% aucun, 26% emplois, 18% CC
-decrit(s$schiste_CC, miss=T, weights=s$weight) # 43% malvenue, 25% valable
-# Figure 23
-barres(file="shale_val_nolegend", dataKN(c("schiste_approbation")), nsp=TRUE, legend=c("Yes", "No", "PNR"), labels = c(" "))
+fig_diesel <- barres(file="diesel_catch_up", dataKN(c("rattrapage_diesel")), thin=F, show_ticks = T, nsp=TRUE, legend=c("Yes", "No", "PNR"), labels = c(" "))
+orca(fig_diesel, "diesel_catch_up_trim.eps", width = , height = , scale = )
 
 
 ##### 6. Determinants #####
@@ -275,7 +292,7 @@ s$connaissances_CC <- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$conna
 
 decrit(s$Gauche_droite, weights=s$weight) # 40% indeterminate
 
-# Figure 24
+# Figure 23
 s$anthropique <- s$cause_CC=='anthropique'
 s$mode_vie_ecolo_oui <- s$mode_vie_ecolo=='Oui'
 s$male <- s$sexe=='Masculin'
@@ -298,7 +315,8 @@ cor.mtest <- function(mat, ...) {
   p.mat
 }
 p.mat <- cor.mtest(data_cor) # corrplot does not work when some packages are loaded before 'corrplot' => if it doesn't work, restart R and load only corrplot.
-corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
+fig_cor <- corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
+orca(fig_cor, "correlation_matrix2.eps", width = , height = , scale = )
 
 # Table I
 variables_determinants_attitudes <- c("Revenu", "Revenu_conjoint", "Gilets_jaunes", "as.factor(diplome4)", # as.factor(ifelse(is.missing(s$Gilets_jaunes), 'NA', as.character(s$Gilets_jaunes)))
@@ -514,36 +532,6 @@ write_clip(gsub('\\end{table}', '} \\\\ \\quad \\\\ {\\footnotesize \\textsc{Not
 # logit_diesel_margins <- logitmfx(formula_diesel, s, atmean=FALSE)$mfxest
 # logit_diesel_margins
 
-## Shale gas
-reg_shale_1 <- lm((schiste_approbation!='Non') ~ (schiste_traite==1), data=s, weights = s$weight)
-summary(reg_shale_1) # - 3.9 p.p. acceptance when treated
-variables_reg_schiste <- c("Revenu", "score_ges", "score_climate_call", variables_demo) # 
-variables_reg_schiste <- variables_reg_schiste[!(variables_reg_schiste %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
-formula_schiste_approbation <- as.formula(paste("schiste_approbation!='Non' ~ (schiste_traite==1) + ",
-                                                paste(variables_reg_schiste, collapse = ' + ')))
-reg_shale_2 <- lm(formula_schiste_approbation, data=s, weights = s$weight)
-summary(reg_shale_2) # - 5.1 p.p. acceptance when treated / Scores, Sex and Education matter
-logit_shale_3 <- glm(formula_schiste_approbation, family = binomial(link='logit'), data=s)
-summary(logit_shale_3)
-logit_shale_3_margins <- logitmfx(formula_schiste_approbation, s, atmean=FALSE)$mfxest
-logit_shale_3_margins # -5.7 p.p. with logit
-summary(lm((schiste_approbation=='Oui') ~ (schiste_traite==1), data=s, weights = s$weight)) # Not significant for approval
-
-decrit(s$schiste_approbation)
-Table_shale_gas <- stargazer(reg_shale_1, reg_shale_2, logit_shale_3, 
-                             title="Effect of being treated on acceptance of shale gas exploitation", model.names = TRUE, #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                             covariate.labels = c("Treated"), 
-                             dep.var.labels = c("Shale gas exploitation: not ``No''"),# dep.var.caption = "", header = FALSE,
-                             keep = c("schiste_traite"),
-                             coef = list(NULL, NULL, logit_shale_3_margins[,1]), 
-                             se = list(NULL, NULL, logit_shale_3_margins[,2]),
-                             column.labels = c("(1)", "(2)", "(3)"), model.numbers = FALSE,
-                             add.lines = list(c("Controls: Socio-demographics, scores", "", "\\checkmark", "\\checkmark")),
-                             no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:shale_gas")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', 
-                                                       '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_shale_gas, fixed=TRUE), fixed=TRUE), collapse=' ')
-
-
 ## Additional specifications determinants of policy approval
 variables_determinants_policy_with_less_controls <- c("connaissances_CC", "(effets_CC > 2)", "diplome4", "age_25_34", "age_35_49", "age_50_64", "age_65_plus", "Revenu", "sexe", "taille_agglo", "transports_frequence")
 
@@ -721,7 +709,8 @@ cor.mtest <- function(mat, ...) {
 }
 p.mat <- cor.mtest(data_cor)
 # corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=T, tl.srt=45, tl.col='black', insig = 'blank', type='upper') # , order='hclust', addCoef.col = 'white', addCoefasPercent = T
-corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
+fig_cor_K <- corrplot(corr, method='color', p.mat = p.mat, sig.level = 0.01, diag=FALSE, tl.srt=35, tl.col='black', insig = 'blank', addCoef.col = 'black', addCoefasPercent = T , type='upper') #, order='hclust'
+orca(fig_cor_K, "correlations_knowledge.eps", width = , height = , scale = )
 
 
 decrit(s[s$Gauche_droite=='Extreme-left',]$Gilets_jaunes, miss=T, weights=s[s$Gauche_droite=='Extreme-left',]$weight)
