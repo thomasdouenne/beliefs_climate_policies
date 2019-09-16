@@ -1818,17 +1818,17 @@ effects_logit <- glm(formula_determinants_effets, family = binomial(link='logit'
 logit_effects_margins <- logitmfx(effects_logit, s, atmean=FALSE)$mfxest
 logit_effects_margins
 
-effects_logit2 <- glm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite, family = binomial(link='logit'), data=s)
+effects_logit2 <- glm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite_na + diplome4 : indeterminate, family = binomial(link='logit'), data=s)
 logit_effects2_margins <- logitmfx(effects_logit2, s, atmean=FALSE)$mfxest
 logit_effects2_margins
 
 Table_determinants_attitudes_CC_logit <- stargazer(cause_logit1, cause_logit2, cause_logit3, effects_logit, effects_logit2,
-     title="Determinants of attitudes towards climate change (CC).", model.names = FALSE, model.numbers = T, 
-     covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
-                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
-                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
-                          "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
-                          "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
+     title="Determinants of attitudes towards climate change (CC) with logit regressions.", model.names = FALSE, model.numbers = T, 
+     covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
+                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
+                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}",
+                          "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65",
+                          "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right", "Diploma $\\times$ Left-right: Indeterminate"),
      header = FALSE, dep.var.labels = c("CC is anthropogenic", "CC is disastrous"),  dep.var.caption = "", 
      coef = list(logit_cause1_margins[,1], logit_cause2_margins[,1], logit_cause3_margins[,1], logit_effects_margins[,1], logit_effects2_margins[,1]),
      se = list(logit_cause1_margins[,2], logit_cause2_margins[,2], logit_cause3_margins[,2], logit_effects_margins[,2], logit_effects2_margins[,2]),
@@ -1858,7 +1858,7 @@ ecologit_margins <- logitmfx(ecologit, s, atmean=FALSE)$mfxest
 ecologit_margins
 
 Table_politiques_env_logit <- stargazer(tax_logit, tax_logit2, env_logit, ecologit,
-    title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = T, 
+    title="Determinants of attitudes towards climate policies with logit regressions.", model.names = FALSE, model.numbers = T, 
     covariate.labels = c("Knowledge about CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)",
