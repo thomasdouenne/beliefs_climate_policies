@@ -806,7 +806,7 @@ cause_logit2 <- glm(cause_CC=='anthropique' ~ age_25_34 + age_35_49 + age_50_64 
 logit_cause2_margins <- logitmfx(cause_logit2, s, atmean=FALSE)$mfxest
 logit_cause2_margins
 
-cause_logit3 <- glm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite, family = binomial(link='logit'), data=s)
+cause_logit3 <- glm(cause_CC=='anthropique' ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite_na + diplome4 : indeterminate, family = binomial(link='logit'), data=s)
 logit_cause3_margins <- logitmfx(cause_logit3, s, atmean=FALSE)$mfxest
 logit_cause3_margins
 
@@ -814,17 +814,17 @@ effects_logit <- glm(formula_determinants_effets, family = binomial(link='logit'
 logit_effects_margins <- logitmfx(effects_logit, s, atmean=FALSE)$mfxest
 logit_effects_margins
 
-effects_logit2 <- glm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite, family = binomial(link='logit'), data=s)
+effects_logit2 <- glm((effets_CC > 2) ~ Gauche_droite + as.factor(diplome4) + diplome4 : gauche_droite_na + diplome4 : indeterminate, family = binomial(link='logit'), data=s)
 logit_effects2_margins <- logitmfx(effects_logit2, s, atmean=FALSE)$mfxest
 logit_effects2_margins
 
 Table_determinants_attitudes_CC_logit <- stargazer(cause_logit1, cause_logit2, cause_logit3, effects_logit, effects_logit2,
-     title="Determinants of attitudes towards climate change (CC).", model.names = FALSE, model.numbers = T, 
-     covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands", 
-                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left", 
-                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}", 
-                          "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65", 
-                          "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right"),
+     title="Determinants of attitudes towards climate change (CC) with logit regressions.", model.names = FALSE, model.numbers = T, 
+     covariate.labels = c("Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
+                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
+                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma: \\textit{CAP} or \\textit{BEP}",
+                          "Diploma: \\textit{Baccalauréat}", "Diploma: Higher", "Age: 25 -- 34","Age: 35 -- 49","Age: 50 -- 64", "Age: $\\geq$ 65",
+                          "Income (k\\euro{}/month)", "Sex: Male", "Size of town (1 to 5)", "Frequency of public transit", "Diploma $\\times$ Left-right", "Diploma $\\times$ Left-right: Indeterminate"),
      header = FALSE, dep.var.labels = c("CC is anthropogenic", "CC is disastrous"),  dep.var.caption = "", 
      coef = list(logit_cause1_margins[,1], logit_cause2_margins[,1], logit_cause3_margins[,1], logit_effects_margins[,1], logit_effects2_margins[,1]),
      se = list(logit_cause1_margins[,2], logit_cause2_margins[,2], logit_cause3_margins[,2], logit_effects_margins[,2], logit_effects2_margins[,2]),
@@ -832,7 +832,7 @@ Table_determinants_attitudes_CC_logit <- stargazer(cause_logit1, cause_logit2, c
               "Gauche_droite", "interet_politique", "transports_frequence"), # "humaniste", , "transports_avis", "conso"
      add.lines = list(c("Additional covariates & \\checkmark &  &  & \\checkmark &  \\\\ ")),
      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:determinants_attitudes_CC")
-write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Interaction term is computed using numeric variables. Omitted modalities are: \\textit{Yellow Vests: opposes}, \\textit{Left-right: Indeterminate}, \\textit{Diploma: Brevet or no diploma}, \\textit{Age: 18 -- 24}. Additional covariates are defined in \\ref{app:covariates}. }                \\end{table*} ', 
+write_clip(gsub('\\end{table}', '}{\\\\ $\\quad$ \\\\                \\footnotesize \\textsc{Note:} Standard errors are reported in parentheses. Interaction term is computed using numeric variables. Omitted modalities are: \\textit{Yellow Vests: opposes}, \\textit{Left-right: Indeterminate}, \\textit{Diploma: Brevet or no diploma}, \\textit{Age: 18 -- 24}. Additional covariates are defined in Appendix C. }                \\end{table*} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', gsub('\\begin{table}', '\\begin{table*}',
        Table_determinants_attitudes_CC_logit, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
 
@@ -854,7 +854,7 @@ ecologit_margins <- logitmfx(ecologit, s, atmean=FALSE)$mfxest
 ecologit_margins
 
 Table_politiques_env_logit <- stargazer(tax_logit, tax_logit2, env_logit, ecologit,
-    title="Determinants of attitudes towards climate policies", model.names = FALSE, model.numbers = T, 
+    title="Determinants of attitudes towards climate policies with logit regressions.", model.names = FALSE, model.numbers = T, 
     covariate.labels = c("Knowledge about CC", "CC is disastrous", "Interest in politics (0 to 2)", "Ecologist", "Yellow Vests: PNR", "Yellow Vests: understands",
                          "Yellow Vests: supports", "Yellow Vests: is part", "Left-right: Extreme-left", "Left-right: Left",
                          "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Diploma (1 to 4)",
