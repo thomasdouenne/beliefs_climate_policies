@@ -3739,6 +3739,34 @@ print(s$benefices_autre[!is.na(s$benefices_autre)])
 print(s$problemes_autre[!is.na(s$problemes_autre)])
 
 
+##### Confirmation bias ? #####
+
+### Confirmation bias iff coef > 0
+## Among winners
+summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ gagnant_categorie, subset = simule_gagnant==1, data=s, weights=s$weight))
+summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ gagnant_categorie, subset = simule_gagnant==1, data=s, weights=s$weight))
+# > 0: .06**: Se mettre à approuver est corrélé à se penser déjà gagnant.
+summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ gagnant_categorie=='Gagnant', subset = simule_gagnant==1, data=s, weights=s$weight))
+# 0: Montre que ce sont des gens qui se pensaient gagnants et NSP à l'approbation qui se mettent à approuver.
+summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ gagnant_categorie=='Gagnant', subset = simule_gagnant==1, data=s, weights=s$weight))
+# .03.: Se mettre à approuver est corrélé à se penser déjà non perdant: l'effet précédent concerne aussi en partie les Non affecté.
+summary(lm(((taxe_feedback_approbation=='Oui') - (taxe_approbation=='Oui')) ~ gagnant_categorie!='Perdant', subset = simule_gagnant==1, data=s, weights=s$weight))
+# < 0: -.03 (p=.13) Se mettre à accepter est corrélé à se penser perdant. => invalide biais de confirmation
+summary(lm(((taxe_feedback_approbation!='Non') - (taxe_approbation!='Non')) ~ gagnant_categorie!='Perdant', subset = simule_gagnant==1, data=s, weights=s$weight))
+## Among losers
+summary(lm(((taxe_feedback_approbation=='Non') - (taxe_approbation=='Non')) ~ gagnant_categorie=='Perdant', subset = simule_gagnant==0, data=s, weights=s$weight))
+# 0
+summary(lm(((taxe_feedback_approbation=='Non') - (taxe_approbation=='Non')) ~ gagnant_categorie, subset = simule_gagnant==0, data=s, weights=s$weight))
+summary(lm(((taxe_feedback_approbation!='Oui') - (taxe_approbation!='Oui')) ~ gagnant_categorie, subset = simule_gagnant==0, data=s, weights=s$weight))
+# > 0: .05. Se mettre à désapprouver est corrélé à se penser perdant.
+summary(lm(((taxe_feedback_approbation!='Oui') - (taxe_approbation!='Oui')) ~ gagnant_categorie=='Perdant', subset = simule_gagnant==0, data=s, weights=s$weight))
+# < 0: -.14*: Se mettre à rejeter est corrélé à se penser gagnant. => invalide le biais de confirmation mais l'échantillon est faible.
+summary(lm(((taxe_feedback_approbation=='Non') - (taxe_approbation=='Non')) ~ gagnant_categorie!='Gagnant', subset = simule_gagnant==0, data=s, weights=s$weight))
+# 0
+summary(lm(((taxe_feedback_approbation!='Oui') - (taxe_approbation!='Oui')) ~ gagnant_categorie!='Gagnant', subset = simule_gagnant==0, data=s, weights=s$weight))
+# decrit(s$feedback_confirme)
+
+
 ##### Trash papier2.R #####
 barres(file="CC_target_emission", title="", data=dataN("emission_cible", miss=FALSE), nsp=FALSE, sort=T, color = rev(brewer.pal(11, "RdBu")), 
        legend = dataN("emission_cible", return="levels"), labels=c("Emission compatible with +2°C (tCO<sub>2</sub>e/yr p.c.)")) 

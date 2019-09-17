@@ -297,6 +297,7 @@ x = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0 & ss$gagnant_feed
 n = sum(ss[ss$variante_taxe_info == 'f' & ss$simule_gagnant==0,]$weight)
 binconf(x = x, n = n) # 83.0%
 
+
 # TableV: Determinants of correct revision
 # Those who think they win update more correctly when they should update
 base_winner <- lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight)
