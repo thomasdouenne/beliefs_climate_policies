@@ -343,6 +343,13 @@ decrit(s$taxe_feedback_approbation[s$gagnant_feedback_categorie=='Gagnant'], mis
 decrit(s$taxe_feedback_approbation[s$gagnant_categorie!='Gagnant' & s$gagnant_feedback_categorie=='Gagnant'], miss=T) 
 # 48% de ceux qu'on fait changer d'avis approuvent
 
+decrit(s$taxe_approbation[s$simule_gagnant==1], miss=T) # 68% des gagnants rejettent
+decrit(s$taxe_approbation[s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant' & s$gagnant_categorie!='Gagnant'], miss=T) # 51% des gagnants qu'on fait changer d'avis rejettent
+decrit(s$taxe_feedback_approbation[s$simule_gagnant==1 & s$gagnant_categorie!='Gagnant' & s$gagnant_feedback_categorie=='Gagnant'], miss=T) 
+decrit(s$taxe_approbation[s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant'], miss=T) # 41% des gagnants qui nous croient rejettent
+decrit(s$taxe_feedback_approbation[s$simule_gagnant==1 & s$gagnant_feedback_categorie=='Gagnant'], miss=T) # 21% de ceux qui croient à l'info qu'ils sont gagnants rejettent après info
+decrit(s$taxe_feedback_approbation[s$simule_gagnant==1 & s$gagnant_feedback_categorie!='Gagnant'], miss=T) # 71% de ceux qui ne croient pas à l'info qu'ils sont gagnants rejettent après info
+
 decrit(s$taxe_approbation, weights=s$weight, miss=T) # Oui/Non 10/ 70
 decrit(s$taxe_info_approbation, weights=s$weight, miss=T) # 16 / 64
 decrit(s$taxe_feedback_approbation[(s$gagnant_info_categorie=='Gagnant' & s$simule_gagnant==1) | (s$gagnant_info_categorie=='Perdant' & s$simule_gagnant==0)], weights=s$weight[(s$gagnant_info_categorie=='Gagnant' & s$simule_gagnant==1) | (s$gagnant_info_categorie=='Perdant' & s$simule_gagnant==0)], miss=T) # 29 / 54
@@ -843,6 +850,18 @@ labels_benefices <- c("Fights CC", "Reduces negative impact of pollution on heal
                       "Increases France's independence toward fossils", "Prepares the economy for tomorrow", "None of these reasons", "Other reasons")
 barres(file="CC_benefits", title="", data=data1(variables_benefices), sort=T, showLegend=FALSE, labels=labels_benefices, hover=labels_benefices)
 
+variables_benefits <- names(s)[which(grepl("benefice", names(s)))[which(grepl("problemes", names(s)))>300]]
+variables_benefits <- variables_benefits[!(variables_benefits %in% c("nb_benefices", "benefices_autre"))]
+labels_benefits <- c("Lutte contre le changement climatique", "Améliore la qualité de l'air et la santé", "Réduit les embouteillages", "Augmente mon pouvoir d'achat", 
+                     "Augmente le pouvoir d'achat des plus modestes",
+                     "Réduit la dépendance aux importations de pétrole", "Prépare l'économie aux technologies de demain", "Pour aucune de ces raisons", "Autres raisons")
+barres(file="CC_benefits_synchro", title="", data=data1(variables_benefits), sort=T, showLegend=FALSE, labels=labels_benefits, hover=labels_benefits, xrange=c(0, 0.47), margin_l=280) # pb 35% NSP
+variables_problems <- names(s)[which(grepl("problemes", names(s)))]
+variables_problems <- variables_problems[!(variables_problems %in% c("nb_problemes", "problemes_autre"))]
+labels_problems <- c("Est inefficace pour réduire la pollution", "Les alternatives sont insuffisantes ou trop chères", "Pénalise les milieux ruraux", "Réduit mon pouvoir d'achat",
+                     "Réduit le pouvoir d'achat de ménages modestes", "Nuit à l'économie et à l'emploi", "Est un prétexte pour augmenter les impôts", "Pour aucune de ces raisons", "Autres raisons")
+barres(file="CC_problems_synchro", title="", data=data1(variables_problems), sort=T, showLegend=FALSE, labels=labels_problems, hover=labels_problems, xrange=c(0, 0.47), margin_l=280)
+
 
 ##### Perdants/Gagnants #####
 labels_gagnant_perdant <- c()
@@ -869,6 +888,13 @@ for (v in c(variables_taxe_gagnant, variables_taxe_perdant)) {
 test <- glm(as.formula(paste(variables_taxe_gagnant[1], "==T ~ variante_monetaire")), data=s, weights=s$weight)
 test <- summary(glm(as.formula(paste(variables_taxe_gagnant[1], "==T ~ variante_monetaire")), data=s, weights=s$weight))
 length(c(variables_taxe_gagnant, variables_taxe_perdant))
+
+variables_winners <- names(s)[which(grepl("taxe_gagnant_", names(s)))]
+labels_winners <- c("Personne", "Les plus pauvres", "Les classes moyennes", "Les plus riches", "Tous les Français", "Les citadins", "Certains Français, mais pas une <br>catégorie de revenus particulière", "NSP <br>(Ne sais pas, ne se prononce pas)")
+barres(file="tax_winners_synchro", title="", data=data1(variables_winners), sort=T, showLegend=FALSE, labels=labels_winners, hover=labels_winners, xrange=c(0, 0.58), margin_l=200)
+variables_losers <- names(s)[which(grepl("taxe_perdant_", names(s)))]
+labels_losers <- c("Personne", "Les plus pauvres", "Les classes moyennes", "Les plus riches", "Tous les Français", "Les ruraux ou péri-urbains", "Certains Français, mais pas une <br>catégorie de revenus particulière", "NSP <br>(Ne sais pas, ne se prononce pas)")
+barres(file="tax_losers_synchro", title="", data=data1(variables_losers), sort=T, showLegend=FALSE, labels=labels_losers, hover=labels_losers, xrange=c(0, 0.58), margin_l=200)
 
 
 ##### Gilets jaunes #####

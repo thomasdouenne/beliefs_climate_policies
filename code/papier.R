@@ -316,19 +316,23 @@ formula_update_bis <- as.formula(paste("update_correct ~ ", paste(variables_upda
 covariates_update_correct_bis <- lm(formula_update_bis, subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(covariates_update_correct_bis)
 
-asymmetric_simple <- stargazer(base_winner, covariates_update_correct, covariates_update_correct_bis,
+formula_update_ter <- as.formula(paste("update_correct ~ diplome4*(taxe_approbation!='Oui') +", paste(variables_update_bis, collapse=' + ')))
+covariates_update_correct_ter <- lm(formula_update_ter, subset = feedback_infirme_large==T, data=s, weights = s$weight)
+summary(covariates_update_correct_ter)
+
+asymmetric_simple <- stargazer(base_winner, covariates_update_correct, covariates_update_correct_bis, covariates_update_correct_ter,
                                title="Asymmetric updating of winning category", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                                covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
-                                                    "Retired", "Active", "Student", "Yellow Vests: PNR", 
+                                                    "Diploma $\\times$ Initial tax: PNR", "Diploma $\\times$ Initial tax: Approves", "Diploma (1 to 4)", "Retired", "Active", "Student", "Yellow Vests: PNR",
                                                     "Yellow Vests: understands", "Yellow Vests: supports", "Yellow Vests: is part"),
                                dep.var.labels = "Correct updating ($U$)", dep.var.caption = "", header = FALSE, 
-                               keep = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
-                               order = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
-                               add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark"), 
-                                                c("Includes controls", "", "\\checkmark", "\\checkmark")),
+                               keep = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'diplome4', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
+                               order = c('Constant', '.*Gagnant.*', 'taxe_approbation', 'diplome4', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
+                               add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark"), 
+                                                c("Includes controls", "", "\\checkmark", "\\checkmark", "\\checkmark")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
 write_clip(gsub('\\end{table}', 
-    ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes} }  \\end{table} ', 
+    ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes}. The list of controls can be found in Appendix \\ref{set_controls}. }  \\end{table} ', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Some alternative specifications

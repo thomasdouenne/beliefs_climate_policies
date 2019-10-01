@@ -1680,3 +1680,24 @@ variables_toutes <- c(variables_approbation, variables_qualite, variables_aleato
                       variables_problemes, variables_taxe_condition, variables_politiques_environnementales, "rattrapage_diesel", variables_connaissances_CC, variables_avis_CC, 
                       variables_comportement_CC, variables_schiste, variables_depenses_publiques)
 variables_mobilite <- c("transports_avis", "transports_frequence", "transports_travail")
+
+
+# Pearson's chi-square test of equality of distributions
+fq <- list()
+fq[['sexe']] <- list(name=c("Féminin", "Masculin"), 
+                     freq=c(0.516,0.484))
+fq[['csp']] <- list(name=c("Inactif", "Ouvrier", "Cadre", "Indépendant", "Intermédiaire", "Retraité", "Employé", "Agriculteur"), 
+                    freq=c(0.1244,0.1214,0.0943,0.0341,0.1364,0.3279,0.1535,0.008))
+fq[['region']] <- list(name=c("autre","ARA", "Est", "Nord", "IDF", "Ouest", "SO", "Occ", "Centre", "PACA"), 
+                       freq=c(0.001,0.124,0.129,0.093,0.189,0.103,0.093,0.091,0.099,0.078))
+fq[['age']] <- list(name=c("18-24", "25-34", "35-49", "50-64", "65+"), 
+                    freq=c(0.117,0.147,0.242,0.242,0.252))
+fq[['taille_agglo']] <- list(name=c(1:5), 
+                             freq=c(0.2166,0.1710,0.1408,0.3083,0.1633))
+fq[['diplome4']] <- list(name=c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur"), 
+                         freq=c(0.301, 0.246, 0.168, 0.285))
+for (v in c('sexe', 'age', 'csp', 'diplome4', 'taille_agglo', 'region')) {
+  freq_sample <- c()
+  for (i in fq[[v]]$name) freq_sample <- c(freq_sample, sum((s[[v]]==i))) # *s$weight
+  print(paste(v, round(chisq.test(freq_sample, p = fq[[v]]$freq)$p.value, 3)))
+} # Equality rejected at .01 except for sex and CSP
