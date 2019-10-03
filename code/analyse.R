@@ -361,6 +361,24 @@ decrit(s$taxe_feedback_approbation[s$gagnant_info_categorie=='Gagnant'], weights
 summary(lm(taxe_approbation != 'Non'~ (simule_gain - gain > 110) + simule_gagnant + simule_gain, data=s, subset=(gagnant_categorie == 'Perdant'), weights = s$weight))
 summary(lm(taxe_approbation != 'Non'~ I((simule_gain - gain)/100) + simule_gagnant + simule_gain, data=s, subset=(gagnant_categorie == 'Perdant'), weights = s$weight))
 
+# Gain selon l'approbation parmi les gagnants pessimistes
+decrit(s$gain[s$taxe_approbation=='Oui' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'])
+decrit(s$gain[s$taxe_approbation=='Non' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'])
+decrit(s$gain[s$taxe_approbation=='NSP' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'])
+# same effect of taxe_approbation when we restrict to simule_gagnant==1
+summary(lm(as.formula(paste("update_correct ~ ", paste(variables_update_bis, collapse=' + '))), subset = feedback_infirme_large==T & simule_gagnant==1, data=s, weights = s$weight))
+# effect of gain in accordance with new interpretation
+summary(lm(as.formula(paste("update_correct ~ gain + (gain==0) + ", paste(variables_update_bis, collapse=' + '))), subset = feedback_infirme_large==T, data=s, weights = s$weight))
+# effect of gain in accordance with new interpretation (restricted to simule_gagnant==1)
+summary(lm(as.formula(paste("update_correct ~ gain + (gain==0) + ", paste(variables_update_bis, collapse=' + '))), subset = feedback_infirme_large==T & simule_gagnant==1, data=s, weights = s$weight))
+# # no effect of gain (even interacted) on simule_gagnant==1
+# summary(lm(as.formula(paste("update_correct ~ gain*taxe_approbation + ", paste(variables_update_bis, collapse=' + '))), subset = feedback_infirme_large==T & simule_gagnant==1, data=s, weights = s$weight))
+# # no effect of gain (even interacted) nor of taxe_approbation on simule_gagnant==0
+# summary(lm(as.formula(paste("update_correct ~ gain*taxe_approbation + ", paste(variables_update_bis[variables_update_bis!="conservateur"], collapse=' + '))), subset = feedback_infirme_large==T & simule_gagnant==0, data=s, weights = s$weight))
+# # many interacted effects but driven by the fact that taxe_approbation has an effect only for simule_gagnant==1
+# summary(lm(as.formula(paste("update_correct ~ gain*taxe_approbation*simule_gagnant + ", paste(variables_update_bis, collapse=' + '))), subset = feedback_infirme_large==T, data=s, weights = s$weight))
+# # for (v in variables_update_bis) print(decrit(s[[v]][s$feedback_infirme_large==T & s$simule_gagnant==0]))
+
 
 ##### Approbation: Model Selection #####
 # Other method of model selection exists (like forward/backward stepwise selection), but seem less reliable as they do not
