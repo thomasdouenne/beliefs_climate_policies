@@ -790,12 +790,59 @@ crosstab_simule_perdant
 Table_update_ee
 
 
-##### Appendix D. Estimation of acceptation motives #####
-## D.1 Two stage least squares: first stage results
+##### Appendix D. Robustness of motivated reasoning #####
+## Table D.1
+decrit(s$taxe_approbation, weights = s$weight, miss=T)
+decrit(s$feedback_infirme_large, weights = s$weight, miss=T)
+decrit(s$simule_gagnant==1 & s$gagnant_categorie=='Perdant', weights = s$weight, miss=T)
+decrit(s$gain[s$taxe_approbation=='Oui'], weights = s$weight[s$taxe_approbation=='Oui'])
+decrit(s$gain[s$taxe_approbation=='NSP'], weights = s$weight[s$taxe_approbation=='NSP'])
+decrit(s$gain[s$taxe_approbation=='Non'], weights = s$weight[s$taxe_approbation=='Non'])
+decrit(s$gain[s$taxe_approbation=='Oui' & s$feedback_infirme_large==T], weights = s$weight[s$taxe_approbation=='Oui' & s$feedback_infirme_large==T])
+decrit(s$gain[s$taxe_approbation=='NSP' & s$feedback_infirme_large==T], weights = s$weight[s$taxe_approbation=='NSP' & s$feedback_infirme_large==T])
+decrit(s$gain[s$taxe_approbation=='Non' & s$feedback_infirme_large==T], weights = s$weight[s$taxe_approbation=='Non' & s$feedback_infirme_large==T])
+decrit(s$gain[s$taxe_approbation=='Oui' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'], weights = s$weight[s$taxe_approbation=='Oui' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'])
+decrit(s$gain[s$taxe_approbation=='NSP' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'], weights = s$weight[s$taxe_approbation=='NSP' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'])
+decrit(s$gain[s$taxe_approbation=='Non' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'], weights = s$weight[s$taxe_approbation=='Non' & s$simule_gagnant==1 & s$gagnant_categorie=='Perdant'])
+
+## Table D.2
+# (2)
+formula_update_with_gain <- as.formula(paste("update_correct ~ gain + (gain==0) + I(gain - simule_gain) + ", paste(variables_update_bis, collapse=' + ')))
+reg_update_with_gain <- lm(formula_update_with_gain, subset = feedback_infirme_large==T, data=s, weights = s$weight)
+summary(reg_update_with_gain)
+
+# (3)
+reg_update_with_gain_gagnants <- lm(formula_update_with_gain, subset = feedback_infirme_large==T & simule_gagnant==1, data=s, weights = s$weight)
+summary(reg_update_with_gain_gagnants)
+
+# (4)
+formula_update_with_gain_no_bug <- as.formula(paste("update_correct ~ gain + (gain==0) + I(gain - simule_gain) + ", paste(variables_update_bis[!(variables_update_bis=='conservateur')], collapse=' + ')))
+reg_update_with_gain_perdants <- lm(formula_update_with_gain_no_bug, subset = feedback_infirme_large==T & simule_gagnant==0, data=s, weights = s$weight)
+summary(reg_update_with_gain_perdants)
+
+robustness_mr <- stargazer(covariates_update_correct_bis, reg_update_with_gain, reg_update_with_gain_gagnants, reg_update_with_gain_perdants,
+   title="Asymmetric updating of winning category (complementary results).", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+   covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
+                        "Subjective gain ($g$)", "Subjective gain: unaffected ($g=0$)", "Bias about gain ($g - \\hat{\\gamma}$)", "Diploma (1 to 4)", "Retired", "Active", "Student", "Yellow Vests: PNR", # , "Diploma $\\times$ Initial tax: PNR", "Diploma $\\times$ Initial tax: Approves"
+                        "Yellow Vests: understands", "Yellow Vests: supports", "Yellow Vests: is part"),
+   dep.var.labels = c("Correct updating ($U$)"), dep.var.caption = "", header = FALSE, 
+   keep = c('Constant', '.*Gagnant.*', 'taxe_approbation', '^gain', 'I\\(gain', 'diplome4', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
+   order = c('Constant', '.*Gagnant.*', 'taxe_approbation', '^gain', 'I\\(gain', 'diplome4', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
+   add.lines = list(c("Includes ``pessimistic winners''", "\\checkmark", "\\checkmark", "\\checkmark", ""), 
+                    c("Includes ``optimistic losers''", "\\checkmark", "\\checkmark", "", "\\checkmark"), 
+                    c("Includes controls", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark")),
+   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:robustness_mr")
+write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive}; \\textit{Yellow Vests: opposes}. Cf. Appendix \\ref{set_controls} for the list of controls. }  \\end{table} ', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', robustness_mr, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+
+##### Appendix E. Estimation of acceptation motives #####
+## E.1 Two stage least squares: first stage results
 Table_si1
 Table_ee1
 
-## D.2 Additional specifications: Table XX
+## E.2 Additional specifications: Table XX
 # (1) Target: Acceptance ~ win 
 iv1_si1 <- lm(gagnant_cible_categorie=='Gagnant' ~ traite_cible + traite_cible_conjoint + 
        I(traite_cible*traite_cible_conjoint) + cible + Revenu + I(Revenu^2) + Revenu_conjoint + I(Revenu_conjoint^2) + single, data=s, weights = s$weight)
