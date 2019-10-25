@@ -1861,6 +1861,19 @@ TableX <- stargazer(tsls1_si1, tsls1_si2bis, tsls1_si6bis,
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableX, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
+ssi5 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant, data=s, subset=variante_taxe_info=='f')
+summary(ssi5)
+s$temp[s$variante_taxe_info=='f'] <- round(ssi5$fitted.values, 4)
+summary(lm(taxe_feedback_approbation!='Non' ~ temp, data=s, subset=variante_taxe_info=='f'))
+
+decrit(s$taxe_approbation, miss=T)
+decrit(s$taxe_approbation[s$gagnant_categorie=="Perdant" & s$gagnant_info_categorie!="Perdant" & s$simule_gagnant==1 & s$variante_taxe_info=='f'], miss=T)
+decrit(s$taxe_feedback_approbation[s$gagnant_categorie=="Perdant" & s$gagnant_info_categorie!="Perdant" & s$simule_gagnant==1], miss=T)
+
+decrit(s$taxe_approbation[s$gagnant_categorie!="Perdant" & s$gagnant_info_categorie=="Perdant" & s$simule_gagnant==0 & s$variante_taxe_info=='f'], miss=T)
+decrit(s$taxe_feedback_approbation[s$gagnant_categorie!="Perdant" & s$gagnant_info_categorie=="Perdant" & s$simule_gagnant==0], miss=T)
+
+
 ##### 5.2 Environmental effectiveness #####
 s$non_perdant <- n(s$gagnant_categorie!='Perdant')
 # Main identification strategy
