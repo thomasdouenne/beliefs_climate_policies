@@ -1860,18 +1860,24 @@ TableX <- stargazer(tsls1_si1, tsls1_si2bis, tsls1_si6bis,
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', TableX, fixed=TRUE), fixed=TRUE), collapse=' ')
 
-
+# Différence entre IV et la stat desc: l'IV (0.52) mesure l'effet de se savoir gagnant par rapport à se savoir perdant. 
+# La stat desc (0.39) mesure l'effet de se savoir gagnant par rapport à se croire perdant mais sans trop savoir.
 ssi5 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant, data=s, subset=variante_taxe_info=='f')
 summary(ssi5)
 s$temp[s$variante_taxe_info=='f'] <- round(ssi5$fitted.values, 4)
-summary(lm(taxe_feedback_approbation!='Non' ~ temp, data=s, subset=variante_taxe_info=='f'))
+summary(lm(taxe_feedback_approbation!='Non' ~ temp, data=s, subset=variante_taxe_info=='f')) # 0.52***
 
-decrit(s$taxe_approbation, miss=T)
+decrit(s$taxe_approbation, miss=T) # 0.7 - 0.41 = 0.39
 decrit(s$taxe_approbation[s$gagnant_categorie=="Perdant" & s$gagnant_info_categorie!="Perdant" & s$simule_gagnant==1 & s$variante_taxe_info=='f'], miss=T)
 decrit(s$taxe_feedback_approbation[s$gagnant_categorie=="Perdant" & s$gagnant_info_categorie!="Perdant" & s$simule_gagnant==1], miss=T)
-
+# 0.54 - 0.69 = -0.15
 decrit(s$taxe_approbation[s$gagnant_categorie!="Perdant" & s$gagnant_info_categorie=="Perdant" & s$simule_gagnant==0 & s$variante_taxe_info=='f'], miss=T)
 decrit(s$taxe_feedback_approbation[s$gagnant_categorie!="Perdant" & s$gagnant_info_categorie=="Perdant" & s$simule_gagnant==0], miss=T)
+
+decrit(s$taxe_approbation[s$gagnant_categorie!="Perdant"], miss=T) # 0.85 - 0.45 = 0.4
+decrit(s$taxe_approbation[s$gagnant_categorie=="Perdant"], miss=T)
+decrit(s$taxe_feedback_approbation[s$gagnant_info_categorie!="Perdant"], miss=T) # 0.87 - 0.33 = 0.54: plus forte différence quand la croyance vague 
+decrit(s$taxe_feedback_approbation[s$gagnant_info_categorie=="Perdant"], miss=T) # est devenue certitude
 
 
 ##### 5.2 Environmental effectiveness #####
