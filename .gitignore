@@ -1,4 +1,4 @@
-*.pyc
+*.mp4*.pyc
 code/*.Rproj.user
 code/*.Rproj
 .Rproj.user
