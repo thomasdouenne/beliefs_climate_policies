@@ -819,14 +819,20 @@ barres(file="diesel_catch_up_val", dataKN(c("rattrapage_diesel")), nsp=TRUE, leg
 for (j in names(s)) if (grepl('si_', j)) print(decrit(s[[j]], weights=s$weight))
 for (j in 102:109) print(decrit(s[[j]], weights=s$weight))
 labels_politiques_env <- c()
-for (j in 109:109) labels_politiques_env <- c(labels_politiques_env, gsub(" - Q74", "", gsub(".*) à ", "", Label(s[[j]]))))  
+for (j in 102:109) labels_politiques_env <- c(labels_politiques_env, gsub(" - Q74", "", gsub(".*) à ", "", Label(s[[j]]))))  
 labels_taxe_condition <- c()
 for (j in 92:100) labels_taxe_condition <- c(labels_taxe_condition, gsub(" - .*", "", gsub(".*: ", "", Label(s[[j]])))) 
-labels_taxe_condition[1] <- "un versement pour les 50% de Français les plus modestes<br> (ceux gagnant moins de 1670€/mois)"
+labels_taxe_condition[8] <- "des énergies renouvelables<br> (éoliennes, solaire, etc.)"
+labels_taxe_condition[1] <- "un versement pour les 50% de Français les plus<br> modestes (ceux gagnant moins de 1670€/mois)"
 labels_taxe_condition[3] <- "une compensation pour les ménages contraints<br> dans leur consommation de produits pétroliers"
 labels_environmental_policies <- c("a tax on kerosene (aviation)", "a tax on red meat", "stricter insulation standards for new buildings", "stricter standards on pollution from new vehicles", "stricter standards on pollution during roadworthiness tests", "the prohibition of polluting vehicles in city centres", "the introduction of urban tolls", "a contribution to a global climate fund")
 labels_tax_condition <- c("a payment for the 50% poorest French people<br> (those earning less than 1670€/month)", "a payment to all French people", "compensation for households forced to consume petroleum products", "a reduction in social contributions", "a VAT cut", "a reduction in the public deficit", "the thermal renovation of buildings", "renewable energies (wind, solar, etc.)", "clean transport")
 labels_tax_condition[3] <- "compensation for households constrained<br> to consume petroleum products"
+labels_politiques_env[3] <- "des normes plus strictes <br>sur l'isolation pour les nouveaux bâtiments"
+labels_politiques_env[4] <- "des normes plus strictes <br>sur la pollution des nouveaux véhicules"
+labels_politiques_env[5] <- "des normes plus strictes <br>sur la pollution lors du contrôle technique"
+labels_politiques_env[8] <- "une contribution pour <br>un fond mondial pour le climat"
+labels_politiques_env[6] <- "l'interdiction des véhicules polluants <br>dans les centre-villes"
 barres(file="politiques_environnementales", title="<b>Seriez-vous favorable aux politiques environnementales suivantes ?</b>", 
        data=data5(names(s)[141:148], miss=FALSE), nsp=FALSE, sort=T, color=(color5), legend = c(oui_non5), labels=labels_politiques_env)
 barres(file="environmental_policies", title="<b>Would you agree with the following environnemental policies?</b>", 
@@ -4037,3 +4043,11 @@ decrit(entd$Mode[entd$dist_obj_km <= 2 & entd$dist_obj_km >= 1], weights = entd$
 # TODO: la seule différence entre variables 6.1 et 6.2 c'est le diplôme (continu ou pas): simplifier
 variables_determinants_policy_CC[which(!(variables_determinants_policy_CC %in% variables_determinants_attitudes_CC))]
 variables_determinants_attitudes_CC[which(!(variables_determinants_attitudes_CC %in% variables_determinants_policy_CC))]
+
+
+##### Graphiques note Cepremap #####
+barres(file="taxe_condition_val", title="", data=data5(names(s)[which(names(s)=='si_pauvres'):(which(names(s)=='si_pauvres')+8)], miss=FALSE, rev=T)[,rev(c(9,5,8,7,3,4,1,6,2))], nsp=FALSE, 
+       sort=F, thin=T, legend = rep("", 5), labels=labels_taxe_condition[rev(c(9,5,8,7,3,4,1,6,2))], margin_l=250) # rev(yes_no5)
+
+barres(file="politiques_climatiques", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
+                                                           miss=FALSE, rev = T)[,rev(c(3,4,1,6,5,8,2,7))], nsp=FALSE, sort=F, legend = rep("", 5), labels=labels_politiques_env[rev(c(3,4,1,6,5,8,2,7))], thin=T, margin_l=200) # rev(yes_no5)
