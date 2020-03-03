@@ -620,7 +620,7 @@ s$gagnant_info <- s$gagnant_info_categorie!='Perdant'
 
 # (1) OLS with controls and interactions
 formula_ols_prog1 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
-                                                                                            " + gagnant_info * effective * progressif + (prog_na == 'NA')")))
+          " + gagnant_info * effective * progressif + (prog_na == 'NA')")))
 ols_prog1 <- lm(formula_ols_prog1, weights=s$weight, data=s)
 summary(ols_prog1) # sum of all effects True: all :0.879. P+G: 0.727. P+E:0.692. G+E: 0.637
 
@@ -630,6 +630,13 @@ formula_ols_prog2 <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif
 # No effect from prog*gauche_droite/gilets_jaunes + progressif * gauche_droite + progressif * gilets_jaunes
 ols_prog2 <- lm(formula_ols_prog2, weights=s$weight, data=s)
 summary(ols_prog2)
+
+# (2bis) OLS with controls including taxe_approbation and all interactions
+formula_ols_prog2bis <- as.formula(paste("taxe_info_approbation!='Non' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+              " + gagnant_info * effective * progressif + progressif * Revenu + (prog_na == 'NA') + (taxe_approbation!='Non')"))) 
+# No effect from prog*gauche_droite/gilets_jaunes + progressif * gauche_droite + progressif * gilets_jaunes
+ols_prog2bis <- lm(formula_ols_prog2bis, weights=s$weight, data=s)
+summary(ols_prog2bis)
 
 # (3) OLS simple: 56 p.p.***
 ols_prog3 <- lm(taxe_info_approbation!='Non' ~ progressif + (prog_na == 'NA'), weights=s$weight, data=s)
@@ -651,6 +658,12 @@ formula_ols_prog5 <- as.formula(paste("taxe_info_approbation=='Oui' ~ progressif
 ols_prog5 <- lm(formula_ols_prog5, weights=s$weight, data=s)
 summary(ols_prog5) # sum of all effects True: all :0.935. P+G: 0.599. P+E:0.709. G+E: 0.673
 
+# # (5bis) Strict OLS with controls and all interactions
+# formula_ols_prog5bis <- as.formula(paste("taxe_info_approbation=='Oui' ~ progressif + ", paste(paste(variables_reg_prog, collapse=' + '), 
+#                      " + gagnant_info * effective * progressif + progressif * Revenu + (prog_na == 'NA') + taxe_approbation"))) 
+# ols_prog5bis <- lm(formula_ols_prog5bis, weights=s$weight, data=s)
+# summary(ols_prog5bis) # sum of all effects True: all :0.. P+G: 0.. P+E:0.. G+E: 0.
+
 # (6) Strict OLS simple
 ols_prog6 <- lm(taxe_info_approbation=='Oui' ~ progressif + (prog_na == 'NA'), weights=s$weight, data=s)
 summary(ols_prog6)
@@ -659,9 +672,9 @@ Table_prog <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5,
   title="Effect of beliefs over progressivity on acceptance. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, 
     where strict dummies do not cover ``PNR'' or ``Unaffected' answers.", 
           covariate.labels = c("Progressivity $(P)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G^P)$", "Effective $(E)$", "$(G^P \\times E)$",
-                               "Interaction: winner $(P \\times G^P)$", "Interaction: effective $(P \\times E)$", "Interaction: income $(P \\times I)$", 
+                               "Interaction: winner $(P \\times G^P)$", "Interaction: effective $(P \\times E)$", "Interaction: income $(P \\times I)$",
                                "$P \\times G^P \\times E$"), # "Constant",
-          dep.var.labels = c("Acceptance ($A^P$) on \\textit{not ``No''}", "Approval ($\\dot{A^P}$) on \\textit{``Yes''}"), dep.var.caption = "", header = FALSE,
+          dep.var.labels = c("Acceptance ($A^K$) on \\textit{not ``No''}", "Approval ($\\dot{A^K}$) on \\textit{``Yes''}"), dep.var.caption = "", header = FALSE,
           keep = c("progressi", "gagnant", 'effective', 'Revenu$'), # "Constant"
           coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
           se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
@@ -681,7 +694,6 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Not
 0.258 + 0.127 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.172 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 
   0.400 * wtd.mean(s$progressivite!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
 
-#
 variables_reg_prog <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "single", "Simule_gain", "Simule_gain2", variables_demo)
 variables_reg_prog <- variables_reg_prog[!(variables_reg_prog %in% 
     c("revenu", "rev_tot", "age", "age_65_plus", "fioul", "gaz", "hausse_chauffage", "hausse_essence", "hausse_diesel", "hausse_depenses", "simule_gain"))]
@@ -728,8 +740,7 @@ ci_at_sample_mean <- function(lm, alpha = 0.05, var, vars) {
 }
 
 ## 5.4 Complementarity between motives
-# 5.4.1 Combined effects
-# Average effect of Progressivity (Not no for acceptance), other things equal:
+# 5.4.1 Combined effects on Approval
 # of winning + progressivity: 0.644
 0.228 + 0.303 + 0.098 + (0.126 + 0.281 - 0.314) * wtd.mean(s$taxe_efficace=='Oui', weights = s$weight)
 # of effective + progressivity: 0.736
@@ -747,6 +758,58 @@ ggplot() + geom_smooth(data=s[s$taxe_efficace!='Non',], method = "auto", aes(x=g
  geom_smooth(data=s, method = "auto", aes(x=gain, y=1*(tax_acceptance), col=' All            ')) + ylim(c(0,1)) + #geom_vline(xintercept=-66, col='red') +
  xlab("Subjective gain") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + theme(legend.position="top", ) + # legend.position="top", 
  scale_color_manual(name="Among:", values=c(" Effective: not `No'"="#000000", ' All            '="#99CCDD"))
+
+# Version bis: où (2) contrôle pour taxe_approbation
+Table_prog_bis <- stargazer(ols_prog1, ols_prog2bis, ols_prog3, logit_prog4, ols_prog5, ols_prog6,
+                        title="Effect of beliefs over progressivity on acceptance. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, 
+                        where strict dummies do not cover ``PNR'' or ``Unaffected' answers.", 
+                        covariate.labels = c("Progressivity $(P)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G^P)$", "Effective $(E)$", 
+                                             "Initial tax Acceptance ($A^I$)", "$(G^P \\times E)$", # "Initial tax: PNR (I don’t know)", "Initial tax: Approves ($\\dot{A^I}$)", 
+                                             "Interaction: winner $(P \\times G^P)$", "Interaction: effective $(P \\times E)$", "Interaction: income $(P \\times I)$",
+                                             "$P \\times G^P \\times E$"), # "Constant",
+                        dep.var.labels = c("Acceptance ($A^K$) on \\textit{not ``No''}", "Approval ($\\dot{A^K}$) on \\textit{``Yes''}"), dep.var.caption = "", header = FALSE,
+                        keep = c("progressi", "gagnant", 'effective', 'Revenu$', 'taxe_approbation'), # "Constant"
+                        coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
+                        se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
+                        add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
+                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
+                For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. } \\end{table} ',
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_prog_bis, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+# # Average effect of Progressivity on Acceptance, other things equal: 0.239
+# 0.216 + 0.144 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.092 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) - 
+#   0.325 * wtd.mean(s$taxe_efficace!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# # of winning: 0.296
+# 0.264 + 0.052 * wtd.mean(s$taxe_efficace!='Non', weights = s$weight) + 0.144 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 
+#   0.325 * wtd.mean(s$taxe_efficace!='Non' & s$progressivite!='Non', weights = s$weight)
+# # of effectiveness: 0.115
+# 0.111 + 0.052 * wtd.mean(s$gagnant_info_categorie!='Perdant', weights = s$weight) + 0.092 * wtd.mean(s$progressivite!='Non', weights = s$weight) - 
+#   0.325 * wtd.mean(s$progressivite!='Non' & s$gagnant_info_categorie!='Perdant', weights = s$weight)
+# 
+# # Combined effects on Acceptance controling for initial acceptance, other things equal:
+# # of winning + progressivity: 0.594
+# 0.216 + 0.264 + 0.144 + (0.052 + 0.092 - 0.325) * wtd.mean(s$taxe_efficace=='Oui', weights = s$weight)
+# # of effective + progressivity: 0.395
+# 0.216 + 0.111 + 0.092 + (0.144 + 0.052 - 0.325) * wtd.mean(s$gagnant_info_categorie=='Gagnant', weights = s$weight)
+# # of winning + effective: 0.410
+# 0.264 + 0.111 + 0.052 + (0.144 + 0.092 - 0.325) * wtd.mean(s$progressivite=='Oui', weights = s$weight)
+# # Of everything: 0.554
+# 0.216 + 0.264 + 0.111 + 0.052 + 0.144 + 0.092 - 0.325
+# # Results are very close to the cumulative effect of the three motives rectified: 0.514
+# 0.216 + 0.703 * 0.264 + 0.111 + 0.703 * 0.052 + 0.703 * 0.144 + 0.092 - 0.703 * 0.325
+# 
+# # Combined effects on Approval controling for initial acceptance, other things equal:
+# # of winning + progressivity: 0.551
+# 0.226 + 0.246 + 0.085 + (0.060 + 0.183 - 0.281) * wtd.mean(s$taxe_efficace=='Oui', weights = s$weight)
+# # of effective + progressivity: 0.448
+# 0.226 + 0.064 + 0.183 + (0.085 + 0.060 - 0.281) * wtd.mean(s$gagnant_info_categorie=='Gagnant', weights = s$weight)
+# # of winning + effective: 0.367
+# 0.246 + 0.064 + 0.060 + (0.183 + 0.085 - 0.281) * wtd.mean(s$progressivite=='Oui', weights = s$weight)
+# # Of everything: 0.583
+# 0.226 + 0.246 + 0.064 + 0.060 + 0.085 + 0.183 - 0.281
+# # Results are very close to the cumulative effect of the three motives rectified: 0.550
+# 0.226 + 0.703 * 0.246 + 0.064 + 0.703 * 0.060 + 0.703 * 0.085 + 0.183 - 0.703 * 0.281
 
 
 ##### Appendix A. Raw data #####
