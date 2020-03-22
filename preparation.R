@@ -959,10 +959,10 @@ convert_s <- function() {
   s$conso[!is.na(s$conso_2)] <<- s$conso_2[!is.na(s$conso_2)]
   label(s$conso) <<- "conso:  Consommation moyenne du vÃ©hicule (en litres aux 100 km)"
 
-  s$age_18_24 <<- 1*(s$age == '18 à 24 ans')
-  s$age_25_34 <<- 1*(s$age == '25 à 34 ans')
-  s$age_35_49 <<- 1*(s$age == '35 à 49 ans')
-  s$age_50_64 <<- 1*(s$age == '50 à 64 ans')
+  s$age_18_24 <<- 1*(s$age == '18 ? 24 ans')
+  s$age_25_34 <<- 1*(s$age == '25 ? 34 ans')
+  s$age_35_49 <<- 1*(s$age == '35 ? 49 ans')
+  s$age_50_64 <<- 1*(s$age == '50 ? 64 ans')
   s$age_65_plus <<- 1*(s$age == '65 ans ou plus')
   
   s$score_polluants <<- 1*(s$ges_CO2 == TRUE) + 1*(s$ges_CH4 == TRUE) - 1*(s$ges_O2 == TRUE) - 1*(s$ges_pm == TRUE)
