@@ -26,4 +26,8 @@ model_reforms_data/*.csv
 !code/df_menages_domicile_teg.csv
 !code/correspondance-code-insee-code-postal.csv
 soumission/*
+Carbon Tax Aversion/submission AER/*
+Carbon Tax Aversion/submission AEJ/*
+Carbon Tax Aversion/Deprecated/submission AER/*
+Carbon Tax Aversion/Deprecated/submission AEJ/*
 *.mp4
