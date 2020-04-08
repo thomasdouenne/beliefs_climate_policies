@@ -741,11 +741,13 @@ decrit(s$conservateur, weights = s$weight) # 2%
 
 
 ##### Transferts inter #####
+summary(lm((transferts_inter=='Oui') ~ aide_2p, data = s, weights = s$weight)) # -.16 !! aide de 2% moins approuvée que de 5%: sûrement parce qu'à partir de la moitié la formulation à changer de "transferts des pays riches" à "aide de la France", ptet aussi faire attention que les socio-démos sont un peu différents dans le 3è tiers de l'échantillon...
+summary(lm((transferts_inter=='Oui') ~ aide_2p*transferts_inter_info*apres_modifs, data = s, weights = s$weight))
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = s, weights = s$weight)) # 0 !
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = s, subset = transferts_inter!='NSP', weights = s$weight)) # 0 !
 decrit(s$variation_aide, weights = s$weight)
 load('p_data.RData')
-t <- merge(s, t_transferts_inter_a, all=T)
+t <- merge(s, t_transferts_inter_a, all=T) # /!\ Problème avec cette analyse: transferts_inter inclut des réponses où la question est 2% et non 5% du PIB (aide_2p) 
 t$transferts_inter[!is.na(t$taille_foyer)] <- t$transferts_inter_a[!is.na(t$taille_foyer)] 
 decrit(t$transferts_inter, weights = t$weight)
 decrit(t$transferts_inter, weights = t$weight, miss=T)
@@ -766,11 +768,14 @@ summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data 
 summary(lm((transferts_inter=='Oui') ~ transferts_inter_info*apres_modifs, data = t, subset = transferts_inter!='NSP', weights = t$weight)) # 0
 
 # use m_global (in enquete/codes) to redo graph with new data for transferts_inter
-decrit(s$aide_non_etats)
-decrit(s$aide_non_priorite)
-decrit(s$aide_non_global)
-decrit(s$aide_non_trop)
-decrit(s$aide_non_autonomie)
+decrit(s$aide_2p, miss = T, weights = s$weight) # Dernier tiers de l'échantillon: 2% du PIB au lieu de 5, et on demande pourquoi s'ils répondent pas Oui
+decrit(s$transferts_inter[s$aide_2p==T], miss = T, weights = s$weight[s$aide_2p==T]) # Désapprobation d'aideà 2%: 51%
+decrit(s$transferts_inter[s$aide_2p==F], miss = T, weights = s$weight[s$aide_2p==F]) # Désapprobation d'aideà 5%: 34%
+decrit(s$aide_non_etats, weights = s$weight)
+decrit(s$aide_non_priorite, weights = s$weight)
+decrit(s$aide_non_global, weights = s$weight)
+decrit(s$aide_non_trop, weights = s$weight)
+decrit(s$aide_non_autonomie, weights = s$weight)
 
 
 ##### Dépenses publiques #####

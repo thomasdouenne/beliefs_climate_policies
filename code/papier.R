@@ -156,6 +156,11 @@ Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
                                                        Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
+# Martin's tips for the note:
+# note.latex <- "\\multicolumn{4}{l}{\\parbox[t]{9cm}{\\textit{Notes:} Logistic regression. Dependent variable: an indicator varible  AND Some very long and interesting comment.}}\\\\"
+# Table1[grepl("Note",Table1)] <- note.latex
+# cat (Table1, sep = "\n")
+# Table1 <- stargazer(type="text") # to show Table in RStudio
 
 ## 3.2 Environmental effectiveness
 decrit(s$taxe_efficace, weights = s$weight, miss = T) # 16.6% vs. 65.9%
