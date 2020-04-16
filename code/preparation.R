@@ -86,7 +86,7 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # }
 # wd <- getwd()
 # setwd("U:/Données/ERFS_2014")
-# setwd("/media/adrien/dd/adrien/DD/Économie/Données/ERFS_2014/Stata")
+# setwd("/mnt/dd/adrien/DD/Économie/Données/ERFS_2014/Stata")
 # indiv <- read.dta13("fpr_indiv_2014.dta")
 # irft4 <- read.dta13("fpr_irf14e14t4.dta")
 # menage <- read.dta13("fpr_menage_2014.dta")
@@ -126,7 +126,7 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # db$revtot_i_par <- db$revdecm * db$proportion_imputee + db$presta_sociales * (db$age >= pmax(db$age_second, 18)) /  pmax(1, db$adult_above_second)
 # sum(db$revtot_i_par, na.rm=T)/sum(menage$presta_sociales + menage$revdecm, na.rm=T) # 1.000032
 # 
-# # Déciles de revenus inflatés : (croissance PIB 2014-2018	1.06075007	https://www.insee.fr/fr/statistiques/2830613#tableau-Tableau1 )
+# # Déciles de revenus inflatés : (croissance PIB 2014-2018	1.06075007	https://www.insee.fr/fr/statistiques/2830613#tableau-Tableau1 ) MàJ 2020: should be 1.0633
 # deciles_erfs_inflates <- 1.06075007*seuils_all(quantiles(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17]))
 # # This is the one used:
 # round(deciles_erfs_inflates) # 229 779 1142 1429 1671 1922 2222 2641 3436
@@ -134,6 +134,7 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # round(deciles_erfs_inflates_weighted) # 237 789 1151 1436 1677 1927 2231 2657 3462
 # deciles_menage_erfs_inflates_weighted <- 1.06075007*seuils_all(quantiles(db$revdecm + db$presta_sociales, weights = db$wprm))
 # 
+# percentiles_revenu <- ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17])
 # distribution_revenu_erfs <- wtd.Ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)])
 # distribution_revenu_erfs_weighted <- wtd.Ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)], weights = db$wprm[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)])
 # # plot(distribution_revenu_erfs$x, distribution_revenu_erfs$ecdf, type='l', xlim=c(0,60000), col="blue")
@@ -1414,6 +1415,8 @@ convert_s <- function() {
   
   s$Revenu <<- s$revenu/1e3 # TODO: labels
   s$Revenu_conjoint <<- s$revenu_conjoint/1e3
+  s$percentile_revenu <<- 100*percentiles_revenu(s$revenu*12)
+  s$percentile_revenu_conjoint  <<- 100*percentiles_revenu(s$revenu_conjoint*12)
   s$Simule_gain <<- s$simule_gain/1e3
   s$Revenu2 <<- s$revenu^2/1e6
   s$Revenu_conjoint2 <<- s$revenu_conjoint^2/1e6
@@ -1421,7 +1424,7 @@ convert_s <- function() {
   s$Simule_gain_cible <<- s$simule_gain_cible/1e3
   s$Simule_gain_cible2 <<- s$simule_gain_cible/1e6
   s$biais_sur <<- abs(s$simule_gain - s$gain) > 110
-  label(s$biais_sur) <<- "biais_sur: Certitude à 99% que le gain subjectif du répondant est biaisé à la baisse: simule_gain - gain > 110"
+  label(s$biais_sur) <<- "biais_sur: Certitude à 99% que le gain subjectif du répondant est biaisé à la baisse: abs(simule_gain - gain) > 110"
   
   s$prog_na <<- s$progressivite
   s$prog_na[is.na(s$prog_na)] <<- "NA"

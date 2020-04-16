@@ -61,6 +61,10 @@ package("snakecase")
 package("rdd")
 package("corrplot")
 package("psy")
+package("devtools")
+install_github(repo = "MatthieuStigler/RCompAngrist", subdir = "RCompAngrist")
+package("RCompAngrist")
+
 
 package("lavaan")
 # package("psych") # library(psych, exclude = "describe")

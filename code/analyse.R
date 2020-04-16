@@ -2440,6 +2440,25 @@ all_effects <- stargazer(ols_all1, ols_all2, ols_all3, logit_all4, ols_all5,
                          no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:all_effects")
 write_clip(gsub("logistic", "logit", gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', all_effects, fixed=TRUE), fixed=TRUE)), collapse=' ')
 
+summary(lm(progressivite!='Non' ~ info_progressivite, data = s, weights = s$weight))
+
+summary(lm(progressivite!='Non' ~ info_CC * simule_gagnant * info_progressivite + simule_gain + taxe_approbation, data = s, weights = s$weight))
+summary(lm(taxe_info_approbation!='Non' ~ info_CC * simule_gagnant * info_progressivite + simule_gain + taxe_approbation, data = s, weights = s$weight))
+
+summary(lm(progressivite!='Non' ~ info_CC * simule_gagnant * info_progressivite * biais_sur + simule_gain + taxe_approbation, data = s, weights = s$weight, subset = apres_modifs == T))
+summary(lm(taxe_feedback_approbation!='Non' ~ info_CC * simule_gagnant * info_progressivite * biais_sur + simule_gain + taxe_approbation, data = s, weights = s$weight, subset = apres_modifs == T))
+
+summary(lm(progressivite!='Non' ~ info_CC * simule_gagnant * info_progressivite + simule_gain + taxe_approbation, data = s, weights = s$weight, subset = biais_sur == F))
+summary(lm(taxe_info_approbation!='Non' ~ info_CC * simule_gagnant * info_progressivite + simule_gain + taxe_approbation, data = s, weights = s$weight, subset = biais_sur == F))
+
+summary(ivreg(taxe_info_approbation!='Non' ~ simule_gagnant + simule_gain + taxe_approbation + (progressivite!='Non') |
+    simule_gagnant + simule_gain + taxe_approbation + info_progressivite, data = s, weights = s$weight), diagnostics = TRUE)
+
+summary(ivreg(taxe_info_approbation!='Non' ~ taxe_approbation + (progressivite!='Non') | taxe_approbation + info_progressivite, data = s, weights = s$weight), diagnostics = TRUE)
+summary(ivreg(taxe_info_approbation!='Non' ~ (progressivite!='Non') |  info_progressivite, data = s, weights = s$weight), diagnostics = TRUE)
+summary(ivreg(taxe_cible_approbation!='Non' ~ (progressivite!='Non') | info_progressivite, data = s, weights = s$weight), diagnostics = TRUE)
+summary(ivreg(taxe_cible_approbation!='Non' ~ cible + percentile_revenu + percentile_revenu_conjoint + (progressivite!='Non') |  
+                info_progressivite + cible + percentile_revenu + percentile_revenu_conjoint, data = s, weights = s$weight), diagnostics = TRUE)
 
 ##### Graphiques RDD #####
 # Seul le revenu du répondant est pris en compte, sont exclus de l'analyse les répondants au revenu > 2220
@@ -3394,8 +3413,7 @@ formula_ex <- as.formula("lwage ~ educ | nearc4")
 iv_ex <- ivmodelFormula(formula_ex, data = card.data)
 iv_ex <- ivmodelFormula(lwage ~ educ + exper + expersq + black + south + smsa + reg661 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 + reg668 + smsa66 |
                           nearc4 + exper + expersq + black + south + smsa + reg661 + reg662 + reg663 + reg664 + reg665 + reg666 + reg667 + reg668 + smsa66,data=card.data)
-iv_ex <- ivmodelFormula(lwage ~ educ + black | nearc4 + black, data=card.data)
-summary(iv_ex)
+summary(ivmodelFormula(lwage ~ educ + black | nearc4 + black, data=card.data))
 ARsens.test(iv_ex, deltarange=c(-0.03, 0.03))
 
 Y=card.data[,"lwage"]
@@ -3405,7 +3423,7 @@ Xname=c("exper", "expersq", "black", "south", "smsa", "reg661",
         "reg662", "reg663", "reg664", "reg665", "reg666", "reg667",
         "reg668", "smsa66")
 X=card.data[,Xname]
-foo = ivmodel(Y=card.data$lwage, D=,Z=Z)
+foo = ivmodel(Y=card.data$lwage, D=D,Z=Z, X=card.data[,"black"])
 summary(foo)
 
 library(ivmodel)
@@ -4056,3 +4074,280 @@ barres(file="taxe_condition_val", title="", data=data5(names(s)[which(names(s)==
 
 barres(file="politiques_climatiques", title="", data=data5(names(s)[(which(names(s)=='si_pauvres')+10):(which(names(s)=='si_pauvres')+17)], 
                                                            miss=FALSE, rev = T)[,rev(c(3,4,1,6,5,8,2,7))], nsp=FALSE, sort=F, legend = rep("", 5), labels=labels_politiques_env[rev(c(3,4,1,6,5,8,2,7))], thin=T, margin_l=200) # rev(yes_no5)
+
+##### Causal complementary  effects #####
+# A^T: insignificant without control, crazy coefs when P added.
+ 
+# formula_all_p <- as.formula(paste("progressivite!='Non' ~ taxe_approbation + gain + simule_gain + simule_gagnant * info_progressivite"))
+# tsls1_all_p <- lm(formula_all_p, data=s, weights = s$weight, na.action='na.exclude')
+# summary(tsls1_all_p)
+# s$p <- fitted.values(tsls1_all_p)
+# 
+# formula2_allp <- as.formula(paste("taxe_info_approbation!='Non' ~ taxe_approbation + gain + simule_gagnant + simule_gain + p"))
+# tsls2_allp <- lm(formula2_allp, data=s, weights=s$weight)
+# summary(tsls2_allp) 
+
+variables_reg_min <- c("percentile_revenu", "Revenu2", "percentile_revenu_conjoint", "Revenu_conjoint2")
+variables_reg_all <- variables_reg_self_interest[!(variables_reg_self_interest %in% c("taxe_efficace", "prog_na"))]
+variables_all_all <- c(variables_reg_all, "taxe_approbation")
+# variables_reg_all <- c(variables_reg_self_interest[!(variables_reg_self_interest %in% c("taxe_efficace", "prog_na"))], "taxe_approbation")
+
+formula_all0_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ",  paste(variables_all_all, collapse = ' + ')))
+tsls1_all0_ee1 <- lm(formula_all0_ee1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_all0_ee1)
+s$taxe_efficace.all <- fitted.values(tsls1_all0_ee1)
+formula_all0_si1 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~", paste(variables_all_all, collapse = ' + '), "+ traite_cible * traite_cible_conjoint + cible"))
+tsls1_all0_si1 <- lm(formula_all0_si1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_all0_si1)
+s$non_perdant <- fitted.values(tsls1_all0_si1)
+
+# !! (0) A^T = ^SI * ^EE + X = 0.61*** ^SI + 0.57. ^EE - 0.32* ^SI*^EE + X (all controls)
+formula2_all0 <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_all_all, collapse = ' + '), " + cible + non_perdant * taxe_efficace.hat"))
+tsls2_all0 <- lm(formula2_all0, data=s, weights=s$weight)
+summary(tsls2_all0) 
+
+formula_all_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ",  paste(variables_reg_all, collapse = ' + ')))
+tsls1_all_ee1 <- lm(formula_all_ee1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_ee1)
+s$taxe_efficace.hat <- fitted.values(tsls1_all_ee1)
+formula_all_si1 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~", paste(variables_reg_all, collapse = ' + '), "+ traite_cible * traite_cible_conjoint + cible"))
+tsls1_all_si1 <- lm(formula_all_si1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_si1)
+s$non_perdant <- fitted.values(tsls1_all_si1)
+
+# ! (1) A^T = ^SI * ^EE + X = 0.75*** ^SI + 0.81* ^EE - 0.55 ^SI*^EE + X (with controls)
+formula2_all1 <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_reg_all, collapse = ' + '), " + cible + non_perdant * taxe_efficace.hat"))
+tsls2_all1 <- lm(formula2_all1, data=s, weights=s$weight)
+summary(tsls2_all1) 
+
+# (2) A^T = ^SI * ^EE * P + X = 0.6. ^SI + 2.3* ^EE - 0.3 P - 0.4 ^SI:^EE  + 1.1** ^SI:P+ 1.4** ^EE:P - 2.5* ^SI:^EE:P + X (with controls) /!\  coef EE: 74 when taxe_approbation in X. why?
+formula2_all2 <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_reg_all, collapse = ' + '), " + cible + non_perdant * taxe_efficace.hat * (progressivite!='Non')"))
+tsls2_all2 <- lm(formula2_all2, data=s, weights=s$weight)
+summary(tsls2_all2) 
+
+# logit_tsls2_all2 <- logitmfx(formula2_all2, s, atmean=FALSE)$mfxest
+# logit_tsls2_all2
+# tsls2_all2 <- glm(formula2_all2, data=s, weights=s$weight, family = binomial(link='logit'))
+# summary(tsls2_all2)
+
+formula_min_ee1 <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ",  paste(variables_reg_min, collapse = ' + ')))
+tsls1_min_ee1 <- lm(formula_min_ee1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_ee1)
+s$taxe_efficace.min <- fitted.values(tsls1_min_ee1)
+formula_min_si1 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~", paste(variables_reg_min, collapse = ' + '), "+ traite_cible * traite_cible_conjoint + cible"))
+tsls1_min_si1 <- lm(formula_min_si1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_si1)
+s$non_perdant <- fitted.values(tsls1_min_si1)
+
+# (1') A^T = ^SI * ^EE = 0.458^SI + 0.70 ^EE - 0.00 ^SI*^EE (no control)
+formula2_min1 <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + cible + non_perdant * taxe_efficace.min"))
+tsls2_min1 <- lm(formula2_min1, data=s, weights=s$weight)
+summary(tsls2_min1)  
+
+# (2') A^T = ^SI * ^EE * P = -1.4 ^SI + 0.2 ^EE - 1.5 P + 5 ^SI:^EE  + 3.8 ^SI:P + 5 ^EE:P - 10 ^SI:^EE:P (no control) /!\  coef EE: 74 when taxe_approbation in X. why?
+formula2_min2 <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + cible + non_perdant * taxe_efficace.min * (progressivite!='Non')"))
+tsls2_min2 <- lm(formula2_min2, data=s, weights=s$weight)
+summary(tsls2_min2) 
+
+# (3) A^F = ^SI * ^EE + X = 0.55*** ^SI - 0.67 ^EE - 0.49* ^SI*^EE + X (original controls)
+formula_tsls1_all_si3 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + 
+      Simule_gain + Simule_gain2 + single + prog_na + taxe_efficace +", paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1_all_si3 <- lm(formula_tsls1_all_si3, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_si3)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_all_si3$fitted.values
+
+formula_tsls2_all_si3 <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_self_interest, collapse = ' + '),  
+      " + tax_acceptance + (taxe_approbation=='NSP') + Simule_gain + Simule_gain2 + single + prog_na + non_perdant * taxe_efficace.hat"))
+tsls2_all_si3 <- lm(formula_tsls2_all_si3, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+summary(tsls2_all_si3)
+
+# (4) A^F = ^SI * ^EE + X = 0.66*** ^SI + 0.87* ^EE - 0.41 ^SI*^EE + X (with controls)
+formula_tsls1_all_si4 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant +", paste(variables_reg_all, collapse = ' + ')))
+tsls1_all_si4 <- lm(formula_tsls1_all_si4, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_si4)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_all_si4$fitted.values
+formula2_all4 <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_all, collapse = ' + '), " + non_perdant * taxe_efficace.hat"))
+tsls2_all4 <- lm(formula2_all4, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all4) 
+
+# !! (4') A^F = ^SI * ^EE + X = 0.55*** ^SI + 0.52* ^EE - 0.26 ^SI*^EE + X (all controls)
+formula_tsls1_all_si4 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant +", paste(variables_all_all, collapse = ' + ')))
+tsls1_all_si4 <- lm(formula_tsls1_all_si4, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_si4)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_all_si4$fitted.values
+formula2_all4 <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_all_all, collapse = ' + '), " + non_perdant * taxe_efficace.hat"))
+tsls2_all4 <- lm(formula2_all4, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all4) 
+
+# (4'') A^F = ^SI * ^EE + X = 0.74 ^SI + 1.22 ^EE + 0.04 ^SI*^EE + X (no control)
+formula_tsls1_all_si4 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + simule_gain + ", paste(variables_reg_min, collapse = ' + ')))
+tsls1_all_si4 <- lm(formula_tsls1_all_si4, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_si4)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_all_si4$fitted.values
+formula2_all4 <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + simule_gain + non_perdant * taxe_efficace.min"))
+tsls2_all4 <- lm(formula2_all4, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all4) 
+
+# (5) A^F = ^SI * ^EE * P + X = 0.17 ^SI - 0.08 ^EE + 0.33. P + 0.19 ^EE:^SI + 0.41 ^SI:P + 0.85 ^EE:P - 1.70 ^SI:^EE:P + X (with controls)
+formula_tsls1_all_si4 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + simule_gain + ", paste(variables_reg_all, collapse = ' + ')))
+tsls1_all_si4 <- lm(formula_tsls1_all_si4, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_si4)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_all_si4$fitted.values
+formula2_all5 <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_all, collapse = ' + '), " + non_perdant * taxe_efficace.hat * (progressivite!='Non')"))
+# formula2_all5 <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_all_all, collapse = ' + '), " + non_perdant * taxe_efficace.hat * (progressivite!='Non')"))
+tsls2_all5<- lm(formula2_all5, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all5) 
+
+# (5') A^F = ^SI * ^EE * P + X = 0.70 ^SI + 0.70 ^EE + 0.62 P - 0.84 ^EE:^SI - 0.56 ^SI:P + 0.06 ^EE:P - 0.95 ^SI:^EE:P + X (no control)
+formula_tsls1_all_si4 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + simule_gain + ", paste(variables_reg_min, collapse = ' + ')))
+tsls1_all_si4 <- lm(formula_tsls1_all_si4, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_si4)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_all_si4$fitted.values
+formula2_all5 <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + simule_gain + non_perdant * taxe_efficace.min * (progressivite!='Non')"))
+tsls2_all5<- lm(formula2_all5, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all5) 
+
+s$v.f <- 1*(s$gagnant_feedback_categorie!='Perdant') + 1*(s$taxe_efficace!='Non')
+s$w.f <- s$v.f + 1*(s$progressivite!='Non')
+s$v.t <- 1*(s$gagnant_cible_categorie!='Perdant') + 1*(s$taxe_efficace!='Non')
+s$w.t <- s$v.t + 1*(s$progressivite!='Non')
+
+# ! (6) A^F = 0.48*** ^V | V = SI + EE: coef similaire à effet d'un seul motif => complémentarité
+formula_tsls1_min_vf1 <- as.formula(paste("v.f ~ ", paste(variables_reg_min, collapse = ' + '), " + simule_gain + simule_gagnant + info_CC + apres_modifs"))
+tsls1_min_vf1 <- lm(formula_tsls1_min_vf1, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_vf1)
+s$v.f.hat[s$variante_taxe_info=='f'] <- tsls1_min_vf1$fitted.values
+formula2_min_vf <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + simule_gain + v.f.hat"))
+tsls2_min_vf <- lm(formula2_min_vf, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_min_vf) 
+
+# (6') A^F = 0.47*** ^V + X (with controls) | V = SI + EE: coef similaire à effet d'un seul motif => complémentarité
+formula_tsls1_all_vf1 <- as.formula(paste("v.f ~ ", paste(variables_reg_all, collapse = ' + '), " + simule_gagnant + info_CC + apres_modifs"))
+tsls1_all_vf1 <- lm(formula_tsls1_all_vf1, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_vf1)
+s$v.f.hat[s$variante_taxe_info=='f'] <- tsls1_all_vf1$fitted.values
+formula2_all_vf <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_all, collapse = ' + '), " + v.f.hat"))
+tsls2_all_vf <- lm(formula2_all_vf, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all_vf) 
+
+# ! (6'') A^F = 0.47*** ^V + X (all controls) | V = SI + EE: coef similaire à effet d'un seul motif => complémentarité
+formula_tsls1_all_vf1 <- as.formula(paste("v.f ~ ", paste(variables_all_all, collapse = ' + '), " + simule_gagnant + info_CC + apres_modifs"))
+tsls1_all_vf1 <- lm(formula_tsls1_all_vf1, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all_vf1)
+s$v.f.hat[s$variante_taxe_info=='f'] <- tsls1_all_vf1$fitted.values
+formula2_all_vf <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_all_all, collapse = ' + '), " + v.f.hat"))
+tsls2_all_vf <- lm(formula2_all_vf, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all_vf) 
+
+# (7) A^F = 0.15*** ^W | ^W = ^V + P
+# apres_modifs (i.e. info_ee) ne peut pas être inclus car il coïncide avec le sous-échantillon où la progressivité est renseignée
+formula_tsls1_min_wf1 <- as.formula(paste("w.f ~ ", paste(variables_reg_min, collapse = ' + '), " + simule_gain + simule_gagnant + info_CC"))
+tsls1_min_wf1 <- lm(formula_tsls1_min_wf1, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_wf1)
+s$w.f.hat[s$variante_taxe_info=='f' & !is.na(s$progressivite)] <- tsls1_min_wf1$fitted.values
+formula2_min_wf <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + simule_gain + w.f.hat"))
+tsls2_min_wf <- lm(formula2_min_wf, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_min_wf) 
+
+# (7') A^F = 0.11** ^W + X (with controls) | ^W = ^V + P
+# apres_modifs (i.e. info_ee) ne peut pas être inclus car il coïncide avec le sous-échantillon où la progressivité est renseignée
+formula_tsls1_min_wf1 <- as.formula(paste("w.f ~ ", paste(variables_reg_all, collapse = ' + '), " simule_gagnant + info_CC"))
+tsls1_min_wf1 <- lm(formula_tsls1_min_wf1, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_wf1)
+s$w.f.hat[s$variante_taxe_info=='f' & !is.na(s$progressivite)] <- tsls1_min_wf1$fitted.values
+formula2_min_wf <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_all, collapse = ' + '), " + w.f.hat"))
+tsls2_min_wf <- lm(formula2_min_wf, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_min_wf) 
+
+# (7'') A^F = 0.04. ^W + X (all controls) | ^W = ^V + P
+# apres_modifs (i.e. info_ee) ne peut pas être inclus car il coïncide avec le sous-échantillon où la progressivité est renseignée
+formula_tsls1_min_wf1 <- as.formula(paste("w.f ~ ", paste(variables_all_all, collapse = ' + '), " simule_gagnant + info_CC"))
+tsls1_min_wf1 <- lm(formula_tsls1_min_wf1, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_wf1)
+s$w.f.hat[s$variante_taxe_info=='f' & !is.na(s$progressivite)] <- tsls1_min_wf1$fitted.values
+formula2_min_wf <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_all_all, collapse = ' + '), " + w.f.hat"))
+tsls2_min_wf <- lm(formula2_min_wf, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_min_wf) 
+
+# ! (8) A^T = 0.56*** ^V | V = SI + EE: coef similaire à effet d'un seul motif => complémentarité
+formula_tsls1_min_vt1 <- as.formula(paste("v.t ~ ", paste(variables_reg_min, collapse = ' + '), " + cible + traite_cible * traite_cible_conjoint + info_CC + apres_modifs"))
+tsls1_min_vt1 <- lm(formula_tsls1_min_vt1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_vt1)
+s$v.t.hat <- tsls1_min_vt1$fitted.values
+formula2_min_vt <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + cible + v.t.hat"))
+tsls2_min_vt <- lm(formula2_min_vt, data=s, weights=s$weight)
+summary(tsls2_min_vt) 
+
+# (8') A^T = 0.56*** ^V + X (with controls) | V = SI + EE: coef similaire à effet d'un seul motif => complémentarité
+formula_tsls1_min_vt1 <- as.formula(paste("v.t ~ ", paste(variables_reg_all, collapse = ' + '), " + cible + traite_cible * traite_cible_conjoint + info_CC + apres_modifs"))
+tsls1_min_vt1 <- lm(formula_tsls1_min_vt1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_vt1)
+s$v.t.hat <- tsls1_min_vt1$fitted.values
+formula2_min_vt <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_reg_all, collapse = ' + '), " + cible + v.t.hat"))
+tsls2_min_vt <- lm(formula2_min_vt, data=s, weights=s$weight)
+summary(tsls2_min_vt) 
+
+# ! (8'') A^T = 0.54*** ^V + X (all controls) | V = SI + EE: coef similaire à effet d'un seul motif => complémentarité
+formula_tsls1_min_vt1 <- as.formula(paste("v.t ~ ", paste(variables_all_all, collapse = ' + '), " + cible + traite_cible * traite_cible_conjoint + info_CC + apres_modifs"))
+tsls1_min_vt1 <- lm(formula_tsls1_min_vt1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_vt1)
+s$v.t.hat <- tsls1_min_vt1$fitted.values
+formula2_min_vt <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_all_all, collapse = ' + '), " + cible + v.t.hat"))
+tsls2_min_vt <- lm(formula2_min_vt, data=s, weights=s$weight)
+summary(tsls2_min_vt) 
+
+# (9) A^T = -0.00 ^W | ^W = ^V + P
+# apres_modifs (i.e. info_ee) ne peut pas être inclus car il coïncide avec le sous-échantillon où la progressivité est renseignée
+formula_tsls1_min_wt1 <- as.formula(paste("w.t ~ ", paste(variables_reg_min, collapse = ' + '), " + cible + traite_cible * traite_cible_conjoint + info_CC"))
+tsls1_min_wt1 <- lm(formula_tsls1_min_wt1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_wt1)
+s$w.t.hat[!is.na(s$progressivite)] <- tsls1_min_wt1$fitted.values
+formula2_min_wt <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + cible + w.t.hat"))
+tsls2_min_wt <- lm(formula2_min_wt, data=s, weights=s$weight)
+summary(tsls2_min_wt) 
+
+# (9') A^T = -0.01 ^W + X (with controls) | ^W = ^V + P
+# apres_modifs (i.e. info_ee) ne peut pas être inclus car il coïncide avec le sous-échantillon où la progressivité est renseignée
+formula_tsls1_min_wt1 <- as.formula(paste("w.t ~ ", paste(variables_reg_all, collapse = ' + '), " + cible + traite_cible * traite_cible_conjoint + info_CC"))
+tsls1_min_wt1 <- lm(formula_tsls1_min_wt1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_wt1)
+s$w.t.hat[!is.na(s$progressivite)] <- tsls1_min_wt1$fitted.values
+formula2_min_wt <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_all, collapse = ' + '), " + cible + w.t.hat"))
+tsls2_min_wt <- lm(formula2_min_wt, data=s, weights=s$weight)
+summary(tsls2_min_wt) 
+
+# (9'') A^T = -0.01 ^W + X (all controls) | ^W = ^V + P
+# apres_modifs (i.e. info_ee) ne peut pas être inclus car il coïncide avec le sous-échantillon où la progressivité est renseignée
+formula_tsls1_min_wt1 <- as.formula(paste("w.t ~ ", paste(variables_reg_min, collapse = ' + '), " + cible + traite_cible * traite_cible_conjoint + info_CC"))
+tsls1_min_wt1 <- lm(formula_tsls1_min_wt1, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_min_wt1)
+s$w.t.hat[!is.na(s$progressivite)] <- tsls1_min_wt1$fitted.values
+formula2_min_wt <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_reg_min, collapse = ' + '), " + cible + w.t.hat"))
+tsls2_min_wt <- lm(formula2_min_wt, data=s, weights=s$weight)
+summary(tsls2_min_wt) 
+
+# below we work with Yes ~ Yes instead of not No ~ not No
+formula_all3_ee <- as.formula(paste("taxe_efficace=='Oui' ~ apres_modifs + info_CC + ",  paste(variables_reg_all, collapse = ' + ')))
+tsls1_all3_ee <- lm(formula_all3_ee, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_all3_ee)
+s$taxe_efficace.hat <- fitted.values(tsls1_all3_ee)
+
+formula_all3_si <- as.formula(paste("gagnant_cible_categorie=='Gagnant' ~", paste(variables_all_controls, collapse = ' + '), " + cible + traite_cible * traite_cible_conjoint"))
+tsls1_all3_si <- lm(formula_all3_si, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_all3_si)
+s$gagnant <- fitted.values(tsls1_all3_si)
+
+# (3) .A^T = ^.SI * ^.EE + X = 0.42*** ^.SI + 0.29 ^E.E - 0.98* ^.SI*^.EE + X (all controls)
+formula2_all3 <- as.formula(paste("taxe_cible_approbation=='Oui' ~", paste(variables_all_controls, collapse = ' + '), " + cible + gagnant * taxe_efficace.hat"))
+tsls2_all3 <- lm(formula2_all3, data=s, weights=s$weight)
+summary(tsls2_all3) 
+
+# (4) .A^F = ^.SI * ^.EE + X = 0.31*** ^.SI + 1.14* ^.EE + 0.06 ^.SI*^.EE + X (all controls)
+formula_tsls1_all4_si <- as.formula(paste("gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant +", paste(variables_all_controls, collapse = ' + ')))
+tsls1_all4_si <- lm(formula_tsls1_all4_si, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all4_si)
+s$gagnant[s$variante_taxe_info=='f'] <- tsls1_all4_si$fitted.values
+
+formula2_all4 <- as.formula(paste("taxe_feedback_approbatio=='Oui' ~", paste(variables_all_controls, collapse = ' + '), " + gagnant * taxe_efficace.hat"))
+tsls2_all4 <- lm(formula2_all4, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all4) 

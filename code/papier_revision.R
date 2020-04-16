@@ -1,0 +1,415 @@
+source("packages_functions.R")
+load(".RData")
+
+##### Self-interest #####
+# percentiles revenu fit: slightly lack of poor (around percentiles 0 and 25)
+plot(1:length(s$percentile_revenu), 100*(1:length(s$percentile_revenu))/length(s$percentile_revenu), type='l', col='red')
+lines(1:length(s$percentile_revenu), sort(s$percentile_revenu), type='l')
+
+# (1a revenu percentiles) Main identification strategy. We had a better fit without percentiles.
+tsls1_si1 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
+                  I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, data=s, weights = s$weight)
+summary(tsls1_si1)
+s$non_perdant <- tsls1_si1$fitted.values
+# 55 p.p.***
+tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, data=s, weights = s$weight)
+summary(tsls2_si1)
+# Effective F-stat from Stata weakivtest: 35
+
+iv_si1 <- ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single | 
+    traite_cible + traite_cible_conjoint + I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, 
+    data = s, weights = s$weight)
+summary(iv_si1, diagnostics = TRUE)
+
+# (1b p10-60) Main identification strategy
+tsls1_si1 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
+                  I(traite_cible*traite_cible_conjoint) + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single, data=s, 
+                subset = percentile_revenu <= 60 & percentile_revenu >= 10, weights = s$weight)
+summary(tsls1_si1)
+s$non_perdant[s$percentile_revenu <= 60 & s$percentile_revenu >= 10] <- tsls1_si1$fitted.values
+# 68 p.p.***
+tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + Revenu + Revenu2 + Revenu_conjoint + Revenu_conjoint2 + single, data=s, 
+                subset = percentile_revenu <= 60 & percentile_revenu >= 10, weights = s$weight)
+summary(tsls2_si1)
+
+# (1c revenu percentiles & revenu in 10-60) Main identification strategy
+tsls1_si1 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
+                  I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, data=s, 
+                subset = percentile_revenu <= 60 & percentile_revenu >= 10, weights = s$weight)
+summary(tsls1_si1)
+s$non_perdant[s$percentile_revenu <= 60 & s$percentile_revenu >= 10] <- tsls1_si1$fitted.values
+# 69 p.p.***
+tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, data=s, 
+                subset = percentile_revenu <= 60 & percentile_revenu >= 10, weights = s$weight)
+summary(tsls2_si1)
+
+iv_si1 <- ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single | 
+    traite_cible + traite_cible_conjoint + I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, 
+    data = s, subset = percentile_revenu <= 60 & percentile_revenu >= 10, weights = s$weight)
+summary(iv_si1, diagnostics = TRUE)
+# Effective F-stat from Stata weakivtest: 18
+
+# (1d revenu percentiles and revenu ou revenu conjoint in 10-60) Main identification strategy
+tsls1_si1 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
+                  I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, data=s, 
+                subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls1_si1)
+s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1_si1$fitted.values
+# 64 p.p.*** (10-70: 60 p.p. / 0-60: 56 p.p. / 0-70: 55 p.p. comme avant): higher acceptance rate in 0-10 (and 60-70)?
+tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, data=s, 
+                subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls2_si1)
+
+iv_si1 <- ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single | 
+    traite_cible + traite_cible_conjoint + I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single, 
+    data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(iv_si1, diagnostics = TRUE)
+# Effective F-stat from Stata weakivtest: 28
+
+# explication de l'effet en hausse: par rapport au chiffre attendu, les p0-10 acceptent moins et les p60-10 acceptent plus la réforme, 
+#    même quand ils se disent resp. gagnant / perdant, atténuant ainsi l'effet quand on les inlcut
+summary(lm(taxe_cible_approbation!='Non' ~ percentile_revenu + percentile_revenu_conjoint + Revenu2 + Revenu_conjoint2 + single + 
+             I(percentile_revenu < 10) + I(percentile_revenu_conjoint < 10) + I(percentile_revenu > 60) + I(percentile_revenu_conjoint > 60), data=s))
+
+s$percentile_revenu__20 <- s$percentile_revenu*(s$percentile_revenu < 20)
+s$percentile_revenu_70_ <- s$percentile_revenu*(s$percentile_revenu > 70)
+s$percentile_revenu_conjoint__20 <- s$percentile_revenu_conjoint*(s$percentile_revenu_conjoint < 20)
+s$percentile_revenu_conjoint_70_ <- s$percentile_revenu_conjoint*(s$percentile_revenu_conjoint > 70)
+
+# (1e revenu percentiles and revenu non linéaire) Main identification strategy (ma préférée parce que dans les précédentes on regarde l'effet sous un sous-échantillon)
+tsls1_si1 <- lm(gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint_70_ + single +
+    percentile_revenu_conjoint__20 + I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2, data=s, weights = s$weight)
+summary(tsls1_si1)
+s$non_perdant <- tsls1_si1$fitted.values
+# 54 p.p.***
+tsls2_si1 <- lm(taxe_cible_approbation!='Non' ~ non_perdant + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 +
+                percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ + single, data=s, weights = s$weight)
+summary(tsls2_si1)
+
+iv_si1 <- ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+  + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ | traite_cible + traite_cible_conjoint + 
+    I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ , data = s, weights = s$weight)
+summary(iv_si1, diagnostics = TRUE)
+# Effective F-stat from Stata weakivtest: 28
+
+# Alternative specifications for robustness checks
+# (2e) With many controls 
+variables_reg_self_interest <- c("percentile_revenu", "Revenu2", "percentile_revenu_conjoint", "Revenu_conjoint2", "prog_na", "Simule_gain", "Simule_gain2", "percentile_revenu__20", 
+                "percentile_revenu_70_", "taxe_efficace", "single",  "hausse_depenses_par_uc", "percentile_revenu_conjoint__20", "percentile_revenu_conjoint_70_", variables_demo) 
+variables_reg_self_interest <- variables_reg_self_interest[!(variables_reg_self_interest %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
+formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible + traite_cible_conjoint + 
+    I(traite_cible*traite_cible_conjoint) + cible + ", paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1_si2 <- lm(formula_tsls1_si2, data=s, weights = s$weight)
+summary(tsls1_si2)
+s$non_perdant <- tsls1_si2$fitted.values
+# 56 p.p.***
+formula_tsls2_si2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + ", 
+                                      paste(variables_reg_self_interest, collapse = ' + '))) # 
+tsls2_si2 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
+summary(tsls2_si2) # Effective F-stat from Stata weakivtest: 
+
+# (3e) Simple OLS: 44 p.p. ***
+formula_ols_si3  <- as.formula(paste("taxe_cible_approbation!='Non' ~ non_perdant + cible + tax_acceptance + I(taxe_approbation=='NSP') + prog_na + taxe_efficace +", 
+                                      paste(variables_reg_self_interest, collapse = ' + '))) # 
+s$non_perdant <- as.numeric(s$gagnant_cible_categorie!='Perdant')
+ols_si3 <- lm(formula_ols_si3, data=s, weights = s$weight)
+summary(ols_si3)
+
+# (4e) Simple Logit: 43 p.p.***
+s$non_perdant <- as.numeric(s$gagnant_cible_categorie!='Perdant')
+# Warning when weighting: it relates to number of trials and not to survey weights. Option weights = s$weight can be added in logistf, doesn't really change results
+logit_si4 <- glm(formula_ols_si3, family = binomial(link='logit'), data=s)
+summary(logit_si4) # Warning: Hauck-Donner effect, run logitsf, cf. https://prezi.com/di_n0_npv27n/hauck-donner-effect-and-instability-in-estimation-of-logisti/
+logit_si4_margins <- logitmfx(formula_ols_si3, s, atmean=FALSE)$mfxest
+logit_si4_margins # reason why mfx and not margins: https://stats.stackexchange.com/questions/409934/why-margins-and-mfx-yield-different-results-in-r/409937#409937
+summary(logistf(formula_ols_si3, data=s, firth = T)) # Firth (93) regression to resolve separation => effect of 2.77*** instead of 2.85***, cf. Heinze & Ploner (03)
+# other way to check significance is to run a Likelihood Ratio test instead of the Wald/Chi-squared test reported in z value/Pr(>|z|) in glm, by running anova:
+# https://stat.ethz.ch/pipermail/r-help/2001-October/015779.html http://nross626.math.yorku.ca/math4330/R/Regression/Hauck_Donner_effect.pdf
+anova(logit_si4, test='LR') # <2e-16 ***
+
+# (5) IV Feedback
+tsls1_si5 <- lm(gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight)
+summary(tsls1_si5)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si5$fitted.values
+# 52 p.p.***
+tsls2_si5 <- lm(taxe_feedback_approbation!='Non' ~ non_perdant + Simule_gain + Simule_gain2, data=s, subset=variante_taxe_info=='f', weights = s$weight)
+summary(tsls2_si5)
+# Effective F-stat from Stata weakivtest: 37.966
+
+# (6) IV Feedback with controls
+formula_tsls1_si6 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + 
+      Simule_gain + Simule_gain2 + single + prog_na + taxe_efficace +", paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1_si6 <- lm(formula_tsls1_si6, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_si6)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_si6$fitted.values
+# 43 p.p. ***
+formula_tsls2_si6 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ non_perdant + tax_acceptance + (taxe_approbation=='NSP') + 
+Simule_gain + Simule_gain2 + single + prog_na + taxe_efficace +", paste(variables_reg_self_interest, collapse = ' + ')))
+tsls2_si6 <- lm(formula_tsls2_si6, data=s[s$variante_taxe_info=='f',], weights = s$weight[s$variante_taxe_info=='f'])
+summary(tsls2_si6)
+# Effective F-stat from Stata weakivtest: 57.866
+
+# Results
+Table_si2 <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_si6, # tsls2_si4: Unrecognized object type
+                    title="Effect of self-interest on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                    covariate.labels = c("Believes does not lose", "Initial tax Acceptance ($A^I$)", "",  "Environmentally effective: ``Yes''"),
+                    dep.var.labels = c("Targeted Acceptance ($A^T$)", "Feedback Acceptance ($A^F$)"), dep.var.caption = "", header = FALSE,
+                    keep = c("non_perdant", "tax_acceptance"),
+                    coef = list(NULL, NULL, NULL, logit_si4_margins[,1], NULL, NULL), 
+                    se = list(NULL, NULL, NULL, logit_si4_margins[,2], NULL, NULL),
+                    add.lines = list(
+                      # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
+                      c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", " ", "\\checkmark"),
+                      c("Controls: Estimated gain ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark", "\\checkmark"),
+                      c("Controls: Target of the tax", "\\checkmark ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", ""),
+                      c("Controls: Socio-demo, other motives ", "", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", "\\checkmark  ")),
+                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
+write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\multicolumn{2}{c}{\\textit{OLS}}", 
+               "\\multicolumn{2}{c}{\\textit{IV}} & \\textit{OLS} & \\textit{logit} & \\multicolumn{2}{c}{\\textit{IV}}", 
+  gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
+     For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. }\\end{table}', 
+                    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_si2, fixed=TRUE), fixed=TRUE), fixed=T), collapse=' ')
+
+Table_si1 <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
+                    title="First stage regressions results for self-interest", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                    covariate.labels = c("Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
+                                         "$T_1 \\times T_2$", "Initial tax Acceptance ($A^I$)", "Simulated winner ($\\widehat{\\Gamma}$)"),
+                    dep.var.labels = c("Targeted tax ($G^T$)", "After feedback ($G^F$)"), dep.var.caption = "Believes does not lose", header = FALSE,
+                    column.labels = c("(1)", "(2)", "(5)", "(6)"), model.numbers = FALSE,
+                    keep = c("traite", "acceptance", "simule_gagnant"),
+                    add.lines = list(c("Controls: Incomes", " \\checkmark", " \\checkmark", "", " \\checkmark"),
+                                  c("Controls: Estimated gain", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
+                                  c("Controls: Target of the tax", " \\checkmark", " \\checkmark", " ", " "),
+                                  c("Controls: Socio-demo, other motives", "", " \\checkmark", " ", " \\checkmark"),
+                                  c("Effective F-Statistic", "44.093", "40.834", "37.966", "57.866")),
+                    no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
+write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+                                                       Table_si1, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+##### Heterogeneity in LATE ####
+## By subsetting: same effect for income, but higher effect when simule_gain < 0
+summary(ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+  + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ | traite_cible + traite_cible_conjoint + 
+    I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ , data = s, weights = s$weight, subset = s$percentile_revenu > 50))
+
+summary(ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+  + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ | traite_cible + traite_cible_conjoint + 
+    I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ , data = s, weights = s$weight, subset = s$percentile_revenu < 50))
+
+summary(ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+  + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ | traite_cible + traite_cible_conjoint + 
+    I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ , data = s, weights = s$weight, subset = s$Simule_gain > 0))
+
+summary(ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+  + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ | traite_cible + traite_cible_conjoint + 
+    I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ , data = s, weights = s$weight, subset = s$Simule_gain < 0))
+
+# no effect for simule_gain > 0 ! meaning the effect is driven by those who discover they lose (in bottom half of incomes)
+#   (for the feedback: the fact that some who wrongly believed they lost turn to accept when they are targeted shows there is an effect also for incredulous winners)
+summary(ivreg(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie!='Perdant') + Simule_gain + Simule_gain2 | 
+                simule_gagnant + Simule_gain + Simule_gain2, data = s, weights = s$weight, subset = s$Simule_gain > 0))
+
+summary(ivreg(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie!='Perdant') + Simule_gain + Simule_gain2 | 
+                simule_gagnant + Simule_gain + Simule_gain2, data = s, weights = s$weight, subset = s$Simule_gain < 0))
+
+length(which(s$gagnant_categorie=='Perdant' & s$gagnant_cible_categorie=='Gagnant' & s$taxe_approbation=='Non' & s$taxe_cible_approbation=='Oui' & s$simule_gain > 0)) # 62
+length(which(s$gagnant_categorie=='Perdant' & s$gagnant_cible_categorie!='Perdant' & s$taxe_approbation=='Non' & s$taxe_cible_approbation!='Non' & s$simule_gain > 0)) # 140
+length(which(s$gagnant_categorie=='Perdant' & (s$traite_cible + s$traite_cible_conjoint > 0) & s$taxe_approbation=='Non' & s$simule_gain > 0)) # 772
+
+summary(ivreg(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie!='Perdant') + Simule_gain + Simule_gain2 | 
+                simule_gagnant + Simule_gain + Simule_gain2, data = s, weights = s$weight, subset = s$percentile_revenu < 50)) # higher effect here
+
+summary(ivreg(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie!='Perdant') + Simule_gain + Simule_gain2 | 
+                simule_gagnant + Simule_gain + Simule_gain2, data = s, weights = s$weight, subset = s$percentile_revenu > 50)) # than here
+
+# no effect for simule_gain < 0 ! Here the mechanism is different: it's motivated reasoning
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') | apres_modifs * info_CC")), data = s, subset = s$Simule_gain < 0))
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') | apres_modifs * info_CC")), data = s, subset = s$Simule_gain > 0))
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') | apres_modifs * info_CC")), data = s, subset = s$percentile_revenu < 50)) # higher effect here
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') | apres_modifs * info_CC")), data = s, subset = s$percentile_revenu > 50)) # than here
+
+## By interacting
+summary(ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') * percentile_revenu + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+  + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ | traite_cible + traite_cible_conjoint + 
+    I(traite_cible*traite_cible_conjoint) + cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ , data = s, weights = s$weight))
+
+# Here we find heterogenous effect:
+summary(ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') * Simule_gain + percentile_revenu + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+  + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ | traite_cible * traite_cible_conjoint * Simule_gain + 
+    cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ , data = s, weights = s$weight))
+
+# And here we are close:
+summary(ivreg(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie!='Perdant') * Simule_gain + Simule_gain2 | 
+                simule_gagnant * Simule_gain + Simule_gain2, data = s, weights = s$weight))
+
+summary(ivreg(taxe_feedback_approbation!='Non' ~ (gagnant_feedback_categorie!='Perdant') * percentile_revenu + Simule_gain + Simule_gain2 | 
+                simule_gagnant * percentile_revenu + Simule_gain + Simule_gain2, data = s, weights = s$weight))
+
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') * Simule_gain | apres_modifs * info_CC * Simule_gain")), data = s), diagnostics = TRUE)
+
+
+##### LIML #####
+# Stata's ivreg2 needed for LIML: ivmodelFormula doesn't work with controls
+# ivreg2's result: 2.5 without control / 1.1 with control; none is significant
+ivmodel(Y=as.numeric(s$tax_acceptance), D=1*(s$taxe_efficace!='Non'), Z=s$info_CC)
+LIML(ivmodel(Y=as.numeric(s$tax_acceptance), D=1*(s$taxe_efficace!='Non'), Z=s[,c('apres_modifs', 'info_CC')], X=s[,variables_reg_ee]))
+ivmodelFormula(as.formula(paste("tax_acceptance ~ (taxe_efficace!='Non') |  apres_modifs + info_CC")), data = s)
+ivmodelFormula(as.formula(paste("tax_acceptance ~ (taxe_efficace!='Non') |  apres_modifs + info_CC")), data = s, subset = s$Simule_gain > 0)
+ivmodelFormula(as.formula(paste("taxe_approbation=='Oui' ~ (taxe_efficace=='Oui') |  apres_modifs + info_CC")), data = s)
+ivmodelFormula(as.formula(paste("taxe_approbation=='Oui' ~ (taxe_efficace!='Non') |  apres_modifs + info_CC")), data = s)
+ivmodelFormula(as.formula(paste("tax_acceptance ~ ", paste(variables_reg_ee, collapse = ' + '), 
+       "+ (taxe_efficace!='Non') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s)
+
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_reg_ee, collapse = ' + '), 
+       "+ (taxe_efficace!='Non') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics = TRUE)
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') | apres_modifs + info_CC")), data = s, weights = s$weight), diagnostics = TRUE)
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') | apres_modifs + info_CC")), data = s), diagnostics = TRUE)
+
+summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), 
+       "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics = TRUE)
+summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ (taxe_efficace=='Oui') | apres_modifs + info_CC")), data = s, weights = s$weight), diagnostics = TRUE)
+# use only the best instrument so the coef is unbiased (Pishke p. 19: http://econ.lse.ac.uk/staff/spischke/ec533/Weak%20IV.pdf)
+# counter-argument p. 21: LIML or other alternative estimators arenít necessarily better than 2SLS (they work only in homoskedastic case, cf. Andrews et al. 2019, Kolesar 2013)
+# counter-counter-argument: then one should use CLR (or AR) confidence sets, and in our case they are infinite, evidence that instruments are two weak and model not identified
+# => tout refaire en mode Oui ~ not No / juste EE en mode Oui ~ Oui / maintenir le 2SLS en disant que c'est pas bien identifié et donner IC à 85% et 40% / introduire hétérogénéité dans effets
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') | info_CC")), data = s, weights = s$weight), diagnostics = TRUE) 
+summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') | apres_modifs")), data = s, weights = s$weight), diagnostics = TRUE) 
+
+summary(lm(taxe_efficace!='Non' ~ apres_modifs + info_CC, data=s, weights = s$weight, na.action='na.exclude'))
+summary(lm(as.formula(paste("taxe_approbation!='Non' ~ apres_modifs")), data = s, weights = s$weight)) 
+summary(lm(as.formula(paste("taxe_approbation!='Non' ~ info_CC")), data = s, weights = s$weight)) 
+summary(lm(as.formula(paste("taxe_approbation!='Non' ~ apres_modifs + info_CC")), data = s, weights = s$weight)) 
+
+
+##### Causal complementary  effects #####
+# The specifications of this section are mis-specified. Or rather, they provide unbiased estimates only if there is not omitted variable.
+# variables_all_controls <- variables_reg_all #
+variables_all_controls <- c(variables_reg_all, "taxe_approbation") # variables_reg_all #
+
+# I don't include taxe_approbation as control here because this would capture the (non-interacted) effect of infos_EE, I include it in the others to avoid effects from beginning of questionnaire.
+formula_all1_ee <- as.formula(paste("taxe_efficace!='Non' ~ apres_modifs + info_CC + ",  paste(variables_reg_all, collapse = ' + ')))
+tsls1_all1_ee <- lm(formula_all1_ee, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_all1_ee)
+s$taxe_efficace.hat <- fitted.values(tsls1_all1_ee)
+
+# (1) A^T = ^SI * ^EE + X = 0.66*** ^SI + 0.61* ^EE - 0.47 ^SI*^EE + X (all controls for SI et s2 but no approbation for EE) (all controls everywhere: 0.61*** ^SI + 0.57. ^EE - 0.32* ^SI*^EE + X)
+formula_all1_si <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~", paste(variables_all_controls, collapse = ' + '), "+ traite_cible * traite_cible_conjoint + cible"))
+tsls1_all1_si <- lm(formula_all1_si, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_all1_si)
+s$non_perdant <- fitted.values(tsls1_all1_si)
+
+formula2_all1 <- as.formula(paste("taxe_cible_approbation!='Non' ~", paste(variables_all_controls, collapse = ' + '), " + cible + non_perdant * taxe_efficace.hat"))
+tsls2_all1 <- lm(formula2_all1, data=s, weights=s$weight)
+summary(tsls2_all1)
+
+# (2) A^F = ^SI * ^EE + X = 0.55*** ^SI + 0.52* ^EE - 0.26 ^SI*^EE + X (all controls for SI et s2 but no approbation for EE)
+formula_tsls1_all2_si <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant +", paste(variables_all_controls, collapse = ' + ')))
+tsls1_all2_si <- lm(formula_tsls1_all2_si, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(tsls1_all2_si)
+s$non_perdant[s$variante_taxe_info=='f'] <- tsls1_all2_si$fitted.values
+
+formula2_all2 <- as.formula(paste("taxe_feedback_approbation!='Non' ~", paste(variables_all_controls, collapse = ' + '), " + non_perdant * taxe_efficace.hat"))
+tsls2_all2 <- lm(formula2_all2, data=s, weights=s$weight, subset= variante_taxe_info=='f')
+summary(tsls2_all2)
+
+
+##### All causal effects ####
+# # (3) A^T = ^SI * ^EE = 0.14 ^SI + 0.30 ^EE + 1.12 ^(SI*EE) (almost no control), similar results with controls
+# formula_all1_ee <- as.formula(paste("taxe_efficace!='Non' ~ cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+#     apres_modifs * info_CC * traite_cible * traite_cible_conjoint"))
+# tsls1_all1_ee <- lm(formula_all1_ee, data=s, weights = s$weight, na.action='na.exclude')
+# summary(tsls1_all1_ee)
+# s$taxe_efficace.hat <- fitted.values(tsls1_all1_ee)
+# 
+# formula_all1_siee <- as.formula(paste("(gagnant_cible_categorie!='Perdant')*(taxe_efficace!='Non') ~ cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+#     apres_modifs * info_CC * traite_cible * traite_cible_conjoint"))
+# tsls1_all1_siee <- lm(formula_all1_siee, data=s, weights = s$weight, na.action='na.exclude')
+# summary(tsls1_all1_siee)
+# s$siee <- fitted.values(tsls1_all1_siee)
+# 
+# formula_all1_si <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+#     apres_modifs * info_CC * traite_cible * traite_cible_conjoint"))
+# tsls1_all1_si <- lm(formula_all1_si, data=s, weights = s$weight, na.action='na.exclude')
+# summary(tsls1_all1_si)
+# s$non_perdant <- fitted.values(tsls1_all1_si)
+# 
+# formula2_all3 <- as.formula(paste("taxe_cible_approbation!='Non' ~ cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+#      + non_perdant + taxe_efficace.hat + siee"))
+# tsls2_all3 <- lm(formula2_all3, data=s, weights=s$weight)
+# summary(tsls2_all3) 
+# 
+# # (4) A^F = ^SI * ^EE = 0.14 ^SI + 0.30 ^EE + 1.12 ^(SI*EE) (almost no control), similar results with controls
+# formula_all1_ee <- as.formula(paste("taxe_efficace!='Non' ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
+# tsls1_all1_ee <- lm(formula_all1_ee, data=s, weights = s$weight, subset = !is.na(s$gagnant_feedback_categorie), na.action='na.exclude') # this instruments are weak
+# summary(tsls1_all1_ee)
+# s$taxe_efficace.hat[!is.na(s$gagnant_feedback_categorie)] <- fitted.values(tsls1_all1_ee)
+# 
+# formula_all1_siee <- as.formula(paste("(gagnant_feedback_categorie!='Perdant')*(taxe_efficace!='Non') ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
+# tsls1_all1_siee <- lm(formula_all1_siee, data=s, weights = s$weight, na.action='na.exclude')
+# summary(tsls1_all1_siee)
+# s$siee <- fitted.values(tsls1_all1_siee)
+# 
+# formula_all1_si <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
+# tsls1_all1_si <- lm(formula_all1_si, data=s, weights = s$weight, na.action='na.exclude')
+# summary(tsls1_all1_si)
+# s$non_perdant <- fitted.values(tsls1_all1_si)
+# 
+# formula2_all3 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ Simule_gain + Simule_gain2 + non_perdant + taxe_efficace.hat + siee"))
+# tsls2_all3 <- lm(formula2_all3, data=s, weights=s$weight)
+# summary(tsls2_all3) 
+
+# The appropriate specifications are below. No significant results because EE doesn't have strong instrument.
+# A^T ~ ...
+iv_siee <- ivreg(taxe_cible_approbation!='Non' ~ cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+                 + (gagnant_cible_categorie!='Perdant') * (taxe_efficace!='Non') | cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    apres_modifs * info_CC * traite_cible * traite_cible_conjoint, data = s, weights = s$weight)
+summary(iv_siee, diagnostics = TRUE)
+
+# A^F ~ ...
+iv_siee <- ivreg(taxe_feedback_approbation!='Non' ~ simule_gain + Simule_gain2 + (gagnant_feedback_categorie!='Perdant') * (taxe_efficace!='Non') | 
+                   simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant, data = s, weights = s$weight)
+summary(iv_siee, diagnostics = TRUE)
+
+iv_siee <- ivreg(taxe_feedback_approbation!='Non' ~ simule_gain + (gagnant_feedback_categorie!='Perdant') * (taxe_efficace!='Non') | 
+                   simule_gain + apres_modifs * info_CC * simule_gagnant, data = s, weights = s$weight)
+summary(iv_siee, diagnostics = TRUE)
+
+# A^T ~ ... +  P
+iv_siee <- ivreg(taxe_cible_approbation!='Non' ~ cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
+  + (gagnant_cible_categorie!='Perdant') * (taxe_efficace!='Non') * (progressivite!='Non') | cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
+    info_CC * traite_cible * traite_cible_conjoint * info_progressivite, data = s, weights = s$weight)
+summary(iv_siee, diagnostics = TRUE)
+
+# A^F ~ ... + P
+iv_siee <- ivreg(taxe_feedback_approbation!='Non' ~ simule_gain + (gagnant_feedback_categorie!='Perdant') * (taxe_efficace!='Non') * (progressivite!='Non') | 
+                   simule_gain + info_CC * simule_gagnant * info_progressivite, data = s, weights = s$weight)
+summary(iv_siee, diagnostics = TRUE)
+
+# With controls
+# A^T ~ ... + X
+summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_all_controls, collapse = ' + '), 
+                 "+ cible + (gagnant_cible_categorie!='Perdant') * (taxe_efficace!='Non') | ", paste(variables_all_controls, collapse = ' + '), 
+                 "+ cible + apres_modifs + info_CC * traite_cible * traite_cible_conjoint")), data = s, weights = s$weight), diagnostics = TRUE)
+
+# A^F ~ ... + X
+summary(ivreg(as.formula(paste("taxe_feedback_approbation!='Non' ~ ", paste(variables_all_controls, collapse = ' + '), 
+                 "+ cible + (gagnant_feedback_categorie!='Perdant') * (taxe_efficace!='Non') | ", paste(variables_all_controls, collapse = ' + '), 
+                 "+ cible + apres_modifs * info_CC * simule_gagnant")), data = s, weights = s$weight), diagnostics = TRUE)
+
+# A^T ~ ... + P + X
+summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_all_controls, collapse = ' + '), 
+                 "+ cible + (gagnant_cible_categorie!='Perdant') * (taxe_efficace!='Non') * (progressivite!='Non') | ", paste(variables_all_controls, collapse = ' + '), 
+                 "+ cible + info_CC * traite_cible * traite_cible_conjoint * info_progressivite")), data = s, weights = s$weight), diagnostics = TRUE)
+
+# A^F ~ ... + P + X
+summary(ivreg(as.formula(paste("taxe_feedback_approbation!='Non' ~ ", paste(variables_all_controls, collapse = ' + '), 
+                 "+ cible + (gagnant_feedback_categorie!='Perdant') * (taxe_efficace!='Non') * (progressivite!='Non') | ", paste(variables_all_controls, collapse = ' + '), 
+                 "+ cible + info_CC * simule_gagnant * info_progressivite")), data = s, weights = s$weight), diagnostics = TRUE)

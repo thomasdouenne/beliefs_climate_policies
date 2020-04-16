@@ -1,9 +1,16 @@
+set more off
 clear
 *#delimit ;
 
-*ssc install weakivtest
-*ssc install avar
-insheet using "C:\Users\thoma\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv", delimiter(";")
+ssc install ivreg2
+ssc install weakivtest
+ssc install avar
+ssc install ranktest
+net from http://www.stata.com/users/bpoi/ 
+net install condivreg
+
+*insheet using "C:\Users\thoma\Documents\Github\beliefs_climate_policies\code\survey_prepared.csv", delimiter(";")
+insheet using "/var/www/beliefs_climate_policies/code/survey_prepared.csv", delimiter(";")
 
 *** Environmental effectiveness
 encode csp, gen(ecsp)
@@ -41,6 +48,24 @@ weakivtest, level(0.05)
 * Yes with controls
 ivreg2 y_var2 revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie masculin i.estatut_emploi i.ecsp i.eregion ediplome4 taille_menage nb_14_et_plus nb_adultes fumeur i.eactualite etaille_agglo uc niveau_vie age_18_24 age_25_34 age_35_49 age_50_64 (x_var2 = z_var1 info_cc)  [pweights=weight]
 weakivtest, level(0.05)
+
+** LIML
+* Not no without controls
+ivreg2 y_var1 (x_var1 = z_var1 info_cc), robust liml
+
+* Not no with controls
+ivreg2 y_var1 revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie masculin i.estatut_emploi i.ecsp i.eregion ediplome4 taille_menage nb_14_et_plus nb_adultes fumeur i.eactualite etaille_agglo uc niveau_vie age_18_24 age_25_34 age_35_49 age_50_64 (x_var1 = z_var1 info_cc), robust liml
+
+** Conditional Likelihood Ratio (CLR) confidence sets (Moreira, 2003)
+* Not no without controls: infinite confidence sets => cannot conclude that beta is identified (pi = 0 possible)
+condivreg y_var1 (x_var1 = z_var1 info_cc)
+condivreg y_var1 (x_var1 = z_var1 info_cc), level(85)
+condivreg y_var1 (x_var1 = z_var1 info_cc), level(42)
+condivreg y_var1 (x_var1 = info_cc) 
+condivreg y_var1 (x_var1 = z_var1)
+
+** Not no with controls
+*condivreg y_var1 revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie masculin i.estatut_emploi i.ecsp i.eregion ediplome4 taille_menage nb_14_et_plus nb_adultes fumeur i.eactualite etaille_agglo uc niveau_vie age_18_24 age_25_34 age_35_49 age_50_64 (x_var1 = z_var1 info_cc)
 
 
 *** Self-interest
