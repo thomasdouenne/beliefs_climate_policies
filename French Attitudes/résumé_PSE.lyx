@@ -1,0 +1,216 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+%\usepackage[super,sort&compress]{natbib}
+\usepackage{dsfont}
+\hypersetup{
+   colorlinks=true, % breaklinks=true,
+   urlcolor=purple,    % color of external links
+   linkcolor=blue,  % color of toc, list of figs etc.
+   citecolor=violet,   % color of links to bibliography
+}
+\usepackage[hyperpageref]{backref} % back references biblio
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language french
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style plainnat
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3.5cm
+\topmargin 3cm
+\rightmargin 3.5cm
+\bottommargin 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style french
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Suite au mouvement des Gilets jaunes et à son large soutien dans la population,
+ le gouvernement annula fin 2018 la hausse prévue de la taxe sur les combustible
+s.
+ Doit-on s'attendre au même sort pour toute tentative de mesure écologique
+ ?
+\end_layout
+
+\begin_layout Standard
+Dans un travail commun avec Thomas Douenne, nous avons analysé les politiques
+ climatiques soutenues par les Français en plein mouvement des Gilets jaunes,
+ en réalisant une enquête sur un échantillon représentatif de trois mille
+ personnes en février et mars 2019.
+ Nous analysons les connaissances, les perceptions et les valeurs liées
+ au changement climatique, examinons les opinions relatives à la taxation
+ des émissions et évaluons le soutien à d'autres politiques climatiques.
+\end_layout
+
+\begin_layout Standard
+Les Français partagent largement la connaissance du caractère anthropique
+ du changement climatique (72%), et la part qui ne croit pas à son existence
+ est marginale (4%).
+ En même temps, leurs connaissances sont limitées, notamment concernant
+ les activités responsables du changement climatiques et les réductions
+ d'émissions nécessaires pour le contenir.
+ Même sans bien connaître le fonctionnement du changement climatique, 80%
+ Français sont inquiets ou très inquiets quant à ses conséquences.
+ Ainsi, il apparaît que 82% des Français sont prêts à adopter un mode de
+ vie écologique si certaines conditions sont remplies : des moyens financiers
+ suffisants, des politiques allant dans ce sens, ou une participation de
+ tout le monde.
+\end_layout
+
+\begin_layout Standard
+Concernant les mesures soutenues, les Français préfèrent des normes et des
+ régulations plutôt que des taxes (à l’exception d’une taxe sur le kérosène).
+ Ainsi, plus de 70% des Français sont favorables à des normes plus strictes
+ sur les nouveaux véhicules, ou à une politique ambitieuse de rénovation
+ thermique des bâtiments.
+ En revanche, les Français sont largement opposés à une taxe sur les combustible
+s, même lorsque les recettes de cette taxe sont redistribuées uniformément
+ à chaque adulte, de sorte que la mesure bénéficie (en moyenne) aux plus
+ modestes.
+ 70% rejettent ainsi une augmentation de la Contribution Climat-Énergie
+ (CCE) de 50€ par tonne de CO2 (impliquant par exemple une hausse de 0,11€/L
+ sur l’essence), malgré le transfert annuel de 110€ par adulte qui l'accompagner
+ait.
+ Cela s'explique notamment par le manque d'alternative aux énergies fossiles,
+ notamment en milieux ruraux, qui fait passer pour beaucoup les mesures
+ incitatives comme 
+\begin_inset Quotes fld
+\end_inset
+
+punitives
+\begin_inset Quotes frd
+\end_inset
+
+.
+ Cela est aussi dû à des perceptions erronées concernant les propriétés
+ d'une telle taxe (analysées dans un papier compagnon*), associées à une
+ méfiance vis-à-vis du gouvernement.
+ Cette méfiance se reflète notamment dans la position d'une personne par
+ rapport aux Gilets jaunes, qui apparaît comme le meilleur prédicteur des
+ préférences environnementales, rendant moins pertinent le spectre traditionnel
+ gauche–droite.
+\end_layout
+
+\begin_layout Standard
+Finalement, notre enquête nous permet d’esquisser une voie pour des mesures
+ populaires qui remettraient la France sur les rails de la transition écologique
+ après le revers de la taxe carbone.
+ D’abord et avant tout, une campagne d’information massive et durable pourrait
+ être lancée pour améliorer les connaissances sur le changement climatique
+ et les politiques climatiques.
+ En effet, ces connaissances sont associées à une plus grande préoccupation
+ à l’égard du changement climatique et à un soutien accru aux politiques
+ climatiques.
+ Deuxièmement, profitant du fait que les alternatives aux énergies fossiles
+ sont plébiscitées, le gouvernement pourrait s’engager résolument dans cette
+ voie à travers un éventail de mesures : investissements, subventions, et
+ lois en faveur des transports publics, de véhicules plus propres et de
+ l’isolation thermique, etc.
+ Troisièmement, pour permettre un déploiement ultérieur de la fiscalité
+ carbone, une taxe limitée au kérosène dont les recettes seraient reversées
+ à chaque Français pourrait servir d’exemple convaincant en faveur des mesures
+ incitatives, car la taxation du kérosène est largement approuvée.
+\end_layout
+
+\begin_layout Standard
+Pour en savoir plus:
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Opinions des Français sur les politiques climatiques
+\emph default
+, note Cepremap (7 pages)
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+French Attitudes on Climate Change, Carbon Taxation and other Climate Policies
+\emph default
+, Ecological Economics, 2020.
+\end_layout
+
+\begin_layout Standard
+* Thomas Douenne & Adrien Fabre, 
+\emph on
+Yellow Vests, Carbon Tax Aversion, and Biased Beliefs
+\emph default
+, PSE Working Paper n° 2020 - 05.
+\end_layout
+
+\end_body
+\end_document
