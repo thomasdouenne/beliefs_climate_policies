@@ -1,5 +1,5 @@
-# setwd("/var/www/beliefs_climate_policies/code")
-setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+setwd("/var/www/beliefs_climate_policies/code")
+# setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 # setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 # setwd("C:/Users/a.fabre/Documents/beliefs_climate_policies/code")
@@ -133,14 +133,18 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # deciles_erfs_inflates_weighted <- 1.06075007*seuils_all(quantiles(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17], weights = db$wprm[!is.na(db$revtot_i_par) & db$age > 17]))
 # round(deciles_erfs_inflates_weighted) # 237 789 1151 1436 1677 1927 2231 2657 3462
 # deciles_menage_erfs_inflates_weighted <- 1.06075007*seuils_all(quantiles(db$revdecm + db$presta_sociales, weights = db$wprm))
-# 
-# percentiles_revenu <- ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17])
+
+# rev_i_erfs2014.csv <- db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17]
+# write.csv(rev_i_erfs2014.csv, "rev_i_erfs2014.csv")
+# rev_i_erfs2014 <- read.csv("rev_i_erfs2014.csv")
+# percentiles_revenu <- ecdf(rev_i_erfs2014$x)
+
 # distribution_revenu_erfs <- wtd.Ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)])
 # distribution_revenu_erfs_weighted <- wtd.Ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)], weights = db$wprm[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)])
 # # plot(distribution_revenu_erfs$x, distribution_revenu_erfs$ecdf, type='l', xlim=c(0,60000), col="blue")
 # distribution_rev_tot_erfs <- wtd.Ecdf(db$revdecm + db$presta_sociales)
 # distribution_rev_tot_erfs_weighted <- wtd.Ecdf(db$revdecm + db$presta_sociales, weights = db$wprm)
-# 
+#
 # # Distribution of adults > 70th. income percentile in function of their spouse income
 # db$revenu_conjoint <- db$revdecm + db$presta_sociales - db$revtot_i_par # selon la définition du sondage où il n'y a que deux parents
 # db$revenu_conjoint[db$nb_adultes < 2] <- 9999*12
@@ -158,7 +162,7 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 # # decrit(s$categorie_cible)
 # wtd.mean(db$nb_adultes, db$wprm) # 2.033
 # # wtd.mean(s$nb_adultes, s$weight) # 1.933
-# 
+#
 # rm(db, temp, irft4, menage, indiv)
 # setwd(wd)
 
