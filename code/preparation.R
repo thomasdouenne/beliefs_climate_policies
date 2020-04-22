@@ -1706,5 +1706,15 @@ fq[['diplome4']] <- list(name=c("Aucun diplôme ou brevet", "CAP ou BEP", "Bacca
 for (v in c('sexe', 'age', 'csp', 'diplome4', 'taille_agglo', 'region')) {
   freq_sample <- c()
   for (i in fq[[v]]$name) freq_sample <- c(freq_sample, sum((s[[v]]==i))) # *s$weight
-  print(paste(v, round(chisq.test(freq_sample, p = fq[[v]]$freq)$p.value, 3)))
+  print(paste(v, round(chisq.test(freq_sample, p = fq[[v]]$freq, simulate.p.value = T)$p.value, 3)))
 } # Equality rejected at .01 except for sex and CSP
+# divide freq_sample by 2: only diploma and age not good / by 4: diploma not good / by 5: all good (at 5%)
+
+ttests <- list()
+for (v in c('sexe', 'age', 'csp', 'diplome4', 'taille_agglo', 'region')) {
+  for (i in 1:length(fq[[v]]$freq)) ttests[[v]] <- c(ttests[[v]], t.test((1*(s[[v]]==fq[[v]]$name[i])), mu=fq[[v]]$freq[i])$p.value)
+  names(ttests[[v]]) <- fq[[v]]$name
+}
+ttests
+# good = can't reject they are equal at 5%
+# sex: all good / diplome: all bad / age: 2/5 good / csp: 7/8 good / taille_agglo: 3/5 good / region: 7/10 good

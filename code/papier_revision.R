@@ -173,7 +173,7 @@ summary(tsls2_si6)
 # Results TODO
 Table_si2 <- stargazer(tsls2_si1, tsls2_si2, ols_si3, logit_si4, tsls2_si5, tsls2_si6, # tsls2_si4: Unrecognized object type
                     title="Effect of self-interest on acceptance", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-                    covariate.labels = c("Believes does not lose", "Initial tax Acceptance ($A^I$)", "",  "Environmentally effective: ``Yes''"),
+                    covariate.labels = c("Believes does not lose", "Initial tax Acceptance ($A^0$)", "",  "Environmentally effective: ``Yes''"),
                     dep.var.labels = c("Targeted Acceptance ($A^T$)", "Feedback Acceptance ($A^F$)"), dep.var.caption = "", header = FALSE,
                     keep = c("non_perdant", "tax_acceptance"),
                     coef = list(NULL, NULL, NULL, logit_si4_margins[,1], NULL, NULL), 
@@ -194,7 +194,7 @@ write_clip(sub("\\multicolumn{3}{c}{\\textit{OLS}} & \\textit{logistic} & \\mult
 Table_si1 <- stargazer(tsls1_si1, tsls1_si2, tsls1_si5, tsls1_si6,
                     title="First stage regressions results for self-interest", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                     covariate.labels = c("Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
-                                         "$T_1 \\times T_2$", "Initial tax Acceptance ($A^I$)", "Simulated winner ($\\widehat{\\Gamma}$)"),
+                                         "$T_1 \\times T_2$", "Initial tax Acceptance ($A^0$)", "Simulated winner ($\\widehat{\\Gamma}$)"),
                     dep.var.labels = c("Targeted tax ($G^T$)", "After feedback ($G^F$)"), dep.var.caption = "Believes does not lose", header = FALSE,
                     column.labels = c("(1)", "(2)", "(5)", "(6)"), model.numbers = FALSE,
                     keep = c("traite", "acceptance", "simule_gagnant"),
@@ -451,3 +451,6 @@ summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variabl
 summary(ivreg(as.formula(paste("taxe_feedback_approbation!='Non' ~ ", paste(variables_all_controls, collapse = ' + '), 
                  "+ cible + (gagnant_feedback_categorie!='Perdant') * (taxe_efficace!='Non') * (progressivite!='Non') | ", paste(variables_all_controls, collapse = ' + '), 
                  "+ cible + info_CC * simule_gagnant * info_progressivite")), data = s, weights = s$weight), diagnostics = TRUE)
+
+summary(lm(benefices_pauvres==T ~ info_progressivite, data = s, weights = s$weight))
+summary(ivreg(taxe_info_approbation!='Non' ~ benefices_pauvres==T | info_progressivite, data = s, weights = s$weight))
