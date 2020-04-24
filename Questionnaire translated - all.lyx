@@ -772,6 +772,30 @@ From 0% to 3%; From 3% to 10%; From 3% to 10%; From 10% to 20%; From 20%
  
 \end_layout
 
+\begin_layout Enumerate
+Do you think that an increase in taxes on gas and heating oil would cause
+ your household to lose more purchasing power than the average French household?
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+Yes, a lot more; Yes, a little more; As much as average; No, a little less;
+ No, a lot less; PNR (Don't know, don't say)
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\emph on
+TODO missing
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Paragraph
 Tax & dividend: initial
 \end_layout
