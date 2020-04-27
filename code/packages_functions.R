@@ -6,6 +6,7 @@ package <- function(p) {
   library(p, character.only = TRUE)
 } # loads packages with automatical install if needed
 
+library(utils)
 package("xtable")
 package('tidyverse')
 package("rms")
@@ -62,6 +63,9 @@ package("rdd")
 package("corrplot")
 package("psy")
 package("devtools")
+install_github("jdstorey/qvalue")
+package("qvalue")
+package("car")
 # install_github(repo = "MatthieuStigler/RCompAngrist", subdir = "RCompAngrist")
 # package("RCompAngrist")
 

@@ -194,12 +194,12 @@ iv_si6 <- summary(ivreg(as.formula(paste("taxe_feedback_approbation!='Non' ~ tax
       " + (gagnant_feedback_categorie!='Perdant') | . - (gagnant_feedback_categorie!='Perdant') + simule_gagnant")), data = s, subset=variante_taxe_info=='f', weights = s$weight), diagnostics = TRUE)
 iv_si6 # Effective F-stat from Stata weakivtest: 37.346
 
-f_stats_si <- round(c(iv_si1$diagnostics[1,3], iv_si2$diagnostics[1,3], iv_si3$diagnostics[1,3], iv_si5$diagnostics[1,3], iv_si6$diagnostics[1,3]), 0)
+f_stats_si <- round(c(iv_si1$diagnostics[1,3], iv_si2$diagnostics[1,3], iv_si3$diagnostics[1,3], iv_si5$diagnostics[1,3], iv_si6$diagnostics[1,3]), 1)
 
 Table_si2 <- stargazer(tsls2_si1, tsls2_si2, tsls2_si3, ols_si3, tsls2_si5, tsls2_si6, 
                     title="Effect of self-interest on acceptance", omit.table.layout = 'n', star.cutoffs = NA,
                     dep.var.labels = c("Targeted Acceptance ($A^T$)", "Feedback Acceptance ($A^F$)"), dep.var.caption = "", header = FALSE,
-                    covariate.labels = c("Believes does not lose", "Initial tax Acceptance ($A^0$)", "",  "Environmentally effective: ``Yes''"),
+                    covariate.labels = c("Believes does not lose ($G$)", "Initial tax Acceptance ($A^0$)", "",  "Environmentally effective: ``Yes''"),
                     keep = c("non_perdant", "tax_acceptance"), order = c("non_perdant", "tax_acceptance"),
                     add.lines = list(
                       # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
@@ -477,3 +477,40 @@ summary(ivreg(as.formula(paste("taxe_feedback_approbation!='Non' ~ ", paste(vari
 
 summary(lm(benefices_pauvres==T ~ info_progressivite, data = s, weights = s$weight))
 summary(ivreg(taxe_info_approbation!='Non' ~ benefices_pauvres==T | info_progressivite, data = s, weights = s$weight))
+
+
+##### FDR #####
+variables_demo_bias <- variables_demo
+variables_demo_bias <- variables_demo_bias[!(variables_demo_bias %in% c("sexe", "age_50_64", "age_65_plus", "taille_agglo"))] # , "fume", "actualite"
+formula_bias <- as.formula(paste("abs(simule_gain - gain) > 110 ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + 
+                                 uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
+reg_bias <- lm(formula_bias, data=s, weights=s$weight)
+summary(reg_bias) # R^2: 0.06 (half due to Yellow Vests)
+# sort(summary(reg_bias)$coefficients[,4]) # TODO: laisser intercept dans la liste des pvalues ?
+pvalues_reg_bias <- summary(reg_bias)$coefficients[2:length(summary(reg_bias)$coefficients[,4]),4]
+sort(p.adjust(pvalues_reg_bias, method = 'fdr'), decreasing=T) # fdr and BH seem to give same result
+sort(qvalue(pvalues_reg_bias)$qvalues, decreasing=T)
+for (v in c("Gilets_jaunes", "as.factor(taille_agglo)", "Gauche_droite", "statut_emploi", "csp", "region", "age", "actualite")) { # 
+  nullhyp <- names(reg_bias$coefficients)[which(grepl(v, names(reg_bias$coefficients), fixed = T))]
+  pvalues_reg_bias <- pvalues_reg_bias[!(names(pvalues_reg_bias) %in% nullhyp)]
+  pvalues_reg_bias[v] <- linearHypothesis(reg_bias, nullhyp)$`Pr(>F)`[2]
+}
+nullhyp <- c('nb_adultes', 'nb_14_et_plus', 'uc')
+pvalues_reg_bias <- pvalues_reg_bias[!(names(pvalues_reg_bias) %in% nullhyp)]
+pvalues_reg_bias['composition_menage'] <- linearHypothesis(reg_bias, nullhyp)$`Pr(>F)`[2]
+nullhyp <- c('revenu', 'rev_tot', 'niveau_vie')
+pvalues_reg_bias <- pvalues_reg_bias[!(names(pvalues_reg_bias) %in% nullhyp)]
+pvalues_reg_bias['revenus'] <- linearHypothesis(reg_bias, nullhyp)$`Pr(>F)`[2]
+sort(p.adjust(pvalues_reg_bias, method = 'BH'), decreasing=T) # fdr and BH seem to give same result
+sort(qvalue_truncp(pvalues_reg_bias)$qvalues, decreasing=T)
+# sort(qvalue(pvalues_reg_bias, lambda = seq(0.05, 0.75, 0.05))$qvalues, decreasing=T)
+
+logit_bias <- glm(formula_bias, family = binomial(link='logit'), data=s)
+summary(logit_bias)
+logit_bias_margins <- logitmfx(formula_bias, s, atmean=FALSE)$mfxest
+logit_bias_margins
+formula_bias_bis <- as.formula(paste("abs(simule_gain - gain) > 110 ~ taxe_approbation + (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + 
+                                      ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
+reg_bias_bis <- lm(formula_bias_bis, data=s, weights=s$weight)
+summary(reg_bias_bis)
+sort(p.adjust(summary(reg_bias_bis)$coefficients[,4], method = 'BH'), decreasing=T)
