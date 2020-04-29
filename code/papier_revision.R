@@ -514,3 +514,51 @@ formula_bias_bis <- as.formula(paste("abs(simule_gain - gain) > 110 ~ taxe_appro
 reg_bias_bis <- lm(formula_bias_bis, data=s, weights=s$weight)
 summary(reg_bias_bis)
 sort(p.adjust(summary(reg_bias_bis)$coefficients[,4], method = 'BH'), decreasing=T)
+
+
+### Motivated Reasoning (table 4.2) ###
+
+variables_update <- c("revenu", "(gagnant_categorie=='Gagnant')", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, 
+                      variables_politiques, "Gilets_jaunes") # 
+variables_update <- variables_update[!(variables_update %in% c("revenu", "rev_tot", "age", "age_65_plus", "taille_agglo", "statut_emploi"))]
+
+# (1)
+base_winner <- lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight)
+summary(base_winner)
+
+# (2)
+formula_update_base <- as.formula(paste("update_correct ~ gain + (gain==0) + I(gain - simule_gain) + ", paste(variables_update_bis, collapse=' + ')))
+reg_update_base <- lm(formula_update_base, subset = feedback_infirme_large==T, data=s, weights = s$weight)
+summary(reg_update_base)
+
+# (3)
+formula_update_diploma <- as.formula(paste("update_correct ~ gain + (gain==0) + I(gain - simule_gain) + diplome4*(taxe_approbation) + ", paste(variables_update_bis, collapse=' + ')))
+reg_update_diploma <- lm(formula_update_diploma, subset = feedback_infirme_large==T, data=s, weights = s$weight)
+summary(reg_update_diploma)
+
+# (4)
+reg_update_with_gain_gagnants <- lm(formula_update_with_gain, subset = feedback_infirme_large==T & simule_gagnant==1, data=s, weights = s$weight)
+summary(reg_update_with_gain_gagnants)
+
+# (5)
+formula_update_with_gain_no_bug <- as.formula(paste("update_correct ~ gain + (gain==0) + I(gain - simule_gain) + ", paste(variables_update_bis[!(variables_update_bis=='conservateur')], collapse=' + ')))
+reg_update_with_gain_perdants <- lm(formula_update_with_gain_no_bug, subset = feedback_infirme_large==T & simule_gagnant==0, data=s, weights = s$weight)
+summary(reg_update_with_gain_perdants)
+
+robustness_mr <- stargazer(base_winner, reg_update_base, reg_update_diploma, reg_update_with_gain_gagnants, reg_update_with_gain_perdants,
+                           title="Asymmetric updating of winning category.", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                           covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
+                                                "Diploma $\\times$ Initial tax: PNR", "Diploma $\\times$ Initial tax: Approves",
+                                                "Subjective gain ($g$)", "Subjective gain: unaffected ($g=0$)", "Bias about gain ($g - \\hat{\\gamma}$)",
+                                                "Diploma (1 to 4)", "Retired", "Active", "Student", "Yellow Vests: PNR",
+                                                "Yellow Vests: understands", "Yellow Vests: supports", "Yellow Vests: is part"),
+                           dep.var.labels = c("Correct updating ($U$)"), dep.var.caption = "", header = FALSE, 
+                           keep = c('Constant', '.*Gagnant.*', 'taxe_approbation', '^gain', 'I\\(gain', 'diplome4', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
+                           order = c('Constant', '.*Gagnant.*', 'taxe_approbation', '^gain', 'I\\(gain', 'diplome4', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
+                           add.lines = list(c("Includes ``pessimistic winners''", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", ""), 
+                                            c("Includes ``optimistic losers''", "\\checkmark", "\\checkmark", "\\checkmark", "", "\\checkmark"), 
+                                            c("Includes controls", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark")),
+                           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:robustness_mr")
+write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive}; \\textit{Yellow Vests: opposes}. The list of controls can be found in Appendix \\ref{set_controls}. }  \\end{table} ', 
+                gsub('\\begin{tabular}{@', '\\resizebox{.76\\columnwidth}{!}{ \\begin{tabular}{@', robustness_mr, fixed=TRUE), fixed=TRUE), collapse=' ')
+

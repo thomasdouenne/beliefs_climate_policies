@@ -321,7 +321,7 @@ formula_update_bis <- as.formula(paste("update_correct ~ ", paste(variables_upda
 covariates_update_correct_bis <- lm(formula_update_bis, subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(covariates_update_correct_bis)
 
-formula_update_ter <- as.formula(paste("update_correct ~ diplome4*(taxe_approbation!='Oui') +", paste(variables_update_bis, collapse=' + ')))
+formula_update_ter <- as.formula(paste("update_correct ~ diplome4*(taxe_approbation) +", paste(variables_update_bis, collapse=' + ')))
 covariates_update_correct_ter <- lm(formula_update_ter, subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(covariates_update_correct_ter)
 
