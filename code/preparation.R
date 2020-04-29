@@ -1,5 +1,5 @@
-setwd("/var/www/beliefs_climate_policies/code")
-# setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
+# setwd("/var/www/beliefs_climate_policies/code")
+setwd("C:/Users/thoma/Documents/Github/beliefs_climate_policies/code")
 # setwd("C:/Users/t.douenne/Documents/Github/beliefs_climate_policies/code")
 # setwd("/home/adrien/Documents/beliefs_climate_policies/code")
 # setwd("C:/Users/a.fabre/Documents/beliefs_climate_policies/code")
@@ -136,8 +136,8 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 
 # rev_i_erfs2014.csv <- db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17]
 # write.csv(rev_i_erfs2014.csv, "rev_i_erfs2014.csv")
-# rev_i_erfs2014 <- read.csv("rev_i_erfs2014.csv")
-# percentiles_revenu <- ecdf(rev_i_erfs2014$x)
+rev_i_erfs2014 <- read.csv("rev_i_erfs2014.csv")
+percentiles_revenu <- ecdf(rev_i_erfs2014$x)
 
 # distribution_revenu_erfs <- wtd.Ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)])
 # distribution_revenu_erfs_weighted <- wtd.Ecdf(db$revtot_i_par[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)], weights = db$wprm[!is.na(db$revtot_i_par) & db$age > 17 & !is.na(db$age)])
@@ -1008,6 +1008,7 @@ convert_s <- function() {
   s$indeterminate <<- s$Gauche_droite == "Indeterminate"
   s$gauche_droite_na <<- as.numeric(s$gauche_droite)
   s$gauche_droite_na[s$indeterminate == T] <<- wtd.mean(s$gauche_droite, weights = s$weight)
+  s$Gauche_droite <<- relevel(s$Gauche_droite, 'Indeterminate')
   
   temp <- Label(s$interet_politique)
   s$interet_politique <<- 1*(s$interet_politique=='Un peu') + 2*(s$interet_politique=='Beaucoup')
@@ -1575,8 +1576,8 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   s$weight <<- weighting_s(s)
 }
 
-prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T) # TODO: let only_finished = FALSE
-sa <- s
+# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T) # TODO: let only_finished = FALSE
+# sa <- s
 # # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
 # # se <- s
 # # prepare_s(exclude_screened=FALSE)
