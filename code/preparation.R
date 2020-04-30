@@ -1008,7 +1008,11 @@ convert_s <- function() {
   s$indeterminate <<- s$Gauche_droite == "Indeterminate"
   s$gauche_droite_na <<- as.numeric(s$gauche_droite)
   s$gauche_droite_na[s$indeterminate == T] <<- wtd.mean(s$gauche_droite, weights = s$weight)
+<<<<<<< Updated upstream
   #s$Gauche_droite <<- relevel(s$Gauche_droite, 'Indeterminate')
+=======
+  s$Gauche_droite <<- relevel(s$Gauche_droite, 'Indeterminate')
+>>>>>>> Stashed changes
   
   temp <- Label(s$interet_politique)
   s$interet_politique <<- 1*(s$interet_politique=='Un peu') + 2*(s$interet_politique=='Beaucoup')
