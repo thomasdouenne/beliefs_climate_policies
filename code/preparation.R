@@ -1009,7 +1009,11 @@ convert_s <- function() {
   s$gauche_droite_na <<- as.numeric(s$gauche_droite)
   s$gauche_droite_na[s$indeterminate == T] <<- wtd.mean(s$gauche_droite, weights = s$weight)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   #s$Gauche_droite <<- relevel(s$Gauche_droite, 'Indeterminate')
+=======
+  s$Gauche_droite <<- relevel(s$Gauche_droite, 'Indeterminate')
+>>>>>>> Stashed changes
 =======
   s$Gauche_droite <<- relevel(s$Gauche_droite, 'Indeterminate')
 >>>>>>> Stashed changes
