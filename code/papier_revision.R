@@ -196,7 +196,7 @@ iv_si6 # Effective F-stat from Stata weakivtest: 37.346
 
 f_stats_si <- round(c(iv_si1$diagnostics[1,3], iv_si2$diagnostics[1,3], iv_si3$diagnostics[1,3], iv_si5$diagnostics[1,3], iv_si6$diagnostics[1,3]), 1)
 
-Table_si2 <- stargazer(tsls2_si1, tsls2_si2, tsls2_si3, ols_si3, tsls2_si5, tsls2_si6, 
+Table_si2 <- stargazer(tsls2_si1, tsls2_si2, tsls2_si3, ols_si4, tsls2_si5, tsls2_si6, 
                     title="Effect of self-interest on acceptance", omit.table.layout = 'n', star.cutoffs = NA,
                     dep.var.labels = c("Targeted Acceptance ($A^T$)", "Feedback Acceptance ($A^F$)"), dep.var.caption = "", header = FALSE,
                     covariate.labels = c("Believes does not lose ($G$)", "Initial tax Acceptance ($A^0$)", "",  "Environmentally effective: ``Yes''"),
@@ -516,7 +516,7 @@ summary(reg_bias_bis)
 sort(p.adjust(summary(reg_bias_bis)$coefficients[,4], method = 'BH'), decreasing=T)
 
 
-### Motivated Reasoning (table 4.2) ###
+##### Motivated Reasoning (table 4.2) #####
 
 variables_update <- c("revenu", "(gagnant_categorie=='Gagnant')", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, 
                       variables_politiques, "Gilets_jaunes") # 
@@ -525,6 +525,10 @@ variables_update <- variables_update[!(variables_update %in% c("revenu", "rev_to
 # (1)
 base_winner <- lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(base_winner)
+
+variables_update_bis <- c("revenu", "(gagnant_categorie=='Gagnant')", "taxe_approbation", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", 
+                          variables_demo, variables_politiques, "Gilets_jaunes") # 
+variables_update_bis <- variables_update_bis[!(variables_update_bis %in% c("revenu", "rev_tot", "age", "age_65_plus", "taille_agglo", "statut_emploi"))]
 
 # (2)
 formula_update_base <- as.formula(paste("update_correct ~ gain + (gain==0) + I(gain - simule_gain) + ", paste(variables_update_bis, collapse=' + ')))
@@ -537,7 +541,7 @@ reg_update_diploma <- lm(formula_update_diploma, subset = feedback_infirme_large
 summary(reg_update_diploma)
 
 # (4)
-reg_update_with_gain_gagnants <- lm(formula_update_with_gain, subset = feedback_infirme_large==T & simule_gagnant==1, data=s, weights = s$weight)
+reg_update_with_gain_gagnants <- lm(formula_update_base, subset = feedback_infirme_large==T & simule_gagnant==1, data=s, weights = s$weight)
 summary(reg_update_with_gain_gagnants)
 
 # (5)
@@ -545,7 +549,7 @@ formula_update_with_gain_no_bug <- as.formula(paste("update_correct ~ gain + (ga
 reg_update_with_gain_perdants <- lm(formula_update_with_gain_no_bug, subset = feedback_infirme_large==T & simule_gagnant==0, data=s, weights = s$weight)
 summary(reg_update_with_gain_perdants)
 
-robustness_mr <- stargazer(base_winner, reg_update_base, reg_update_diploma, reg_update_with_gain_gagnants, reg_update_with_gain_perdants,
+heterogeneity_update <- stargazer(base_winner, reg_update_base, reg_update_diploma, reg_update_with_gain_gagnants, reg_update_with_gain_perdants,
                            title="Asymmetric updating of winning category.", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                            covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
                                                 "Diploma $\\times$ Initial tax: PNR", "Diploma $\\times$ Initial tax: Approves",
@@ -555,10 +559,47 @@ robustness_mr <- stargazer(base_winner, reg_update_base, reg_update_diploma, reg
                            dep.var.labels = c("Correct updating ($U$)"), dep.var.caption = "", header = FALSE, 
                            keep = c('Constant', '.*Gagnant.*', 'taxe_approbation', '^gain', 'I\\(gain', 'diplome4', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'), 
                            order = c('Constant', '.*Gagnant.*', 'taxe_approbation', '^gain', 'I\\(gain', 'diplome4', 'retraites', 'actifs', 'etudiants', 'Gilets_jaunes'),
+                           omit.table.layout = 'n', star.cutoffs = NA,
                            add.lines = list(c("Includes ``pessimistic winners''", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", ""), 
                                             c("Includes ``optimistic losers''", "\\checkmark", "\\checkmark", "\\checkmark", "", "\\checkmark"), 
                                             c("Includes controls", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark")),
-                           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:robustness_mr")
+                           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:heterogeneity_update")
 write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive}; \\textit{Yellow Vests: opposes}. The list of controls can be found in Appendix \\ref{set_controls}. }  \\end{table} ', 
-                gsub('\\begin{tabular}{@', '\\resizebox{.76\\columnwidth}{!}{ \\begin{tabular}{@', robustness_mr, fixed=TRUE), fixed=TRUE), collapse=' ')
+                gsub('\\begin{tabular}{@', '\\resizebox{.80\\columnwidth}{!}{ \\begin{tabular}{@', heterogeneity_update, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+
+##### Heterogeneity in bias #####
+
+variables_demo_bias <- variables_demo
+variables_demo_bias <- variables_demo_bias[!(variables_demo_bias %in% c("sexe", "age_50_64", "age_65_plus", "taille_agglo"))]
+formula_bias <- as.formula(paste("abs(simule_gain - gain) > 110 ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + 
+                                 uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
+reg_bias <- lm(formula_bias, data=s, weights=s$weight)
+summary(reg_bias) # R^2: 0.06 (half due to Yellow Vests)
+logit_bias <- glm(formula_bias, family = binomial(link='logit'), data=s)
+summary(logit_bias)
+logit_bias_margins <- logitmfx(formula_bias, s, atmean=FALSE)$mfxest
+logit_bias_margins
+formula_bias_bis <- as.formula(paste("abs(simule_gain - gain) > 110 ~ taxe_approbation + (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + 
+                                     ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
+reg_bias_bis <- lm(formula_bias_bis, data=s, weights=s$weight)
+summary(reg_bias_bis)
+
+Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
+                                     title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
+                                     covariate.labels = c("Initial tax: PNR (I don't know)", "Initial tax: Approves",
+                                                          "Yellow Vests: PNR","Yellow Vests: understands","Yellow Vests: supports", "Yellow Vests: is part",
+                                                          "Ecologist", "Left-right: Left", "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Left-right: Indeterminate"),
+                                     dep.var.labels = c("Large bias ($\\left|\\widehat{\\gamma}-g\\right| > 110$)"), dep.var.caption = "", header = FALSE,
+                                     keep = c("taxe_approbation", "Gilets_jaunes", "Gauche_droite", "ecologiste"),
+                                     order = c("taxe_approbation", "Gilets_jaunes", "ecologiste", "Gauche_droite"),
+                                     omit.table.layout = 'n', star.cutoffs = NA,
+                                     coef = list(NULL, logit_bias_margins[,1], NULL),
+                                     se = list(NULL, logit_bias_margins[,2], NULL),
+                                     add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark", "\\checkmark")),
+                                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
+write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:}  Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. Omitted variables are \\textit{Yellow Vests: opposes}; \\textit{Left-right: Extreme-left}. The list of controls can be found in Appendix \\ref{set_controls}. }  \\end{table} ',
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
+                                                       Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
 
