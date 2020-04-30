@@ -1599,10 +1599,10 @@ write.csv2(s, "survey_prepared.csv", row.names=FALSE)
 fit_housing <- read.csv("../model_reforms_data/prediction housing expenditures.csv") # specification (1), élasticité 0.15
 fit_housing$vrai_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$obj
 fit_housing$estimation_gain_chauffage <- 50 * pmin(2, fit_housing$nb_adultes) - fit_housing$fit
-fit_housing$gain <- fit_housing$vrai_gain_chauffage / fit_housing$uc
+fit_housing$gain <- fit_housing$vrai_gain_chauffage / fit_housing$uc # TODO: bug
 fit_housing$predicted_gain <- (16.1 + fit_housing$estimation_gain_chauffage) / fit_housing$uc
 fit_housing$error <- (fit_housing$vrai_gain_chauffage > 0) != (16.1 + fit_housing$estimation_gain_chauffage > 0)
-fit_housing <- fit_housing[order(fit_housing$predicted_gain, decreasing=T),]
+fit_housing <- fit_housing[order(fit_housing$predicted_gain, decreasing=T),] 
 fit_housing_2 <- read.csv("../model_reforms_data/prediction housing expenditures (2).csv") # specification (2), élasticité 0.2
 fit_housing_2$vrai_gain_chauffage <- 50 * pmin(2, fit_housing_2$nb_adultes) - fit_housing_2$obj
 fit_housing_2$estimation_gain_chauffage <- 50 * pmin(2, fit_housing_2$nb_adultes) - fit_housing_2$fit

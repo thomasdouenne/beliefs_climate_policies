@@ -4351,3 +4351,9 @@ s$gagnant[s$variante_taxe_info=='f'] <- tsls1_all4_si$fitted.values
 formula2_all4 <- as.formula(paste("taxe_feedback_approbatio=='Oui' ~", paste(variables_all_controls, collapse = ' + '), " + gagnant * taxe_efficace.hat"))
 tsls2_all4 <- lm(formula2_all4, data=s, weights=s$weight, subset= variante_taxe_info=='f')
 summary(tsls2_all4) 
+
+
+##### Update correct among "feedback correct" #####
+summary(lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight)) # .69***
+summary(lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T  & round(conso)==7 & !(fuel_2_1 %in% c('Diesel')), data=s, weights = s$weight)) # .54*
+summary(lm(formula_update, subset = feedback_infirme_large==T  & round(conso)==7 & !(fuel_2_1 %in% c('Diesel')), data=s, weights = s$weight)) # .24

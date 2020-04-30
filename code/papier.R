@@ -141,6 +141,7 @@ logit_bias_margins <- logitmfx(formula_bias, s, atmean=FALSE)$mfxest
 logit_bias_margins
 formula_bias_bis <- as.formula(paste("abs(simule_gain - gain) > 110 ~ taxe_approbation + (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + 
                                       ecologiste + Gauche_droite + uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
+s$Gauche_droite <- relevel(s$Gauche_droite, "Extreme-left")
 reg_bias_bis <- lm(formula_bias_bis, data=s, weights=s$weight)
 summary(reg_bias_bis)
 
@@ -321,7 +322,7 @@ formula_update_bis <- as.formula(paste("update_correct ~ ", paste(variables_upda
 covariates_update_correct_bis <- lm(formula_update_bis, subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(covariates_update_correct_bis)
 
-formula_update_ter <- as.formula(paste("update_correct ~ diplome4*(taxe_approbation) +", paste(variables_update_bis, collapse=' + ')))
+formula_update_ter <- as.formula(paste("update_correct ~ diplome4*(taxe_approbation) +", paste(variables_update_bis, collapse=' + '))) # DONE: removed =='Oui' in taxe_approbation
 covariates_update_correct_ter <- lm(formula_update_ter, subset = feedback_infirme_large==T, data=s, weights = s$weight)
 summary(covariates_update_correct_ter)
 

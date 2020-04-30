@@ -38,8 +38,8 @@ package("rattle")
 package("data.table")
 package("reshape2")
 package("margins")
-package("rddtools")
-package("rddapp")
+# package("rddtools")
+# package("rddapp")
 # package("mets")
 package("plyr")
 package("descr")
@@ -145,7 +145,15 @@ irpp <- function(rev, nb_adultes, nb_pers) {
 	decote <- (ir < seuil_decote) * 0.75 * (seuil_decote - ir)
 	return(pmax((ir-decote),0)) # vrai calcul
 }
-
+piece.formula <- function(var.names, knots, vector=F) {
+  formula.sign <- rep(" - ", length(knots))
+  formula.sign[knots < 0] <- " + "
+  formulas <- c()
+  for (v in var.names) formulas <- c(formulas, paste(v, "+", paste("I(pmin(", v, formula.sign, abs(knots), ", 0))", collapse = " + ", sep="")))
+  formula <- paste(formulas, collapse = ' + ')
+  if (vector) return(strsplit(formula, ' + ', fixed=T)[[1]])
+  else return(formula)
+}
 
 
 ##### Graphiques #####
