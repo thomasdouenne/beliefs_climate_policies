@@ -1596,6 +1596,8 @@ prepare_s()
 write.csv2(s, "survey_prepared.csv", row.names=FALSE)
 
 # write.csv(s[,c("id", "taille_agglo", "sexe", "age", "diplome4", "region", "csp")], "IDs.csv")
+# saveRDS(s, "beliefs_climate_policies.Rda")
+# TODO!: duplicated ID
 
 # ids <- read.csv("C:/Users/a.fabre/Downloads/IDs.csv", header=FALSE)
 # ids <- as.vector(ids$V1[-1])

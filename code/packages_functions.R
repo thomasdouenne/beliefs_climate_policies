@@ -947,6 +947,12 @@ print.Crosstab <- function(x,dec.places=x$dec.places,subtotals=x$subtotals,...) 
   }
   
 }
+# plot(1:3,1:3) # example
+# dev.copy(png, filename="../images/test.png") # save plot from R
+# dev.off()
+
+# orca(example, file = "image.png") # BEST METHOD
+# export(example, file = "image.png") # other method which should work with plotly
 
 ##### Template #####
 
