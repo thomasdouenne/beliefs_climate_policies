@@ -133,7 +133,7 @@ iv_si1 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", pas
         data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
 iv_si1 # Effective F-stat from Stata weakivtest: 16
 
-# # Alternative specifications for robustness checks
+  # # Alternative specifications for robustness checks
 # # (2 revenu percentiles and revenu ou revenu conjoint in 10-60) 
 # formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), c(20,70)), " + single + cible + traite_cible*traite_cible_conjoint"))
 # tsls1_si2 <- lm(formula_tsls1_si2, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
@@ -244,10 +244,10 @@ iv_si5 # Effective F-stat from Stata weakivtest: 21
 f_stats_si <- sprintf("%.1f", round(c(iv_si1$diagnostics[1,3], iv_si3$diagnostics[1,3], iv_si5$diagnostics[1,3]), 1))
 
 Table_si2 <- stargazer(tsls2_si1, tsls2_si3, ols_si3, tsls2_si5, 
-                    title="Effect of self-interest on acceptance", omit.table.layout = 'n', star.cutoffs = NA, column.labels = c("$IV$", "$OLS$", "$IV$"), column.separate = c(2,1,1),
-                    dep.var.labels = c("Targeted Acceptance ($A^T$)", "Feedback Acceptance ($A^F$)"), dep.var.caption = "", header = FALSE,
+                    title="Effect of self-interest on acceptance", star.cutoffs = NA, column.labels = c("\\textit{IV: random target/eligibility}", "$OLS$", "\\textit{IV: discontinuity in feedback}"), column.separate = c(2,1,1),
+                    dep.var.labels = c("Targeted Dividend ($A^T$)", "After Feedback ($A^F$)"), dep.var.caption = "Acceptance (``Yes'' or ``Don't know'' to policy support)", header = FALSE,
                     covariate.labels = c("Believes does not lose ($G$)", "Initial tax Acceptance ($A^0$)", "",  "Environmentally effective: ``Yes''"),
-                    keep = c("non_perdant", "tax_acceptance"), order = c("non_perdant", "tax_acceptance"),
+                    keep = c("non_perdant", "tax_acceptance"), order = c("non_perdant", "tax_acceptance"), omit.table.layout = 'n', 
                     add.lines = list(
                       # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
                       c("Controls: Incomes (piecewise continuous)", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark"), # TODO: non-parametric incomes in (2)?
@@ -257,14 +257,14 @@ Table_si2 <- stargazer(tsls2_si1, tsls2_si3, ols_si3, tsls2_si5,
                       c("Sub-sample", "[p10; p60]", "", "", "$\\left| \\widehat{\\gamma}\\right|<50$"),
                       c("Effective F-Statistic", f_stats_si[1:2], "", f_stats_si[3])),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}. }\\end{table}', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}. The first-stages for the targeted dividend use as source of exogenous variation in the belief the random assignment of the income threshold that determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }\\end{table}', 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_si2, fixed=TRUE), fixed=T), collapse=' ')
 
 Table_si1 <- stargazer(tsls1_si1, tsls1_si3, tsls1_si5, 
                     title="First stage regressions results for self-interest", omit.table.layout = 'n', star.cutoffs = NA,
                     covariate.labels = c("Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
                                          "$T_1 \\times T_2$", "Simulated winner ($\\widehat{\\Gamma}$)", "Initial tax Acceptance ($A^0$)"),
-                    dep.var.labels = c("Targeted tax ($G^T$)", "After feedback ($G^F$)"), dep.var.caption = "Believes does not lose", header = FALSE,
+                    dep.var.labels = c("Targeted Dividend ($G^T$)", "After feedback ($G^F$)"), dep.var.caption = "Believes does not lose", header = FALSE,
                     column.labels = c("(1)", "(2)", "(4)"), model.numbers = FALSE,
                     keep = c("traite", "simule_gagnant", "acceptance"), order = c("traite", "simule_gagnant", "acceptance"),
                     add.lines = list(c("Controls: Incomes (piecewise continuous)", " \\checkmark", " \\checkmark", "\\checkmark"),
@@ -613,8 +613,8 @@ heterogeneity_update <- stargazer(base_winner, reg_update_base, reg_update_diplo
                                             c("Includes ``optimistic losers''", "\\checkmark", "\\checkmark", "\\checkmark", "", "\\checkmark"), 
                                             c("Includes controls", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark")),
                            no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:heterogeneity_update")
-write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive}; \\textit{Yellow Vests: opposes}. The list of controls can be found in Appendix \\ref{set_controls}. }  \\end{table} ', 
-                gsub('\\begin{tabular}{@', '\\resizebox{.80\\columnwidth}{!}{ \\begin{tabular}{@', heterogeneity_update, fixed=TRUE), fixed=TRUE), collapse=' ')
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{13.5cm}{\\linespread{1.2}\\selectfont \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes}. The list of controls can be found in Appendix \\ref{set_controls}.} }\\end{table}', 
+                gsub('\\begin{tabular}{@', '\\resizebox{.90\\columnwidth}{!}{ \\begin{tabular}{@', heterogeneity_update, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
 
@@ -639,7 +639,7 @@ Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
                                      title="Determinants of bias in subjective gains", model.names = T, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
                                      covariate.labels = c("Initial tax: PNR (I don't know)", "Initial tax: Approves",
                                                           "Yellow Vests: PNR","Yellow Vests: understands","Yellow Vests: supports", "Yellow Vests: is part",
-                                                          "Ecologist", "Left-right: Left", "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right", "Left-right: Indeterminate"),
+                                                          "Ecologist", "Left-right: Indeterminate", "Left-right: Left", "Left-right: Center", "Left-right: Right", "Left-right: Extreme-right"),
                                      dep.var.labels = c("Large bias ($\\left|\\widehat{\\gamma}-g\\right| > 110$)"), dep.var.caption = "", header = FALSE,
                                      keep = c("taxe_approbation", "Gilets_jaunes", "Gauche_droite", "ecologiste"),
                                      order = c("taxe_approbation", "Gilets_jaunes", "ecologiste", "Gauche_droite"),
@@ -648,7 +648,7 @@ Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,#
                                      se = list(NULL, logit_bias_margins[,2], NULL),
                                      add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark", "\\checkmark")),
                                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
-write_clip(gsub('\\end{table}', ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:}  Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. Omitted variables are \\textit{Yellow Vests: opposes}; \\textit{Left-right: Extreme-left}. The list of controls can be found in Appendix \\ref{set_controls}. }  \\end{table} ',
+write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{12cm}{\\linespread{1.2}\\selectfont \\textsc{Note:}  Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. Omitted variables are \\textit{Yellow Vests: opposes}; \\textit{Left-right: Extreme-left}. The list of controls can be found in Appendix \\ref{set_controls}. }}  \\end{table} ',
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
                                                        Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
 

@@ -337,8 +337,7 @@ asymmetric_simple <- stargazer(base_winner, covariates_update_correct, covariate
                                add.lines = list(c("Among invalidated", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark"), 
                                                 c("Includes controls", "", "\\checkmark", "\\checkmark", "\\checkmark")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="asymmetric_simple")
-write_clip(gsub('\\end{table}', 
-    ' } \\\\ \\quad \\\\ {\\footnotesize \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes}. The list of controls can be found in Appendix \\ref{set_controls}. }  \\end{table} ', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}. The first-stages for the targeted dividend use as source of exogenous variation in the belief the random assignment of the income threshold that determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }\\end{table}', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', asymmetric_simple, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Some alternative specifications
@@ -407,7 +406,7 @@ prog <- stargazer(ols_prog_1, ols_prog_2, ols_prog_3, title="Effect of informati
                                covariate.labels = c("Constant", "Information on progressivity ($Z_P$)", "Large bias $(\\left|\\widehat{\\gamma}-g\\right|>110)$",
                                                   "Interaction $Z_P \\times (\\left|\\widehat{\\gamma}-g\\right|>110)$"),
                                keep = c("Constant", "info_progressiviteTRUE$", "biais_sur"), 
-                               dep.var.labels = "Progressivity: not No ($P$)", dep.var.caption = "", header = FALSE,
+                               dep.var.labels = "Progressivity: not ``No'' ($P$)", dep.var.caption = "", header = FALSE,
                                add.lines = list(c("Controls: Socio-demo, politics ", "", "", "\\checkmark ")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog")
 write_clip(gsub('\\end{table}', ' } \\end{table} ', gsub('\\begin{tabular}{@', 
@@ -675,19 +674,20 @@ ols_prog6 <- lm(taxe_info_approbation=='Oui' ~ progressif + (prog_na == 'NA'), w
 summary(ols_prog6)
 
 Table_prog <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5, ols_prog6,
-  title="Effect of beliefs over progressivity on acceptance. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, 
-    where strict dummies do not cover ``PNR'' or ``Unaffected' answers.", 
+  title="Support of the Tax \\& Dividend in function of beliefs in each motive.", 
           covariate.labels = c("Progressivity $(P)$", "Income ($I$, in k\\euro{}/month)", "Winner $(G^1)$", "Effective $(E)$", "$(G^1 \\times E)$",
                                "Interaction: winner $(P \\times G^1)$", "Interaction: effective $(P \\times E)$", "Interaction: income $(P \\times I)$",
                                "$P \\times G^1 \\times E$"), # "Constant",
-          dep.var.labels = c("Acceptance ($A^K$) on \\textit{not ``No''}", "Approval ($\\dot{A^K}$) on \\textit{``Yes''}"), dep.var.caption = "", header = FALSE,
-          keep = c("progressi", "gagnant", 'effective', 'Revenu$'), # "Constant"
-          coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
+          dep.var.labels = c("Broad definition of variables (\\textit{not ``No''})", "Strict definitions (\\textit{``Yes''})"),
+          dep.var.caption = "Support (after information)", header = FALSE, star.cutoffs = NA, omit.table.layout = 'n', 
+          keep = c("progressi", "gagnant", 'effective', 'Revenu$'), 
+# c("progressif$", 'gagnant_info$', '^effective', 'gagnant_infoTRUE:effective', "progressifTRUE:gagnant_info$", 'progressifTRUE:effective', 'Revenu', 'progressifTRUE:Revenu', 'progressifTRUE:gagnant_infoTRUE:effective')
+          # order = c(1:9),
+          coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T, 
           se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
           add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
-                For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. } \\end{table} ',
+write_clip(gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, where strict dummies do not cover ``PNR'' or ``Unaffected'' answers.}} \\end{table} ",
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_prog, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Average effect of Progressivity (Not no for acceptance), other things equal: 0.274
@@ -759,7 +759,7 @@ ci_at_sample_mean <- function(lm, alpha = 0.05, var, vars) {
 0.228 + 0.703 * 0.303 + 0.244 + 0.703 * 0.126 + 0.703 * 0.098 + 0.281 - 0.703 * 0.314
 
 # 5.4.2 Willingness-to-pay
-ggplot() + geom_smooth(data=s[s$taxe_efficace!='Non',], method = "auto", aes(x=gain, y=1*(tax_acceptance), col=" Effective: not `No'")) + ylim(c(0,1)) +
+ggplot() + geom_smooth(data=s[s$taxe_efficace!='Non',], method = "auto", aes(x=gain, y=1*(tax_acceptance), col=" Effective: not ``No''")) + ylim(c(0,1)) +
  xlab("Subjective gain, among non believers in ineffectiveness") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + 
  geom_smooth(data=s, method = "auto", aes(x=gain, y=1*(tax_acceptance), col=' All            ')) + ylim(c(0,1)) + #geom_vline(xintercept=-66, col='red') +
  xlab("Subjective gain") + ylab("Acceptance rate") + geom_hline(yintercept=0.5, col='red') + theme_bw() + theme(legend.position="top", ) + # legend.position="top", 
@@ -966,7 +966,7 @@ Table_additional_res <- stargazer(iv2_si1, iv2_si2, iv2_si3, iv2_si4, iv2_si5, i
        title="Effect of self-interest on acceptance: second stages of alternative specifications", #star.cutoffs = c(0.1, 1e-5, 1e-30),
        covariate.labels = c("Believes wins", "Believes does not lose", "Initial tax Acceptance ($A^0$)"), model.names = FALSE,
        dep.var.labels = c("Acceptance", "Approval", "Acceptance", "Approval"), 
-       dep.var.caption = c("\\multicolumn{3}{c}{Targeted Tax} & \\multicolumn{3}{c}{After Feedback}"), header = FALSE,
+       dep.var.caption = c("\\multicolumn{3}{c}{Targeted Dividend} & \\multicolumn{3}{c}{After Feedback}"), header = FALSE,
        keep = c("gagnant", "non_perdant", "tax_acceptance"),
        add.lines = list(
          c("Controls: Incomes ", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "\\checkmark", "\\checkmark", "\\checkmark"),

@@ -9,7 +9,7 @@ package <- function(p) {
 library(utils)
 package("xtable")
 package('tidyverse')
-package("rms")
+# package("rms") # TODO
 package('pwr')
 package("foreign")
 package("memisc")
@@ -22,11 +22,11 @@ package("survey")
 package("plotly")
 package('gdata')
 package("Hmisc")
-package("quantreg")
+# package("quantreg") # TODO
 package("rcompanion")
 package("DescTools")
-package("VCA")
-package("glmnet")
+# package("VCA") # TODO
+# package("glmnet") # TODO
 # package("installr") # not for linux
 package("plotly")
 package("processx")
