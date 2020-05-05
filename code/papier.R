@@ -189,7 +189,7 @@ Table_elast <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls,
         keep = c("Elasticite"),
         add.lines = list(c("Controls: Socio-demographics, energy", "", "", "\\checkmark  ", "\\checkmark")),
         no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} See discussion in the main text, Section \\vref{subsec:perception_ee}.} \\end{table}', gsub('\\begin{tabular}{@', 
                                                        '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_elast, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 ## 3.3 Progressivity
@@ -409,7 +409,7 @@ prog <- stargazer(ols_prog_1, ols_prog_2, ols_prog_3, title="Effect of informati
                                dep.var.labels = "Progressivity: not ``No'' ($P$)", dep.var.caption = "", header = FALSE,
                                add.lines = list(c("Controls: Socio-demo, politics ", "", "", "\\checkmark ")),
                                no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:prog")
-write_clip(gsub('\\end{table}', ' } \\end{table} ', gsub('\\begin{tabular}{@', 
+write_clip(gsub('\\end{table}', ' } {\\footnotesize \\textsc{Note:} See discussion in the main text, Section \\vref{subsec:persistence-prog}.} \\end{table} ', gsub('\\begin{tabular}{@', 
                                                          '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', prog, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
@@ -610,7 +610,7 @@ Table_ee1 <- stargazer(tsls1_ee1, tsls1_ee5,
                        column.labels = c("(1)", "(4,5)"), model.numbers = FALSE,
                        add.lines = list(c("Controls ", "\\checkmark ", "\\checkmark "), c("Effective F-Statistic", "5.886", "11.145")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
-write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} See discussion in the main text, Section \\vref{subsec:update_ee} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_ee1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
@@ -687,7 +687,7 @@ Table_prog <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5,
           se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
           add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
-write_clip(gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. Covariates refer either to broad (1-4) or strict (5-6) definitions of the beliefs, where strict dummies do not cover ``PNR'' or ``Unaffected'' answers.}} \\end{table} ",
+write_clip(gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. Covariates and dependent variables refer either to broad (1-4) or strict (5-6) definitions of the beliefs, where strict dummies do not cover ``PNR'' or ``Unaffected'' answers.}} \\end{table} ",
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_prog, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # Average effect of Progressivity (Not no for acceptance), other things equal: 0.274
@@ -973,7 +973,7 @@ Table_additional_res <- stargazer(iv2_si1, iv2_si2, iv2_si3, iv2_si4, iv2_si5, i
          c("Controls: Estimated gain ", "", "", "", "\\checkmark", "\\checkmark ", "\\checkmark "),
          c("Controls: Target of the tax ", "\\checkmark ", "\\checkmark ", "\\checkmark ", "", "", "")),
        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
-write_clip(sub("\\multicolumn{6}{c}{", "", sub("er Feedback}}", "er Feedback}", gsub('\\end{table}', '} \\end{table}', 
+write_clip(sub("\\multicolumn{6}{c}{", "", sub("er Feedback}}", "er Feedback}", gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}.\\end{table}', 
    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # clean heaviest objects

@@ -60,13 +60,15 @@ ivreg2 y_var1 revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simul
 ivreg2 y_var2 (x_var2 = z_var1 info_cc), robust liml
 
 * Yes with controls
-ivreg2 y_var2 revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie masculin i.estatut_emploi i.ecsp i.eregion ediplome4 taille_menage nb_14_et_plus nb_adultes fumeur i.eactualite etaille_agglo uc niveau_vie age_18_24 age_25_34 age_35_49 age_50_64 (x_var2 = z_var1 info_cc), robust liml
+ivreg2 y_var2 revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie masculin i.estatut_emploi i.ecsp i.eregion ediplome4 taille_menage nb_14_et_plus nb_adultes fumeur i.eactualite etaille_agglo uc niveau_vie age_18_24 age_25_34 age_35_49 age_50_64 (x_var2 = z_var1 info_cc) [pweights=weight], robust liml /*partial(i.eregion) */
+
+
 
 * not No ~ Yes without controls
 ivreg2 y_var1 (x_var2 = z_var1 info_cc), robust liml
 
 * not no ~ Yes with controls
-ivreg2 y_var1 revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie masculin i.estatut_emploi i.ecsp i.eregion ediplome4 taille_menage nb_14_et_plus nb_adultes fumeur i.eactualite etaille_agglo uc niveau_vie age_18_24 age_25_34 age_35_49 age_50_64 (x_var2 = z_var1 info_cc), robust liml
+ivreg2 y_var1 revenu revenu2 revenu_conjoint revenu_conjoint2 nb_adultes_1 simule_gain simule_gain2 i.egagnant_categorie masculin i.estatut_emploi i.ecsp i.eregion ediplome4 taille_menage nb_14_et_plus nb_adultes fumeur i.eactualite etaille_agglo uc niveau_vie age_18_24 age_25_34 age_35_49 age_50_64 (x_var2 = z_var1 info_cc) [pweights=weight], robust liml
 
 ** Conditional Likelihood Ratio (CLR) confidence sets (Moreira, 2003)
 * Not no without controls: infinite confidence sets => cannot conclude that beta is identified (pi = 0 possible)
