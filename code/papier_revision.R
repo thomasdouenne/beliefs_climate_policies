@@ -611,7 +611,7 @@ heterogeneity_update <- stargazer(base_winner, reg_update_base, reg_update_diplo
                            omit.table.layout = 'n', star.cutoffs = NA,
                            add.lines = list(c("Includes ``pessimistic winners''", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", ""), 
                                             c("Includes ``optimistic losers''", "\\checkmark", "\\checkmark", "\\checkmark", "", "\\checkmark"), 
-                                            c("Includes controls", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark")),
+                                            c("Includes controls", "", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark")),
                            no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:heterogeneity_update")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{13.5cm}{\\linespread{1.2}\\selectfont \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes}. The list of controls can be found in Appendix \\ref{set_controls}.} }\\end{table}', 
                 gsub('\\begin{tabular}{@', '\\resizebox{.90\\columnwidth}{!}{ \\begin{tabular}{@', heterogeneity_update, fixed=TRUE), fixed=TRUE), collapse=' ')
