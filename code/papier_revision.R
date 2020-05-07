@@ -599,7 +599,7 @@ reg_update_with_gain_perdants <- lm(formula_update_with_gain_no_bug, subset = fe
 summary(reg_update_with_gain_perdants)
 
 heterogeneity_update <- stargazer(base_winner, reg_update_base, reg_update_diploma, reg_update_with_gain_gagnants, reg_update_with_gain_perdants,
-                           title="Asymmetric updating of winning category.", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+                           title="Heterogeneity in updating.", #star.cutoffs = c(0.1, 1e-5, 1e-30),
                            covariate.labels = c("Constant", "Winner, before feedback ($\\dot{G}$)", "Initial tax: PNR (I don't know)", "Initial tax: Approves",
                                                 "Diploma $\\times$ Initial tax: PNR", "Diploma $\\times$ Initial tax: Approves",
                                                 "Subjective gain ($g$)", "Subjective gain: unaffected ($g=0$)", "Bias about gain ($g - \\hat{\\gamma}$)",
