@@ -1528,7 +1528,7 @@ weighting_s <- function(data, printWeights = T) { # cf. google sheet
   return(weights(trimWeights(raked, lower=0.25, upper=4, strict=TRUE)))
 }
 
-prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished=TRUE, exclude_more_speeder=F, exclude_even_more=F, only_known_agglo=T) { # , exclude_quotas_full=TRUE
+prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished=TRUE, exclude_more_speeder=F, exclude_even_more=F, only_known_agglo=T, only_quality=F) { # , exclude_quotas_full=TRUE
   # setwd("/home/adrien/Google Drive/Economie/Travail/enquete/codes")
   # setwd("C:/Users/a.fabre/Google Drive/Economie/Travail/enquete/codes")
   # pes <<- read.csv("fin.csv", sep=";")
@@ -1549,7 +1549,7 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   print(paste(length(which(s$exclu=="QuotaMet")), "QuotaMet"))
   s$fini[s$exclu=="QuotaMet" | is.na(s$revenu)] <<- "False" # To check the number of QuotaMet that shouldn't have incremented the quota, comment this line and: decrit(s$each_strate[s$exclu=="QuotaMet" & s$csp=="Employé" & !grepl("2019-03-04 07", s$date)])
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
-  if (exclude_speeder) { s <<- s[as.numeric(as.vector(s$duree)) > 420 + 180*exclude_more_speeder + 420*exclude_even_more,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
+  if (exclude_speeder) { s <<- s[as.numeric(as.vector(s$duree)) > 420 + 240*exclude_more_speeder + 420*exclude_even_more,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
   # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
   if (only_finished) { s <<- s[s$fini=="True",] }
@@ -1566,6 +1566,7 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   if (only_known_agglo) s <<- s[!is.na(s$taille_agglo),]
   
   convert_s(only_finished) 
+  if (only_quality) s <<- s[s$mauvaise_qualite==0,]
   
   s$sample <<- "a"
   s$sample[s$fini=="True"] <<- "e"
@@ -1587,9 +1588,11 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
 # prepare_s(exclude_speeder=FALSE, only_finished=FALSE)
 # ss <- s # keep people answering in less than 7 min
 # prepare_s(exclude_speeder=T,  exclude_more_speeder = T)
-# sl <- s # exclude < 10 min
+# sl <- s # exclude < 11 min
 # prepare_s(exclude_speeder=T, exclude_even_more=T)
 # sr <- s # exclude < 14 min
+# prepare_s(only_quality = T)
+# sq <- s # exclude mauvaise_qualite > 0
  
 prepare_s()
 

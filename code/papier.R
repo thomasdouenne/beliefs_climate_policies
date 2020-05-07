@@ -848,7 +848,7 @@ decrit(s$conso)
 
 ##### Appendix C. Beliefs' persistence #####
 ## C.1 Self-interest: Tables VII and VIII
-ggplot(data=fit, aes(x=gain)) + theme_bw() + geom_smooth(method = "auto", aes(y=predicted_winner), se=F) + ylim(c(0,1)) + 
+ggplot(data=fit, aes(x=gain)) + theme_bw() + stat_smooth(method = "auto", aes(y=predicted_winner, outfit=fitted_proba<<-..y..), se=F) + ylim(c(0,1)) +  # rerun with outfit=fitted_x<<-..x.. to get value at +100. 0.66*fitted_proba[71]+0.34*fitted_proba[70] = 0.96%
    xlab("Objective gain per consumption unit (density in black)") + ylab("Probability of predicting gain (in blue)") + xlim(c(-250, 200)) + 
    geom_density(aes(y=..scaled..), bw=30) + geom_vline(xintercept=0, col='grey')
 crosstab_simule_gagnant

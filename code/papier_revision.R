@@ -477,7 +477,7 @@ Table_ee2 <- stargazer(tsls2_ee1, ols_ee2, ols_eea3, title="Effect of believing 
                                         c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark "),
                                         c("Effective F-Statistic", f_stats_ee[1], "", "")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}, and first stage results in Table \\vref{first_stage_environmental_effectiveness}.}}\\end{table}', 
+write_clip(gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}, and first stage results in Table \\vref{first_stage_environmental_effectiveness}. The dependent variable corresponds to either initial approval (answer ``Yes'' to support of the policy) or acceptance (answer not ``No''). The first stage exploits the information randomly displayed about climate change (C.C.) and the effectiveness of carbon taxation (E.E.) as exogenous instruments.}}\\end{table}", 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_ee2, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 Table_ee1 <- stargazer(tsls1_ee1, tsls1_eea4,
@@ -766,7 +766,7 @@ write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{12cm}{\\linespre
 # TODO: recalculer d'autres poids
 # 2 autres seuils (10 min, 15 min) et 3 résultats : SI, EE, et MR
 
-# (1) SI, 10 min: 55*** p.p.
+# (1) SI, 11 min: 55*** p.p.
 tsls1_si10 <- lm(formula_tsls1_si1, data=sl, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight)
 summary(tsls1_si10)
 sl$non_perdant[((sl$percentile_revenu <= 60 & sl$percentile_revenu >= 10) | (sl$percentile_revenu_conjoint <= 60 & sl$percentile_revenu_conjoint >= 10))] <- tsls1_si10$fitted.values
@@ -777,23 +777,7 @@ iv_si10 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", pa
         " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
         data = sl, subset = (duree > 600 & (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight), diagnostics = TRUE)
 
-
-# (2) EE, 10 min: 40** p.p.
-tsls1_ee10 <- lm(formula_tsls1_ee1, data=sl, weights = sl$weight, na.action='na.exclude')
-summary(tsls1_ee10)
-sl$taxe_efficace.hat <- tsls1_ee10$fitted.values
-tsls2_ee10 <- lm(formula_tsls2_ee1, data=sl, weights = sl$weight) 
-summary(tsls2_ee10)
-
-iv_ee10 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = sl), diagnostics = TRUE)
-
-
-# (3) MR, 10 min: 54*** p.p. / 20*** p.p.
-reg_update_base_10 <- lm(formula_update_base, data=sl, subset = feedback_infirme_large==T, weights = sl$weight)
-summary(reg_update_base_10)
-
-
-# (4) SI, 0 min: 57*** p.p.
+# (2) SI, 0 min: 57*** p.p.
 tsls1_si0 <- lm(formula_tsls1_si1, data=ss, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = ss$weight, na.action = "na.exclude")
 summary(tsls1_si0)
 ss$non_perdant[((ss$percentile_revenu <= 60 & ss$percentile_revenu >= 10) | (ss$percentile_revenu_conjoint <= 60 & ss$percentile_revenu_conjoint >= 10))] <- fitted(tsls1_si0)
@@ -804,78 +788,127 @@ iv_si0 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", pas
         " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
         data = ss, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = ss$weight), diagnostics = TRUE)
 
-# (5) EE, 0 min: 41** p.p.
-tsls1_ee0 <- lm(formula_tsls1_ee1, data=ss, weights = ss$weight, na.action='na.exclude')
-summary(tsls1_ee0)
-ss$taxe_efficace.hat <- fitted(tsls1_ee0)
-tsls2_ee0 <- lm(formula_tsls2_ee1, data=ss, weights = ss$weight) 
-summary(tsls2_ee0)
+# (3) SI, qualite: 56*** p.p.
+tsls1_siq <- lm(formula_tsls1_si1, data=sq, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sq$weight, na.action = "na.exclude")
+summary(tsls1_siq)
+sq$non_perdant[((sq$percentile_revenu <= 60 & sq$percentile_revenu >= 10) | (sq$percentile_revenu_conjoint <= 60 & sq$percentile_revenu_conjoint >= 10))] <- fitted(tsls1_siq)
+tsls2_siq <- lm(formula_tsls2_si1, data=sq, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sq$weight)
+summary(tsls2_siq) 
 
-iv_ee0 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = ss), diagnostics = TRUE)
+iv_siq <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
+        data = sq, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sq$weight), diagnostics = TRUE)
 
+# (4) MR, 11 min: 53*** p.p. / 22*** p.p.
+reg_update_base_10 <- lm(formula_update_base, data=sl, subset = feedback_infirme_large==T, weights = sl$weight)
+summary(reg_update_base_10)
 
-# (6) MR, 0 min: 54*** p.p. / 18*** p.p.
+# (5) MR, 0 min: 54*** p.p. / 18*** p.p.
 reg_update_base_0 <- lm(formula_update_base, subset = feedback_infirme_large==T, data=ss, weights = weight)
 summary(reg_update_base_0)
 
+# (6) MR, qualite: 55*** p.p. / 20*** p.p.
+reg_update_base_q <- lm(formula_update_base, subset = feedback_infirme_large==T, data=sq, weights = weight)
+summary(reg_update_base_q)
 
-# (-1) SI, 14 min: 60 p.p.
-tsls1_si15 <- lm(formula_tsls1_si1, data=sr, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sr$weight)
-summary(tsls1_si15)
-sr$non_perdant[((sr$percentile_revenu <= 60 & sr$percentile_revenu >= 10) | (sr$percentile_revenu_conjoint <= 60 & sr$percentile_revenu_conjoint >= 10))] <- tsls1_si15$fitted.values
-tsls2_si15 <- lm(formula_tsls2_si1, data=sr, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sr$weight)
-summary(tsls2_si15) 
+f_stats_7min <- sprintf("%.1f", round(c(iv_si0$diagnostics[1,3], iv_si10$diagnostics[1,3], iv_siq$diagnostics[1,3]), 1))
 
-iv_si15 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),
-        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
-        data = sr, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sr$weight), diagnostics = TRUE)
-
-
-# (-2) EE, 14 min: 39* p.p.
-tsls1_ee15 <- lm(formula_tsls1_ee1, data=sr, weights = weight, na.action='na.exclude')
-summary(tsls1_ee15)
-sr$taxe_efficace.hat <- tsls1_ee15$fitted.values
-tsls2_ee15 <- lm(formula_tsls2_ee1, data=sr, weights = weight) 
-summary(tsls2_ee15)
-
-iv_ee15 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = sr, weights = sr$weight), diagnostics = TRUE)
-
-
-# (-3) MR, 14 min: 68. p.p. / 20*** p.p.
-reg_update_base_15 <- lm(formula_update_base, subset = feedback_infirme_large==T, data=sr, weights = sr$weight)
-summary(reg_update_base_15)
-
-f_stats_7min <- sprintf("%.1f", round(c(iv_si0$diagnostics[1,3], iv_si10$diagnostics[1,3], iv_ee0$diagnostics[1,3], iv_ee10$diagnostics[1,3]), 1))
-
-Table_robustesse_7min <- stargazer(tsls2_si0, tsls2_si10, tsls2_ee0, tsls2_ee10, reg_update_base_0, reg_update_base_10,#
-                                     title="Robustness of main results to the 7 min cutoff excluding faster respondents.", model.names = F, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
-                                     column.labels = c("all", "> 10 min", "all", "> 10 min", "all", "> 10 min"), 
-                                     covariate.labels = c("Believes does not lose (.53)", "Believes effective (.42)", "Winner, before feedback (.69)", "Initial tax: Approves (.18)"),
-                                     dep.var.labels = c("Acceptance ($A^T$)", "Approval ($\\dot{A^0}$)", "Correct updating ($U$)"), dep.var.caption = "", header = FALSE,
-                                     keep = c("non_perdant", "taxe_efficace.hat", '"Gagnant"TRUE', "taxe_approbationOui"),
-                                     order = c("non_perdant", "taxe_efficace.hat", '"Gagnant"TRUE', "taxe_approbationOui"),
+Table_robustesse_exclude <- stargazer(tsls2_si0, tsls2_si10, tsls2_siq, reg_update_base_0, reg_update_base_10, reg_update_base_q,
+                                     title="Robustness of main results to the exclusion of answers of poor quality.", model.names = F, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
+                                     column.labels = c("all", "> 11 min", "not flagged", "all", "> 11 min", "not flagged"), 
+                                     covariate.labels = c("Believes does not lose (.53)", "Winner, before feedback (.55)", "Initial tax: Approves (.18)"),
+                                     dep.var.labels = c("Acceptance ($A^T$)", "Correct updating ($U$)"), dep.var.caption = "", header = FALSE,
+                                     keep = c("non_perdant", '"Gagnant"TRUE', "taxe_approbationOui"),
+                                     order = c("non_perdant", '"Gagnant"TRUE', "taxe_approbationOui"),
                                      omit.table.layout = 'n', star.cutoffs = NA,
-                                     add.lines = list(c("Original regression: Table (column)", "\\ref{results_private_benefits} (1)", "\\ref{results_private_benefits} (1)", "\\ref{tab:ee} (1)", "\\ref{tab:ee} (1)", "\\ref{tab:heterogeneity_update} (2)", "\\ref{tab:heterogeneity_update} (2)"),
-                                                      c("Effective F-statistic", f_stats_7min, "", "")), # TODO
+                                     add.lines = list(c("Original regression: Table (column)", "\\ref{results_private_benefits} (1)", "\\ref{results_private_benefits} (1)", "\\ref{results_private_benefits} (1)", "\\ref{tab:heterogeneity_update} (2)", "\\ref{tab:heterogeneity_update} (2)", "\\ref{tab:heterogeneity_update} (2)"),
+                                                      c("Effective F-statistic", f_stats_7min, "", "", ""),
+                                                      c("Whole sample size", rep(c(nrow(sl), nrow(ss), nrow(sq)),2))), # TODO
                                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:7min")
-write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. Original estimates are reported next to variable name. See the original Tables for more details. }}  \\end{table} ',
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_robustesse_7min, fixed=TRUE), fixed=TRUE), collapse=' ')
-
-f_stats_7min_bis <- sprintf("%.1f", round(c(iv_si0$diagnostics[1,3], iv_si15$diagnostics[1,3], iv_ee0$diagnostics[1,3], iv_ee15$diagnostics[1,3]), 1))
-Table_robustesse_7min_bis <- stargazer(tsls2_si0, tsls2_si15, tsls2_ee0, tsls2_ee15, reg_update_base_0, reg_update_base_15,#
-                                     title="Robustness of main results to the 7 min cutoff excluding faster respondents.", model.names = F, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
-                                     column.labels = c("all", "> 14 min", "all", "> 14 min", "all", "> 14 min"), 
-                                     covariate.labels = c("Believes does not lose (.53)", "Believes effective (.42)", "Winner, before feedback (.69)", "Initial tax: Approves (.18)"),
-                                     dep.var.labels = c("Acceptance ($A^T$)", "Approval ($\\dot{A^0}$)", "Correct updating ($U$)"), dep.var.caption = "", header = FALSE,
-                                     keep = c("non_perdant", "taxe_efficace.hat", '"Gagnant"TRUE', "taxe_approbationOui"),
-                                     order = c("non_perdant", "taxe_efficace.hat", '"Gagnant"TRUE', "taxe_approbationOui"),
-                                     omit.table.layout = 'n', star.cutoffs = NA,
-                                     add.lines = list(c("Original regression: Table (column)", "\\ref{results_private_benefits} (1)", "\\ref{results_private_benefits} (1)", "\\ref{tab:ee} (1)", "\\ref{tab:ee} (1)", "\\ref{tab:heterogeneity_update} (2)", "\\ref{tab:heterogeneity_update} (2)"),
-                                                      c("Effective F-statistic", f_stats_7min, "", "")), # TODO
-                                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:7min")
-write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. Original estimates are reported next to variable name. See the original Tables for more details. }}  \\end{table} ',
-                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_robustesse_7min_bis, fixed=TRUE), fixed=TRUE), collapse=' ')
+write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Two of our main results are checked on three alternative sampling restrictions: (1) inclusion of answers < 7 min, (2) exclusion of the 10\\% of answers < 11 min, (3) exclusion of flagged (inconsistent) respondents. Weights have been recalculated for each sample. Estimates on the original sample are reported next to variable name. See the original Tables for more details. Correlation between our main variables of interest and response time or being flagged is always below 3\\%. Standard errors are reported in parentheses. }}  \\end{table} ',
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_robustesse_exclude, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 cor(s$duree, s$tax_approval) # -0.01
 cor(s$duree, s$tax_acceptance) # -0.0007
 cor(s$duree, s$gain) # -0.01
+cor(s$mauvaise_qualite, s$tax_acceptance) # .025
+cor(s$mauvaise_qualite, s$gain) # -0.01
+cor(s$mauvaise_qualite > 0, s$tax_acceptance) # .026
+cor(s$mauvaise_qualite > 0, s$gain) # -0.007
+
+# # (2) EE, 10 min: 40** p.p.
+# tsls1_ee10 <- lm(formula_tsls1_ee1, data=sl, weights = sl$weight, na.action='na.exclude')
+# summary(tsls1_ee10)
+# sl$taxe_efficace.hat <- tsls1_ee10$fitted.values
+# tsls2_ee10 <- lm(formula_tsls2_ee1, data=sl, weights = sl$weight) 
+# summary(tsls2_ee10)
+# 
+# iv_ee10 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = sl), diagnostics = TRUE)
+
+# # (5) EE, 0 min: 41** p.p.
+# formula_tsls1_ee0 <- as.formula(paste("taxe_efficace=='Oui' ~", paste(variables_reg_ee[!(variables_reg_ee %in% c("actualite", "fume"))], collapse = ' + '), " + apres_modifs + info_CC"))
+# tsls1_ee0 <- lm(formula_tsls1_ee0, data=ss, weights = ss$weight, na.action='na.exclude')
+# summary(tsls1_ee0)
+# ss$taxe_efficace.hat <- fitted(tsls1_ee0)
+# formula_tsls2_ee0 <- as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_reg_ee[!(variables_reg_ee %in% c("actualite", "fume"))], collapse = ' + '), " + taxe_efficace.hat"))
+# tsls2_ee0 <- lm(formula_tsls2_ee0, data=ss, weights = ss$weight) 
+# summary(tsls2_ee0)
+# 
+# iv_ee0 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = ss), diagnostics = TRUE)
+
+# 
+# # (-1) SI, 14 min: 60 p.p.
+# tsls1_si15 <- lm(formula_tsls1_si1, data=sr, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sr$weight)
+# summary(tsls1_si15)
+# sr$non_perdant[((sr$percentile_revenu <= 60 & sr$percentile_revenu >= 10) | (sr$percentile_revenu_conjoint <= 60 & sr$percentile_revenu_conjoint >= 10))] <- tsls1_si15$fitted.values
+# tsls2_si15 <- lm(formula_tsls2_si1, data=sr, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sr$weight)
+# summary(tsls2_si15) 
+# 
+# iv_si15 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),
+#         " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
+#         data = sr, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sr$weight), diagnostics = TRUE)
+# 
+# 
+# # (-2) EE, 14 min: 39* p.p.
+# tsls1_ee15 <- lm(formula_tsls1_ee1, data=sr, weights = weight, na.action='na.exclude')
+# summary(tsls1_ee15)
+# sr$taxe_efficace.hat <- tsls1_ee15$fitted.values
+# tsls2_ee15 <- lm(formula_tsls2_ee1, data=sr, weights = weight) 
+# summary(tsls2_ee15)
+# 
+# iv_ee15 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = sr, weights = sr$weight), diagnostics = TRUE)
+# 
+# 
+# # (-3) MR, 14 min: 68. p.p. / 20*** p.p.
+# reg_update_base_15 <- lm(formula_update_base, subset = feedback_infirme_large==T, data=sr, weights = sr$weight)
+# summary(reg_update_base_15)
+
+# Table_robustesse_7min <- stargazer(tsls2_si0, tsls2_si10, tsls2_ee0, tsls2_ee10, reg_update_base_0, reg_update_base_10,#
+#                                      title="Robustness of main results to the 7 min cutoff excluding faster respondents.", model.names = F, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
+#                                      column.labels = c("all", "> 11 min", "all", "> 11 min", "all", "> 11 min"), 
+#                                      covariate.labels = c("Believes does not lose (.53)", "Believes effective (.42)", "Winner, before feedback (.69)", "Initial tax: Approves (.18)"),
+#                                      dep.var.labels = c("Acceptance ($A^T$)", "Approval ($\\dot{A^0}$)", "Correct updating ($U$)"), dep.var.caption = "", header = FALSE,
+#                                      keep = c("non_perdant", "taxe_efficace.hat", '"Gagnant"TRUE', "taxe_approbationOui"),
+#                                      order = c("non_perdant", "taxe_efficace.hat", '"Gagnant"TRUE', "taxe_approbationOui"),
+#                                      omit.table.layout = 'n', star.cutoffs = NA,
+#                                      add.lines = list(c("Original regression: Table (column)", "\\ref{results_private_benefits} (1)", "\\ref{results_private_benefits} (1)", "\\ref{tab:ee} (1)", "\\ref{tab:ee} (1)", "\\ref{tab:heterogeneity_update} (2)", "\\ref{tab:heterogeneity_update} (2)"),
+#                                                       c("Effective F-statistic", f_stats_7min, "", "")), # TODO
+#                                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:7min")
+# write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. Original estimates are reported next to variable name. See the original Tables for more details. }}  \\end{table} ',
+#                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_robustesse_7min, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+# f_stats_7min_bis <- sprintf("%.1f", round(c(iv_si0$diagnostics[1,3], iv_si15$diagnostics[1,3], iv_ee0$diagnostics[1,3], iv_ee15$diagnostics[1,3]), 1))
+# Table_robustesse_7min_bis <- stargazer(tsls2_si0, tsls2_si15, tsls2_ee0, tsls2_ee15, reg_update_base_0, reg_update_base_15,#
+#                                      title="Robustness of main results to the 7 min cutoff excluding faster respondents.", model.names = F, model.numbers = FALSE, #star.cutoffs = c(0.1, 1e-5, 1e-30), # "Diploma: Bachelor or above", 
+#                                      column.labels = c("all", "> 14 min", "all", "> 14 min", "all", "> 14 min"), 
+#                                      covariate.labels = c("Believes does not lose (.53)", "Believes effective (.42)", "Winner, before feedback (.69)", "Initial tax: Approves (.18)"),
+#                                      dep.var.labels = c("Acceptance ($A^T$)", "Approval ($\\dot{A^0}$)", "Correct updating ($U$)"), dep.var.caption = "", header = FALSE,
+#                                      keep = c("non_perdant", "taxe_efficace.hat", '"Gagnant"TRUE', "taxe_approbationOui"),
+#                                      order = c("non_perdant", "taxe_efficace.hat", '"Gagnant"TRUE', "taxe_approbationOui"),
+#                                      omit.table.layout = 'n', star.cutoffs = NA,
+#                                      add.lines = list(c("Original regression: Table (column)", "\\ref{results_private_benefits} (1)", "\\ref{results_private_benefits} (1)", "\\ref{tab:ee} (1)", "\\ref{tab:ee} (1)", "\\ref{tab:heterogeneity_update} (2)", "\\ref{tab:heterogeneity_update} (2)"),
+#                                                       c("Effective F-statistic", f_stats_7min, "", "")), # TODO
+#                                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:7min")
+# write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. Original estimates are reported next to variable name. See the original Tables for more details. }}  \\end{table} ',
+#                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_robustesse_7min_bis, fixed=TRUE), fixed=TRUE), collapse=' ')
+
