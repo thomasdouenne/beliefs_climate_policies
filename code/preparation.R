@@ -819,7 +819,7 @@ relabel_and_rename_s <- function() {
   s <<- s[,c(1,2,7,20:319)]
 }
 
-convert_s <- function() {
+convert_s <- function(only_finished = T) {
   # lab <- label(s$csp)
   # s$csp <<- factor(s$csp, levels=c(levels(s$csp), "Cadres", "Indépendants", "Ouvriers", 'Inactifs', "Professions intermédiaires", "Retraités", "Employés", "Agriculteurs"))
   # s$csp <<- as.character(s$csp)
@@ -1463,23 +1463,24 @@ convert_s <- function() {
   s$connaissances_CC <<- (s$connaissances_CC - mean(s$connaissances_CC))/sd(s$connaissances_CC)
   label(s$connaissances_CC) <<- "connaissances_CC: index des bonnes réponses aux questions sur le changement climatique (GES, climate call, cause, emission_cible, region)"
 
-  s$nb_politiques_env <<- 0
-  variables_politiques_environnementales <- c("taxe_kerosene", "taxe_viande", "normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants", 
-                                              "peages_urbains", "fonds_mondial") # "rattrapage_diesel"
-  for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <<- 1 + s$nb_politiques_env[s[[v]]>0]
-
-  categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
-  # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
-  for (i in 0:10) {
-    s[[paste('dep', i, 'en_position', sep='_')]] <<- (s$en_position_1==i) + 2*(s$en_position_2==i)  + 3*(s$en_position_3==i)  + 4*(s$en_position_4==i)  + 5*(s$en_position_5==i)  + 6*(s$en_position_6==i)  + 7*(s$en_position_7==i)  + 8*(s$en_position_8==i)  + 9*(s$en_position_9==i)  + 10*(s$en_position_10==i) 
-    label(s[[paste('dep', i, 'en_position', sep='_')]]) <<- paste(paste('dep', i, 'en_position', sep='_'), ": Position à laquelle est affichée la catégorie de dépense ", i, "(", categories_depenses[i], ") (cf. en_position_i)", sep="")
-    # for (o in 1:nrow(s)) {
-    #   j <- s[[paste('en_position', i, sep='_')]][o]
-    #   if (!is.na(j)) s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
-    #   s[[paste('dep', j, 'en_position', sep='_')]][!is.na(s$en_position_0)] <- 
-    # }
-  }
+  if (only_finished) {
+    s$nb_politiques_env <<- 0
+    variables_politiques_environnementales <- c("taxe_kerosene", "taxe_viande", "normes_isolation", "normes_vehicules", "controle_technique", "interdiction_polluants", 
+                                                "peages_urbains", "fonds_mondial") # "rattrapage_diesel"
+    for (v in variables_politiques_environnementales) s$nb_politiques_env[s[[v]]>0] <<- 1 + s$nb_politiques_env[s[[v]]>0]
   
+    categories_depenses <- c("sante", "retraites", "protection", "education", "recherche", "loisirs", "infrastructures", "justice", "armee", "securite", "aide")
+    # for (i in 0:10) s[[paste('dep', i, 'en_position', sep='_')]] <<- NA
+    for (i in 0:10) {
+      s[[paste('dep', i, 'en_position', sep='_')]] <<- (s$en_position_1==i) + 2*(s$en_position_2==i)  + 3*(s$en_position_3==i)  + 4*(s$en_position_4==i)  + 5*(s$en_position_5==i)  + 6*(s$en_position_6==i)  + 7*(s$en_position_7==i)  + 8*(s$en_position_8==i)  + 9*(s$en_position_9==i)  + 10*(s$en_position_10==i) 
+      label(s[[paste('dep', i, 'en_position', sep='_')]]) <<- paste(paste('dep', i, 'en_position', sep='_'), ": Position à laquelle est affichée la catégorie de dépense ", i, "(", categories_depenses[i], ") (cf. en_position_i)", sep="")
+      # for (o in 1:nrow(s)) {
+      #   j <- s[[paste('en_position', i, sep='_')]][o]
+      #   if (!is.na(j)) s[[paste('dep', j, 'en_position', sep='_')]][o] <<- i
+      #   s[[paste('dep', j, 'en_position', sep='_')]][!is.na(s$en_position_0)] <- 
+      # }
+    }
+  }
   s <<- s[, -c(78:97, 100:119, 294:303)]
   # TODO: qualité, connaissances CC, opinions CC
 }
@@ -1527,7 +1528,7 @@ weighting_s <- function(data, printWeights = T) { # cf. google sheet
   return(weights(trimWeights(raked, lower=0.25, upper=4, strict=TRUE)))
 }
 
-prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished=TRUE, only_known_agglo=T) { # , exclude_quotas_full=TRUE
+prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished=TRUE, exclude_more_speeder=F, exclude_even_more=F, only_known_agglo=T) { # , exclude_quotas_full=TRUE
   # setwd("/home/adrien/Google Drive/Economie/Travail/enquete/codes")
   # setwd("C:/Users/a.fabre/Google Drive/Economie/Travail/enquete/codes")
   # pes <<- read.csv("fin.csv", sep=";")
@@ -1548,10 +1549,11 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   print(paste(length(which(s$exclu=="QuotaMet")), "QuotaMet"))
   s$fini[s$exclu=="QuotaMet" | is.na(s$revenu)] <<- "False" # To check the number of QuotaMet that shouldn't have incremented the quota, comment this line and: decrit(s$each_strate[s$exclu=="QuotaMet" & s$csp=="Employé" & !grepl("2019-03-04 07", s$date)])
   if (exclude_screened) { s <<- s[is.na(s$exclu),] } # remove Screened
-  if (exclude_speeder) { s <<- s[as.numeric(as.vector(s$duree)) > 420,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
+  if (exclude_speeder) { s <<- s[as.numeric(as.vector(s$duree)) > 420 + 180*exclude_more_speeder + 420*exclude_even_more,] } # remove speedest /!\ was 540 before 22-02-11:00 (EST Coast time)
   # if (exclude_quotas_full) { s <<- s[s[101][[1]] %in% c(1:5),]  } # remove those with a problem for the taille d'agglo
   # if (exclude_quotas_full) { s <<- s[s$Q_TerminateFlag=="",]  } # remove those with a problem for the taille d'agglo
   if (only_finished) { s <<- s[s$fini=="True",] }
+  else { s <<- s[!is.na(s$gagnant_categorie),]  }
   
   agglos <- read.csv2('agglos.csv')
   names(agglos) <- c("id", "taille_agglo2")
@@ -1563,7 +1565,7 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
   # write.csv(id_agglo_manquante, "ID_agglo_manquante.csv")
   if (only_known_agglo) s <<- s[!is.na(s$taille_agglo),]
   
-  convert_s() 
+  convert_s(only_finished) 
   
   s$sample <<- "a"
   s$sample[s$fini=="True"] <<- "e"
@@ -1578,11 +1580,17 @@ prepare_s <- function(exclude_speeder=TRUE, exclude_screened=TRUE, only_finished
 
 # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE, only_finished=T) # TODO: let only_finished = FALSE
 # sa <- s
-# # prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
-# # se <- s
+# prepare_s(exclude_screened=FALSE, exclude_speeder=FALSE)
+# se <- s
 # # prepare_s(exclude_screened=FALSE)
 # # sp <- s
-
+# prepare_s(exclude_speeder=FALSE, only_finished=FALSE)
+# ss <- s # keep people answering in less than 7 min
+# prepare_s(exclude_speeder=T,  exclude_more_speeder = T)
+# sl <- s # exclude < 10 min
+# prepare_s(exclude_speeder=T, exclude_even_more=T)
+# sr <- s # exclude < 14 min
+ 
 prepare_s()
 
 write.csv2(s, "survey_prepared.csv", row.names=FALSE)
