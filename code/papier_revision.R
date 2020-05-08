@@ -275,7 +275,7 @@ Table_si1 <- stargazer(tsls1_si1, tsls1_si3, tsls1_si5,
                                   c("Sub-sample", "[p10; p60]", "", "$\\left| \\widehat{\\gamma}\\right|<50$"),
                                   c("Effective F-Statistic", f_stats_si)),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See second stage results, Table \\vref{results_private_benefits}. }} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} In (1,2), the random (conditionally on income) eligibility to the dividend is used as source of exogenous variation in the belief. In (4), the discontinuity in the win/lose feedback when the net gain switches from negative to positive is used. See second stage results, Table \\vref{results_private_benefits}. }} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_si1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
@@ -490,7 +490,7 @@ Table_ee1 <- stargazer(tsls1_ee1, tsls1_eea4,
                        column.labels = c("(1; A2)", "(A4)"), model.numbers = FALSE,
                        add.lines = list(c("Controls ", "\\checkmark ", "\\checkmark "), c("Effective F-Statistic", f_stats_ee)), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} See discussion in the main text, Section \\vref{subsec:motive_ee}. } \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} The information randomly displayed about climate change ($Z_{CC}$) and the effectiveness of carbon taxation ($Z_{E}$) are used as sources of exogenous variation in the belief. See discussion in the main text, Section \\vref{subsec:motive_ee}. } \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_ee1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 Table_eea <- stargazer(logit_ee1, tsls2_eea2, ols_eea3, tsls2_eea4, ols_eea5, title="Effect of believing in environmental effectiveness on support: second stages of alternative specifications", 
