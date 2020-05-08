@@ -912,3 +912,51 @@ cor(s$mauvaise_qualite > 0, s$gain) # -0.007
 # write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. Original estimates are reported next to variable name. See the original Tables for more details. }}  \\end{table} ',
 #                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_robustesse_7min_bis, fixed=TRUE), fixed=TRUE), collapse=' ')
 
+
+
+##### Reduced form self-interest #####
+
+# Target on acceptance
+formula_reduced_form_targeted_acceptance <- as.formula(paste("taxe_cible_approbation!='Non' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
+                                      paste(variables_reg_self_interest, collapse = ' + ')))
+reduced_form_targeted_acceptance <- lm(formula_reduced_form_targeted_acceptance, data=s, weights = s$weight)
+summary(reduced_form_targeted_acceptance)
+
+# Target on approval
+formula_reduced_form_targeted_approval <- as.formula(paste("taxe_cible_approbation=='Oui' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
+                                                             paste(variables_reg_self_interest, collapse = ' + ')))
+reduced_form_targeted_approval <- lm(formula_reduced_form_targeted_approval, data=s, weights = s$weight)
+summary(reduced_form_targeted_approval)
+
+
+# Feedback on acceptance
+formula_reduced_form_feedback_acceptance <- as.formula(paste("taxe_feedback_approbation!='Non' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + ", 
+                                      paste(variables_reg_self_interest, collapse = ' + ')))
+reduced_form_feedback_acceptance <- lm(formula_reduced_form_feedback_acceptance, data=s, weights = s$weight, na.action='na.exclude')
+summary(reduced_form_feedback_acceptance)
+
+# Feedback on approval
+formula_reduced_form_feedback_approval <- as.formula(paste("taxe_feedback_approbation=='Oui' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + ", 
+                                                             paste(variables_reg_self_interest, collapse = ' + ')))
+reduced_form_feedback_approval <- lm(formula_reduced_form_feedback_approval, data=s, weights = s$weight, na.action='na.exclude')
+summary(reduced_form_feedback_approval)
+
+
+# TODO: solve issue in write clip (delete \multicolumn{4}{c})
+Table_reduced_form_si <- stargazer(reduced_form_targeted_acceptance, reduced_form_targeted_approval, reduced_form_feedback_acceptance, reduced_form_feedback_approval,
+                       title="Reduced form effect of instruments for self-interest on support", star.cutoffs = NA, #column.labels = c("Acceptance", "Approval", "Acceptance", "Approval"),# column.separate = c(2,1,1),
+                       dep.var.labels = c("Acceptance", "Approval", "Acceptance", "Approval"), 
+                       dep.var.caption = c("\\multicolumn{2}{c}{Targeted Tax} & \\multicolumn{2}{c}{After Feedback}"), header = FALSE,
+                       covariate.labels = c("Transfer to respondent ($T_1$)", "Transfer to spouse ($T_2$)",
+                                            "$T_1 \\times T_2$", "Simulated winner ($\\widehat{\\Gamma}$)", "Initial tax Acceptance ($A^0$)"),
+                       #column.labels = c("(1)", "(2)", "(3)", "(4)"), model.numbers = FALSE,
+                       keep = c("traite", "simule_gagnant", "acceptance"), order = c("traite", "simule_gagnant", "acceptance"),
+                       add.lines = list(c("Controls: Incomes (piecewise continuous)", " \\checkmark", " \\checkmark", "\\checkmark", "\\checkmark"),
+                                        c("\\quad Estimated gain, socio-demo, other motives ", "", "", "", " " ),
+                                        # c("Controls: Estimated gain", "", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
+                                        c("Controls: Policy assigned", " \\checkmark", " \\checkmark", " ", " "),
+                                        # c("Controls: Socio-demo, other motives", "", "", " \\checkmark", " ", " \\checkmark"),
+                                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits"))
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}.} }\\end{table}', 
+                gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_reduced_form_si, fixed=TRUE), fixed=T), collapse=' ')
+
