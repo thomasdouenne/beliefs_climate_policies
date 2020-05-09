@@ -155,6 +155,8 @@ iv_si1 # Effective F-stat from Stata weakivtest: 16
 summary(lm(taxe_cible_approbation!='Non' ~ percentile_revenu + percentile_revenu_conjoint + Revenu2 + Revenu_conjoint2 + single +
              I(percentile_revenu < 10) + I(percentile_revenu_conjoint < 10) + I(percentile_revenu > 60) + I(percentile_revenu_conjoint > 60), data=s))
 summary(lm(taxe_cible_approbation!='Non' ~ percentile_revenu + percentile_revenu_conjoint + Revenu2 + Revenu_conjoint2 + single +
+             I(percentile_revenu < 10 | percentile_revenu_conjoint < 10)*traite_cible*traite_cible_conjoint + I(percentile_revenu > 60 | percentile_revenu_conjoint > 60)*traite_cible*traite_cible_conjoint, data=s))
+summary(lm(taxe_cible_approbation!='Non' ~ percentile_revenu + percentile_revenu_conjoint + Revenu2 + Revenu_conjoint2 + single +
              I(percentile_revenu < 10 | percentile_revenu_conjoint < 10)*(gagnant_cible_categorie!='Perdant') + I(percentile_revenu > 60 | percentile_revenu_conjoint > 60)*(gagnant_cible_categorie=='Perdant'), data=s))
 summary(lm(taxe_cible_approbation!='Non' ~ percentile_revenu + percentile_revenu_conjoint + Revenu2 + Revenu_conjoint2 + single + 
              I(percentile_revenu > 60) + I(percentile_revenu_conjoint > 60), data=s, subset = gagnant_cible_categorie=='Perdant'))
@@ -1082,3 +1084,18 @@ Table_reduced_form_si <- stargazer(reduced_form_targeted_acceptance, reduced_for
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}.} }\\end{table}', 
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_reduced_form_si, fixed=TRUE), fixed=T), collapse=' ')
 
+
+##### 5.2 Sargan #####
+summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), 
+                               " + apres_modifs * info_CC * info_PM")), data = s), diagnostics=T)
+summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), 
+                               " + apres_modifs * info_CC")), data = s), diagnostics=T)
+summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), 
+                               " + apres_modifs + info_CC")), data = s), diagnostics=T)
+
+
+##### CDF for the bias #####
+par(mar = c(4.1, 4.1, 1.1, 0.1), cex=1.5)
+plot(Ecdf(s$simule_gain - s$gain), type="s", lwd=2, col="red", xlim=c(-100, 400), xlab=expression("Bias: objective minus subjective net gain"), main="", ylab=expression("Proportion "<=" x")) + grid() #  \\widehat{\\gamma} - g
+lines(density(s$simule_gain - s$gain, bw=30)$x, density(s$simule_gain - s$gain, bw=30)$y/0.004, xlim=c(-100, 400), lwd=2, type='l', col="darkblue")
+par(mar = mar_old, cex = cex_old)

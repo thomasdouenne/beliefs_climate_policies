@@ -66,6 +66,7 @@ package("devtools")
 install_github("jdstorey/qvalue")
 package("qvalue")
 package("car")
+# package("latex2exp")
 # install_github(repo = "MatthieuStigler/RCompAngrist", subdir = "RCompAngrist")
 # package("RCompAngrist")
 
