@@ -1099,3 +1099,6 @@ par(mar = c(4.1, 4.1, 1.1, 0.1), cex=1.5)
 plot(Ecdf(s$simule_gain - s$gain), type="s", lwd=2, col="red", xlim=c(-100, 400), xlab=expression("Bias: objective minus subjective net gain"), main="", ylab=expression("Proportion "<=" x")) + grid() #  \\widehat{\\gamma} - g
 lines(density(s$simule_gain - s$gain, bw=30)$x, density(s$simule_gain - s$gain, bw=30)$y/0.004, xlim=c(-100, 400), lwd=2, type='l', col="darkblue")
 par(mar = mar_old, cex = cex_old)
+
+# Identify point in the distriution for figure footnote
+sum(((s$simule_gain - s$gain) > 200)*s$weight) / sum(s$weight)
