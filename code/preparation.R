@@ -1732,3 +1732,42 @@ for (v in c('sexe', 'age', 'csp', 'diplome4', 'taille_agglo', 'region')) {
 ttests
 # good = can't reject they are equal at 5%
 # sex: all good / diplome: all bad / age: 2/5 good / csp: 7/8 good / taille_agglo: 3/5 good / region: 7/10 good
+
+## Testing the equality of two distributions
+# Résumé : le mieux semble le G-test (qui est similaire au chi2). Hellinger est bien en théorie mais on a pas de source fiable pour la rule of thumb. On peut aussi essayer Maasoumi & Racine (2002).
+# The univariate case: usually test the L^p distance between the CDFs (two first cases below). o if for ordered variables (i.e. not categorical).
+# o Kolmogorov-Smirnov (KS) test: tests the L^infini distance i.e. D = max |CDF_1 - CDF_2|. Continuous distrib: ks.test() / Discrete (less conservative): KSgeneral::disc_ks_test() (or in the dgof package) https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test
+# o Cramer-von Mises test: use the L^2 distance, which seems preferable. dgof::cvm.test() https://stats.stackexchange.com/questions/288416/non-parametric-test-if-two-samples-are-drawn-from-the-same-distribution
+# o Anderson-Darling: not conservative like KS and other good properties (ideal to compare response times). http://www.jaqm.ro/issues/volume-6,issue-3/pdfs/1_engmann_cousineau.pdf
+# o Mann-Whitney U test: tests whether two groups have similar values or if one has higher values than the other (see also Wilcoxon for equality of medians).
+# - Maasoumi & Racine (2002): compare densities comprised of continuous and categorical data using entropy. np::npunitest()
+# - Kullback-Leibler divergence D_KL(P||Q) (= relative entropy): measures the information loss of approximating true distribution P by Q. Is a f-divergence and a Bergman divergence.
+# > G-test: similar but better than a chi-squared test. G-stat ~ D_KL. This is what should be used to test similarity between categorical distributions. AMR::g.test() https://en.wikipedia.org/wiki/G-test
+# - Hellinger distance: H = ||sqrt(P)-sqrt(Q)||_2, another f-divergence. Rule-of-thumb: two distributions are close if H < 0.05. StatMatch::comp.prop (also computes L^1 distance with rule of thumb < 0.03) p. 14 https://ec.europa.eu/eurostat/documents/3888793/5855821/KS-RA-13-020-EN.PDF/477dd541-92ee-4259-95d4-1c42fcf2ef34?version=1.0 https://en.wikipedia.org/wiki/Hellinger_distance
+# ? maximum mean discrepancy (Gretton et al., 2012): state-of-the-art mathematical tool for related problems. http://jmlr.csail.mit.edu/papers/v13/gretton12a.html
+# - unpaired two-sample t-test or z-test: tests equality of means of two distribution using asymptotic normal approximation.
+# - Wald & Wolfowitz (1940) runs test and the (Pearson's) chi-squared test: tests respectively the sign (of the difference) and the distance of two distributions under the null that the frequencies are the same. https://en.wikipedia.org/wiki/Wald%E2%80%93Wolfowitz_runs_test
+#
+# The multivariate case:
+# o (best) Fasano & Franceschini (1987): generalizes KS in higher dimensions*. No implementation in R. *Defining CDF as P(X<x & Y<y) doesn't yield same D (= max...) as P(X<x & Y>y): all 2^d-1 possible arrangements have to be tested, and we take the max of them. https://stats.stackexchange.com/questions/71036/test-if-multidimensional-distributions-are-the-same implementation in C and python: https://stats.stackexchange.com/questions/27288/two-dimensional-kolmogorov-smirnov
+# o Peacock (1983): similar to Fasano & Franceschini but more computationally intensive. Exists only for dimension 2 and 3. Peacock.test::peacock2()
+# - Li, Maasoumi & Racine (2009): compare densities comprised of continuous and categorical data using entropy. np::npdeneqtest() https://cran.r-project.org/web/packages/np/vignettes/entropy_np.pdf
+# o Chacon & Duong (2018): kernel density estimates, up to dimension 6: ks::kde.test https://cran.r-project.org/web/packages/ks/ks.pdf (seen on https://stats.stackexchange.com/questions/27288/two-dimensional-kolmogorov-smirnov)
+
+
+# rm(list=ls()[grepl("tsls|ols|logit_|_logit|probit|iv_|rdd_|reg_|iv._", ls()) & !grepl("variables", ls())])
+# rm(sa, sq, sr)
+# load("/var/www/beliefs_climate_policies/code/.RData")
+# formula_test <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),          " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint"))
+# ivreg(formula_test, data = s)
+# summary(ivreg(formula_test, data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
+# ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),          " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),          data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+# ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),          data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+# ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),          data = s, weights = s$weight)
+# ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), data = s)
+# ivreg(taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint, data = s)
+# ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible, data = s)
+# packages in "/usr/lib/R/library" (or "/usr/local/lib/R/site-library" for rstudio) but not in "/home/adrien/R/x86_64-pc-linux-gnu-library/4.0" : c("compiler","datasets","graphics","grDevices","grid","methods","parallel","splines","stats","stats4","tcltk","tools","utils","base","rstudio")
+installed_packages <- installed.packages()[,c('Package','LibPath')]
+install.packages(c('abind','colorspace','dichromat','gtable','labeling','memoise','munsell','proto','RColorBrewer','sp'))
+remove.packages(c('abind','colorspace','dichromat','gtable','labeling','memoise','munsell','proto','RColorBrewer','sp'))
