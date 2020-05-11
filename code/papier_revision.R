@@ -359,9 +359,8 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\li
 
 # TODO: check autres seuils et en faire une table en appendix
 summary(ivreg(taxe_cible_approbation!='Non' ~ ((gagnant_cible_categorie!='Perdant') & (percentile_revenu > 45)) + (gagnant_cible_categorie!='Perdant') + percentile_revenu + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
-  + percentile_revenu__1 + percentile_revenu_3_ + percentile_revenu_conjoint__1 + percentile_revenu_conjoint_3_ | traite_cible + traite_cible_conjoint + 
-    I(traite_cible*traite_cible_conjoint) + cible + (percentile_revenu > 45) + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
-    percentile_revenu__1 + percentile_revenu_3_ + percentile_revenu_conjoint__1 + percentile_revenu_conjoint_3_ , data = s, weights = s$weight))
+  + percentile_revenu__1 + percentile_revenu_3_ + percentile_revenu_conjoint__1 + percentile_revenu_conjoint_3_ | traite_cible*traite_cible_conjoint*(percentile_revenu > 45) + cible + (percentile_revenu > 45) 
+  + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + percentile_revenu__1 + percentile_revenu_3_ + percentile_revenu_conjoint__1 + percentile_revenu_conjoint_3_ , data = s, weights = s$weight))
 
 # # Here we find heterogenous effect:
 # summary(ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') * Simule_gain + percentile_revenu + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
@@ -506,7 +505,7 @@ Table_ee1 <- stargazer(tsls1_ee1, tsls1_eea4,
                        column.labels = c("(1; A2)", "(A4)"), model.numbers = FALSE,
                        add.lines = list(c("Controls ", "\\checkmark ", "\\checkmark "), c("Effective F-Statistic", f_stats_ee)), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} The information randomly displayed about climate change ($Z_{CC}$) and the effectiveness of carbon taxation ($Z_{E}$) are used as sources of exogenous variation in the belief. See discussion in the main text, Section \\vref{subsec:motive_ee}. } \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} The information randomly displayed about climate change ($Z_{CC}$) and the effectiveness of carbon taxation ($Z_{E}$) are used as sources of exogenous variation in the belief. See discussion in the main text, Section \\vref{subsec:motive_ee}. We chose the set of instruments that maximizes the effective F-statistics. Our specification is well-founded as the Sargan test does not reject the validity of our over-identification restrictions (p-value of 0.93).} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_ee1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 Table_eea <- stargazer(logit_ee1, tsls2_eea2, ols_eea3, tsls2_eea4, ols_eea5, title="Effect of believing in environmental effectiveness on support: second stages of alternative specifications", 
@@ -1096,9 +1095,137 @@ summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg
 
 ##### CDF for the bias #####
 par(mar = c(4.1, 4.1, 1.1, 0.1), cex=1.5)
-plot(Ecdf(s$simule_gain - s$gain), type="s", lwd=2, col="red", xlim=c(-100, 400), xlab=expression("Bias: objective minus subjective net gain"), main="", ylab=expression("Proportion "<=" x")) + grid() #  \\widehat{\\gamma} - g
+plot(Ecdf(s$simule_gain - s$gain), type="s", lwd=2, col="red", xlim=c(-100, 400), xlab=expression("Bias: objective minus subjective net gain (in €/year per C.U.)"), main="", ylab=expression("Proportion "<=" x")) + grid() #  \\widehat{\\gamma} - g
 lines(density(s$simule_gain - s$gain, bw=30)$x, density(s$simule_gain - s$gain, bw=30)$y/0.004, xlim=c(-100, 400), lwd=2, type='l', col="darkblue")
 par(mar = mar_old, cex = cex_old)
 
 # Identify point in the distriution for figure footnote
 sum(((s$simule_gain - s$gain) > 200)*s$weight) / sum(s$weight)
+
+##### Test similarity of distributions #####
+# T-tests test of representativeness of quotas
+fq <- list()
+fq[['sexe']] <- list(name=c("Féminin", "Masculin"), 
+                     freq=c(0.516,0.484))
+fq[['csp']] <- list(name=c("Inactif", "Ouvrier", "Cadre", "Indépendant", "Intermédiaire", "Retraité", "Employé", "Agriculteur"), 
+                    freq=c(0.1244,0.1214,0.0943,0.0341,0.1364,0.3279,0.1535,0.008))
+fq[['region']] <- list(name=c("autre","ARA", "Est", "Nord", "IDF", "Ouest", "SO", "Occ", "Centre", "PACA"), 
+                       freq=c(0.001,0.124,0.129,0.093,0.189,0.103,0.093,0.091,0.099,0.078))
+fq[['age']] <- list(name=c("18-24", "25-34", "35-49", "50-64", "65+"), 
+                    freq=c(0.117,0.147,0.242,0.242,0.252))
+fq[['taille_agglo']] <- list(name=c(1:5), 
+                             freq=c(0.2166,0.1710,0.1408,0.3083,0.1633))
+fq[['diplome4']] <- list(name=c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur"), 
+                         freq=c(0.301, 0.246, 0.168, 0.285))
+variables_strata <- c('sexe', 'age', 'csp', 'diplome4', 'taille_agglo', 'region')
+ttests_quotas <- list()
+for (v in variables_strata) {
+  for (i in 1:length(fq[[v]]$freq)) ttests_quotas[[v]] <- c(ttests_quotas[[v]], t.test((1*(s[[v]]==fq[[v]]$name[i])), mu=fq[[v]]$freq[i])$p.value) # prop.test yields same results
+  names(ttests_quotas[[v]]) <- fq[[v]]$name
+}
+mean_characs <- ttests_characs <- c('taille_menage'=2.36, 'nb_adultes'=2.03, 'uc'=1.60, 'gaz'=0.42, 'fioul'=0.12, 'surface'=97, 'km'=13735, 'conso'=6.39)
+for (c in c('taille_menage', 'nb_adultes', 'uc', 'gaz', 'fioul', 'surface', 'km', 'conso'))  ttests_characs[c] <- t.test(as.numeric(s[[c]]), mu=mean_characs[c])$p.value 
+
+sort(p.adjust(c(ttests_characs, unlist(ttests_quotas)), method = 'fdr'), decreasing=T)
+length(which(sort(p.adjust(c(ttests_characs, unlist(ttests_quotas)), method = 'fdr'), decreasing=T)<0.05)) # 12
+length(c(ttests_characs, unlist(ttests_quotas))) # 42
+
+
+##### Self-interest: heterogeneity and other controls of incomes #####
+# (1) Heterogeneity: interaction with percentile_revenu > 45
+formula_tsls1a_sio1 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible*traite_cible_conjoint*(percentile_revenu > 45) + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1a_sio1 <- lm(formula_tsls1a_sio1, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+formula_tsls1b_sio1 <- as.formula(paste("((gagnant_cible_categorie!='Perdant')*(percentile_revenu > 45)) ~ traite_cible*traite_cible_conjoint*(percentile_revenu > 45) + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1b_sio1 <- lm(formula_tsls1b_sio1, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1a_sio1$fitted.values
+s$non_perdant_p45_[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1b_sio1$fitted.values
+formula_tsls2_sio1 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse = ' + '), "+ cible + I(taxe_approbation=='NSP') + tax_acceptance + non_perdant + non_perdant_p45_ + (percentile_revenu > 45)")) # 
+tsls2_sio1 <- lm(formula_tsls2_sio1, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls2_sio1) 
+
+iv_sio1 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '), 
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant')*(percentile_revenu > 45) |", paste(variables_reg_self_interest, collapse=' + '), 
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + traite_cible*traite_cible_conjoint*(percentile_revenu > 45)")), 
+        data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
+iv_sio1
+
+# (2) Robustness: additional income slope change at 30th percentile
+formula_tsls1_sio2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
+                                      piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 30), ' + ', paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1_sio2 <- lm(formula_tsls1_sio2, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls1_sio2)
+s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1_sio2$fitted.values
+formula_tsls2_sio2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 30), ' + ', 
+                                      paste(variables_reg_self_interest, collapse = ' + '), "+ cible + I(taxe_approbation=='NSP') + tax_acceptance + non_perdant")) # 
+tsls2_sio2 <- lm(formula_tsls2_sio2, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls2_sio2) 
+
+iv_sio2 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 30), ' + ', paste(variables_reg_self_interest, collapse=' + '), 
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), 
+        data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
+iv_sio2
+
+# (3) Robustness: additional income slope change at 40th percentile
+formula_tsls1_sio3 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
+                                      piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 40), ' + ', paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1_sio3 <- lm(formula_tsls1_sio3, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls1_sio3)
+s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1_sio3$fitted.values
+formula_tsls2_sio3 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 40), ' + ', 
+                                      paste(variables_reg_self_interest, collapse = ' + '), "+ cible + I(taxe_approbation=='NSP') + tax_acceptance + non_perdant")) # 
+tsls2_sio3 <- lm(formula_tsls2_sio3, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls2_sio3) 
+
+iv_sio3 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 40), ' + ', paste(variables_reg_self_interest, collapse=' + '), 
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), 
+        data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
+iv_sio3
+
+# (4) Robustness: additional income slope change at 50th percentile
+formula_tsls1_sio4 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
+                                      piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 50), ' + ', paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1_sio4 <- lm(formula_tsls1_sio4, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls1_sio4)
+s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1_sio4$fitted.values
+formula_tsls2_sio4 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 50), ' + ', 
+                                      paste(variables_reg_self_interest, collapse = ' + '), "+ cible + I(taxe_approbation=='NSP') + tax_acceptance + non_perdant")) # 
+tsls2_sio4 <- lm(formula_tsls2_sio4, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls2_sio4) 
+
+iv_sio4 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 50), ' + ', paste(variables_reg_self_interest, collapse=' + '), 
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), 
+        data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
+iv_sio4
+
+# (5) Robustness: additional income slope change at 60th percentile
+formula_tsls1_sio5 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
+                                      piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 60), ' + ', paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1_sio5 <- lm(formula_tsls1_sio5, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls1_sio5)
+s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1_sio5$fitted.values
+formula_tsls2_sio5 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 60), ' + ', 
+                                      paste(variables_reg_self_interest, collapse = ' + '), "+ cible + I(taxe_approbation=='NSP') + tax_acceptance + non_perdant")) # 
+tsls2_sio5 <- lm(formula_tsls2_sio5, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+summary(tsls2_sio5) 
+
+iv_sio5 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 60), ' + ', paste(variables_reg_self_interest, collapse=' + '), 
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), 
+        data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
+iv_sio5
+
+f_stats_sio <- sprintf("%.1f", round(c(iv_sio1$diagnostics[1,3], iv_sio2$diagnostics[1,3], iv_sio3$diagnostics[1,3], iv_sio4$diagnostics[1,3], iv_sio5$diagnostics[1,3]), 1))
+Table_additional_res <- stargazer(tsls2_sio1, tsls2_sio2, tsls2_sio3, tsls2_sio4, tsls2_sio5, 
+       title="Effect of self-interest on acceptance: the role of incomes", #star.cutoffs = c(0.1, 1e-5, 1e-30),
+       covariate.labels = c("Believes does not lose ($G^T$)", "Income in top 55\\% ($\\un_{I > p45}$)", "$G^T \\times \\un_{I > p45}$", "Initial tax Acceptance ($A^0$)"),
+       omit.table.layout = 'n', star.cutoffs = NA, model.names = FALSE, dep.var.labels = "Acceptance of Tax \\& Targeted Dividend ($A^T$)",
+       dep.var.caption = "", header = FALSE, 
+       keep = c("non_perdant", "tax_acceptance", "45"), order = c("non_perdant$", "percentile", "p45", "acceptance"),
+       add.lines = list(
+            c("Percentile with additional income slope change", "", "30", "40", "50", "60"),
+            c("Controls: Incomes (piecewise continuous)", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark", "\\checkmark "), 
+            c("\\quad estimated gain, socio-demo, other motives ", "", "", "", "", ""),
+            c("Sub-sample: [p10; p60]; Controls: Policy assigned", "\\checkmark  ", "\\checkmark ", "\\checkmark", "\\checkmark ", "\\checkmark"),
+            c("Effective F-Statistic", f_stats_sio)),
+       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. The first-stage use as source of exogenous variation in the belief the random assignment of the income threshold that determines eligibility to the dividend.} }.\\end{table}', 
+   gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), collapse=' ')

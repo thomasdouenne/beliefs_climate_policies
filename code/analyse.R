@@ -4357,3 +4357,105 @@ summary(tsls2_all4)
 summary(lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T, data=s, weights = s$weight)) # .69***
 summary(lm(update_correct ~ gagnant_categorie=='Gagnant', subset = feedback_infirme_large==T  & round(conso)==7 & !(fuel_2_1 %in% c('Diesel')), data=s, weights = s$weight)) # .54*
 summary(lm(formula_update, subset = feedback_infirme_large==T  & round(conso)==7 & !(fuel_2_1 %in% c('Diesel')), data=s, weights = s$weight)) # .24
+
+
+
+##### Test similarity of distributions #####
+# Pearson's chi-square test of equality of distributions
+fq <- list()
+fq[['sexe']] <- list(name=c("Féminin", "Masculin"), 
+                     freq=c(0.516,0.484))
+fq[['csp']] <- list(name=c("Inactif", "Ouvrier", "Cadre", "Indépendant", "Intermédiaire", "Retraité", "Employé", "Agriculteur"), 
+                    freq=c(0.1244,0.1214,0.0943,0.0341,0.1364,0.3279,0.1535,0.008))
+fq[['region']] <- list(name=c("autre","ARA", "Est", "Nord", "IDF", "Ouest", "SO", "Occ", "Centre", "PACA"), 
+                       freq=c(0.001,0.124,0.129,0.093,0.189,0.103,0.093,0.091,0.099,0.078))
+fq[['age']] <- list(name=c("18-24", "25-34", "35-49", "50-64", "65+"), 
+                    freq=c(0.117,0.147,0.242,0.242,0.252))
+fq[['taille_agglo']] <- list(name=c(1:5), 
+                             freq=c(0.2166,0.1710,0.1408,0.3083,0.1633))
+fq[['diplome4']] <- list(name=c("Aucun diplôme ou brevet", "CAP ou BEP", "Baccalauréat", "Supérieur"), 
+                         freq=c(0.301, 0.246, 0.168, 0.285))
+variables_strata <- c('sexe', 'age', 'csp', 'diplome4', 'taille_agglo', 'region')
+pvalues_representativeness <- c()
+for (v in variables_strata) {
+  freq_sample <- c()
+  for (i in fq[[v]]$name) freq_sample <- c(freq_sample, sum((s[[v]]==i))) # *s$weight
+  # print(paste(v, round(chisq.test(freq_sample, p = fq[[v]]$freq, simulate.p.value = T)$p.value, 3)))
+  pvalues_representativeness <- c(pvalues_representativeness, chisq.test(freq_sample, p = fq[[v]]$freq, simulate.p.value = T)$p.value)
+} 
+names(pvalues_representativeness) <- variables_strata
+sort(p.adjust(pvalues_representativeness, method = 'fdr'), decreasing=T) 
+# Equality rejected at .01 except for sex and CSP
+# divide freq_sample by 2: only diploma and age not good / by 4: diploma not good / by 5: all good (at 5%)
+
+ttests <- equivtests_3 <- equivtests_5 <- equivtests_10p <- list()
+for (v in c('sexe', 'age', 'csp', 'diplome4', 'taille_agglo', 'region')) {
+  for (i in 1:length(fq[[v]]$freq)) {
+    ttests[[v]] <- c(ttests[[v]], t.test((1*(s[[v]]==fq[[v]]$name[i])), mu=fq[[v]]$freq[i])$p.value)
+    equivtests_5[[v]] <- c(equivtests_5[[v]], tost((s[[v]]==fq[[v]]$name[i]) - fq[[v]]$freq[i],  epsilon = 0.05)$result)
+    equivtests_3[[v]] <- c(equivtests_3[[v]], tost((s[[v]]==fq[[v]]$name[i]) - fq[[v]]$freq[i],  epsilon = 0.03)$result)
+    equivtests_10p[[v]] <- c(equivtests_10p[[v]], tost((s[[v]]==fq[[v]]$name[i]) - fq[[v]]$freq[i],  epsilon = 0.1*fq[[v]]$freq[i])$result)   }
+  names(ttests[[v]]) <- fq[[v]]$name
+}
+mean(unlist(equivtests_5)=='rejected') # 97% sont équivalents
+mean(unlist(equivtests_3)=='rejected') # 76%
+mean(unlist(equivtests_10p)=='rejected') # 15%
+ttests
+sort(p.adjust(unlist(ttests), method = 'fdr'), decreasing=T) 
+mean(unlist(ttests)<0.05)
+mean(sort(p.adjust(unlist(ttests), method = 'fdr'), decreasing=T)<0.01) 
+# good = can't reject they are equal at 5%
+# sex: all good / diplome: all bad / age: 2/5 good / csp: 7/8 good / taille_agglo: 3/5 good / region: 7/10 good
+
+tost((s$sexe=='Masculin') - 0.484,  epsilon = 0.05)
+temp$
+equiv.test <- function(var, null, epsilon = NULL, alpha = 0.05) { # under the assumption of normality
+  if (missing(epsilon)) epsilon <- 0.05*mean(as.numeric(var))
+  return(tost.stat(mean(as.numeric(var)), sd(as.numeric(var)), length(var), null = null, alpha = alpha, Epsilon = epsilon))
+}
+temp <- equiv.test((s$sexe=='Masculin'), 0.484, epsilon = 0.05)
+
+variables_strata <- c('sexe', 'age', 'csp', 'diplome4', 'taille_agglo', 'region')
+ttests_quotas <- list()
+for (v in variables_strata) {
+  for (i in 1:length(fq[[v]]$freq)) ttests_quotas[[v]] <- c(ttests_quotas[[v]], t.test((1*(s[[v]]==fq[[v]]$name[i])), mu=fq[[v]]$freq[i])$p.value) # prop.test yields same results
+  names(ttests_quotas[[v]]) <- fq[[v]]$name
+}
+sort(p.adjust(unlist(ttests_quotas), method = 'fdr'), decreasing=T) 
+mean(sort(p.adjust(unlist(ttests_quotas), method = 'fdr'), decreasing=T)<0.05) # 21%
+length(which(sort(p.adjust(unlist(ttests_quotas), method = 'fdr'), decreasing=T)<0.001)) # 21%
+
+mean_characs <- ttests_characs <- c('taille_menage'=2.36, 'nb_adultes'=2.03, 'uc'=1.60, 'gaz'=0.42, 'fioul'=0.12, 'surface'=97, 'km'=13735, 'conso'=6.39)
+for (c in c('taille_menage', 'nb_adultes', 'uc', 'gaz', 'fioul', 'surface', 'km', 'conso'))  ttests_characs[c] <- t.test(as.numeric(s[[c]]), mu=mean_characs[c])$p.value 
+ttests_characs
+sort(p.adjust(ttests_characs, method = 'fdr'), decreasing=T) 
+mean(sort(p.adjust(ttests_characs, method = 'fdr'), decreasing=T)<0.05) # 63%
+length(which(sort(p.adjust(ttests_characs, method = 'fdr'), decreasing=T)<0.001)) # 5
+
+
+## Testing the equality of two distributions
+# Résumé : le mieux semble le G-test (qui est similaire au chi2). Hellinger est bien en théorie mais on a pas de source fiable pour la rule of thumb. On peut aussi essayer Maasoumi & Racine (2002).
+# The univariate case: usually test the L^p distance between the CDFs (two first cases below). o if for ordered variables (i.e. not categorical).
+# o Kolmogorov-Smirnov (KS) test: tests the L^infini distance i.e. D = max |CDF_1 - CDF_2|. Continuous distrib: ks.test() / Discrete (less conservative): KSgeneral::disc_ks_test() (or in the dgof package) https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test
+# o Cramer-von Mises test: use the L^2 distance, which seems preferable. dgof::cvm.test() https://stats.stackexchange.com/questions/288416/non-parametric-test-if-two-samples-are-drawn-from-the-same-distribution
+# o Anderson-Darling: not conservative like KS and other good properties (ideal to compare response times). http://www.jaqm.ro/issues/volume-6,issue-3/pdfs/1_engmann_cousineau.pdf
+# o Mann-Whitney U test: tests whether two groups have similar values or if one has higher values than the other (see also Wilcoxon for equality of medians).
+# - Maasoumi & Racine (2002): compare densities comprised of continuous and categorical data using entropy. np::npunitest()
+# - Kullback-Leibler divergence D_KL(P||Q) (= relative entropy): measures the information loss of approximating true distribution P by Q. Is a f-divergence and a Bergman divergence.
+# > G-test: similar but better than a chi-squared test. G-stat ~ D_KL. This is what should be used to test similarity between categorical distributions. AMR::g.test() https://en.wikipedia.org/wiki/G-test
+# - Hellinger distance: H = ||sqrt(P)-sqrt(Q)||_2, another f-divergence. Rule-of-thumb: two distributions are close if H < 0.05. StatMatch::comp.prop (also computes L^1 distance with rule of thumb < 0.03) p. 14 https://ec.europa.eu/eurostat/documents/3888793/5855821/KS-RA-13-020-EN.PDF/477dd541-92ee-4259-95d4-1c42fcf2ef34?version=1.0 https://en.wikipedia.org/wiki/Hellinger_distance
+# ? maximum mean discrepancy (Gretton et al., 2012): state-of-the-art mathematical tool for related problems. http://jmlr.csail.mit.edu/papers/v13/gretton12a.html
+# - unpaired two-sample t-test or z-test: tests equality of means of two distribution using asymptotic normal approximation.
+# - Wald & Wolfowitz (1940) runs test and the (Pearson's) chi-squared test: tests respectively the sign (of the difference) and the distance of two distributions under the null that the frequencies are the same. https://en.wikipedia.org/wiki/Wald%E2%80%93Wolfowitz_runs_test
+# - Equivalence tests: here the null hypothesis is the dissimilarity (two one-sided t-tests). Equivalence test of mean under normality assumption: equivalence::tost(x - mean(x))
+#
+# The multivariate case:
+# o (best) Fasano & Franceschini (1987): generalizes KS in higher dimensions*. No implementation in R. *Defining CDF as P(X<x & Y<y) doesn't yield same D (= max...) as P(X<x & Y>y): all 2^d-1 possible arrangements have to be tested, and we take the max of them. https://stats.stackexchange.com/questions/71036/test-if-multidimensional-distributions-are-the-same implementation in C and python: https://stats.stackexchange.com/questions/27288/two-dimensional-kolmogorov-smirnov
+# o Peacock (1983): similar to Fasano & Franceschini but more computationally intensive. Exists only for dimension 2 and 3. Peacock.test::peacock2()
+# - Li, Maasoumi & Racine (2009): compare densities comprised of continuous and categorical data using entropy. np::npdeneqtest() https://cran.r-project.org/web/packages/np/vignettes/entropy_np.pdf
+# o Chacon & Duong (2018): kernel density estimates, up to dimension 6: ks::kde.test https://cran.r-project.org/web/packages/ks/ks.pdf (seen on https://stats.stackexchange.com/questions/27288/two-dimensional-kolmogorov-smirnov)
+
+
+##### Role endorsement #####
+summary(lm((gagnant_categorie!='Perdant') ~ info_PM, data=s))
+summary(lm((gagnant_categorie!='Perdant') ~ info_CC, data=s))
