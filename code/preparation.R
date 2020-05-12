@@ -1630,7 +1630,7 @@ fit_2 <- read.csv("../model_reforms_data/prediction expenditures (2).csv") # spe
 fit_2$gain <- (110 * fit_2$nb_beneficiaries - fit_2$total_expenditures_increase) / fit_2$consumption_units
 fit_2$predicted_gain <- (16.1 + 110 * fit_2$nb_beneficiaries - fit_2$predicted_total_expenditures_increase) / fit_2$consumption_units
 
-  # Preparation for Figures 1 and 2: importation of distribution calculated (for objective) or smoothed (for subjective) in standardize_data_bdf_ptc.py
+# Preparation for Figures 1 and 2: importation of distribution calculated (for objective) or smoothed (for subjective) in standardize_data_bdf_ptc.py
 objective_gains <- read.csv2("df_objective_gains.csv") 
 subjective_gains <- read.csv2("df_subjective_gains.csv")
 objective_gains_inelastic <- read.csv2("df_objective_gains_inelastic.csv")

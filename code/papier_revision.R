@@ -1,13 +1,13 @@
 source("packages_functions.R")
 load(".RData")
 
-##### Survey #####
+##### *Survey #####
 # Context of the study
 decrit(s$gilets_jaunes >= 0, numbers=T, miss=T, weights=s$weight)
-decrit(s$gilets_jaunes[s$centre==T] >= 0, numbers=T, miss=T, weights=s$weight[s$centre==T])
+decrit(s$gilets_jaunes[s$centre!=''] >= 0, numbers=T, miss=T, weights=s$weight[s$centre!=''])
 
 
-##### Self-interest #####
+##### *Self-interest #####
 # TODO: rajouter des thresholds dans les contrôles revenus
 # percentiles revenu fit: slightly lack of poor (around percentiles 0 and 25)
 plot(1:length(s$percentile_revenu), 100*(1:length(s$percentile_revenu))/length(s$percentile_revenu), type='l', col='red')
@@ -295,7 +295,7 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\li
                                                        Table_si1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
-##### Heterogeneity in LATE (R2) #### 
+##### **Heterogeneity in LATE (R2) #### 
 ## By subsetting: same effect for income, but higher effect when simule_gain < 0
 # summary(ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') + cible + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single
 #   + percentile_revenu__20 + percentile_revenu_70_ + percentile_revenu_conjoint__20 + percentile_revenu_conjoint_70_ | traite_cible + traite_cible_conjoint + 
@@ -378,7 +378,7 @@ summary(ivreg(taxe_cible_approbation!='Non' ~ ((gagnant_cible_categorie!='Perdan
 # summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ (taxe_efficace!='Non') * Simule_gain | apres_modifs * info_CC * Simule_gain")), data = s), diagnostics = TRUE)
 
 
-##### LIML #####
+##### **LIML #####
 # 1 Yes2, 2 Yes2 OLS, 3 No ~ Yes LIML 
 # app: 1 Yes2 logit, 2 No ~ Yes, 3 No ~ Yes OLS, 4 No ~ No, 5 No ~ No OLS
 # Spec Yes ~ Yes as main, then present result of CLR for old main (coef consistent but not identified, biased towards OLS)
@@ -414,7 +414,7 @@ summary(lm(as.formula(paste("taxe_approbation!='Non' ~ apres_modifs")), data = s
 summary(lm(as.formula(paste("taxe_approbation!='Non' ~ info_CC")), data = s, weights = s$weight)) 
 summary(lm(as.formula(paste("taxe_approbation!='Non' ~ apres_modifs + info_CC")), data = s, weights = s$weight)) 
 
-##### 5.2 EE #####
+##### *5.2 EE #####
 # (1) Yes ~ Yes, 2SLS: 42*** p.p. 
 formula_tsls1_ee1 <- as.formula(paste("taxe_efficace=='Oui' ~", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC"))
 tsls1_ee1 <- lm(formula_tsls1_ee1, data=s, weights = s$weight, na.action='na.exclude')
@@ -525,7 +525,7 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{1.05\\textwidth}{
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_eea, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
-##### Causal complementary  effects #####
+##### **Causal complementary  effects #####
 # The specifications of this section are mis-specified. Or rather, they provide unbiased estimates only if there is not omitted variable.
 # variables_all_controls <- variables_reg_all #
 variables_all_controls <- c(variables_reg_all, "taxe_approbation") # variables_reg_all #
@@ -557,7 +557,7 @@ tsls2_all2 <- lm(formula2_all2, data=s, weights=s$weight, subset= variante_taxe_
 summary(tsls2_all2)
 
 
-##### All causal effects ####
+##### **All causal effects ####
 # # (3) A^T = ^SI * ^EE = 0.14 ^SI + 0.30 ^EE + 1.12 ^(SI*EE) (almost no control), similar results with controls
 # formula_all1_ee <- as.formula(paste("taxe_efficace!='Non' ~ cible + percentile_revenu + Revenu2 + percentile_revenu_conjoint + Revenu_conjoint2 + single + 
 #     apres_modifs * info_CC * traite_cible * traite_cible_conjoint"))
@@ -654,7 +654,7 @@ summary(lm(benefices_pauvres==T ~ info_progressivite, data = s, weights = s$weig
 summary(ivreg(taxe_info_approbation!='Non' ~ benefices_pauvres==T | info_progressivite, data = s, weights = s$weight))
 
 
-##### FDR #####
+##### *FDR #####
 variables_demo_bias <- variables_demo
 variables_demo_bias <- variables_demo_bias[!(variables_demo_bias %in% c("sexe", "age_50_64", "age_65_plus", "taille_agglo"))] # , "fume", "actualite"
 formula_bias <- as.formula(paste("abs(simule_gain - gain) > 110 ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + 
@@ -692,7 +692,7 @@ summary(reg_bias_bis)
 sort(p.adjust(summary(reg_bias_bis)$coefficients[,4], method = 'BH'), decreasing=T)
 
 
-##### Motivated Reasoning (table 4.2) #####
+##### *Motivated Reasoning (table 4.2) #####
 
 variables_update <- c("revenu", "(gagnant_categorie=='Gagnant')", "Simule_gain", "as.factor(taille_agglo)", "retraites", "actifs", "etudiants", variables_demo, 
                       variables_politiques, "Gilets_jaunes") # 
@@ -745,8 +745,7 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{13.5cm}{\\linespr
 
 
 
-##### Heterogeneity in bias #####
-
+##### *Heterogeneity in bias #####
 variables_demo_bias <- variables_demo
 variables_demo_bias <- variables_demo_bias[!(variables_demo_bias %in% c("sexe", "age_50_64", "age_65_plus", "taille_agglo"))]
 formula_bias <- as.formula(paste("abs(simule_gain - gain) > 110 ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + 
@@ -781,8 +780,7 @@ write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{12cm}{\\linespre
 
 
 ##### Robustesse des 7 min #####
-# TODO: recalculer d'autres poids
-# 2 autres seuils (10 min, 15 min) et 3 résultats : SI, EE, et MR
+# 2 autres seuils (0 min, 11 min) et 3 résultats : SI, EE, et MR
 
 # (1) SI, 11 min: 55*** p.p.
 tsls1_si10 <- lm(formula_tsls1_si1, data=sl, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight)
@@ -930,7 +928,7 @@ cor(s$mauvaise_qualite > 0, s$gain) # -0.007
 # write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. Original estimates are reported next to variable name. See the original Tables for more details. }}  \\end{table} ',
 #                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_robustesse_7min_bis, fixed=TRUE), fixed=TRUE), collapse=' ')
 
-##### Table D.3 SI 2nd stage alternatives #####
+##### *Table E.3 SI 2nd stage alternatives #####
 # (1) Target: Acceptance ~ win 
 formula_tsls1_sia1 <- as.formula(paste("gagnant_cible_categorie=='Gagnant' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
                                       paste(variables_reg_self_interest, collapse = ' + ')))
@@ -1040,7 +1038,7 @@ Table_additional_res <- stargazer(tsls2_sia1, tsls2_sia2, tsls2_sia3, tsls2_sia4
 write_clip(sub("\\multicolumn{6}{c}{", "", gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. As in the latter Table, the source of exogenous variation in the belief used in first-stages for the targeted dividend is the random assignment of the income threshold, which determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }.\\end{table}', 
    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
 
-##### Reduced form self-interest #####
+##### **Reduced form self-interest #####
 
 # Target on acceptance
 formula_reduced_form_targeted_acceptance <- as.formula(paste("taxe_cible_approbation!='Non' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
@@ -1087,7 +1085,7 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\li
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_reduced_form_si, fixed=TRUE), fixed=T), collapse=' ')
 
 
-##### 5.2 Sargan #####
+##### *5.2 Sargan #####
 summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), 
                                " + apres_modifs * info_CC * info_PM")), data = s), diagnostics=T)
 summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), 
@@ -1096,7 +1094,7 @@ summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg
                                " + apres_modifs + info_CC")), data = s), diagnostics=T)
 
 
-##### CDF for the bias #####
+##### *CDF for the bias #####
 par(mar = c(4.1, 4.1, 1.1, 0.1), cex=1.5)
 plot(Ecdf(s$simule_gain - s$gain), type="s", lwd=2, col="red", xlim=c(-100, 400), xlab=expression("Bias: objective minus subjective net gain (in €/year per C.U.)"), main="", ylab=expression("Proportion "<=" x")) + grid() #  \\widehat{\\gamma} - g
 lines(density(s$simule_gain - s$gain, bw=30)$x, density(s$simule_gain - s$gain, bw=30)$y/0.004, xlim=c(-100, 400), lwd=2, type='l', col="darkblue")
@@ -1105,7 +1103,7 @@ par(mar = mar_old, cex = cex_old)
 # Identify point in the distriution for figure footnote
 sum(((s$simule_gain - s$gain) > 200)*s$weight) / sum(s$weight)
 
-##### Test similarity of distributions #####
+##### *Test similarity of distributions #####
 # T-tests test of representativeness of quotas
 fq <- list()
 fq[['sexe']] <- list(name=c("Féminin", "Masculin"), 
@@ -1134,7 +1132,7 @@ length(which(sort(p.adjust(c(ttests_characs, unlist(ttests_quotas)), method = 'f
 length(c(ttests_characs, unlist(ttests_quotas))) # 42
 
 
-##### Self-interest: heterogeneity and other controls of incomes #####
+##### *Self-interest: heterogeneity and other controls of incomes #####
 # (1) Heterogeneity: interaction with percentile_revenu > 35
 formula_tsls1a_sio1 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ 0 + (percentile_revenu > 35) + traite_cible*traite_cible_conjoint*(percentile_revenu > 35) + cible*(percentile_revenu < 35) + I(taxe_approbation=='NSP')*(percentile_revenu < 35) + tax_acceptance*(percentile_revenu < 35) + ", paste(paste(variables_reg_self_interest, "(percentile_revenu < 35)", sep='*'), collapse = ' + ')))
 tsls1a_sio1 <- lm(formula_tsls1a_sio1, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
