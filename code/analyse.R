@@ -4477,3 +4477,25 @@ iv_sio1 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", pa
         " + cible + I(taxe_approbation=='NSP') + tax_acceptance + traite_cible*traite_cible_conjoint*(percentile_revenu > 45)")), 
         data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
 iv_sio1
+
+
+##### SI on > p70 #####
+decrit(s$gagnant_categorie[s$simule_gagnant==1 & s$percentile_revenu > 50 & (s$percentile_revenu_conjoint > 50 | s$nb_adultes==1)], miss=T)
+decrit(s$taxe_approbation[s$simule_gagnant==1 & s$percentile_revenu > 50 & (s$percentile_revenu_conjoint > 50 | s$nb_adultes==1)], miss=T)
+# decrit(s$taxe_feedback_approbation[s$simule_gagnant==1 & s$percentile_revenu > 50 & (s$percentile_revenu_conjoint > 50 | s$nb_adultes==1)], miss=T)
+decrit(s$taxe_cible_approbation[s$simule_gagnant==1 & s$percentile_revenu > 50 & (s$percentile_revenu_conjoint > 50 | s$nb_adultes==1)], miss=T)
+decrit(s$taxe_approbation[s$gagnant_categorie!='Perdant' & s$simule_gagnant==1 & s$percentile_revenu > 50 & (s$percentile_revenu_conjoint > 50 | s$nb_adultes==1)], miss=T)
+decrit(s$taxe_cible_approbation[s$gagnant_categorie!='Perdant' & s$simule_gagnant==1 & s$percentile_revenu > 50 & (s$percentile_revenu_conjoint > 50 | s$nb_adultes==1)], miss=T)
+
+m_1 <- m_2 <- s[,c("weight", "taxe_approbation", "taxe_cible_approbation", "gagnant_categorie", "gagnant_cible_categorie", "cible", "categorie_cible", "simule_gagnant", "percentile_revenu", "percentile_revenu_conjoint", "nb_adultes", "single")]
+m_1$tax_acceptance <- m_1$taxe_approbation != 'Non'
+m_1$non_perdant <- m_1$gagnant_categorie != 'Perdant'
+m_1$initial <- TRUE
+m_2$tax_acceptance <- m_2$taxe_cible_approbation != 'Non'
+m_2$non_perdant <- m_2$gagnant_cible_categorie != 'Perdant'
+m_2$initial <- FALSE
+s2 <- rbind(m_1, m_2)
+rm(m_1, m_2)
+
+summary(ivreg(tax_acceptance ~ non_perdant | initial, data = s2, subset = percentile_revenu > 50 & (percentile_revenu_conjoint > 50 | nb_adultes==1)), diagnostics = T)
+summary(ivreg(tax_acceptance ~ non_perdant | initial, data = s2, subset = simule_gagnant==1 & percentile_revenu > 50 & (percentile_revenu_conjoint > 50 | nb_adultes==1)), diagnostics = T)
