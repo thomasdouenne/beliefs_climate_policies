@@ -267,13 +267,13 @@ Table_si2 <- stargazer(tsls2_si1, tsls2_si3, ols_si3, tsls2_si5,
                     add.lines = list(
                       # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
                       c("Controls: Incomes (piecewise continuous)", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark"), # TODO: non-parametric incomes in (2)?
-                      c("\\quad estimated gain, socio-demo, other motives ", "", "", "", ""),
+                      c("\\quad estimated gains, socio-demo, other motives ", "", "", "", ""),
                       # c("Controls: Estimated gain ", "\\checkmark", "", "\\checkmark", "\\checkmark"),
                       c("Controls: Policy assigned", "\\checkmark ", "\\checkmark ", "\\checkmark  ", ""),
                       c("Sub-sample", "[p10; p60]", "", "", "$\\left| \\widehat{\\gamma}\\right|<50$"),
                       c("Effective F-Statistic", f_stats_si[1:2], "", f_stats_si[3])),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="results_private_benefits")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}. The first-stages for the targeted dividend use as source of exogenous variation in the belief the random assignment of the income threshold that determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }\\end{table}', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}. The source of exogenous variation in the belief used in first-stages for the targeted dividend is the random assignment of the income threshold, which determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }\\end{table}', 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_si2, fixed=TRUE), fixed=T), collapse=' ')
 
 Table_si1 <- stargazer(tsls1_si1, tsls1_si3, tsls1_si5, 
@@ -284,7 +284,7 @@ Table_si1 <- stargazer(tsls1_si1, tsls1_si3, tsls1_si5,
                     column.labels = c("(1)", "(2)", "(4)"), model.numbers = FALSE,
                     keep = c("traite", "simule_gagnant", "acceptance"), order = c("traite", "simule_gagnant", "acceptance"),
                     add.lines = list(c("Controls: Incomes (piecewise continuous)", " \\checkmark", " \\checkmark", "\\checkmark"),
-                                       c("\\quad estimated gain, socio-demo, other motives ", "", "", ""),
+                                       c("\\quad estimated gains, socio-demo, other motives ", "", "", ""),
                                   # c("Controls: Estimated gain", "", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
                                   c("Controls: Policy assigned", " \\checkmark", " \\checkmark", " "),
                                   # c("Controls: Socio-demo, other motives", "", "", " \\checkmark", " ", " \\checkmark"),
@@ -489,7 +489,8 @@ Table_ee2 <- stargazer(tsls2_ee1, ols_ee2, ols_eea3, title="Effect of believing 
                        coef = list(NULL, NULL, liml_ee3$coef),
                        se = list(NULL, NULL, liml_ee3$sd),
                        add.lines = list(c("Instruments: info E.E. \\& C.C. ", "\\checkmark ", "", "\\checkmark "),
-                                        c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark "),
+                                        c("Controls: Socio-demo, other motives, ", "\\checkmark ", "\\checkmark  ", "\\checkmark "),
+                                        c("\\quad incomes, estimated gains", "", "", ""),
                                         c("Effective F-Statistic", f_stats_ee[1], "", "")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
 write_clip(gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}, and first stage results in Table \\vref{first_stage_environmental_effectiveness}. The dependent variable corresponds to either initial approval (answer ``Yes'' to support of the policy) or acceptance (answer not ``No''). The first stage exploits the information randomly displayed about climate change (C.C.) and the effectiveness of carbon taxation (E.E.) as exogenous instruments.}}\\end{table}", 
@@ -503,7 +504,9 @@ Table_ee1 <- stargazer(tsls1_ee1, tsls1_eea4,
                        dep.var.labels = c("``Yes''", "not ``No''"), dep.var.caption = "Environmental effectiveness", header = FALSE, star.cutoffs = NA, omit.table.layout = 'n',
                        keep = c("info", "apres_modifs"), 
                        column.labels = c("(1; A2)", "(A4)"), model.numbers = FALSE,
-                       add.lines = list(c("Controls ", "\\checkmark ", "\\checkmark "), c("Effective F-Statistic", f_stats_ee)), 
+                       add.lines = list(c("Controls: Socio-demo, other motives,", "\\checkmark ", "\\checkmark "), 
+                                        c("\\quad incomes, estimated gains", "", ""),
+                                        c("Effective F-Statistic", f_stats_ee)), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} The information randomly displayed about climate change ($Z_{CC}$) and the effectiveness of carbon taxation ($Z_{E}$) are used as sources of exogenous variation in the belief. See discussion in the main text, Section \\vref{subsec:motive_ee}. We chose the set of instruments that maximizes the effective F-statistics. Our specification is well-founded as the Sargan test does not reject the validity of our over-identification restrictions (p-value of 0.93).} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_ee1, fixed=TRUE), fixed=TRUE), collapse=' ')
@@ -735,7 +738,7 @@ heterogeneity_update <- stargazer(base_winner, reg_update_base, reg_update_diplo
                            omit.table.layout = 'n', star.cutoffs = NA,
                            add.lines = list(c("Includes ``pessimistic winners''", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark", ""), 
                                             c("Includes ``optimistic losers''", "\\checkmark", "\\checkmark", "\\checkmark", "", "\\checkmark"), 
-                                            c("Includes controls", "", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark")),
+                                            c("Controls: socio-demo, politics, estimated gains", "", "\\checkmark", "\\checkmark", "\\checkmark", "\\checkmark")),
                            no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="tab:heterogeneity_update")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{13.5cm}{\\linespread{1.2}\\selectfont \\textsc{Note:} Omitted variables are \\textit{Unemployed/Inactive} and \\textit{Yellow Vests: opposes}. The list of controls can be found in Appendix \\ref{set_controls}.} }\\end{table}', 
                 gsub('\\begin{tabular}{@', '\\resizebox{.90\\columnwidth}{!}{ \\begin{tabular}{@', heterogeneity_update, fixed=TRUE), fixed=TRUE), collapse=' ')
@@ -1028,13 +1031,13 @@ Table_additional_res <- stargazer(tsls2_sia1, tsls2_sia2, tsls2_sia3, tsls2_sia4
        keep = c("gagnant", "non_perdant"),
        add.lines = list(
             c("Controls: Incomes (piecewise continuous)", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark", "\\checkmark ", "\\checkmark"), 
-            c("\\quad estimated gain, socio-demo, other motives ", "", "", "", ""),
+            c("\\quad estimated gains, socio-demo, other motives ", "", "", "", ""),
             # c("Controls: Estimated gain ", "\\checkmark", "", "\\checkmark", "\\checkmark"),
             c("Controls: Policy assigned", "\\checkmark ", "\\checkmark ", "\\checkmark  ", "", "", ""),
             c("Sub-sample: [p10; p60] ($A^T$) or $\left| \widehat{\gamma}\right|<50$ ($A^F$)", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark", "\\checkmark ", "\\checkmark"),
             c("Effective F-Statistic", f_stats_sia)),
        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
-write_clip(sub("\\multicolumn{6}{c}{", "", gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. As in the latter Table, the first-stages for the targeted dividend use as source of exogenous variation in the belief the random assignment of the income threshold that determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }.\\end{table}', 
+write_clip(sub("\\multicolumn{6}{c}{", "", gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. As in the latter Table, the source of exogenous variation in the belief used in first-stages for the targeted dividend is the random assignment of the income threshold, which determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }.\\end{table}', 
    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
 
 ##### Reduced form self-interest #####
@@ -1075,7 +1078,7 @@ Table_reduced_form_si <- stargazer(reduced_form_targeted_acceptance, reduced_for
                        #column.labels = c("(1)", "(2)", "(3)", "(4)"), model.numbers = FALSE,
                        keep = c("traite", "simule_gagnant", "acceptance"), order = c("traite", "simule_gagnant", "acceptance"),
                        add.lines = list(c("Controls: Incomes (piecewise continuous)", " \\checkmark", " \\checkmark", "\\checkmark", "\\checkmark"),
-                                        c("\\quad Estimated gain, socio-demo, other motives ", "", "", "", " " ),
+                                        c("\\quad estimated gains, socio-demo, other motives ", "", "", "", " " ),
                                         # c("Controls: Estimated gain", "", "", " \\checkmark ", " \\checkmark", " \\checkmark"),
                                         c("Controls: Policy assigned", " \\checkmark", " \\checkmark", " ", " "),
                                         # c("Controls: Socio-demo, other motives", "", "", " \\checkmark", " ", " \\checkmark"),
@@ -1132,20 +1135,20 @@ length(c(ttests_characs, unlist(ttests_quotas))) # 42
 
 
 ##### Self-interest: heterogeneity and other controls of incomes #####
-# (1) Heterogeneity: interaction with percentile_revenu > 45
-formula_tsls1a_sio1 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible*traite_cible_conjoint*(percentile_revenu > 45) + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", paste(variables_reg_self_interest, collapse = ' + ')))
+# (1) Heterogeneity: interaction with percentile_revenu > 35
+formula_tsls1a_sio1 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ 0 + (percentile_revenu > 35) + traite_cible*traite_cible_conjoint*(percentile_revenu > 35) + cible*(percentile_revenu < 35) + I(taxe_approbation=='NSP')*(percentile_revenu < 35) + tax_acceptance*(percentile_revenu < 35) + ", paste(paste(variables_reg_self_interest, "(percentile_revenu < 35)", sep='*'), collapse = ' + ')))
 tsls1a_sio1 <- lm(formula_tsls1a_sio1, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
-formula_tsls1b_sio1 <- as.formula(paste("((gagnant_cible_categorie!='Perdant')*(percentile_revenu > 45)) ~ traite_cible*traite_cible_conjoint*(percentile_revenu > 45) + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", paste(variables_reg_self_interest, collapse = ' + ')))
+formula_tsls1b_sio1 <- as.formula(paste("((gagnant_cible_categorie!='Perdant')*(percentile_revenu > 35)) ~ 0 + (percentile_revenu > 35) + traite_cible*traite_cible_conjoint*(percentile_revenu > 35) + cible*(percentile_revenu < 35) + I(taxe_approbation=='NSP')*(percentile_revenu < 35) + tax_acceptance*(percentile_revenu < 35) + ", paste(paste(variables_reg_self_interest, "(percentile_revenu < 35)", sep='*'), collapse = ' + ')))
 tsls1b_sio1 <- lm(formula_tsls1b_sio1, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
 s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1a_sio1$fitted.values
-s$non_perdant_p45_[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1b_sio1$fitted.values
-formula_tsls2_sio1 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse = ' + '), "+ cible + I(taxe_approbation=='NSP') + tax_acceptance + non_perdant + non_perdant_p45_ + (percentile_revenu > 45)")) # 
+s$non_perdant_p35_[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1b_sio1$fitted.values
+formula_tsls2_sio1 <- as.formula(paste("taxe_cible_approbation!='Non' ~ 0 + (percentile_revenu > 35) + ", paste(paste(variables_reg_self_interest, "(percentile_revenu < 35)", sep='*'), collapse = ' + '), "+ cible*(percentile_revenu < 35) + I(taxe_approbation=='NSP')*(percentile_revenu < 35) + tax_acceptance*(percentile_revenu < 35) + non_perdant + non_perdant_p35_")) # 
 tsls2_sio1 <- lm(formula_tsls2_sio1, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
 summary(tsls2_sio1) 
 
-iv_sio1 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '), 
-        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant')*(percentile_revenu > 45) |", paste(variables_reg_self_interest, collapse=' + '), 
-        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + traite_cible*traite_cible_conjoint*(percentile_revenu > 45)")), 
+iv_sio1 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ 0 + (percentile_revenu > 35) + ", paste(paste(variables_reg_self_interest, "(percentile_revenu < 35)", sep='*'), collapse=' + '), " + cible*(percentile_revenu < 35) + I(taxe_approbation=='NSP')*(percentile_revenu < 35) + tax_acceptance*(percentile_revenu < 35) + (gagnant_cible_categorie!='Perdant')*(percentile_revenu > 35) | 0 + (percentile_revenu > 35) + ", 
+        paste(paste(variables_reg_self_interest, "(percentile_revenu < 35)", sep='*'), collapse=' + '), 
+        " + cible*(percentile_revenu < 35) + I(taxe_approbation=='NSP')*(percentile_revenu < 35) + tax_acceptance*(percentile_revenu < 35) + traite_cible*traite_cible_conjoint*(percentile_revenu > 35)")), 
         data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
 iv_sio1
 
@@ -1216,16 +1219,16 @@ iv_sio5
 f_stats_sio <- sprintf("%.1f", round(c(iv_sio1$diagnostics[1,3], iv_sio2$diagnostics[1,3], iv_sio3$diagnostics[1,3], iv_sio4$diagnostics[1,3], iv_sio5$diagnostics[1,3]), 1))
 Table_additional_res <- stargazer(tsls2_sio1, tsls2_sio2, tsls2_sio3, tsls2_sio4, tsls2_sio5, 
        title="Effect of self-interest on acceptance: the role of incomes", #star.cutoffs = c(0.1, 1e-5, 1e-30),
-       covariate.labels = c("Believes does not lose ($G^T$)", "Income in top 55\\% ($\\un_{I > p45}$)", "$G^T \\times \\un_{I > p45}$", "Initial tax Acceptance ($A^0$)"),
+       covariate.labels = c("Believes does not lose ($G^T$)", "Income above 35th percentile ($\\un_{I > p35}$)", "$G^T \\times \\un_{I > p35}$", "Initial tax Acceptance ($A^0$)"),
        omit.table.layout = 'n', star.cutoffs = NA, model.names = FALSE, dep.var.labels = "Acceptance of Tax \\& Targeted Dividend ($A^T$)",
        dep.var.caption = "", header = FALSE, 
-       keep = c("non_perdant", "tax_acceptance", "45"), order = c("non_perdant$", "percentile", "p45", "acceptance"),
+       keep = c("non_perdant", "^tax_acceptance", "^percentile_revenu > 35TRUE$"), order = c("non_perdant$", "percentile", "p35", "acceptance"),
        add.lines = list(
             c("Percentile with additional income slope change", "", "30", "40", "50", "60"),
             c("Controls: Incomes (piecewise continuous)", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark", "\\checkmark "), 
-            c("\\quad estimated gain, socio-demo, other motives ", "", "", "", "", ""),
+            c("\\quad estimated gains, socio-demo, other motives ", "", "", "", "", ""),
             c("Sub-sample: [p10; p60]; Controls: Policy assigned", "\\checkmark  ", "\\checkmark ", "\\checkmark", "\\checkmark ", "\\checkmark"),
             c("Effective F-Statistic", f_stats_sio)),
-       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. The first-stage use as source of exogenous variation in the belief the random assignment of the income threshold that determines eligibility to the dividend.} }.\\end{table}', 
+       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_sio")
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. The source of exogenous variation in the belief used in the first-stage is the random assignment of the income threshold, which determines eligibility to the dividend.} }\\end{table}', 
    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), collapse=' ')

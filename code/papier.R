@@ -187,7 +187,7 @@ Table_elast <- stargazer(elas_c, elas_f, elast_c_controls, elast_f_controls,
         covariate.labels = c("Price elasticity: Housing", "Price elasticity: Transports", "Income","Size of town", "Age","Domestic fuel", "Natural gas", "Diesel"), 
         dep.var.labels = c("Environmental effectiveness: not ``No''"), dep.var.caption = "", header = FALSE,
         keep = c("Elasticite"),
-        add.lines = list(c("Controls: Socio-demographics, energy", "", "", "\\checkmark  ", "\\checkmark")),
+        add.lines = list(c("Controls: Socio-demo, energy", "", "", "\\checkmark  ", "\\checkmark")),
         no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="table:elasticities_effectiveness")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} See discussion in the main text, Section \\vref{subsec:perception_ee}.} \\end{table}', gsub('\\begin{tabular}{@', 
                                                        '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_elast, fixed=TRUE), fixed=TRUE), collapse=' ')
@@ -386,7 +386,7 @@ Table_update_ee <- stargazer(reg_update_ee1, reg_update_ee2, logit_update_ee3, r
                              coef = list(NULL, NULL, logit_update_ee3_margins[,1], NULL), 
                              se = list(NULL, NULL, logit_update_ee3_margins[,2], NULL),
                              column.labels = c("(1)", "(2)", "(3)", "(4)"), model.numbers = FALSE,
-                             add.lines = list(c("Controls: Socio-demographics ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ")), 
+                             add.lines = list(c("Controls: Socio-demo ", "", "\\checkmark ", "\\checkmark ", "\\checkmark ")), 
                              no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:update_ee")
 write_clip(gsub('\\end{table}', '} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
                                                        Table_update_ee, fixed=TRUE), fixed=TRUE), collapse=' ')
@@ -685,7 +685,7 @@ Table_prog <- stargazer(ols_prog1, ols_prog2, ols_prog3, logit_prog4, ols_prog5,
           # order = c(1:9),
           coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T, 
           se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
-          add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
+          add.lines = list(c("Controls: Socio-demo", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
           no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. Covariates and dependent variables refer either to broad (1-4) or strict (5-6) definitions of the beliefs, where strict dummies do not cover ``PNR'' or ``Unaffected'' answers.}} \\end{table} ",
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_prog, fixed=TRUE), fixed=TRUE), collapse=' ')
@@ -777,7 +777,7 @@ Table_prog_bis <- stargazer(ols_prog1, ols_prog2bis, ols_prog3, logit_prog4, ols
                         keep = c("progressi", "gagnant", 'effective', 'Revenu$', 'taxe_approbation'), # "Constant"
                         coef = list(NULL, NULL, NULL, logit_prog4_margins[,1], NULL, NULL), perl=T,
                         se = list(NULL, NULL, NULL, logit_prog4_margins[,2], NULL, NULL), 
-                        add.lines = list(c("Controls: Socio-demographics", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
+                        add.lines = list(c("Controls: Socio-demo", "\\checkmark ", "\\checkmark ", " ", "", "\\checkmark ", "")),
                         no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:progressivity")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\\\ \\quad \\\\ \\textsc{Note:} Standard errors are reported in parentheses. 
                 For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}. } \\end{table} ',

@@ -4459,3 +4459,21 @@ length(which(sort(p.adjust(ttests_characs, method = 'fdr'), decreasing=T)<0.001)
 ##### Role endorsement #####
 summary(lm((gagnant_categorie!='Perdant') ~ info_PM, data=s))
 summary(lm((gagnant_categorie!='Perdant') ~ info_CC, data=s))
+
+
+##### Heterogeneity SI #####
+formula_tsls1a_sio1 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible*traite_cible_conjoint*(percentile_revenu > 45) + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1a_sio1 <- lm(formula_tsls1a_sio1, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
+formula_tsls1b_sio1 <- as.formula(paste("((gagnant_cible_categorie!='Perdant')*(percentile_revenu > 45)) ~ traite_cible*traite_cible_conjoint*(percentile_revenu > 45) + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", paste(variables_reg_self_interest, collapse = ' + ')))
+tsls1b_sio1 <- lm(formula_tsls1b_sio1, data=s, subset = (percentile_revenu > 45) & ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = s$weight)
+s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1a_sio1$fitted.values
+s$non_perdant_p45_[(s$percentile_revenu > 45) & ((s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10))] <- tsls1b_sio1$fitted.values
+formula_tsls2_sio1 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse = ' + '), "+ cible + I(taxe_approbation=='NSP') + tax_acceptance + non_perdant_p45_ + (percentile_revenu > 45)")) # 
+tsls2_sio1 <- lm(formula_tsls2_sio1, data=s, subset = (s$percentile_revenu > 45) & ((s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)), weights = s$weight)
+summary(tsls2_sio1) 
+
+iv_sio1 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '), 
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant')*(percentile_revenu > 45) |", paste(variables_reg_self_interest, collapse=' + '), 
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + traite_cible*traite_cible_conjoint*(percentile_revenu > 45)")), 
+        data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
+iv_sio1
