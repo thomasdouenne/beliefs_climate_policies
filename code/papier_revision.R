@@ -424,7 +424,7 @@ formula_tsls2_ee1 <- as.formula(paste("(taxe_approbation=='Oui') ~", paste(varia
 tsls2_ee1 <- lm(formula_tsls2_ee1, data=s, weights = s$weight) 
 summary(tsls2_ee1)
 
-iv_ee1 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s))
+iv_ee1 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics=T)
 
 # (2) Yes ~ Yes, OLS: 37*** p.p.
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace=='Oui')
@@ -452,7 +452,7 @@ formula_tsls2_eea2 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(vari
 tsls2_eea2 <- lm(formula_tsls2_eea2, data=s, weights = s$weight) 
 summary(tsls2_eea2)
 
-iv_eea2 <- summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s))
+iv_eea2 <- summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics=T)
 
 # (A3) not No ~ Yes, OLS: 37*** p.p.
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace=='Oui')
@@ -469,7 +469,7 @@ formula_tsls2_eea4 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(vari
 tsls2_eea4 <- lm(formula_tsls2_eea4, data=s, weights = s$weight) 
 summary(tsls2_eea4)
 
-iv_eea4 <- summary(ivreg(as.formula(paste("(taxe_approbation!='Non') ~ ", paste(variables_reg_ee, collapse = ' + '),  "+ (taxe_efficace!='Non') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s))
+iv_eea4 <- summary(ivreg(as.formula(paste("(taxe_approbation!='Non') ~ ", paste(variables_reg_ee, collapse = ' + '),  "+ (taxe_efficace!='Non') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics=T)
 
 # (A5), not No ~ not No, OLS: 41*** p.p.
 s$taxe_efficace.not_no <- as.numeric(s$taxe_efficace!='Non')
@@ -521,7 +521,7 @@ Table_eea <- stargazer(logit_ee1, tsls2_eea2, ols_eea3, tsls2_eea4, ols_eea5, ti
                                         c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark "),
                                         c("Effective F-Statistic", "", f_stats_ee[1], "", f_stats_ee[2], "")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:eea")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{1.05\\textwidth}{\\hspace{-.05\\textwidth} \\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}, and discussion in the main text, Section \\vref{subsec:motive_ee}.}}\\end{table}',  # first stage results in Table \\vref{first_stage_environmental_effectiveness}.
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{1.05\\textwidth}{\\hspace{-.05\\textwidth} \\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}, and the second stage results in Table \\vref{tab:ee}. As in the latter Table, the dependent variable corresponds to either initial approval (answer "Yes" to support of the policy) or acceptance (answer not "No""). The first stage exploits the information randomly displayed about climate change (C.C.) and the effectiveness of carbon taxation (E.E.) as exogenous instruments.}}\\end{table}',  # first stage results in Table \\vref{first_stage_environmental_effectiveness}.
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_eea, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
@@ -1232,3 +1232,18 @@ Table_additional_res <- stargazer(tsls2_sio1, tsls2_sio2, tsls2_sio3, tsls2_sio4
        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_sio")
 write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. The source of exogenous variation in the belief used in the first-stage is the random assignment of the income threshold, which determines eligibility to the dividend.} }\\end{table}', 
    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), collapse=' ')
+
+
+##### Approval #####
+decrit(s$taxe_approbation, miss=T, weights = s$weight)
+decrit(s$taxe_cible_approbation[s$cible == 20], miss=T, weights = s$weight[s$cible == 20]) #
+decrit(s$taxe_cible_approbation[s$cible == 30], miss=T, weights = s$weight[s$cible == 30]) #
+decrit(s$taxe_cible_approbation[s$cible == 40], miss=T, weights = s$weight[s$cible == 40]) #
+decrit(s$taxe_cible_approbation[s$cible == 50], miss=T, weights = s$weight[s$cible == 50]) #
+decrit(s$taxe_cible_approbation, miss=T, weights = s$weight) #
+decrit(s$taxe_feedback_approbation[s$variante_progressivite=='fb_info'], miss=T, weights = s$weight[s$variante_progressivite=='fb_info'])
+decrit(s$taxe_feedback_approbation[s$variante_progressivite=='fb_no_info'], miss=T, weights = s$weight[s$variante_progressivite=='fb_no_info'])
+decrit(s$taxe_feedback_approbation[s$variante_progressivite=='prog'], miss=T, weights = s$weight[s$variante_progressivite=='prog'])
+decrit(s$taxe_feedback_approbation, miss=T, weights = s$weight)
+
+
