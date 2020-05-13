@@ -424,7 +424,7 @@ formula_tsls2_ee1 <- as.formula(paste("(taxe_approbation=='Oui') ~", paste(varia
 tsls2_ee1 <- lm(formula_tsls2_ee1, data=s, weights = s$weight) 
 summary(tsls2_ee1)
 
-iv_ee1 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics=T)
+iv_ee1 <- summary(ivreg(as.formula(paste("taxe_approbation=='Oui' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics = T)
 
 # (2) Yes ~ Yes, OLS: 37*** p.p.
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace=='Oui')
@@ -452,7 +452,7 @@ formula_tsls2_eea2 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(vari
 tsls2_eea2 <- lm(formula_tsls2_eea2, data=s, weights = s$weight) 
 summary(tsls2_eea2)
 
-iv_eea2 <- summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics=T)
+iv_eea2 <- summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics = T)
 
 # (A3) not No ~ Yes, OLS: 37*** p.p.
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace=='Oui')
@@ -469,7 +469,7 @@ formula_tsls2_eea4 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(vari
 tsls2_eea4 <- lm(formula_tsls2_eea4, data=s, weights = s$weight) 
 summary(tsls2_eea4)
 
-iv_eea4 <- summary(ivreg(as.formula(paste("(taxe_approbation!='Non') ~ ", paste(variables_reg_ee, collapse = ' + '),  "+ (taxe_efficace!='Non') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics=T)
+iv_eea4 <- summary(ivreg(as.formula(paste("(taxe_approbation!='Non') ~ ", paste(variables_reg_ee, collapse = ' + '),  "+ (taxe_efficace!='Non') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics = T)
 
 # (A5), not No ~ not No, OLS: 41*** p.p.
 s$taxe_efficace.not_no <- as.numeric(s$taxe_efficace!='Non')
