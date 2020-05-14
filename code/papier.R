@@ -460,6 +460,7 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} The informati
 ##### 6 Conclusion #####
 decrit(s$taxe_approbation, weights = s$weight, miss=T) # 70%
 decrit(s$simule_gain > s$gain, weights = s$weight) # 89%
+decrit(s$progressivite!='Oui' & s$taxe_efficace!='Oui', weights = s$weight) # 60%
 
 
 ##### Appendix A. Raw data #####
