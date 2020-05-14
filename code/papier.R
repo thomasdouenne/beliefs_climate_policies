@@ -329,7 +329,7 @@ iv_si2 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", pas
 formula_ols_si3  <- as.formula(paste("taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + ", paste(variables_reg_self_interest, collapse = ' + '), " + non_perdant + tax_acceptance")) # 
 s$non_perdant <- as.numeric(s$gagnant_cible_categorie!='Perdant')
 ols_si3 <- lm(formula_ols_si3, data=s, weights = s$weight)
-summary(ols_si3) # TODO: result has slightly changed, don't know why => update table
+summary(ols_si3)
 
 # (4) Feedback ,restricted to |simule_gain| < 50: 64 p.p. ***
 formula_tsls1_si4 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + ", 
@@ -408,9 +408,16 @@ formula_ee2 <- as.formula(paste("(taxe_approbation=='Oui') ~", paste(variables_r
 ols_ee2 <- lm(formula_ee2, data=s, weights = s$weight) 
 summary(ols_ee2)
 
-# (3) not No ~ Yes, LIML (cf. Stata)
-liml_ee3 <- ivmodelFormula(as.formula(paste("tax_acceptance ~ ", paste(variables_reg_ee, collapse = ' + '), "+ taxe_efficace.hat | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s)
-liml_ee3
+# (3) not No ~ Yes, 2SLS: 50** p.p.
+formula_tsls1_ee3 <- as.formula(paste("taxe_efficace=='Oui' ~", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC"))
+tsls1_ee3 <- lm(formula_tsls1_ee3, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_ee3)
+s$taxe_efficace.hat <- tsls1_ee3$fitted.values
+formula_tsls2_ee3 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_reg_ee, collapse = ' + '), " + taxe_efficace.hat"))
+tsls2_ee3 <- lm(formula_tsls2_ee3, data=s, weights = s$weight) 
+summary(tsls2_ee3)
+
+iv_ee3 <- summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s, weights = s$weight), diagnostics = T)
 
 # (A4) not No ~ not No, 2SLS: 48** p.p.
 formula_tsls1_eea4 <- as.formula(paste("taxe_efficace!='Non' ~", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC"))
@@ -424,20 +431,17 @@ summary(tsls2_eea4)
 iv_eea4 <- summary(ivreg(as.formula(paste("(taxe_approbation!='Non') ~ ", paste(variables_reg_ee, collapse = ' + '),  "+ (taxe_efficace!='Non') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics = T)
 
 f_stats_ee <- sprintf("%.1f", round(c(iv_ee1$diagnostics[1,3], iv_eea4$diagnostics[1,3]), 1))
-liml_ee3$coef <- liml_ee3$sd <- ols_ee2$coefficients
-liml_ee3$coef['taxe_efficace.hat'] <- liml_ee3$LIML$point.est
-liml_ee3$sd['taxe_efficace.hat'] <- liml_ee3$LIML$std.err
 
-Table_ee2 <- stargazer(tsls2_ee1, ols_ee2, ols_ee2, title="Effect of believing in environmental effectiveness on approval", star.cutoffs = NA, omit.table.layout = 'n',
+Table_ee2 <- stargazer(tsls2_ee1, ols_ee2, tsls2_ee3, title="Effect of believing in environmental effectiveness on approval", star.cutoffs = NA, omit.table.layout = 'n',
                        covariate.labels = c("Believes in effectiveness ($\\dot{E}$)"), # Environmental effectiveness: ``Yes''
-                       dep.var.labels = c("Approval ($\\dot{A^0}$)", "Acceptance ($A^0$)"), header = FALSE, column.labels = c("$IV$", "$OLS$", "$LIML$"), dep.var.caption = "Initial Tax \\& Dividend",
+                       dep.var.labels = c("Approval ($\\dot{A^0}$)", "Acceptance ($A^0$)"), header = FALSE, column.labels = c("$IV$", "$OLS$", "$IV$"), dep.var.caption = "Initial Tax \\& Dividend",
                        keep = c("efficace"), # "Constant",
-                       coef = list(NULL, NULL, liml_ee3$coef),
-                       se = list(NULL, NULL, liml_ee3$sd),
+                       # coef = list(NULL, NULL, liml_ee3$coef),
+                       # se = list(NULL, NULL, liml_ee3$sd),
                        add.lines = list(c("Instruments: info E.E. \\& C.C. ", "\\checkmark ", "", "\\checkmark "),
                                         c("Controls: Socio-demo, other motives, ", "\\checkmark ", "\\checkmark  ", "\\checkmark "),
                                         c("\\quad incomes, estimated gains", "", "", ""),
-                                        c("Effective F-Statistic", f_stats_ee[1], "", "")), 
+                                        c("Effective F-Statistic", f_stats_ee[1], "", f_stats_ee[1])), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:ee")
 write_clip(gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. The list of controls can be found in Appendix \\ref{set_controls}, and first stage results in Table \\vref{first_stage_environmental_effectiveness}. The dependent variable corresponds to either initial approval (answer ``Yes'' to support of the policy) or acceptance (answer not ``No''). The first stage exploits the information randomly displayed about climate change (C.C.) and the effectiveness of carbon taxation (E.E.) as exogenous instruments.}}\\end{table}", 
                     gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_ee2, fixed=TRUE), fixed=TRUE), collapse=' ')
@@ -449,12 +453,12 @@ Table_ee1 <- stargazer(tsls1_ee1, tsls1_eea4,
                                             "Info on Climate Change ($Z_{CC}$)", "Info on Particulate Matter ($Z_{PM}$)", "$Z_{CC} \\times Z_{PM}$"), 
                        dep.var.labels = c("``Yes''", "not ``No''"), dep.var.caption = "Environmental effectiveness", header = FALSE, star.cutoffs = NA, omit.table.layout = 'n',
                        keep = c("info", "apres_modifs"), 
-                       column.labels = c("(1; A2)", "(A4)"), model.numbers = FALSE,
+                       column.labels = c("(1; 3)", "(A4)"), model.numbers = FALSE,
                        add.lines = list(c("Controls: Socio-demo, other motives,", "\\checkmark ", "\\checkmark "), 
                                         c("\\quad incomes, estimated gains", "", ""),
                                         c("Effective F-Statistic", f_stats_ee)), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_environmental_effectiveness")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} The information randomly displayed about climate change ($Z_{CC}$) and the effectiveness of carbon taxation ($Z_{E}$) are used as sources of exogenous variation in the belief. See discussion in the main text, Section \\vref{subsec:motive_ee}. We chose the set of instruments that maximizes the effective F-statistics. Our specification is well-founded as the Sargan test does not reject the validity of our over-identification restrictions (p-value of 0.93).} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\textsc{Note:} In column names, (A4) refer to columns of alternative second stages in Table \\ref{tab:eea}. The information randomly displayed about climate change ($Z_{CC}$) and the effectiveness of carbon taxation ($Z_{E}$) are used as sources of exogenous variation in the belief. We chose the set of instruments that maximizes the effective F-statistics. Our specification is well-founded as the Sargan test does not reject the validity of our over-identification restrictions (p-value of 0.93). See discussion in the main text, Section \\vref{subsec:motive_ee}.} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_ee1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
@@ -909,16 +913,9 @@ summary(logit_ee1)
 logit_ee1_margins <- logitmfx(data=s, formula=logit_ee1, atmean=FALSE)$mfxest
 logit_ee1_margins
 
-# (A2) not No ~ Yes, 2SLS: 50** p.p.
-formula_tsls1_eea2 <- as.formula(paste("taxe_efficace=='Oui' ~", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC"))
-tsls1_eea2 <- lm(formula_tsls1_eea2, data=s, weights = s$weight, na.action='na.exclude')
-summary(tsls1_eea2)
-s$taxe_efficace.hat <- tsls1_eea2$fitted.values
-formula_tsls2_eea2 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_reg_ee, collapse = ' + '), " + taxe_efficace.hat"))
-tsls2_eea2 <- lm(formula_tsls2_eea2, data=s, weights = s$weight) 
-summary(tsls2_eea2)
-
-iv_eea2 <- summary(ivreg(as.formula(paste("taxe_approbation!='Non' ~ ", paste(variables_reg_ee, collapse = ' + '), "+ (taxe_efficace=='Oui') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics = T)
+# (A2) not No ~ Yes, LIML: 64* p.p. (cf. Stata)
+liml_ee2 <- ivmodelFormula(as.formula(paste("tax_acceptance ~ ", paste(variables_reg_ee, collapse = ' + '), "+ taxe_efficace.hat | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s)
+liml_ee2
 
 # (A3) not No ~ Yes, OLS: 37*** p.p.
 s$taxe_efficace.hat <- as.numeric(s$taxe_efficace=='Oui')
@@ -943,18 +940,22 @@ formula_eea5 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_
 ols_eea5 <- lm(formula_eea5, data=s, weights = s$weight) 
 summary(ols_eea5)
 
-Table_eea <- stargazer(logit_ee1, tsls2_eea2, ols_eea3, tsls2_eea4, ols_eea5, title="Effect of believing in environmental effectiveness on support: second stages of alternative specifications", 
+liml_ee3$coef <- liml_ee3$sd <- ols_eea3$coefficients
+liml_ee3$coef['taxe_efficace.hat'] <- liml_ee3$LIML$point.est
+liml_ee3$sd['taxe_efficace.hat'] <- liml_ee3$LIML$std.err
+
+Table_eea <- stargazer(logit_ee1, ols_eea3, ols_eea3, tsls2_eea4, ols_eea5, title="Effect of believing in environmental effectiveness on support: second stages of alternative specifications", 
                        dep.var.caption = "Initial Tax \\& Dividend", model.names = F, covariate.labels = c("Environmental effectiveness: ``Yes''", "Environmental effectiveness: not ``No''"), 
-                       dep.var.labels = c("Approval ($\\dot{A^0}$)", "Acceptance ($A^0$)"), header = FALSE, column.labels = c("$logit$", "$IV$", "$OLS$", "$IV$", "$OLS$"),
+                       dep.var.labels = c("Approval ($\\dot{A^0}$)", "Acceptance ($A^0$)"), header = FALSE, column.labels = c("$logit$", "$LIML$", "$OLS$", "$IV$", "$OLS$"),
                        keep = c("efficace"), star.cutoffs = NA, omit.table.layout = 'n', # "Constant",
-                       coef = list(logit_ee1_margins[,1], NULL, NULL, NULL, NULL), # TODO: column names (A1), ...
-                       se = list(logit_ee1_margins[,2], NULL, NULL, NULL, NULL),
+                       coef = list(logit_ee1_margins[,1], liml_ee3$coef, NULL, NULL, NULL), #column.labels = c("(A1)", "(A2)", "(A3)", "(A4)", "(A5)"),
+                       se = list(logit_ee1_margins[,2], liml_ee3$sd, NULL, NULL, NULL),
                        add.lines = list(c("Instruments: info E.E. \\& C.C. ", "", "\\checkmark ", "", "\\checkmark ", ""),
                                         c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark "),
-                                        c("Effective F-Statistic", "", f_stats_ee[1], "", f_stats_ee[2], "")), 
+                                        c("Effective F-Statistic", "", "", "", f_stats_ee[2], "")), 
                        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:eea")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{1.05\\textwidth}{\\hspace{-.05\\textwidth} \\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}, and discussion in the main text, Section \\vref{subsec:motive_ee}.}}\\end{table}',  # first stage results in Table \\vref{first_stage_environmental_effectiveness}.
-                    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_eea, fixed=TRUE), fixed=TRUE), collapse=' ')
+write_clip(gsub('(1) & (2) & (3) & (4) & (5)', '(A1) & (A2) & (A3) & (A4) & (A5)', gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{1.05\\textwidth}{\\hspace{-.05\\textwidth} \\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}, and the main results in Table \\vref{tab:ee}. As in the latter Table, the dependent variable corresponds to either initial approval (answer ``Yes'' to support of the policy) or acceptance (answer not ``No''). The first stage exploits the information randomly displayed about climate change (C.C.) and the effectiveness of carbon taxation (E.E.) as exogenous instruments.}}\\end{table}",  # first stage results in Table \\vref{first_stage_environmental_effectiveness}.
+                    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_eea, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
 ##### Appendix F. Controls variables #####
