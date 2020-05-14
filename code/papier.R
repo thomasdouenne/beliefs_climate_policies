@@ -312,17 +312,17 @@ iv_si1 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", pas
 
 # Alternative specifications for robustness
 # (2) Whole sample: 46 p.p.***
-formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), c(20,70)), 
+formula_tsls1_si2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ ", paste(variables_reg_self_interest, collapse=' + '), 
                                       " + single + cible + I(taxe_approbation=='NSP') + tax_acceptance + traite_cible*traite_cible_conjoint"))
 tsls1_si2 <- lm(formula_tsls1_si2, data=s, weights = s$weight)
 summary(tsls1_si2)
 s$non_perdant <- tsls1_si2$fitted.values
-formula_tsls2_si2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), c(20,70)), 
+formula_tsls2_si2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '), 
                                       " + I(taxe_approbation=='NSP') + tax_acceptance + single + cible + non_perdant"))
 tsls2_si2 <- lm(formula_tsls2_si2, data=s, weights = s$weight)
 summary(tsls2_si2)
 
-iv_si2 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), c(20,70)), 
+iv_si2 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '), 
           " + I(taxe_approbation=='NSP') + tax_acceptance + single + cible + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), data = s, weights = s$weight), diagnostics = TRUE)
 
 # (3) Simple OLS: 44 p.p. ***
@@ -347,7 +347,7 @@ iv_si4 <- summary(ivreg(as.formula(paste("taxe_feedback_approbation!='Non' ~ tax
       subset=variante_taxe_info=='f' & abs(simule_gain) < 50, weights = s$weight), diagnostics = TRUE)
 
 
-f_stats_si <- sprintf("%.1f", round(c(iv_si1$diagnostics[1,3], iv_si3$diagnostics[1,3], iv_si5$diagnostics[1,3]), 1))
+f_stats_si <- sprintf("%.1f", round(c(iv_si1$diagnostics[1,3], iv_si2$diagnostics[1,3], iv_si4$diagnostics[1,3]), 1))
 
 Table_si2 <- stargazer(tsls2_si1, tsls2_si2, ols_si3, tsls2_si4, 
                     title="Effect of self-interest on acceptance", star.cutoffs = NA, column.labels = c("\\textit{IV: random target/eligibility}", "$OLS$", "\\textit{IV: discontinuity in feedback}"), column.separate = c(2,1,1),
@@ -381,13 +381,17 @@ Table_si1 <- stargazer(tsls1_si1, tsls1_si2, tsls1_si4,
                                   c("Sub-sample", "[p10; p60]", "", "$\\left| \\widehat{\\gamma}\\right|<50$"),
                                   c("Effective F-Statistic", f_stats_si)),
                     no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser"), label="first_stage_private_benefits")
-write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} In (1,2), the random (conditionally on income) eligibility to the dividend is used as source of exogenous variation in the belief. In (4), the discontinuity in the win/lose feedback when the net gain switches from negative to positive is used. See second stage results, Table \\vref{results_private_benefits}. }} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
+write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} In (1,2), the random eligibility to the dividend (conditionally on income) is used as source of exogenous variation in the belief. In (4), the discontinuity in the win/lose feedback when the net gain switches from negative to positive is used. Column numbers correspond to second stage results, Table \\vref{results_private_benefits}.}} \\end{table}', gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', 
                                                        Table_si1, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 
 ## 5.2 Environmental effectiveness
 # Table 5.2
-# (1) Yes ~ Yes, 2SLS: 42*** p.p. 
+variables_reg_ee <- c("Revenu", "Revenu2", "Revenu_conjoint", "Revenu_conjoint2", "single", "Simule_gain", "Simule_gain2", "gagnant_categorie", variables_demo)
+variables_reg_ee <- variables_reg_ee[!(variables_reg_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
+
+# (1) Yes ~ Yes, 2SLS: 42*** p.p.
+
 formula_tsls1_ee1 <- as.formula(paste("taxe_efficace=='Oui' ~", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC"))
 tsls1_ee1 <- lm(formula_tsls1_ee1, data=s, weights = s$weight, na.action='na.exclude')
 summary(tsls1_ee1)
@@ -469,7 +473,7 @@ decrit(s$age)
 decrit(s$csp)
 decrit(s$diplome4)
 decrit(s$taille_agglo)
-decrit(s$region)
+decrit(s$region) # TODO: small diff with Occ and PACA
 
 # Table A.2
 # for objective data, see python (BdF), preparation.R (ERFS, cf. wtd.mean(db$nb_adultes, db$wprm)) 
@@ -480,7 +484,7 @@ decrit(s$uc)
 decrit(s$chauffage)
 decrit(s$surface)
 decrit(s$km)
-decrit(s$conso)
+decrit(s$conso) # TODO: 7.18 and not 7.25
 
 # t-tests test for representativeness of sample
 fq <- list()
@@ -793,7 +797,7 @@ Table_additional_res <- stargazer(tsls2_sia1, tsls2_sia2, tsls2_sia3, tsls2_sia4
        no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
 write_clip(sub("\\multicolumn{6}{c}{", "", gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. As in the latter Table, the source of exogenous variation in the belief used in first-stages for the targeted dividend is the random assignment of the income threshold, which determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }.\\end{table}', 
    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
-
+# TODO: pb avec cette table (résultats sont bons mais pb avec stargazer)
 
 # Table E.4
 # (1) Heterogeneity: interaction with percentile_revenu > 35
@@ -955,7 +959,7 @@ write_clip(gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{1.05\\textwidth}{
 variables_demo # Socio-demo
 variables_politiques # Politics
 decrit(s$Gauche_droite) # Political leaning
-variables_energie # Energy
+variables_energie # Energy # TODO: Simue_gain appears in it but not in our paper
 # Incomes: revenu, revenu_conjoint, Revenu2, Revenu_conjoint2, single
 piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), c(20,70), vector=T) # Incomes (piecewise continuous) (excluding "single")
 # Estimated gains: simule_gain, Simule_gain2
@@ -1013,9 +1017,9 @@ decrit(s$Gilets_jaunes, weights=s$weight)
 decrit(s$taxe_approbation, weights = s$weight, miss=T) # Initial stage
 decrit(s$taxe_feedback_approbation, weights = s$weight, miss=T) # After feedback
 decrit(s$taxe_cible_approbation[s$cible==20], weights = s$weight[s$cible==20], miss=T) # Targeted dividend: bottom 20%
-decrit(s$taxe_cible_approbation[s$cible==20], weights = s$weight[s$cible==30], miss=T) # Targeted dividend: bottom 20%
-decrit(s$taxe_cible_approbation[s$cible==20], weights = s$weight[s$cible==40], miss=T) # Targeted dividend: bottom 20%
-decrit(s$taxe_cible_approbation[s$cible==20], weights = s$weight[s$cible==50], miss=T) # Targeted dividend: bottom 20%
+decrit(s$taxe_cible_approbation[s$cible==30], weights = s$weight[s$cible==30], miss=T) # Targeted dividend: bottom 30%
+decrit(s$taxe_cible_approbation[s$cible==40], weights = s$weight[s$cible==40], miss=T) # Targeted dividend: bottom 40%
+decrit(s$taxe_cible_approbation[s$cible==50], weights = s$weight[s$cible==50], miss=T) # Targeted dividend: bottom 50%
 decrit(s$taxe_cible_approbation, weights = s$weight, miss=T) # Targeted dividend: all
 
 
