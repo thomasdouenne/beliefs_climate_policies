@@ -271,7 +271,7 @@ def save_dataframes_kernel_density(df_bdf, df_ptc):
     df_subjective_chauffage = extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'chauffage')[1]
     df_subjective_taxe_carbone = extrapolate_distribution_bcp_from_bdf(df_bdf, df_ptc, energy = 'taxe_carbone')[1]
     
-    df_objective = df_objective[['gain_net_numeric_uc_fuel'] + ['gain_net_numeric_uc_chauffage'] + ['gain_net_numeric_uc_taxe_carbone']]
+    df_objective = df_objective[['gain_net_numeric_uc_fuel'] + ['gain_net_numeric_uc_chauffage'] + ['gain_net_numeric_uc_taxe_carbone'] + ['weight']]
     df_subjective = df_subjective_fuel.merge(df_subjective_chauffage).merge(df_subjective_taxe_carbone)
     df_subjective = df_subjective[['subjective_gain_numeric_fuel'] + ['subjective_gain_numeric_chauffage'] + ['subjective_gain_numeric_taxe_carbone']]
     
