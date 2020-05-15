@@ -5,7 +5,8 @@
 #     R environment with all the data prepared (.RData) and python files for complementary computations
 
 source("packages_functions.R")
-load(".RData")
+load("after_papier.RData") # This loads the .RData generated after executing preparation.R and papier.R, so that one can run any line of this file almost independently (sometimes variables like taxe_efficace.hat or non_perdant should be redefined using the nearest above line that defines it though)
+# load("after_preparation.RData") # This loads the .RData generated after executing preparation.R: it contains the dataframe (s) but lacks the definition of some objects (such as variables_reg_self_interest)
 
 ##### 1 Introduction #####
 decrit(s$taxe_approbation, miss=T, weights = s$weight)
@@ -52,18 +53,22 @@ summary(lm(gain ~ mauvaise_qualite, data=s, weights = s$weight))
 ##### 3 Pessimistic beliefs #####
 ## 3.1 Self-interest
 # Objective winning category: cf. consistency_belief_losses.py for weighted results reported in comments
-decrit(objective_gains$all > 0, weights = objective_gains$weight) # 0.703
-decrit(objective_gains$transport > 0) # 0.736
-decrit(objective_gains$housing > 0) # 0.6749
+decrit(objective_gains$all > 0, weights = objective_gains$weight) # 0.703 # TODO
+decrit(objective_gains$transport > 0, weights = objective_gains$weight) # 0.736
+decrit(objective_gains$housing > 0, weights = objective_gains$weight) # 0.6749
 # Subjective winning category
 decrit(s$gagnant_categorie, weights = s$weight) # 14.0% think they win (21.7% unaffected)
 decrit(s$gagnant_fuel_categorie, weights = s$weight) # 15.5% think they win (21.8% unaffected)
 decrit(s$gagnant_chauffage_categorie, weights = s$weight) # 17.0% think they win (30.0% unaffected)
 # Over-estimation of policy costs 
-# Subjective losses
-decrit(s$gain_fuel, weights = s$weight) # mean -61 instead of +18 # TODO: mean(objective_gains$all)
-decrit(s$gain_chauffage, weights = s$weight) # -43 instead of +6
-decrit(s$gain, weights = s$weight) # -89 instead of +24
+# Objective net gains
+wtd.mean(objective_gains$transport, weights = objective_gains$weight) # mean +18
+wtd.mean(objective_gains$housing, weights = objective_gains$weight) # +6
+wtd.mean(objective_gains$all, weights = objective_gains$weight) # +24
+# Subjective net gains
+decrit(s$gain_fuel, weights = s$weight) # mean -61 
+decrit(s$gain_chauffage, weights = s$weight) # -43
+decrit(s$gain, weights = s$weight) # -89 
 decrit(as.numeric(s$gain) - s$simule_gain, weights = s$weight) # mean -126, median -116
 decrit(s$simule_gain > s$gain, weights = s$weight) # 89%
 decrit(s$simule_gain_inelastique - s$gain > 0, weights = s$weight) # 77%
@@ -122,7 +127,7 @@ mean(abs(fit$predicted_gain - fit$gain) > 110) # 5%
 wtd.mean(abs(s$simule_gain - s$gain) > 110, weights = s$weight) # 55%
 
 # Table 3.1: Heterogeneity in bias
-variables_demo_bias <- variables_demo
+variables_demo_bias <- variables_demo 
 variables_demo_bias <- variables_demo_bias[!(variables_demo_bias %in% c("sexe", "age_50_64", "age_65_plus", "taille_agglo"))]
 formula_bias <- as.formula(paste("abs(simule_gain - gain) > 110 ~ (sexe=='Féminin') + as.factor(taille_agglo) + (Diplome>=5) + revenu + ecologiste + Gauche_droite + 
                                  uc + Gilets_jaunes + ", paste(variables_demo_bias, collapse=' + ')))
@@ -150,13 +155,12 @@ Table_heterogenous_bias <- stargazer(reg_bias, logit_bias, reg_bias_bis,
                                      se = list(NULL, logit_bias_margins[,2], NULL),
                                      add.lines = list(c("Controls: Socio-demo, political leaning", "\\checkmark", "\\checkmark", "\\checkmark")),
                                      no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:bias")
-write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{12cm}{\\linespread{1.2}\\selectfont \\textsc{Note:}  Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. Omitted variables are \\textit{Yellow Vests: opposes}; \\textit{Left-right: Extreme-left}. The list of controls can be found in Appendix \\ref{set_controls}. }}  \\end{table} ',
+write_clip(gsub('\\end{table}', ' } {\\footnotesize \\parbox[t]{12cm}{\\linespread{1.2}\\selectfont \\textsc{Note:}  Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. Omitted variables are \\textit{Yellow Vests: opposes}; \\textit{Left-right: Extreme-left}. The list of controls can be found in Appendix \\ref{set_controls}. A large bias is defined as a difference between subjective ($g$) and objectively estimated ($\\hat{\\gamma})$ net gain larger than 110\\euro{}/year per c.u. }}  \\end{table} ',
                 gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@',
                                                        Table_heterogenous_bias, fixed=TRUE), fixed=TRUE), collapse=' ')
 
 # False discovery rate at 5%
 pvalues_reg_bias <- summary(reg_bias)$coefficients[2:length(summary(reg_bias)$coefficients[,4]),4]
-sort(p.adjust(pvalues_reg_bias, method = 'BH'), decreasing=T) 
 for (v in c("Gilets_jaunes", "as.factor(taille_agglo)", "Gauche_droite", "statut_emploi", "csp", "region", "age", "actualite")) { # 
   nullhyp <- names(reg_bias$coefficients)[which(grepl(v, names(reg_bias$coefficients), fixed = T))]
   pvalues_reg_bias <- pvalues_reg_bias[!(names(pvalues_reg_bias) %in% nullhyp)]
@@ -308,7 +312,8 @@ summary(tsls2_si1)
 
 iv_si1 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '), 
         " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), 
-        data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
+        data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE) # stratified RCT: replace cible by as.numeric(cible) + categorie_cible
+iv_si1
 
 # Alternative specifications for robustness
 # (2) Whole sample: 46 p.p.***
@@ -356,7 +361,7 @@ Table_si2 <- stargazer(tsls2_si1, tsls2_si2, ols_si3, tsls2_si4,
                     keep = c("non_perdant", "tax_acceptance"), order = c("non_perdant", "tax_acceptance"), omit.table.layout = 'n', 
                     add.lines = list(
                       # "Method: 2SLS & \\checkmark & \\checkmark &  & \\checkmark",
-                      c("Controls: Incomes (piecewise continuous)", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark"), # TODO: non-parametric incomes in (2)?
+                      c("Controls: Incomes (piecewise continuous)", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark"), 
                       c("\\quad estimated gains, socio-demo, other motives ", "", "", "", ""),
                       # c("Controls: Estimated gain ", "\\checkmark", "", "\\checkmark", "\\checkmark"),
                       c("Controls: Policy assigned", "\\checkmark ", "\\checkmark ", "\\checkmark  ", ""),
@@ -478,7 +483,7 @@ decrit(s$age)
 decrit(s$csp)
 decrit(s$diplome4)
 decrit(s$taille_agglo)
-decrit(s$region) # TODO: small diff with Occ and PACA
+decrit(s$region) 
 
 # Table A.2
 # for objective data, see python (BdF), preparation.R (ERFS, cf. wtd.mean(db$nb_adultes, db$wprm)) 
@@ -489,7 +494,7 @@ decrit(s$uc)
 decrit(s$chauffage)
 decrit(s$surface)
 decrit(s$km)
-decrit(s$conso) # TODO: 7.18 and not 7.25
+decrit(s$conso) 
 
 # t-tests test for representativeness of sample
 fq <- list()
@@ -620,7 +625,7 @@ n = sum(sb[sb$variante_taxe_info == 'f' & sb$simule_gagnant==0,]$weight)
 binconf(x = x, n = n) # 83.0%
 
 
-## D.3 Environmental effectiveness: Table XI
+## D.3 Environmental effectiveness
 # Table D.5 Effect of primings on beliefs about environmental effectiveness
 variables_update_ee <- c("Revenu", variables_demo)
 variables_update_ee <- variables_update_ee[!(variables_update_ee %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
@@ -802,7 +807,7 @@ Table_additional_res <- stargazer(tsls2_sia1, tsls2_sia2, tsls2_sia3, tsls2_sia4
                                   no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:alternative_si")
 write_clip(sub("\\multicolumn{6}{c}{", "", gsub('\\end{table}', '} {\\footnotesize \\parbox[t]{\\textwidth}{\\linespread{1.2}\\selectfont \\textsc{Note:} See results of main specifications, Table \\vref{results_private_benefits}. As in the latter Table, the source of exogenous variation in the belief used in first-stages for the targeted dividend is the random assignment of the income threshold, which determines eligibility to the dividend. The first-stage for the non-targeted dividend exploits instead the discontinuity in the win/lose feedback when the net gain switches from negative to positive.} }.\\end{table}', 
    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_additional_res, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')
-# TODO: pb avec cette table (résultats sont bons mais pb avec stargazer)
+
 
 # Table E.4
 # (1) Heterogeneity: interaction with percentile_revenu > 35
@@ -833,7 +838,6 @@ formula_tsls2_sio2 <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece
 tsls2_sio2 <- lm(formula_tsls2_sio2, data=s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
 summary(tsls2_sio2) 
 
-formula_tsls1_sio2 <- as.formula(paste("gagnant_cible_categorie!='Perdant' ~ traite_cible*traite_cible_conjoint + cible + I(taxe_approbation=='NSP') + tax_acceptance + ", 
 iv_sio2 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), 30), ' + ', paste(variables_reg_self_interest, collapse=' + '), 
         " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), 
         data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
@@ -940,16 +944,16 @@ formula_eea5 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_
 ols_eea5 <- lm(formula_eea5, data=s, weights = s$weight) 
 summary(ols_eea5)
 
-liml_ee3$coef <- liml_ee3$sd <- ols_eea3$coefficients
-liml_ee3$coef['taxe_efficace.hat'] <- liml_ee3$LIML$point.est
-liml_ee3$sd['taxe_efficace.hat'] <- liml_ee3$LIML$std.err
+liml_ee2$coef <- liml_ee2$sd <- ols_eea3$coefficients
+liml_ee2$coef['taxe_efficace.hat'] <- liml_ee2$LIML$point.est
+liml_ee2$sd['taxe_efficace.hat'] <- liml_ee2$LIML$std.err
 
 Table_eea <- stargazer(logit_ee1, ols_eea3, ols_eea3, tsls2_eea4, ols_eea5, title="Effect of believing in environmental effectiveness on support: second stages of alternative specifications", 
                        dep.var.caption = "Initial Tax \\& Dividend", model.names = F, covariate.labels = c("Environmental effectiveness: ``Yes''", "Environmental effectiveness: not ``No''"), 
                        dep.var.labels = c("Approval ($\\dot{A^0}$)", "Acceptance ($A^0$)"), header = FALSE, column.labels = c("$logit$", "$LIML$", "$OLS$", "$IV$", "$OLS$"),
                        keep = c("efficace"), star.cutoffs = NA, omit.table.layout = 'n', # "Constant",
-                       coef = list(logit_ee1_margins[,1], liml_ee3$coef, NULL, NULL, NULL), #column.labels = c("(A1)", "(A2)", "(A3)", "(A4)", "(A5)"),
-                       se = list(logit_ee1_margins[,2], liml_ee3$sd, NULL, NULL, NULL),
+                       coef = list(logit_ee1_margins[,1], liml_ee2$coef, NULL, NULL, NULL), #column.labels = c("(A1)", "(A2)", "(A3)", "(A4)", "(A5)"),
+                       se = list(logit_ee1_margins[,2], liml_ee2$sd, NULL, NULL, NULL),
                        add.lines = list(c("Instruments: info E.E. \\& C.C. ", "", "\\checkmark ", "", "\\checkmark ", ""),
                                         c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark "),
                                         c("Effective F-Statistic", "", "", "", f_stats_ee[2], "")), 
@@ -1136,18 +1140,7 @@ summary(lm(gain ~ mauvaise_qualite, data=s, weights = s$weight))
 # For 58 persons with incomes > 10k€/month, see preparation.R, line ~860
 
 # Table L.1
-# (1) SI, 11 min: 55*** p.p.
-tsls1_si10 <- lm(formula_tsls1_si1, data=sl, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight)
-summary(tsls1_si10)
-sl$non_perdant[((sl$percentile_revenu <= 60 & sl$percentile_revenu >= 10) | (sl$percentile_revenu_conjoint <= 60 & sl$percentile_revenu_conjoint >= 10))] <- tsls1_si10$fitted.values
-tsls2_si10 <- lm(formula_tsls2_si1, data=sl, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight)
-summary(tsls2_si10) 
-
-iv_si10 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),
-        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
-        data = sl, subset = (duree > 600 & (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight), diagnostics = TRUE)
-
-# (2) SI, 0 min: 57*** p.p.
+# (1) SI, 0 min: 57*** p.p.
 tsls1_si0 <- lm(formula_tsls1_si1, data=ss, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = ss$weight, na.action = "na.exclude")
 summary(tsls1_si0)
 ss$non_perdant[((ss$percentile_revenu <= 60 & ss$percentile_revenu >= 10) | (ss$percentile_revenu_conjoint <= 60 & ss$percentile_revenu_conjoint >= 10))] <- fitted(tsls1_si0)
@@ -1157,6 +1150,17 @@ summary(tsls2_si0)
 iv_si0 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),
         " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
         data = ss, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = ss$weight), diagnostics = TRUE)
+
+# (2) SI, 11 min: 55*** p.p.
+tsls1_si10 <- lm(formula_tsls1_si1, data=sl, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight)
+summary(tsls1_si10)
+sl$non_perdant[((sl$percentile_revenu <= 60 & sl$percentile_revenu >= 10) | (sl$percentile_revenu_conjoint <= 60 & sl$percentile_revenu_conjoint >= 10))] <- tsls1_si10$fitted.values
+tsls2_si10 <- lm(formula_tsls2_si1, data=sl, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight)
+summary(tsls2_si10) 
+
+iv_si10 <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),
+        " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
+        data = sl, subset = (duree > 600 & (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sl$weight), diagnostics = TRUE)
 
 # (3) SI, qualite: 56*** p.p.
 tsls1_siq <- lm(formula_tsls1_si1, data=sq, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sq$weight, na.action = "na.exclude")
@@ -1169,13 +1173,13 @@ iv_siq <- summary(ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", pas
         " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),
         data = sq, subset = ((percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10)), weights = sq$weight), diagnostics = TRUE)
 
-# (4) MR, 11 min: 53*** p.p. / 22*** p.p.
-reg_update_base_10 <- lm(formula_update_base, data=sl, subset = feedback_infirme_large==T, weights = sl$weight)
-summary(reg_update_base_10)
-
-# (5) MR, 0 min: 54*** p.p. / 18*** p.p.
+# (4) MR, 0 min: 54*** p.p. / 18*** p.p.
 reg_update_base_0 <- lm(formula_update_base, subset = feedback_infirme_large==T, data=ss, weights = weight)
 summary(reg_update_base_0)
+
+# (5) MR, 11 min: 53*** p.p. / 22*** p.p.
+reg_update_base_10 <- lm(formula_update_base, data=sl, subset = feedback_infirme_large==T, weights = sl$weight)
+summary(reg_update_base_10)
 
 # (6) MR, qualite: 55*** p.p. / 20*** p.p.
 reg_update_base_q <- lm(formula_update_base, subset = feedback_infirme_large==T, data=sq, weights = weight)
