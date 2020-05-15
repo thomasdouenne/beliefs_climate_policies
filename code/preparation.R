@@ -1702,23 +1702,3 @@ variables_toutes <- c(variables_approbation, variables_qualite, variables_aleato
                       variables_comportement_CC, variables_schiste, variables_depenses_publiques)
 variables_mobilite <- c("transports_avis", "transports_frequence", "transports_travail")
 
-<<<<<<< HEAD
-=======
-
-rm(list=ls()[grepl("tsls|ols|logit_|_logit|probit|iv_|rdd_|reg_|iv._", ls()) & !grepl("variables", ls())])
-rm(sa, sq, sr)
-load("/var/www/beliefs_climate_policies/code/.RData")
-formula_test <- as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),          " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint"))
-ivreg(formula_test, data = s)
-summary(ivreg(formula_test, data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight), diagnostics = TRUE)
-ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ ", paste(variables_reg_self_interest, collapse=' + '),          " + cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),          data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
-ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),          data = s, subset = (percentile_revenu <= 60 & percentile_revenu >= 10) | (percentile_revenu_conjoint <= 60 & percentile_revenu_conjoint >= 10), weights = s$weight)
-ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")),          data = s, weights = s$weight)
-ivreg(as.formula(paste("taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint")), data = s)
-ivreg(taxe_cible_approbation!='Non' ~ cible + I(taxe_approbation=='NSP') + tax_acceptance + (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible*traite_cible_conjoint, data = s)
-ivreg(taxe_cible_approbation!='Non' ~ (gagnant_cible_categorie!='Perdant') | . - (gagnant_cible_categorie!='Perdant') + traite_cible, data = s)
-# packages in "/usr/lib/R/library" (or "/usr/local/lib/R/site-library" for rstudio) but not in "/home/adrien/R/x86_64-pc-linux-gnu-library/4.0" : c("compiler","datasets","graphics","grDevices","grid","methods","parallel","splines","stats","stats4","tcltk","tools","utils","base","rstudio")
-installed_packages <- installed.packages()[,c('Package','LibPath')]
-install.packages(c('abind','colorspace','dichromat','gtable','labeling','memoise','munsell','proto','RColorBrewer','sp'))
-remove.packages(c('abind','colorspace','dichromat','gtable','labeling','memoise','munsell','proto','RColorBrewer','sp'))
->>>>>>> master
