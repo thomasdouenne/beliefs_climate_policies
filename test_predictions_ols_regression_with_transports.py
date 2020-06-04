@@ -60,12 +60,12 @@ if __name__ == "__main__":
     df_hh['mistake'] = \
         1 * ((df_hh['winner'] - df_hh['predicted_winner']) != 0)
     
-    print "Share of mistakes:", (float(len(df_hh.query('mistake == 1'))) / len(df_hh))
-    print "Probability predict that a loser wins:", float(len(df_hh.query('winner == 0').query('predicted_winner == 1'))) / len(df_hh.query('winner == 0'))
-    print "Probability predict that a winner loses:", float(len(df_hh.query('winner == 1').query('predicted_winner == 0'))) / len(df_hh.query('winner == 1'))
+    print("Share of mistakes:", (float(len(df_hh.query('mistake == 1'))) / len(df_hh)))
+    print("Probability predict that a loser wins:", float(len(df_hh.query('winner == 0').query('predicted_winner == 1'))) / len(df_hh.query('winner == 0')))
+    print("Probability predict that a winner loses:", float(len(df_hh.query('winner == 1').query('predicted_winner == 0'))) / len(df_hh.query('winner == 1')))
 
-    print df_hh['predicted_winner'].mean() 
-    print df_hh['winner'].mean()
+    print(df_hh['predicted_winner'].mean())
+    print(df_hh['winner'].mean())
     
     if data_for_estimation == 'enl':
         df_estimation['housing_expenditures_increase_to_impute'] = df_estimation['housing_expenditures_increase']

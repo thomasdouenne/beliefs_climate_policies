@@ -25,11 +25,12 @@ if __name__ == "__main__":
     df_hh = compute_gains_losses_housing(df_hh)
 
     df_hh['hh_income_2'] = df_hh['hh_income'] ** 2
+    df_hh['heating_oil'] = df_hh['domestic_fuel']
 
     df_hh['winner'] = 0 + 1 * (df_hh['housing_expenditures_increase'] < 55 * df_hh['nb_beneficiaries'])
 
     variables = ['hh_income', 'hh_income_2', 'consumption_units', 'nb_beneficiaries', 'natural_gas',
-        'domestic_fuel', 'accommodation_size', 'age_18_24', 'age_25_34', 'age_35_49', 'age_50_64']
+        'heating_oil', 'accommodation_size', 'age_18_24', 'age_25_34', 'age_35_49', 'age_50_64']
 
     clf = tree.DecisionTreeClassifier(max_depth=3)
     clf = clf.fit(df_hh[variables], df_hh['winner'])

@@ -84,17 +84,17 @@ def regress_ols_housing_expenditures_increase(df_hh):
     df_hh['accommodation_size_2'] = df_hh['accommodation_size'] ** 2
 
     regression_ols = smf.ols(formula = 'housing_expenditures_increase ~ \
-        natural_gas + domestic_fuel + accommodation_size',
+        natural_gas + domestic_fuel + accommodation_size + region + os + en',
 #        natural_gas : accommodation_size + domestic_fuel + domestic_fuel : accommodation_size - 1 ',
 #        natural_gas * accommodation_size + domestic_fuel + domestic_fuel : accommodation_size  ',
         data = df_hh).fit()
     
     alpha = 90.
     prediction_intervals = regression_ols.get_prediction(df_hh, weights=1).summary_frame(alpha=(100-alpha)/100)
-    print 'average prediction interval size (at ', alpha, '%):',  round(np.mean(prediction_intervals['obs_ci_upper'] - prediction_intervals['obs_ci_lower'])), '(variance:', np.round(np.var(prediction_intervals['obs_ci_upper'] - prediction_intervals['obs_ci_lower']),3), ')'
-    print 'proportion with loss prediction interval above 0 (resp. below 0):', np.round(sum(prediction_intervals['obs_ci_lower'] > 0)/len(prediction_intervals['obs_ci_upper']), 3), sum(prediction_intervals['obs_ci_upper'] < 0)/len(prediction_intervals['obs_ci_upper'])
-    print 'proportion with loss prediction interval above 110 (resp. below 110):', np.round(sum(prediction_intervals['obs_ci_lower'] > 110)/len(prediction_intervals['obs_ci_upper']), 3), sum(prediction_intervals['obs_ci_upper'] < 110)/len(prediction_intervals['obs_ci_upper'])
-    print 'proportion with zero housing expenditure increase:', np.round(sum(df_hh['housing_expenditures_increase'] == 0)/len(df_hh['housing_expenditures_increase']), 3)
+#    print 'average prediction interval size (at ', alpha, '%):',  round(np.mean(prediction_intervals['obs_ci_upper'] - prediction_intervals['obs_ci_lower'])), '(variance:', np.round(np.var(prediction_intervals['obs_ci_upper'] - prediction_intervals['obs_ci_lower']),3), ')'
+#    print 'proportion with loss prediction interval above 0 (resp. below 0):', np.round(sum(prediction_intervals['obs_ci_lower'] > 0)/len(prediction_intervals['obs_ci_upper']), 3), sum(prediction_intervals['obs_ci_upper'] < 0)/len(prediction_intervals['obs_ci_upper'])
+#    print 'proportion with loss prediction interval above 110 (resp. below 110):', np.round(sum(prediction_intervals['obs_ci_lower'] > 110)/len(prediction_intervals['obs_ci_upper']), 3), sum(prediction_intervals['obs_ci_upper'] < 110)/len(prediction_intervals['obs_ci_upper'])
+#    print 'proportion with zero housing expenditure increase:', np.round(sum(df_hh['housing_expenditures_increase'] == 0)/len(df_hh['housing_expenditures_increase']), 3)
 #    print prediction_intervals    
     
     pd.DataFrame({'obj': df_hh['housing_expenditures_increase'], 'fit':prediction_intervals['mean'], 'nb_adultes': df_hh['nb_beneficiaries'], 'uc': df_hh['consumption_units']}).to_csv('prediction housing expenditures.csv')
@@ -151,11 +151,11 @@ if __name__ == "__main__":
     df_hh = compute_gains_losses_housing(df_hh)
     regression_ols = regress_ols_housing_expenditures_increase(df_hh)
 
-    print regression_ols.summary()
+    print(regression_ols.summary())
     
-    logit_winner = predict_winner_looser_housing(df_hh)[0]
-    probit_winner = predict_winner_looser_housing(df_hh)[1]
-    ols_winner = predict_winner_looser_housing(df_hh)[2]
+#    logit_winner = predict_winner_looser_housing(df_hh)[0]
+#    probit_winner = predict_winner_looser_housing(df_hh)[1]
+#    ols_winner = predict_winner_looser_housing(df_hh)[2]
     
     #print ols_winner.summary()
     #print logit_winner.summary()

@@ -583,24 +583,26 @@ summary(tsls2_all2)
 # summary(tsls2_all3) 
 # 
 # # (4) A^F = ^SI * ^EE = 0.14 ^SI + 0.30 ^EE + 1.12 ^(SI*EE) (almost no control), similar results with controls
-# formula_all1_ee <- as.formula(paste("taxe_efficace!='Non' ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
-# tsls1_all1_ee <- lm(formula_all1_ee, data=s, weights = s$weight, subset = !is.na(s$gagnant_feedback_categorie), na.action='na.exclude') # this instruments are weak
-# summary(tsls1_all1_ee)
-# s$taxe_efficace.hat[!is.na(s$gagnant_feedback_categorie)] <- fitted.values(tsls1_all1_ee)
-# 
-# formula_all1_siee <- as.formula(paste("(gagnant_feedback_categorie!='Perdant')*(taxe_efficace!='Non') ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
-# tsls1_all1_siee <- lm(formula_all1_siee, data=s, weights = s$weight, na.action='na.exclude')
-# summary(tsls1_all1_siee)
-# s$siee <- fitted.values(tsls1_all1_siee)
-# 
-# formula_all1_si <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
-# tsls1_all1_si <- lm(formula_all1_si, data=s, weights = s$weight, na.action='na.exclude')
-# summary(tsls1_all1_si)
-# s$non_perdant <- fitted.values(tsls1_all1_si)
-# 
-# formula2_all3 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ Simule_gain + Simule_gain2 + non_perdant + taxe_efficace.hat + siee"))
-# tsls2_all3 <- lm(formula2_all3, data=s, weights=s$weight)
-# summary(tsls2_all3) 
+  # formula_all1_ee <- as.formula(paste("taxe_efficace!='Non' ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
+  # tsls1_all1_ee <- lm(formula_all1_ee, data=s, weights = s$weight, subset = !is.na(s$gagnant_feedback_categorie), na.action='na.exclude') # this instruments are weak
+  # summary(tsls1_all1_ee)
+  # s$taxe_efficace.hat[!is.na(s$gagnant_feedback_categorie)] <- fitted.values(tsls1_all1_ee)
+  # 
+  # formula_all1_siee <- as.formula(paste("(gagnant_feedback_categorie!='Perdant')*(taxe_efficace!='Non') ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
+  # tsls1_all1_siee <- lm(formula_all1_siee, data=s, weights = s$weight, na.action='na.exclude')
+  # summary(tsls1_all1_siee)
+  # s$siee <- fitted.values(tsls1_all1_siee)
+  # 
+  # formula_all1_si <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant"))
+  # tsls1_all1_si <- lm(formula_all1_si, data=s, weights = s$weight, na.action='na.exclude')
+  # summary(tsls1_all1_si)
+  # s$non_perdant <- fitted.values(tsls1_all1_si)
+  # 
+  # formula2_all3 <- as.formula(paste("taxe_feedback_approbation!='Non' ~ Simule_gain + Simule_gain2 + non_perdant + taxe_efficace.hat + siee"))
+  # tsls2_all3 <- lm(formula2_all3, data=s, weights=s$weight)
+  # summary(tsls2_all3)
+
+# summary(ivreg(taxe_feedback_approbation!='Non' ~ Simule_gain + Simule_gain2 + (gagnant_feedback_categorie!='Perdant')*(taxe_efficace!='Non') | Simule_gain + Simule_gain2 + apres_modifs * info_CC * simule_gagnant, data=s, weights = s$weight))
 
 # The appropriate specifications are below. No significant results because EE doesn't have strong instrument.
 # A^T ~ ...
@@ -1245,3 +1247,55 @@ decrit(s$taxe_feedback_approbation[s$variante_progressivite=='prog'], miss=T, we
 decrit(s$taxe_feedback_approbation, miss=T, weights = s$weight)
 
 
+##### Table E.5 with logit #####
+# Table E.5
+# (A1) Yes ~ Yes, logit: 29*** p.p. 
+s$taxe_efficace.hat <- as.numeric(s$taxe_efficace=='Oui')
+logit_ee1 <- glm(formula_ee2, family = binomial(link='logit'), data=s) # Warning: Hauck-Donner effect, run logitsf. For a test run anova.glm, not Wald  TODO. Also Sargan
+summary(logit_ee1)
+logit_ee1_margins <- logitmfx(data=s, formula=logit_ee1, atmean=FALSE)$mfxest
+logit_ee1_margins
+
+# (A2) not No ~ Yes, LIML: 64* p.p. (cf. Stata)
+liml_ee2 <- ivmodelFormula(as.formula(paste("tax_acceptance ~ ", paste(variables_reg_ee, collapse = ' + '), "+ taxe_efficace.hat | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s)
+liml_ee2
+
+# (A3) not No ~ Yes, OLS: 37*** p.p.
+s$taxe_efficace.hat <- as.numeric(s$taxe_efficace=='Oui')
+formula_eea3 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_reg_ee, collapse = ' + '), " + taxe_efficace.hat"))
+ols_eea3 <- lm(formula_eea3, data=s, weights = s$weight) 
+summary(ols_eea3)
+
+# (A4) not No ~ not No, 2SLS: 48** p.p. /!\ already defined in 5.2
+formula_tsls1_eea4 <- as.formula(paste("taxe_efficace!='Non' ~", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC"))
+tsls1_eea4 <- lm(formula_tsls1_eea4, data=s, weights = s$weight, na.action='na.exclude')
+summary(tsls1_eea4)
+s$taxe_efficace.not_no <- tsls1_eea4$fitted.values
+formula_tsls2_eea4 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_reg_ee, collapse = ' + '), " + taxe_efficace.not_no"))
+tsls2_eea4 <- lm(formula_tsls2_eea4, data=s, weights = s$weight) 
+summary(tsls2_eea4)
+
+iv_eea4 <- summary(ivreg(as.formula(paste("(taxe_approbation!='Non') ~ ", paste(variables_reg_ee, collapse = ' + '),  "+ (taxe_efficace!='Non') | ", paste(variables_reg_ee, collapse = ' + '), " + apres_modifs + info_CC")), data = s), diagnostics = T)
+
+# (A5), not No ~ not No, OLS: 41*** p.p.
+s$taxe_efficace.not_no <- as.numeric(s$taxe_efficace!='Non')
+formula_eea5 <- as.formula(paste("(taxe_approbation!='Non') ~", paste(variables_reg_ee, collapse = ' + '), " + taxe_efficace.not_no"))
+ols_eea5 <- lm(formula_eea5, data=s, weights = s$weight) 
+summary(ols_eea5)
+
+liml_ee2$coef <- liml_ee2$sd <- ols_eea3$coefficients
+liml_ee2$coef['taxe_efficace.hat'] <- liml_ee2$LIML$point.est
+liml_ee2$sd['taxe_efficace.hat'] <- liml_ee2$LIML$std.err
+
+Table_eea <- stargazer(logit_ee1, ols_eea3, ols_eea3, tsls2_eea4, ols_eea5, title="Effect of believing in environmental effectiveness on support: second stages of alternative specifications", 
+                       dep.var.caption = "Initial Tax \\& Dividend", model.names = F, covariate.labels = c("Environmental effectiveness: ``Yes''", "Environmental effectiveness: not ``No''"), 
+                       dep.var.labels = c("Approval ($\\dot{A^0}$)", "Acceptance ($A^0$)"), header = FALSE, column.labels = c("$logit$", "$LIML$", "$OLS$", "$IV$", "$OLS$"),
+                       keep = c("efficace"), star.cutoffs = NA, omit.table.layout = 'n', # "Constant",
+                       coef = list(logit_ee1_margins[,1], liml_ee2$coef, NULL, NULL, NULL), #column.labels = c("(A1)", "(A2)", "(A3)", "(A4)", "(A5)"),
+                       se = list(logit_ee1_margins[,2], liml_ee2$sd, NULL, NULL, NULL),
+                       add.lines = list(c("Instruments: info E.E. \\& C.C. ", "", "\\checkmark ", "", "\\checkmark ", ""),
+                                        c("Controls: Socio-demo, other motives ", "\\checkmark ", "\\checkmark  ", "\\checkmark ", "\\checkmark ", "\\checkmark "),
+                                        c("Effective F-Statistic", "", "", "", f_stats_ee[2], "")), 
+                       no.space=TRUE, intercept.bottom=FALSE, intercept.top=TRUE, omit.stat=c("adj.rsq", "f", "ser", "ll", "aic"), label="tab:eea")
+write_clip(gsub('(1) & (2) & (3) & (4) & (5)', '(A1) & (A2) & (A3) & (A4) & (A5)', gsub('\\end{table}', "} {\\footnotesize \\parbox[t]{1.05\\textwidth}{\\hspace{-.05\\textwidth} \\linespread{1.2}\\selectfont \\textsc{Note:} Standard errors are reported in parentheses. For logit, average marginal effects are reported and not coefficients. The list of controls can be found in Appendix \\ref{set_controls}, and the main results in Table \\vref{tab:ee}. As in the latter Table, the dependent variable corresponds to either initial approval (answer ``Yes'' to support of the policy) or acceptance (answer not ``No''). The first stage exploits the information randomly displayed about climate change (C.C.) and the effectiveness of carbon taxation (E.E.) as exogenous instruments.}}\\end{table}",  # first stage results in Table \\vref{first_stage_environmental_effectiveness}.
+                    gsub('\\begin{tabular}{@', '\\makebox[\\textwidth][c]{ \\begin{tabular}{@', Table_eea, fixed=TRUE), fixed=TRUE), fixed=TRUE), collapse=' ')

@@ -4499,3 +4499,11 @@ rm(m_1, m_2)
 
 summary(ivreg(tax_acceptance ~ non_perdant | initial, data = s2, subset = percentile_revenu > 50 & (percentile_revenu_conjoint > 50 | nb_adultes==1)), diagnostics = T)
 summary(ivreg(tax_acceptance ~ non_perdant | initial, data = s2, subset = simule_gagnant==1 & percentile_revenu > 50 & (percentile_revenu_conjoint > 50 | nb_adultes==1)), diagnostics = T)
+
+
+##### Soutenance thèse #####
+summary(lm(taxe_kerosene ~ Revenu, data=s, weights = s$weight)) # no effect
+summary(lm(taxe_kerosene==2 ~ Revenu, data=s, weights = s$weight)) # no effect
+summary(lm(as.formula(paste("taxe_kerosene ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + '))), data=s, weights = s$weight))
+summary(lm(normes_isolation ~ I(fioul | gaz) + surface, data=s, weights = s$weight)) # no effect
+summary(lm(as.formula(paste("normes_isolation ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + '))), data=s, weights = s$weight))

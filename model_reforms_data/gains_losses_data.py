@@ -106,25 +106,11 @@ if __name__ == "__main__":
     revenue_from_tax_housing = (df_hh['hh_weight'] * df_hh['housing_tax_increase']).sum()
     revenue_from_tax_total = (df_hh['hh_weight'] * df_hh['total_tax_increase']).sum()
 
-    print "Average loss in purchasing power :", df_hh['total_expenditures_increase'].mean()
-    print "Average additional taxes paid :", df_hh['total_tax_increase'].mean()
-    print "Revenue from trannsport fuels tax policy in billions euros :", revenue_from_tax_transports / 1e09
-    print "Revenue from housing energies tax policy in billions euros :", revenue_from_tax_housing / 1e09
-    print "Revenue from the total policy in billions euros :", revenue_from_tax_total / 1e09
-
-    print ((df_hh['transport_expenditures_increase'] - 60 * df_hh['nb_beneficiaries']) / df_hh['consumption_units']).quantile(0.956)
-    print ((df_hh['housing_expenditures_increase'] - 50 *df_hh['nb_beneficiaries']) / df_hh['consumption_units']).quantile(0.934)
-    print ((df_hh['total_expenditures_increase'] - 110 *df_hh['nb_beneficiaries']) / df_hh['consumption_units']).quantile(0.953)
-    
+     
     df_s = df_hh.query('consumption_units < 1.5')
     df_m = df_hh.query('consumption_units > 1.4').query('consumption_units < 2')
     df_l = df_hh.query('consumption_units > 1.9').query('consumption_units < 2.4')
     df_xl = df_hh.query('consumption_units > 2.3')
     df_xxl = df_hh.query('consumption_units > 2.75')
     
-    print ((df_s['total_expenditures_increase'] - 110 *df_s['nb_beneficiaries'])).quantile(0.9)
-    print ((df_m['total_expenditures_increase'] - 110 *df_m['nb_beneficiaries'])).quantile(0.9)
-    print ((df_l['total_expenditures_increase'] - 110 *df_l['nb_beneficiaries'])).quantile(0.9)
-    print ((df_xl['total_expenditures_increase']- 110 *df_xl['nb_beneficiaries'])).quantile(0.9)
-    
-    
+ 
