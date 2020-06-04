@@ -69,10 +69,7 @@ def prepare_dataset_housing(survey):
                     'ocde10' : 'consumption_units',
                     'pondmen' : 'hh_weight',
                     'revtot' : 'hh_income',
-                    'surfhab_d' : 'accommodation_size',
-                    'zeat' : 'region',
-                    'ouest_sud': 'os',
-                    'est_nord': 'en'
+                    'surfhab_d' : 'accommodation_size'
                     },
                 inplace = True,
                 )
@@ -95,12 +92,12 @@ def prepare_dataset_housing(survey):
         df_hh = df_hh[['domestic_fuel_expenditures'] + ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] +
             ['hh_weight'] + ['income_decile'] + ['hh_income'] + ['domestic_fuel'] + ['natural_gas'] +
             ['consumption_units'] + ['age_hh_representative'] + ['accommodation_size'] + ['age_18_24'] +
-            ['age_25_34'] + ['age_35_49'] + ['age_50_64'] + ['nb_persons'] + ['plus_14'] + ['plus_18'] + ['region'] + ['os'] + ['en']]
+            ['age_25_34'] + ['age_35_49'] + ['age_50_64'] + ['nb_persons'] + ['plus_14'] + ['plus_18']]
     else:
         df_hh = df_hh[['domestic_fuel_expenditures'] + ['natural_gas_expenditures'] + ['natural_gas_variable_expenditures'] +
             ['hh_weight'] + ['income_decile'] + ['hh_income'] + ['hh_id'] + ['domestic_fuel'] + ['natural_gas'] +
             ['consumption_units'] + ['age_hh_representative'] + ['accommodation_size'] + ['age_18_24'] +
-            ['age_25_34'] + ['age_35_49'] + ['age_50_64'] + ['nb_persons'] + ['nb_children'] + ['region'] + ['os'] + ['en']]
+            ['age_25_34'] + ['age_35_49'] + ['age_50_64'] + ['nb_persons'] + ['nb_children']]
 
     return df_hh
 
