@@ -4507,3 +4507,35 @@ summary(lm(taxe_kerosene==2 ~ Revenu, data=s, weights = s$weight)) # no effect
 summary(lm(as.formula(paste("taxe_kerosene ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + '))), data=s, weights = s$weight))
 summary(lm(normes_isolation ~ I(fioul | gaz) + surface, data=s, weights = s$weight)) # no effect
 summary(lm(as.formula(paste("normes_isolation ~ ", paste(variables_determinants_attitudes_CC, collapse = ' + '))), data=s, weights = s$weight))
+
+
+##### idées Mélanie: gain ~ gilets jaunes ####
+# gilets jaunes plus affectés par la taxe en proportion de pouvoir d'achat
+summary(lm(I(hausse_depenses_par_uc/niveau_vie) ~ Gilets_jaunes, data = s, subset = s$hausse_depenses_par_uc/s$niveau_vie < 2 ))
+# mais n'ont pas des gain nets différents des autres
+summary(lm(simule_gain ~ Gilets_jaunes, data = s))
+
+
+##### Acceptance if beliefs were correct #####
+# Increase in acceptance rate if 100% were compliers and coef didn't change: 0.38
+0.703 * 0.534
+
+# (1) Acceptance rate in [p10-p60] if everyone was correct in Tax & Targeted Dividend: 0.47
+s$non_perdant[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)] <- tsls1_si1$fitted.values
+wtd.mean(tsls2_si1$fitted.values + 0.534 * (1*(s$simule_gain_cible > 0) - (s$non_perdant))[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)], 
+         weights = s$weight[(s$percentile_revenu <= 60 & s$percentile_revenu >= 10) | (s$percentile_revenu_conjoint <= 60 & s$percentile_revenu_conjoint >= 10)])
+
+# (2) Acceptance rate if everyone was correct in Tax & Targeted Dividend (IV): 0.45
+s$non_perdant <- tsls1_si2$fitted.values
+wtd.mean(tsls2_si2$fitted.values + 0.4756 * (1*(s$simule_gain_cible > 0) - (s$non_perdant)), weights = s$weight)
+
+# (3) Acceptance rate if everyone was correct in Tax & Targeted Dividend (OLS): 0.44
+wtd.mean(ols_si3$fitted.values + 0.4376 * (1*(s$simule_gain_cible > 0) - as.numeric(s$gagnant_cible_categorie!='Perdant')), weights = s$weight)
+
+# (4) Acceptance rate in |simule_gain| < 50 if everyone was correct after feedback: 0.46
+s$non_perdant[s$variante_taxe_info=='f' & abs(s$simule_gain) < 50] <- tsls1_si4$fitted.values
+wtd.mean(tsls2_si4$fitted.values + 0.4196 * (as.numeric(s$simule_gagnant) - (s$non_perdant))[s$variante_taxe_info=='f' & abs(s$simule_gain) < 50], weights = s$weight[s$variante_taxe_info=='f' & abs(s$simule_gain) < 50])
+
+# Acceptance rate if everyone believed in effectiveness: 0.45 (IV effect: +0.42)
+s$taxe_efficace.hat <- tsls1_ee1$fitted.values
+wtd.mean(tsls2_ee1$fitted.values + 0.4156 * (1 - (s$taxe_efficace.hat)), weights = s$weight)
