@@ -213,6 +213,28 @@ binconf(x = x, n = n) # 85.7%
 wtd.mean(abs(s$simule_gain) > 110, weights = s$weight) # 28%
 mean(fit$mistake[fit$gain > 110]) # 1%
 
+# 4.1.3 Effect of feedback on beliefs
+variables_reg_effect_feedback <- c("prog_na", "Simule_gain", "Simule_gain2", "taxe_efficace", "single",  "hausse_depenses_par_uc", variables_demo, piece.formula(c("percentile_revenu", "percentile_revenu_conjoint"), c(20,70), vector=T)) 
+variables_reg_effect_feedback <- variables_reg_effect_feedback[!(variables_reg_effect_feedback %in% c("revenu", "rev_tot", "age", "age_65_plus"))]
+
+# Not no, close to the threshold
+formula_effect_feedback_1 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + ", 
+                                      paste(variables_reg_effect_feedback, collapse = ' + ')))
+reg_effect_feedback_1 <- lm(formula_effect_feedback_1, data=s, subset=variante_taxe_info=='f' & abs(simule_gain) < 50, weights = s$weight, na.action='na.exclude')
+summary(reg_effect_feedback_1)
+
+# Yes, close to the threshol
+formula_effect_feedback_2 <- as.formula(paste("gagnant_feedback_categorie=='Gagnant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + ", 
+                                              paste(variables_reg_effect_feedback, collapse = ' + ')))
+reg_effect_feedback_2 <- lm(formula_effect_feedback_2, data=s, subset=variante_taxe_info=='f' & abs(simule_gain) < 50, weights = s$weight, na.action='na.exclude')
+summary(reg_effect_feedback_2)
+
+# Not no, full sample
+formula_effect_feedback_3 <- as.formula(paste("gagnant_feedback_categorie!='Perdant' ~ simule_gagnant + tax_acceptance + (taxe_approbation=='NSP') + ", 
+                                              paste(variables_reg_effect_feedback, collapse = ' + ')))
+reg_effect_feedback_3 <- lm(formula_effect_feedback_3, data=s, subset=variante_taxe_info=='f', weights = s$weight, na.action='na.exclude')
+summary(reg_effect_feedback_3)
+
 
 # 4.2 Environmental effectiveness: see Appendix D.4
 # No effect of our information on other variables than taxe_efficace
